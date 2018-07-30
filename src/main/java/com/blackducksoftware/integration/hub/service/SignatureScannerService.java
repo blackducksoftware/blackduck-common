@@ -36,7 +36,6 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.generated.component.ProjectRequest;
 import com.blackducksoftware.integration.hub.api.generated.discovery.ApiDiscovery;
 import com.blackducksoftware.integration.hub.api.generated.response.CurrentVersionView;
-import com.blackducksoftware.integration.hub.api.generated.view.CodeLocationView;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
@@ -54,33 +53,28 @@ public class SignatureScannerService extends DataService {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final CLIDownloadUtility cliDownloadService;
     private final ProjectService projectDataService;
-    private final CodeLocationService codeLocationService;
     private final Optional<ExecutorService> optionalExecutorService;
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationService) {
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationService = codeLocationService;
-        this.optionalExecutorService = Optional.empty();
+        optionalExecutorService = Optional.empty();
     }
 
     public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
-            final CodeLocationService codeLocationService, final ExecutorService executorService) {
+            final ExecutorService executorService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
         this.projectDataService = projectDataService;
-        this.codeLocationService = codeLocationService;
-        this.optionalExecutorService = Optional.of(executorService);
+        optionalExecutorService = Optional.of(executorService);
     }
 
-    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest)
-            throws InterruptedException, IntegrationException {
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
         final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
 
         final ParallelSimpleScanner parallelSimpleScanner;
@@ -102,7 +96,6 @@ public class SignatureScannerService extends DataService {
             }
         }
         cleanLogs(hubScanConfig.isCleanupLogsOnSuccess(), logDirectories);
-        mapCodeLocations(hubScanConfig.getCommonScanConfig().isDryRun(), scanSummaryViews);
         logger.info("Completed the post scan steps");
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
@@ -144,24 +137,11 @@ public class SignatureScannerService extends DataService {
                     if (null != logDirectory && logDirectory.isDirectory()) {
                         try {
                             FileUtils.deleteDirectory(logDirectory);
-                        } catch (IOException e) {
+                        } catch (final IOException e) {
                             logger.error(String.format("Could not delete the directory '%s' because: %s", logDirectory.getAbsolutePath(), e.getMessage()), e);
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private void mapCodeLocations(final boolean dryRun, final List<ScanSummaryView> scanSummaryViews) throws IntegrationException {
-        logger.trace(String.format("Scan is dry run %s", dryRun));
-        if (!dryRun) {
-            for (final ScanSummaryView scanSummaryView : scanSummaryViews) {
-                // TODO update when ScanSummaryView is part of the swagger
-                final String codeLocationUrl = hubService.getFirstLinkSafely(scanSummaryView, ScanSummaryView.CODELOCATION_LINK);
-
-                final CodeLocationView codeLocationView = hubService.getResponse(codeLocationUrl, CodeLocationView.class);
-                codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.getProjectVersionView());
             }
         }
     }

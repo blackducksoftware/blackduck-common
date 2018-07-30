@@ -54,23 +54,21 @@ public class ParallelSimpleScanner {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
-        this.optionalExecutorService = Optional.empty();
+        optionalExecutorService = Optional.empty();
     }
 
     public ParallelSimpleScanner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final Gson gson, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
-        this.optionalExecutorService = Optional.of(executorService);
+        optionalExecutorService = Optional.of(executorService);
     }
 
-    public List<ScanTargetOutput> executeDryRunScans(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation)
-            throws InterruptedException, IntegrationException {
+    public List<ScanTargetOutput> executeDryRunScans(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation) throws InterruptedException, IntegrationException {
         return executeScans(null, hubScanConfig, projectRequest, cliLocation);
     }
 
-    public List<ScanTargetOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation)
-            throws InterruptedException, IntegrationException {
+    public List<ScanTargetOutput> executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest, final CLILocation cliLocation) throws InterruptedException, IntegrationException {
         final List<ScanTargetOutput> scanTargetOutputs = new ArrayList<>();
         final List<ScanPathCallable> scanPathCallables = createScanPathCallables(hubScanConfig.createSignatureScanConfigs(), logger, hubServerConfig, hubScanConfig.getCommonScanConfig().isDryRun(), projectRequest, cliLocation, gson);
 
@@ -78,7 +76,7 @@ public class ParallelSimpleScanner {
 
         try {
             if (optionalExecutorService.isPresent()) {
-                ExecutorService executorService = optionalExecutorService.get();
+                final ExecutorService executorService = optionalExecutorService.get();
                 final List<Future<ScanTargetOutput>> submittedScanPathCallables = new ArrayList<>();
                 for (final ScanPathCallable scanPathCallable : scanPathCallables) {
                     submittedScanPathCallables.add(executorService.submit(scanPathCallable));
@@ -101,13 +99,13 @@ public class ParallelSimpleScanner {
         return scanTargetOutputs;
     }
 
-    private List<ScanPathCallable> createScanPathCallables(final List<SignatureScanConfig> signatureScanConfigs, final IntLogger logger, final HubServerConfig hubServerConfig, final boolean dryRun,
-            final ProjectRequest projectRequest, final CLILocation cliLocation, final Gson gson) {
+    private List<ScanPathCallable> createScanPathCallables(final List<SignatureScanConfig> signatureScanConfigs, final IntLogger logger, final HubServerConfig hubServerConfig, final boolean dryRun, final ProjectRequest projectRequest,
+            final CLILocation cliLocation, final Gson gson) {
         final List<ScanPathCallable> scanPathCallables = new ArrayList<>();
 
         String projectName = null;
         String projectVersionName = null;
-        if (dryRun && null != projectRequest && StringUtils.isNotBlank(projectRequest.name) && null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
+        if (null != projectRequest && StringUtils.isNotBlank(projectRequest.name) && null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
             projectName = projectRequest.name;
             projectVersionName = projectRequest.versionRequest.versionName;
         }
