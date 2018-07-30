@@ -1,9 +1,9 @@
 /**
  * hub-common
- * <p>
+ *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -58,8 +58,8 @@ public class SignatureScannerService extends DataService {
 
     private ProjectVersionWrapper projectVersionWrapper;
 
-    public SignatureScannerService(HubService hubService, IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, CLIDownloadUtility cliDownloadService, ProjectService projectDataService,
-            CodeLocationService codeLocationService) {
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
@@ -68,8 +68,8 @@ public class SignatureScannerService extends DataService {
         optionalExecutorService = Optional.empty();
     }
 
-    public SignatureScannerService(HubService hubService, IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, CLIDownloadUtility cliDownloadService, ProjectService projectDataService, CodeLocationService codeLocationService,
-            ExecutorService executorService) {
+    public SignatureScannerService(final HubService hubService, final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final CLIDownloadUtility cliDownloadService, final ProjectService projectDataService,
+            final CodeLocationService codeLocationService, final ExecutorService executorService) {
         super(hubService, logger);
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.cliDownloadService = cliDownloadService;
@@ -78,22 +78,22 @@ public class SignatureScannerService extends DataService {
         optionalExecutorService = Optional.of(executorService);
     }
 
-    public ScanServiceOutput executeScans(HubServerConfig hubServerConfig, HubScanConfig hubScanConfig, ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
-        CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
+    public ScanServiceOutput executeScans(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws InterruptedException, IntegrationException {
+        final CLILocation cliLocation = preScan(hubServerConfig, hubScanConfig, projectRequest);
 
-        ParallelSimpleScanner parallelSimpleScanner;
+        final ParallelSimpleScanner parallelSimpleScanner;
         if (optionalExecutorService.isPresent()) {
             parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson(), optionalExecutorService.get());
         } else {
             parallelSimpleScanner = new ParallelSimpleScanner(logger, intEnvironmentVariables, hubService.getGson());
         }
 
-        List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation);
+        final List<ScanTargetOutput> scanTargetOutputs = parallelSimpleScanner.executeScans(hubServerConfig, hubScanConfig, projectRequest, cliLocation);
 
         logger.info("Starting the post scan steps");
-        List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
-        List<File> logDirectories = new ArrayList<>();
-        for (ScanTargetOutput scanTargetOutput : scanTargetOutputs) {
+        final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
+        final List<File> logDirectories = new ArrayList<>();
+        for (final ScanTargetOutput scanTargetOutput : scanTargetOutputs) {
             if (scanTargetOutput.getResult() == Result.SUCCESS) {
                 scanSummaryViews.add(scanTargetOutput.getScanSummaryView());
                 logDirectories.add(scanTargetOutput.getLogDirectory());
@@ -104,11 +104,11 @@ public class SignatureScannerService extends DataService {
         return new ScanServiceOutput(projectVersionWrapper, scanTargetOutputs);
     }
 
-    private CLILocation preScan(HubServerConfig hubServerConfig, HubScanConfig hubScanConfig, ProjectRequest projectRequest) throws IntegrationException {
+    private CLILocation preScan(final HubServerConfig hubServerConfig, final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) throws IntegrationException {
         printConfiguration(hubScanConfig, projectRequest);
-        CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-        File directoryToInstallTo = hubScanConfig.getCommonScanConfig().getToolsDir();
-        CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
+        final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        final File directoryToInstallTo = hubScanConfig.getCommonScanConfig().getToolsDir();
+        final CLILocation cliLocation = cliDownloadService.performInstallation(directoryToInstallTo, hubServerConfig.getHubUrl().toString(), currentVersion.version);
 
         if (!hubScanConfig.getCommonScanConfig().isDryRun()) {
             projectVersionWrapper = projectDataService.getProjectVersionAndCreateIfNeeded(projectRequest);
@@ -116,7 +116,7 @@ public class SignatureScannerService extends DataService {
         return cliLocation;
     }
 
-    private void printConfiguration(HubScanConfig hubScanConfig, ProjectRequest projectRequest) {
+    private void printConfiguration(final HubScanConfig hubScanConfig, final ProjectRequest projectRequest) {
         logger.alwaysLog(String.format("--> Log Level : %s", logger.getLogLevel().name()));
         String projectName = null;
         String projectVersionName = null;
@@ -134,14 +134,14 @@ public class SignatureScannerService extends DataService {
         hubScanConfig.print(logger);
     }
 
-    private void cleanLogs(boolean cleanupLogDirectories, List<File> logDirectories) {
+    private void cleanLogs(final boolean cleanupLogDirectories, final List<File> logDirectories) {
         if (cleanupLogDirectories) {
             if (null != logDirectories && !logDirectories.isEmpty()) {
-                for (File logDirectory : logDirectories) {
+                for (final File logDirectory : logDirectories) {
                     if (null != logDirectory && logDirectory.isDirectory()) {
                         try {
                             FileUtils.deleteDirectory(logDirectory);
-                        } catch (IOException e) {
+                        } catch (final IOException e) {
                             logger.error(String.format("Could not delete the directory '%s' because: %s", logDirectory.getAbsolutePath(), e.getMessage()), e);
                         }
                     }
