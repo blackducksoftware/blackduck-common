@@ -70,7 +70,7 @@ public class HubServicesFactory {
     }
 
     public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackduckRestConnection restConnection, final IntLogger logger) {
-        this.intEnvironmentVariables = new IntEnvironmentVariables();
+        intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
         this.jsonParser = jsonParser;
@@ -87,11 +87,11 @@ public class HubServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService(), executorService);
+        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), executorService);
     }
 
     public SignatureScannerService createSignatureScannerService() {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), createCodeLocationService());
+        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
     public PhoneHomeService createPhoneHomeService() {
