@@ -23,13 +23,13 @@
  */
 package com.blackducksoftware.integration.hub.service;
 
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.slf4j.Logger;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.cli.CLIDownloadUtility;
@@ -39,8 +39,11 @@ import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
 import com.blackducksoftware.integration.hub.notification.content.detail.NotificationContentDetailFactory;
 import com.blackducksoftware.integration.hub.rest.BlackduckRestConnection;
 import com.blackducksoftware.integration.hub.service.bucket.HubBucketService;
+import com.blackducksoftware.integration.hub.service.model.BlackDuckPhoneHomeCallable;
 import com.blackducksoftware.integration.log.IntLogger;
+import com.blackducksoftware.integration.phonehome.PhoneHomeCallable;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.PhoneHomeService;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.blackducksoftware.integration.rest.RestConstants;
 import com.blackducksoftware.integration.rest.connection.RestConnection;
@@ -94,20 +97,24 @@ public class HubServicesFactory {
         return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
-    public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(createHubService(), logger, createPhoneHomeClient(), createHubRegistrationService(), intEnvironmentVariables);
+    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion) {
+        return new PhoneHomeService(logger, createPhoneHomeCallable(productURL, artifactId, artifactVersion));
+    }
+
+    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final ExecutorService executorService) {
+        return new PhoneHomeService(logger, createPhoneHomeCallable(productURL, artifactId, artifactVersion), executorService);
+    }
+
+    public PhoneHomeCallable createPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
+        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion,
+                intEnvironmentVariables, createHubService(), createHubRegistrationService());
+        return phoneHomeCallable;
     }
 
     public PhoneHomeClient createPhoneHomeClient() {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
         final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
-        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, gson);
-    }
-
-    public PhoneHomeClient createPhoneHomeClient(final Logger logger) {
-        final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
-        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
-        return new PhoneHomeClient(googleAnalyticsTrackingId, httpClientBuilder, logger, gson);
+        return new PhoneHomeClient(googleAnalyticsTrackingId, logger, httpClientBuilder, gson);
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
