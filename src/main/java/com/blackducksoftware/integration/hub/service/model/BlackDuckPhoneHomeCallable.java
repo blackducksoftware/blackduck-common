@@ -43,6 +43,7 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
     private final IntLogger logger;
     private final HubService hubService;
     private final HubRegistrationService hubRegistrationService;
+    private final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder;
 
     public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion,
             final IntEnvironmentVariables intEnvironmentVariables, final HubService hubService, final HubRegistrationService hubRegistrationService) {
@@ -50,11 +51,20 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
         this.logger = logger;
         this.hubService = hubService;
         this.hubRegistrationService = hubRegistrationService;
+        this.phoneHomeRequestBodyBuilder = new PhoneHomeRequestBody.Builder();
+    }
+
+    public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion,
+            final IntEnvironmentVariables intEnvironmentVariables, final HubService hubService, final HubRegistrationService hubRegistrationService, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
+        super(logger, client, productURL, artifactId, artifactVersion, intEnvironmentVariables);
+        this.logger = logger;
+        this.hubService = hubService;
+        this.hubRegistrationService = hubRegistrationService;
+        this.phoneHomeRequestBodyBuilder = phoneHomeRequestBodyBuilder;
     }
 
     @Override
     public PhoneHomeRequestBody.Builder createPhoneHomeRequestBodyBuilder() {
-        final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder = new PhoneHomeRequestBody.Builder();
         try {
             final CurrentVersionView currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
             String registrationId = null;

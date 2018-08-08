@@ -43,6 +43,7 @@ import com.blackducksoftware.integration.hub.service.model.BlackDuckPhoneHomeCal
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.phonehome.PhoneHomeCallable;
 import com.blackducksoftware.integration.phonehome.PhoneHomeClient;
+import com.blackducksoftware.integration.phonehome.PhoneHomeRequestBody;
 import com.blackducksoftware.integration.phonehome.PhoneHomeService;
 import com.blackducksoftware.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.blackducksoftware.integration.rest.RestConstants;
@@ -98,16 +99,30 @@ public class HubServicesFactory {
     }
 
     public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion) {
-        return new PhoneHomeService(logger, createPhoneHomeCallable(productURL, artifactId, artifactVersion));
+        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion));
     }
 
     public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final ExecutorService executorService) {
-        return new PhoneHomeService(logger, createPhoneHomeCallable(productURL, artifactId, artifactVersion), executorService);
+        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion), executorService);
     }
 
-    public PhoneHomeCallable createPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
+    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
+        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion, phoneHomeRequestBodyBuilder));
+    }
+
+    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder, final ExecutorService executorService) {
+        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion, phoneHomeRequestBodyBuilder), executorService);
+    }
+
+    public PhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
         final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion,
                 intEnvironmentVariables, createHubService(), createHubRegistrationService());
+        return phoneHomeCallable;
+    }
+
+    public PhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
+        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion,
+                intEnvironmentVariables, createHubService(), createHubRegistrationService(), phoneHomeRequestBodyBuilder);
         return phoneHomeCallable;
     }
 
