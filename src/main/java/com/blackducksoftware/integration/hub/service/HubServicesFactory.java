@@ -98,20 +98,12 @@ public class HubServicesFactory {
         return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
-    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion) {
-        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion));
+    public PhoneHomeService createPhoneHomeService() {
+        return new PhoneHomeService(logger);
     }
 
-    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final ExecutorService executorService) {
-        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion), executorService);
-    }
-
-    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
-        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion, phoneHomeRequestBodyBuilder));
-    }
-
-    public PhoneHomeService createPhoneHomeService(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder, final ExecutorService executorService) {
-        return new PhoneHomeService(logger, createBlackDuckPhoneHomeCallable(productURL, artifactId, artifactVersion, phoneHomeRequestBodyBuilder), executorService);
+    public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
+        return new PhoneHomeService(logger, executorService);
     }
 
     public PhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
