@@ -32,7 +32,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.PolicyRuleViewV2
 import com.blackducksoftware.integration.hub.exception.DoesNotExistException;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.rest.HttpMethod;
-import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.body.StringBodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
@@ -61,7 +61,7 @@ public class PolicyRuleService {
 
     public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
         final String json = hubService.convertToJson(policyRuleView);
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(json)).uri(hubService.getHref(policyRuleView));
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(hubService.getHref(policyRuleView));
         try (Response response = hubService.executeRequest(requestBuilder.build())) {
 
         } catch (final IOException e) {

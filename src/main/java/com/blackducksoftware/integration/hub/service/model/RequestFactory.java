@@ -30,7 +30,9 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.blackducksoftware.integration.rest.HttpMethod;
-import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.body.FileBodyContent;
+import com.blackducksoftware.integration.rest.body.MapBodyContent;
+import com.blackducksoftware.integration.rest.body.StringBodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 
 public class RequestFactory {
@@ -117,19 +119,19 @@ public class RequestFactory {
     }
 
     public static Request.Builder createCommonPostRequestBuilder(final File bodyContentFile) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContentFile));
+        return new Request.Builder().method(HttpMethod.POST).bodyContent(new FileBodyContent(bodyContentFile));
     }
 
     public static Request.Builder createCommonPostRequestBuilder(final Map<String, String> bodyContentMap) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContentMap));
+        return new Request.Builder().method(HttpMethod.POST).bodyContent(new MapBodyContent(bodyContentMap));
     }
 
     public static Request.Builder createCommonPostRequestBuilder(final String bodyContent) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new BodyContent(bodyContent));
+        return new Request.Builder().method(HttpMethod.POST).bodyContent(new StringBodyContent(bodyContent));
     }
 
     public static Request.Builder createCommonPutRequestBuilder(final String bodyContent) {
-        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new BodyContent(bodyContent));
+        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(bodyContent));
     }
 
 }

@@ -30,7 +30,7 @@ import com.blackducksoftware.integration.hub.api.generated.view.IssueView;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
-import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.body.StringBodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
@@ -47,7 +47,7 @@ public class IssueService extends DataService {
 
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
         final String json = hubService.convertToJson(issueItem);
-        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new BodyContent(json)).build();
+        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

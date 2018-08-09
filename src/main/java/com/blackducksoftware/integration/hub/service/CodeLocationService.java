@@ -45,7 +45,7 @@ import com.blackducksoftware.integration.hub.service.model.HubQuery;
 import com.blackducksoftware.integration.hub.service.model.RequestFactory;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.rest.HttpMethod;
-import com.blackducksoftware.integration.rest.request.BodyContent;
+import com.blackducksoftware.integration.rest.body.StringBodyContent;
 import com.blackducksoftware.integration.rest.request.Request;
 import com.blackducksoftware.integration.rest.request.Response;
 
@@ -59,7 +59,7 @@ public class CodeLocationService extends DataService {
     }
 
     public void importBomFile(final File file, final String mimeType) throws IntegrationException {
-        String jsonPayload;
+        final String jsonPayload;
         try {
             jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         } catch (final IOException e) {
@@ -108,7 +108,7 @@ public class CodeLocationService extends DataService {
     }
 
     public void updateCodeLocation(final String codeLocationViewUrl, final String codeLocationViewJson) throws IntegrationException {
-        final Request request = new Request.Builder(codeLocationViewUrl).method(HttpMethod.PUT).bodyContent(new BodyContent(codeLocationViewJson)).build();
+        final Request request = new Request.Builder(codeLocationViewUrl).method(HttpMethod.PUT).bodyContent(new StringBodyContent(codeLocationViewJson)).build();
         try (Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
