@@ -98,9 +98,6 @@ public class HubServicesFactory {
         return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
-    public PhoneHomeService createPhoneHomeService() {
-        return new PhoneHomeService(logger);
-    }
 
     public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
         return new PhoneHomeService(logger, executorService);
