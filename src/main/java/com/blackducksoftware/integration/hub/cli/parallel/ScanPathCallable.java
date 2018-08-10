@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,13 +30,16 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
+import com.blackducksoftware.integration.exception.EncryptionException;
 import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.api.view.ScanSummaryView;
 import com.blackducksoftware.integration.hub.cli.CLILocation;
 import com.blackducksoftware.integration.hub.cli.SignatureScanConfig;
+import com.blackducksoftware.integration.hub.cli.SimpleScanData;
 import com.blackducksoftware.integration.hub.cli.SimpleScanUtility;
 import com.blackducksoftware.integration.hub.cli.summary.ScanTargetOutput;
 import com.blackducksoftware.integration.hub.configuration.HubServerConfig;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.log.IntLogger;
 import com.blackducksoftware.integration.util.IntEnvironmentVariables;
 import com.google.gson.Gson;
@@ -51,8 +54,8 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
     private final CLILocation cliLocation;
     private final Gson gson;
 
-    public ScanPathCallable(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig, final String projectName,
-            final String projectVersionName, final CLILocation cliLocation, final Gson gson) {
+    public ScanPathCallable(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final SignatureScanConfig signatureScanConfig, final String projectName, final String projectVersionName,
+            final CLILocation cliLocation, final Gson gson) {
         this(logger, null, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName, cliLocation, gson);
     }
 
@@ -69,23 +72,19 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
     }
 
     @Override
-    public ScanTargetOutput call() throws InterruptedException {
+    public ScanTargetOutput call() throws IOException, InterruptedException, EncryptionException, HubIntegrationException {
         ScanTargetOutput scanTargetOutput = null;
 
-        final SimpleScanUtility simpleScanUtility;
-        if (null != hubServerConfig) {
-            simpleScanUtility = new SimpleScanUtility(logger, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
-        } else {
-            simpleScanUtility = new SimpleScanUtility(logger, intEnvironmentVariables, signatureScanConfig, projectName, projectVersionName);
-        }
+        final SimpleScanData simpleScanData = new SimpleScanData(hubServerConfig, signatureScanConfig, intEnvironmentVariables, projectName, projectVersionName);
+        final SimpleScanUtility simpleScanUtility = new SimpleScanUtility(logger, simpleScanData);
 
-        logger.info(String.format("Starting the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
+        logger.info(String.format("Starting the signature scan of %s", simpleScanData.getTargetPath()));
         ScanSummaryView scanSummaryView = null;
         File dryRunFile = null;
         File logDirectory = null;
-        final String scanTarget = simpleScanUtility.getSignatureScanConfig().getScanTarget();
+        final String scanTarget = simpleScanData.getTargetPath();
         try {
-            simpleScanUtility.setupAndExecuteScan(cliLocation);
+            simpleScanUtility.setupAndExecuteScan();
 
             scanSummaryView = getScanSummaryFromFile(simpleScanUtility.getScanSummaryFile());
             dryRunFile = simpleScanUtility.getDryRunFile();
@@ -97,7 +96,7 @@ public class ScanPathCallable implements Callable<ScanTargetOutput> {
         }
         scanTargetOutput = ScanTargetOutput.SUCCESS(scanTarget, logDirectory, dryRunFile, scanSummaryView);
 
-        logger.info(String.format("Completed the signature scan of %s", simpleScanUtility.getSignatureScanConfig().getScanTarget()));
+        logger.info(String.format("Completed the signature scan of %s", simpleScanData.getTargetPath()));
         return scanTargetOutput;
     }
 

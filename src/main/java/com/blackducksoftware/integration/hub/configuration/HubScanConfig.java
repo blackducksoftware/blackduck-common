@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,8 +42,7 @@ public class HubScanConfig extends Stringable {
     private final Map<String, Set<String>> targetToExclusionPatterns;
     private final Set<String> scanTargetPaths;
 
-    public HubScanConfig(final CommonScanConfig commonScanConfig, final Set<String> scanTargetPaths, final boolean cleanupLogsOnSuccess,
-            final Map<String, Set<String>> targetToExclusionPatterns,
+    public HubScanConfig(final CommonScanConfig commonScanConfig, final Set<String> scanTargetPaths, final boolean cleanupLogsOnSuccess, final Map<String, Set<String>> targetToExclusionPatterns,
             final Map<String, String> targetToCodeLocationName) {
         this.commonScanConfig = commonScanConfig;
         this.scanTargetPaths = scanTargetPaths;
@@ -88,7 +87,7 @@ public class HubScanConfig extends Stringable {
 
     public void print(final IntLogger logger) {
         try {
-            logger.alwaysLog("--> Using Working Directory: " + commonScanConfig.getWorkingDirectory().getCanonicalPath());
+            logger.alwaysLog("--> Using Working Directory: " + commonScanConfig.getOutputDirectory().getCanonicalPath());
         } catch (final IOException e) {
             logger.alwaysLog("Extremely unlikely exception getting the canonical path: " + e.getMessage());
         }

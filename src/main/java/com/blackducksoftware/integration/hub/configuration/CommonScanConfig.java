@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,18 +31,19 @@ public class CommonScanConfig {
     private final boolean dryRun;
     private final int scanMemory;
     private final boolean snippetModeEnabled;
-    private final File toolsDir;
-    private final File workingDirectory;
+    private final File installDirectory;
+    private final File outputDirectory;
     private final boolean verbose;
 
-    public CommonScanConfig(final String additionalScanArguments, final boolean debug, final boolean dryRun, final int scanMemory, final boolean snippetModeEnabled, final File toolsDir, final File workingDirectory, final boolean verbose) {
+    public CommonScanConfig(final String additionalScanArguments, final boolean debug, final boolean dryRun, final int scanMemory, final boolean snippetModeEnabled, final File installDirectory, final File outputDirectory,
+            final boolean verbose) {
         this.additionalScanArguments = additionalScanArguments;
         this.debug = debug;
         this.dryRun = dryRun;
         this.scanMemory = scanMemory;
         this.snippetModeEnabled = snippetModeEnabled;
-        this.toolsDir = toolsDir;
-        this.workingDirectory = workingDirectory;
+        this.installDirectory = installDirectory;
+        this.outputDirectory = outputDirectory;
         this.verbose = verbose;
     }
 
@@ -66,12 +67,12 @@ public class CommonScanConfig {
         return snippetModeEnabled;
     }
 
-    public File getToolsDir() {
-        return toolsDir;
+    public File getInstallDirectory() {
+        return installDirectory;
     }
 
-    public File getWorkingDirectory() {
-        return workingDirectory;
+    public File getOutputDirectory() {
+        return outputDirectory;
     }
 
     public boolean isVerbose() {
