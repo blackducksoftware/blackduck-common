@@ -13,9 +13,9 @@ version = '37.0.0-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-common-rest:11.0.0'
+    compile 'com.blackducksoftware.integration:hub-common-rest:12.0.0'
     compile 'com.blackducksoftware.integration:hub-common-api:4.7.0.4'
-    compile 'com.blackducksoftware.integration:hub-common-reporting:6.0.0'
+    compile 'com.blackducksoftware.integration:hub-common-reporting:7.0.0'
     compile 'com.blackducksoftware.integration:integration-bdio:16.0.0'
     compile 'com.blackducksoftware.integration:phone-home-client:0.15.0'
 
