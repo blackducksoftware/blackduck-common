@@ -1,9 +1,9 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.exception.DoesNotExistException
 import com.synopsys.integration.blackduck.service.ProjectService
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.view.ProjectView
 import com.synopsys.integration.rest.exception.IntegrationRestException
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After

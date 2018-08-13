@@ -28,8 +28,8 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleCategoryType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
-import com.synopsys.integration.hub.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.hub.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
 
 public class PolicyRuleModel {
     private final PolicyRuleViewV2 rule;
@@ -39,8 +39,7 @@ public class PolicyRuleModel {
     }
 
     public boolean hasExpressions() {
-        return rule != null && rule.expression != null && rule.expression.expressions != null
-                && !rule.expression.expressions.isEmpty();
+        return rule != null && rule.expression != null && rule.expression.expressions != null && !rule.expression.expressions.isEmpty();
     }
 
     public List<PolicyRuleExpressionView> getExpressionList() {

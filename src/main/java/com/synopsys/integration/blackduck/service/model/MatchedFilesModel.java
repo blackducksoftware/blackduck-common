@@ -26,9 +26,9 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.synopsys.integration.hub.api.generated.component.CompositePathWithArchiveContext;
-import com.synopsys.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
-import com.synopsys.integration.hub.api.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.generated.component.CompositePathWithArchiveContext;
+import com.synopsys.integration.blackduck.api.generated.enumeration.MatchedFileUsagesType;
+import com.synopsys.integration.blackduck.api.generated.view.MatchedFileView;
 
 public class MatchedFilesModel {
     private final String path;
@@ -39,11 +39,11 @@ public class MatchedFilesModel {
 
     public MatchedFilesModel(final MatchedFileView matchedFile) {
         final CompositePathWithArchiveContext pathView = matchedFile.filePath;
-        this.path = pathView.path;
-        this.archiveContext = pathView.archiveContext;
-        this.fileName = pathView.fileName;
-        this.compositePathContext = pathView.compositePathContext;
-        this.usages = new HashSet<>(matchedFile.usages);
+        path = pathView.path;
+        archiveContext = pathView.archiveContext;
+        fileName = pathView.fileName;
+        compositePathContext = pathView.compositePathContext;
+        usages = new HashSet<>(matchedFile.usages);
     }
 
     public String getPath() {

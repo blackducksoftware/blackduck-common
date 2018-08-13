@@ -25,7 +25,7 @@ package com.synopsys.integration.blackduck.service.bucket;
 
 import java.util.Optional;
 
-import com.synopsys.integration.hub.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.util.Stringable;
 
 public class HubBucketItem<T extends HubResponse> extends Stringable {
@@ -36,12 +36,12 @@ public class HubBucketItem<T extends HubResponse> extends Stringable {
     public HubBucketItem(final String uri, final T hubResponse) {
         this.uri = uri;
         this.hubResponse = Optional.of(hubResponse);
-        this.e = Optional.empty();
+        e = Optional.empty();
     }
 
     public HubBucketItem(final String uri, final Exception e) {
         this.uri = uri;
-        this.hubResponse = Optional.empty();
+        hubResponse = Optional.empty();
         this.e = Optional.of(e);
     }
 

@@ -22,11 +22,11 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.scan
 
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.DryRunUploadResponse
 import com.synopsys.integration.blackduck.service.DryRunUploadService
 import com.synopsys.integration.blackduck.service.HubServicesFactory
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger

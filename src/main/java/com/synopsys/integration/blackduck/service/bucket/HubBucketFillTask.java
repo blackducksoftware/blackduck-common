@@ -24,8 +24,8 @@
 package com.synopsys.integration.blackduck.service.bucket;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.blackduck.service.HubService;
-import com.synopsys.integration.hub.api.core.HubResponse;
 
 public class HubBucketFillTask implements Runnable {
     private final HubService hubService;

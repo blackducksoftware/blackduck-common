@@ -28,11 +28,12 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionRequestPhaseType;
 import com.synopsys.integration.builder.AbstractBuilder;
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest;
-import com.synopsys.integration.hub.api.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.validator.AbstractValidator;
 
@@ -58,7 +59,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     @Override
     public ProjectRequest buildObject() {
         final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution.toUpperCase());
-        final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase.toUpperCase());
+        final ProjectVersionRequestPhaseType phaseValue = ProjectVersionRequestPhaseType.valueOf(phase.toUpperCase());
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = distributionValue;
         projectVersionRequest.phase = phaseValue;

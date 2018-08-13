@@ -29,22 +29,22 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.synopsys.integration.hub.api.generated.component.NameValuePairView;
-import com.synopsys.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
+import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
 import com.synopsys.integration.util.Stringable;
 
 public class ComponentVersionStatusCount extends Stringable {
-    public PolicyStatusSummaryStatusType name;
+    public PolicySummaryStatusType name;
     public int value;
 
     public ComponentVersionStatusCount() {
     }
 
     public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
-        final Set<PolicyStatusSummaryStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusSummaryStatusType.class);
+        final Set<PolicySummaryStatusType> policyStatusTypes = EnumSet.allOf(PolicySummaryStatusType.class);
         final Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicyStatusSummaryStatusType.valueOf(nameValuePair.name);
+            name = PolicySummaryStatusType.valueOf(nameValuePair.name);
         }
 
         if (nameValuePair.value != null) {

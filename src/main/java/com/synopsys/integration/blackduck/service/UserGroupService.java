@@ -28,14 +28,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.response.AssignedProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
+import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.hub.api.generated.response.AssignedProjectView;
-import com.synopsys.integration.hub.api.generated.view.ProjectView;
-import com.synopsys.integration.hub.api.generated.view.RoleAssignmentView;
-import com.synopsys.integration.hub.api.generated.view.UserGroupView;
-import com.synopsys.integration.hub.api.generated.view.UserView;
 import com.synopsys.integration.log.IntLogger;
 
 public class UserGroupService {

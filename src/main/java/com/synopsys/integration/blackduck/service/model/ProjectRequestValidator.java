@@ -27,8 +27,8 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.validator.AbstractValidator;
 import com.synopsys.integration.validator.ValidationResult;
@@ -43,11 +43,11 @@ public class ProjectRequestValidator extends AbstractValidator {
     private final String releasedOn;
 
     public ProjectRequestValidator(final ProjectRequestBuilder projectRequestBuilder) {
-        this.projectName = projectRequestBuilder.getProjectName();
-        this.distribution = projectRequestBuilder.getDistribution();
-        this.phase = projectRequestBuilder.getPhase();
-        this.versionName = projectRequestBuilder.getVersionName();
-        this.releasedOn = projectRequestBuilder.getReleasedOn();
+        projectName = projectRequestBuilder.getProjectName();
+        distribution = projectRequestBuilder.getDistribution();
+        phase = projectRequestBuilder.getPhase();
+        versionName = projectRequestBuilder.getVersionName();
+        releasedOn = projectRequestBuilder.getReleasedOn();
     }
 
     @Override

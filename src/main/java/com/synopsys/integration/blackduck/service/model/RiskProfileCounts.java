@@ -26,9 +26,9 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.synopsys.integration.hub.api.generated.component.RiskCountView;
-import com.synopsys.integration.hub.api.generated.enumeration.RiskCountType;
-import com.synopsys.integration.hub.api.generated.view.RiskProfileView;
+import com.synopsys.integration.blackduck.api.generated.component.RiskCountView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
+import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {
     private final Map<RiskCountType, Integer> countsMap;

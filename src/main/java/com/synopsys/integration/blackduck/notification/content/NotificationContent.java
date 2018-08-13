@@ -25,8 +25,8 @@ package com.synopsys.integration.blackduck.notification.content;
 
 import java.util.List;
 
+import com.synopsys.integration.blackduck.api.core.HubComponent;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionDescription;
-import com.synopsys.integration.hub.api.core.HubComponent;
 
 public abstract class NotificationContent extends HubComponent {
     public abstract boolean providesPolicyDetails();

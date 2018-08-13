@@ -35,21 +35,21 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
+import com.synopsys.integration.blackduck.api.core.HubPath;
+import com.synopsys.integration.blackduck.api.core.HubPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.HubPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.HubView;
+import com.synopsys.integration.blackduck.api.core.LinkMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
+import com.synopsys.integration.blackduck.api.core.ResourceLink;
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.core.HubPath;
-import com.synopsys.integration.hub.api.core.HubPathMultipleResponses;
-import com.synopsys.integration.hub.api.core.HubPathSingleResponse;
-import com.synopsys.integration.hub.api.core.HubResponse;
-import com.synopsys.integration.hub.api.core.HubView;
-import com.synopsys.integration.hub.api.core.LinkMultipleResponses;
-import com.synopsys.integration.hub.api.core.LinkSingleResponse;
-import com.synopsys.integration.hub.api.core.ResourceLink;
-import com.synopsys.integration.hub.api.core.ResourceMetadata;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
@@ -68,12 +68,12 @@ public class HubService {
 
     public HubService(final IntLogger logger, final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
-        this.hubBaseUrl = restConnection.getBaseUrl();
+        hubBaseUrl = restConnection.getBaseUrl();
         this.jsonParser = jsonParser;
         this.gson = gson;
-        this.metaHandler = new MetaHandler(logger);
-        this.hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser);
-        this.hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
+        metaHandler = new MetaHandler(logger);
+        hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser);
+        hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
     }
 
     public BlackduckRestConnection getRestConnection() {

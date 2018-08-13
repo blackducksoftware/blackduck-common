@@ -1,9 +1,9 @@
 /**
  * Hub Common
- *
+ * <p>
  * Copyright (C) 2017 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,18 +32,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionRequestPhaseType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest;
-import com.synopsys.integration.hub.api.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.hub.api.generated.view.ProjectView;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.test.annotation.IntegrationTest;
 
@@ -81,17 +82,17 @@ public class ProjectServiceTestIT {
         project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
         final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
         projectVersionRequest1.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest1.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest1.phase = ProjectVersionRequestPhaseType.DEVELOPMENT;
         projectVersionRequest1.versionName = testProjectVersion1Name;
 
         final ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
         projectVersionRequest2.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest2.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest2.phase = ProjectVersionRequestPhaseType.DEVELOPMENT;
         projectVersionRequest2.versionName = testProjectVersion2Name;
 
         final ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
         projectVersionRequest3.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest3.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest3.phase = ProjectVersionRequestPhaseType.DEVELOPMENT;
         projectVersionRequest3.versionName = testProjectVersion3Name;
 
         hubServicesFactory.createProjectService().createHubVersion(project, projectVersionRequest1);
@@ -161,7 +162,7 @@ public class ProjectServiceTestIT {
         projectRequest.description = "Initial Description";
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.versionName = "Initial VersionName";
-        projectVersionRequest.phase = ProjectVersionPhaseType.PLANNING;
+        projectVersionRequest.phase = ProjectVersionRequestPhaseType.PLANNING;
         projectVersionRequest.distribution = ProjectVersionDistributionType.EXTERNAL;
         projectRequest.versionRequest = projectVersionRequest;
 
@@ -178,7 +179,7 @@ public class ProjectServiceTestIT {
         assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.distribution);
 
         projectVersionRequest.versionName = "New VersionName";
-        projectVersionRequest.phase = ProjectVersionPhaseType.DEPRECATED;
+        projectVersionRequest.phase = ProjectVersionRequestPhaseType.DEPRECATED;
         projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
 
         projectService.updateProjectVersion(projectVersionView, projectVersionRequest);

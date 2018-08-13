@@ -26,8 +26,8 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 
 import com.google.gson.JsonObject;
+import com.synopsys.integration.blackduck.api.core.HubPath;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.core.HubPath;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Response;
 

@@ -25,11 +25,11 @@ package com.synopsys.integration.blackduck.notification;
 
 import java.util.Date;
 
-import com.synopsys.integration.hub.api.core.HubView;
-import com.synopsys.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
-import com.synopsys.integration.hub.api.generated.enumeration.NotificationType;
-import com.synopsys.integration.hub.api.generated.view.NotificationUserView;
-import com.synopsys.integration.hub.api.generated.view.NotificationView;
+import com.synopsys.integration.blackduck.api.core.HubView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationStateRequestStateType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 
 /**
  * This is a flattened view of both NotificationView and NotificationUserView and must be manually maintained to support both views and their api. The only common class between both views is HubView which is why sourceView is of that type,
@@ -43,23 +43,23 @@ public class CommonNotificationView extends HubView {
     private final NotificationStateRequestStateType notificationState;
 
     public CommonNotificationView(final NotificationView notificationView) {
-        this.sourceView = notificationView;
-        this.contentType = notificationView.contentType;
-        this.createdAt = notificationView.createdAt;
-        this.type = notificationView.type;
-        this.notificationState = null;
-        this._meta = notificationView._meta;
-        this.json = notificationView.json;
+        sourceView = notificationView;
+        contentType = notificationView.contentType;
+        createdAt = notificationView.createdAt;
+        type = notificationView.type;
+        notificationState = null;
+        _meta = notificationView._meta;
+        json = notificationView.json;
     }
 
     public CommonNotificationView(final NotificationUserView notificationUserView) {
-        this.sourceView = notificationUserView;
-        this.contentType = notificationUserView.contentType;
-        this.createdAt = notificationUserView.createdAt;
-        this.type = notificationUserView.type;
-        this.notificationState = notificationUserView.notificationState;
-        this._meta = notificationUserView._meta;
-        this.json = notificationUserView.json;
+        sourceView = notificationUserView;
+        contentType = notificationUserView.contentType;
+        createdAt = notificationUserView.createdAt;
+        type = notificationUserView.type;
+        notificationState = notificationUserView.notificationState;
+        _meta = notificationUserView._meta;
+        json = notificationUserView.json;
     }
 
     public HubView getSourceView() {

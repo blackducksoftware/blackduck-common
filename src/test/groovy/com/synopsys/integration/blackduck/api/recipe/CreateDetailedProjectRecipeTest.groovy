@@ -1,12 +1,12 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.HubService
 import com.synopsys.integration.blackduck.service.ProjectService
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView
-import com.synopsys.integration.hub.api.generated.view.ProjectView
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After
 import org.junit.Test

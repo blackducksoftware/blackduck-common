@@ -26,8 +26,8 @@ package com.synopsys.integration.blackduck.api.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synopsys.integration.blackduck.api.core.HubView;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.hub.api.core.HubView;
 
 public class HubViewFilter<T extends HubView> {
     public List<T> getAccessibleItems(final MetaHandler metaHandler, final List<T> hubItems) throws HubIntegrationException {

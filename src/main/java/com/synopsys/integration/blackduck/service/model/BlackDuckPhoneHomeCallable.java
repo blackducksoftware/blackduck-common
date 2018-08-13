@@ -27,11 +27,11 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.service.HubRegistrationService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.hub.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeCallable;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
@@ -45,17 +45,17 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
     private final HubRegistrationService hubRegistrationService;
     private final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder;
 
-    public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion,
-            final IntEnvironmentVariables intEnvironmentVariables, final HubService hubService, final HubRegistrationService hubRegistrationService) {
+    public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion, final IntEnvironmentVariables intEnvironmentVariables,
+            final HubService hubService, final HubRegistrationService hubRegistrationService) {
         super(logger, client, productURL, artifactId, artifactVersion, intEnvironmentVariables);
         this.logger = logger;
         this.hubService = hubService;
         this.hubRegistrationService = hubRegistrationService;
-        this.phoneHomeRequestBodyBuilder = new PhoneHomeRequestBody.Builder();
+        phoneHomeRequestBodyBuilder = new PhoneHomeRequestBody.Builder();
     }
 
-    public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion,
-            final IntEnvironmentVariables intEnvironmentVariables, final HubService hubService, final HubRegistrationService hubRegistrationService, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
+    public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion, final IntEnvironmentVariables intEnvironmentVariables,
+            final HubService hubService, final HubRegistrationService hubRegistrationService, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
         super(logger, client, productURL, artifactId, artifactVersion, intEnvironmentVariables);
         this.logger = logger;
         this.hubService = hubService;

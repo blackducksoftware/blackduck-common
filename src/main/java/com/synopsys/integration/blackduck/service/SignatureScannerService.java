@@ -32,6 +32,9 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.FileUtils;
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.cli.CLIDownloadUtility;
 import com.synopsys.integration.blackduck.cli.CLILocation;
@@ -43,9 +46,6 @@ import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.blackduck.summary.Result;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest;
-import com.synopsys.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.hub.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 

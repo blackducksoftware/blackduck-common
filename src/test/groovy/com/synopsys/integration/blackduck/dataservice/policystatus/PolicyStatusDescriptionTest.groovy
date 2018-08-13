@@ -23,16 +23,15 @@
 package com.synopsys.integration.blackduck.dataservice.policystatus
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionPolicyViolationDetails
+import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription
-import com.synopsys.integration.hub.api.generated.component.ComponentVersionPolicyViolationDetails
-import com.synopsys.integration.hub.api.generated.component.NameValuePairView
-import com.synopsys.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType
-import com.synopsys.integration.hub.api.generated.view.VersionBomPolicyStatusView
 import org.junit.Assert
 import org.junit.Test
 
 class PolicyStatusDescriptionTest {
-
     @Test
     void getCountTest() {
         final NameValuePairView blockerViolation = new NameValuePairView()
@@ -51,7 +50,7 @@ class PolicyStatusDescriptionTest {
         componentVersionPolicyViolationDetails.severityLevels = violations
 
         final NameValuePairView inViolation = new NameValuePairView()
-        inViolation.name = PolicyStatusSummaryStatusType.IN_VIOLATION
+        inViolation.name = PolicySummaryStatusType.IN_VIOLATION
         inViolation.value = 4
 
         def statuses = []
@@ -60,7 +59,7 @@ class PolicyStatusDescriptionTest {
         final VersionBomPolicyStatusView policyStatusItem = new VersionBomPolicyStatusView()
         policyStatusItem.componentVersionPolicyViolationDetails = componentVersionPolicyViolationDetails
         policyStatusItem.componentVersionStatusCounts = statuses
-        policyStatusItem.overallStatus = PolicyStatusSummaryStatusType.IN_VIOLATION
+        policyStatusItem.overallStatus = PolicySummaryStatusType.IN_VIOLATION
 
         final PolicyStatusDescription test = new PolicyStatusDescription(policyStatusItem)
 
@@ -69,8 +68,8 @@ class PolicyStatusDescriptionTest {
         int expectedBlockerSeverity = 3
         int expectedTrivialSeverity = 1
         int expectedMajorSeverity = 0
-        int actualInViolationOverall = test.getCountOfStatus(PolicyStatusSummaryStatusType.IN_VIOLATION)
-        int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusSummaryStatusType.NOT_IN_VIOLATION)
+        int actualInViolationOverall = test.getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION)
+        int actualNotInViolationOverall = test.getCountOfStatus(PolicySummaryStatusType.NOT_IN_VIOLATION)
         int actualBlockerSeverity = test.getCountOfSeverity(PolicySeverityType.BLOCKER)
         int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityType.TRIVIAL)
         int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityType.MAJOR)

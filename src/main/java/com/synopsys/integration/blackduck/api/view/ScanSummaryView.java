@@ -28,9 +28,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.synopsys.integration.blackduck.api.core.HubView;
 import com.synopsys.integration.blackduck.api.enumeration.ScanSummaryStatusType;
-import com.synopsys.integration.hub.api.core.HubView;
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView;
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 
 public class ScanSummaryView extends HubView {
     public static final Map<String, Type> links = new HashMap<>();

@@ -28,17 +28,17 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.gson.JsonElement;
+import com.synopsys.integration.blackduck.api.generated.component.RemediationOptionsView;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityV2View;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.service.model.HubMediaTypes;
 import com.synopsys.integration.blackduck.service.model.HubQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.component.RemediationOptionsView;
-import com.synopsys.integration.hub.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.hub.api.generated.view.ComponentSearchResultView;
-import com.synopsys.integration.hub.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.hub.api.generated.view.ComponentView;
-import com.synopsys.integration.hub.api.generated.view.VulnerabilityV2View;
 import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
@@ -52,7 +52,7 @@ public class ComponentService extends DataService {
     }
 
     public ComponentVersionView getComponentVersion(final ExternalId externalId) throws IntegrationException {
-        for (final ComponentVersionView componentVersion : this.getAllComponentVersions(externalId)) {
+        for (final ComponentVersionView componentVersion : getAllComponentVersions(externalId)) {
             if (componentVersion.versionName.equals(externalId.version)) {
                 return componentVersion;
             }
@@ -112,7 +112,7 @@ public class ComponentService extends DataService {
         final String href = hubService.getHref(componentVersionView);
         try {
             final String remediatingURL = href + "/" + REMEDIATING_LINK;
-            try (final Response response = hubService.executeGetRequest(remediatingURL);) {
+            try (final Response response = hubService.executeGetRequest(remediatingURL)) {
                 final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
                 return hubService.getGson().fromJson(jsonElement, RemediationOptionsView.class);
             } catch (final IOException ioException) {

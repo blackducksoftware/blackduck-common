@@ -1,6 +1,6 @@
 package com.synopsys.integration.blackduck.service;
 
-import com.synopsys.integration.hub.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 
 public class DryRunUploadResponse extends HubResponse {
     public String codeLocationId;

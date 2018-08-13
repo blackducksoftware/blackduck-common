@@ -31,10 +31,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.core.HubResponse;
 import com.synopsys.integration.log.IntLogger;
 
 public class HubBucketService extends DataService {
@@ -71,12 +71,9 @@ public class HubBucketService extends DataService {
     }
 
     public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
-        final List<HubBucketFillTask> taskList = uriSingleResponses
-                .stream()
-                .map(uriSingleResponse -> {
-                    return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
-                })
-                .collect(Collectors.toList());
+        final List<HubBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
+            return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
+        }).collect(Collectors.toList());
         if (executorService.isPresent()) {
             // NOTE: it is up to the user of the bucket service to shutdown the executor
             taskList.forEach(task -> {

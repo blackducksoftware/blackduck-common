@@ -1,5 +1,9 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.view.NotificationView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView
 import com.synopsys.integration.blackduck.notification.CommonNotificationView
 import com.synopsys.integration.blackduck.notification.NotificationDetailResult
 import com.synopsys.integration.blackduck.notification.NotificationDetailResults
@@ -12,10 +16,6 @@ import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.bucket.HubBucket
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService
 import com.synopsys.integration.exception.IntegrationException
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.view.NotificationView
-import com.synopsys.integration.hub.api.generated.view.ProjectView
-import com.synopsys.integration.hub.api.generated.view.VersionBomComponentView
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After
 import org.junit.Test

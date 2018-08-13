@@ -25,8 +25,8 @@ package com.synopsys.integration.blackduck.service.model;
 
 import java.util.Map;
 
-import com.synopsys.integration.hub.api.generated.view.ExternalExtensionConfigValueView;
-import com.synopsys.integration.hub.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.api.generated.view.ExternalExtensionConfigValueView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 
 public class UserConfigItem {
     private final UserView user;
@@ -35,7 +35,7 @@ public class UserConfigItem {
 
     public UserConfigItem(final UserView user, final Map<String, ExternalExtensionConfigValueView> configItems) {
         this.user = user;
-        this.configMap = configItems;
+        configMap = configItems;
     }
 
     public UserView getUser() {

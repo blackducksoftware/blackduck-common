@@ -22,12 +22,12 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.dataservice.scan
 
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.CodeLocationService
 import com.synopsys.integration.blackduck.service.HubServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView
-import com.synopsys.integration.hub.api.generated.view.ProjectView
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After

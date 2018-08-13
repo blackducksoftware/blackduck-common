@@ -1,19 +1,19 @@
 package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.api.view.MetaHandler
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.PolicyRuleService
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
-import com.synopsys.integration.hub.api.generated.component.PolicyRuleExpressionSetView
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType
-import com.synopsys.integration.hub.api.generated.view.ComponentVersionView
-import com.synopsys.integration.hub.api.generated.view.PolicyRuleView
-import com.synopsys.integration.hub.api.generated.view.PolicyRuleViewV2
-import com.synopsys.integration.hub.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.hub.bdio.model.Forge
 import com.synopsys.integration.hub.bdio.model.externalid.ExternalId
 import com.synopsys.integration.test.annotation.IntegrationTest
@@ -69,7 +69,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
         VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView())
-        Assert.assertEquals(PolicyStatusSummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
+        Assert.assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
 

@@ -26,10 +26,10 @@ package com.synopsys.integration.blackduck.api.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synopsys.integration.blackduck.api.core.HubView;
+import com.synopsys.integration.blackduck.api.core.ResourceLink;
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.hub.api.core.HubView;
-import com.synopsys.integration.hub.api.core.ResourceLink;
-import com.synopsys.integration.hub.api.core.ResourceMetadata;
 import com.synopsys.integration.log.IntLogger;
 
 public class MetaHandler {

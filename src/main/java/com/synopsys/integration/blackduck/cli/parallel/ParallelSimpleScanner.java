@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.cli.CLILocation;
 import com.synopsys.integration.blackduck.cli.SignatureScanConfig;
 import com.synopsys.integration.blackduck.cli.summary.ScanTargetOutput;
@@ -40,7 +41,6 @@ import com.synopsys.integration.blackduck.configuration.HubScanConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 

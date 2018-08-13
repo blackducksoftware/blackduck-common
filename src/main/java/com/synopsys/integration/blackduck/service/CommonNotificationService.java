@@ -33,6 +33,9 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 import com.synopsys.integration.blackduck.notification.CommonNotificationView;
 import com.synopsys.integration.blackduck.notification.CommonNotificationViewResults;
 import com.synopsys.integration.blackduck.notification.NotificationDetailResult;
@@ -41,9 +44,6 @@ import com.synopsys.integration.blackduck.notification.content.detail.Notificati
 import com.synopsys.integration.blackduck.service.bucket.HubBucket;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.core.HubResponse;
-import com.synopsys.integration.hub.api.generated.view.NotificationUserView;
-import com.synopsys.integration.hub.api.generated.view.NotificationView;
 import com.synopsys.integration.rest.RestConstants;
 
 public class CommonNotificationService {
@@ -56,21 +56,17 @@ public class CommonNotificationService {
     }
 
     public List<CommonNotificationView> getCommonNotifications(final List<NotificationView> notificationViews) {
-        final List<CommonNotificationView> commonStates = notificationViews
-                .stream()
-                .map(view -> {
-                    return new CommonNotificationView(view);
-                }).collect(Collectors.toList());
+        final List<CommonNotificationView> commonStates = notificationViews.stream().map(view -> {
+            return new CommonNotificationView(view);
+        }).collect(Collectors.toList());
 
         return commonStates;
     }
 
     public List<CommonNotificationView> getCommonUserNotifications(final List<NotificationUserView> notificationUserViews) {
-        final List<CommonNotificationView> commonStates = notificationUserViews
-                .stream()
-                .map(view -> {
-                    return new CommonNotificationView(view);
-                }).collect(Collectors.toList());
+        final List<CommonNotificationView> commonStates = notificationUserViews.stream().map(view -> {
+            return new CommonNotificationView(view);
+        }).collect(Collectors.toList());
 
         return commonStates;
     }
@@ -84,8 +80,7 @@ public class CommonNotificationService {
         return new CommonNotificationViewResults(commonNotifications, datePair.date, datePair.dateString);
     }
 
-    public NotificationDetailResults getNotificationDetailResults(final List<CommonNotificationView> commonNotifications)
-            throws IntegrationException {
+    public NotificationDetailResults getNotificationDetailResults(final List<CommonNotificationView> commonNotifications) throws IntegrationException {
         if (commonNotifications == null || commonNotifications.isEmpty()) {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty());
         }

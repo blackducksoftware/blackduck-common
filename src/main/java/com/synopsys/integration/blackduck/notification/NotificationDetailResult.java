@@ -27,10 +27,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationStateRequestStateType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.notification.content.NotificationContent;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetail;
-import com.synopsys.integration.hub.api.generated.enumeration.NotificationStateRequestStateType;
-import com.synopsys.integration.hub.api.generated.enumeration.NotificationType;
 
 public class NotificationDetailResult {
     private final NotificationContent notificationContent;

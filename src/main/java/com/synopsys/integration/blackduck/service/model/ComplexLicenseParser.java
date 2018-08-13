@@ -23,8 +23,8 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.hub.api.generated.enumeration.ComplexLicenseType;
-import com.synopsys.integration.hub.api.generated.view.ComplexLicenseView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComplexLicenseType;
+import com.synopsys.integration.blackduck.api.generated.view.ComplexLicenseView;
 
 public class ComplexLicenseParser {
     private final ComplexLicenseView complexLicense;
@@ -36,7 +36,7 @@ public class ComplexLicenseParser {
 
     public String parse() {
         if (licenseString == null) {
-            licenseString = parse(this.complexLicense);
+            licenseString = parse(complexLicense);
         }
         return licenseString;
     }
@@ -50,7 +50,7 @@ public class ComplexLicenseParser {
             final StringBuilder licenseText = new StringBuilder();
             int i = 1;
             for (final ComplexLicenseView childLicense : complexLicense.licenses) {
-                licenseText.append(this.parse(childLicense));
+                licenseText.append(parse(childLicense));
                 if (i < complexLicense.licenses.size()) {
                     licenseText.append(operator);
                 }

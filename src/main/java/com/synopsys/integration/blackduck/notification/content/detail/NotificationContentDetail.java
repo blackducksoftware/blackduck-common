@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.hub.api.core.HubResponse;
-import com.synopsys.integration.hub.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.hub.api.generated.view.ComponentView;
-import com.synopsys.integration.hub.api.generated.view.IssueView;
-import com.synopsys.integration.hub.api.generated.view.PolicyRuleViewV2;
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.IssueView;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
@@ -126,13 +126,13 @@ public class NotificationContentDetail extends Stringable {
         this.componentVersionOriginName = componentVersionOriginName;
         this.componentIssue = createUriSingleResponse(componentIssue, IssueView.class);
         this.componentVersionOriginId = componentVersionOriginId;
-        this.contentDetailKey = createContentDetailKey();
+        contentDetailKey = createContentDetailKey();
     }
     // @formatter:on
 
     private <T extends HubResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
         if (uri.isPresent()) {
-            return Optional.of(new UriSingleResponse<T>(uri.get(), responseClass));
+            return Optional.of(new UriSingleResponse<>(uri.get(), responseClass));
         }
         return Optional.empty();
     }

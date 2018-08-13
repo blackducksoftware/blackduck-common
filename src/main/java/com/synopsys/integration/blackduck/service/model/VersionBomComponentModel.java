@@ -27,17 +27,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.synopsys.integration.hub.api.generated.component.ActivityDataView;
-import com.synopsys.integration.hub.api.generated.component.ReviewedDetails;
-import com.synopsys.integration.hub.api.generated.component.VersionBomLicenseView;
-import com.synopsys.integration.hub.api.generated.component.VersionBomOriginView;
-import com.synopsys.integration.hub.api.generated.enumeration.MatchedFileUsagesType;
-import com.synopsys.integration.hub.api.generated.enumeration.PolicyStatusSummaryStatusType;
-import com.synopsys.integration.hub.api.generated.enumeration.RiskCountType;
-import com.synopsys.integration.hub.api.generated.enumeration.VersionBomComponentMatchType;
-import com.synopsys.integration.hub.api.generated.enumeration.VersionBomComponentReviewStatusType;
-import com.synopsys.integration.hub.api.generated.view.MatchedFileView;
-import com.synopsys.integration.hub.api.generated.view.VersionBomComponentView;
+import com.synopsys.integration.blackduck.api.generated.component.ActivityDataView;
+import com.synopsys.integration.blackduck.api.generated.component.ReviewedDetails;
+import com.synopsys.integration.blackduck.api.generated.component.VersionBomLicenseView;
+import com.synopsys.integration.blackduck.api.generated.component.VersionBomOriginView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.MatchedFileUsagesType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.VersionBomComponentMatchType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.VersionBomComponentReviewStatusType;
+import com.synopsys.integration.blackduck.api.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 
 public class VersionBomComponentModel {
     private final VersionBomComponentView component;
@@ -136,7 +136,7 @@ public class VersionBomComponentModel {
         return component.reviewedDetails;
     }
 
-    public PolicyStatusSummaryStatusType getApprovalStatus() {
+    public PolicySummaryStatusType getApprovalStatus() {
         return component.approvalStatus;
     }
 

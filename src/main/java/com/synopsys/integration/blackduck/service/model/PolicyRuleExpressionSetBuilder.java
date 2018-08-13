@@ -31,19 +31,19 @@ import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleComponentUsa
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
 import com.synopsys.integration.blackduck.api.enumeration.ReviewStatusType;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionParameter;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseCodeSharingType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionSetOperatorType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.hub.api.generated.component.PolicyRuleExpressionParameter;
-import com.synopsys.integration.hub.api.generated.component.PolicyRuleExpressionSetView;
-import com.synopsys.integration.hub.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.hub.api.generated.enumeration.LicenseCodeSharingType;
-import com.synopsys.integration.hub.api.generated.enumeration.PolicyRuleExpressionSetOperatorType;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.hub.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.hub.api.generated.view.ComponentView;
-import com.synopsys.integration.hub.api.generated.view.LicenseView;
-import com.synopsys.integration.hub.api.generated.view.ProjectView;
 import com.synopsys.integration.rest.RestConstants;
 
 public class PolicyRuleExpressionSetBuilder {

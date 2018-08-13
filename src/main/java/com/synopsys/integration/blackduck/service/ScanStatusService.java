@@ -30,14 +30,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.synopsys.integration.blackduck.api.enumeration.ScanSummaryStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.CodeLocationType;
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.exception.HubTimeoutExceededException;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.api.generated.enumeration.CodeLocationType;
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView;
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.hub.api.generated.view.ProjectView;
 import com.synopsys.integration.log.IntLogger;
 
 public class ScanStatusService extends DataService {
@@ -69,35 +69,35 @@ public class ScanStatusService extends DataService {
     /**
      * For the provided projectName and projectVersion, wait at most timeoutInMilliseconds for the project/version to exist and/or at least one pending bom import scan to begin. Then, wait at most timeoutInMilliseconds for all discovered
      * pending scans to complete.
-     *
+     * <p>
      * If the timeouts are exceeded, a HubTimeoutExceededException will be thrown.
      */
     public void assertBomImportScanStartedThenFinished(final String projectName, final String projectVersion) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
-        final List<ScanSummaryView> pendingScans = waitForPendingScansToStart(projectName, projectVersion, this.timeoutInMilliseconds);
-        waitForScansToComplete(pendingScans, this.timeoutInMilliseconds);
+        final List<ScanSummaryView> pendingScans = waitForPendingScansToStart(projectName, projectVersion, timeoutInMilliseconds);
+        waitForScansToComplete(pendingScans, timeoutInMilliseconds);
     }
 
     /**
      * For the given pendingScans, wait at most timeoutInMilliseconds for the scans to complete.
-     *
+     * <p>
      * If the timeout is exceeded, a HubTimeoutExceededException will be thrown.
      */
     public void assertScansFinished(final List<ScanSummaryView> pendingScans) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
-        waitForScansToComplete(pendingScans, this.timeoutInMilliseconds);
+        waitForScansToComplete(pendingScans, timeoutInMilliseconds);
     }
 
     public void assertScansFinished(final String projectName, final String projectVersion) throws InterruptedException, IntegrationException {
-        final ProjectView projectItem = this.projectDataService.getProjectByName(projectName);
-        final ProjectVersionView projectVersionView = this.projectDataService.getProjectVersion(projectItem, projectVersion);
+        final ProjectView projectItem = projectDataService.getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = projectDataService.getProjectVersion(projectItem, projectVersion);
         assertScansFinished(projectVersionView);
     }
 
     public void assertScansFinished(final ProjectVersionView projectVersionView) throws InterruptedException, HubTimeoutExceededException, IntegrationException {
-        final List<CodeLocationView> allCodeLocations = this.hubService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> allCodeLocations = hubService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         final List<ScanSummaryView> scanSummaryViews = new ArrayList<>();
         for (final CodeLocationView codeLocationView : allCodeLocations) {
-            final String scansLink = this.hubService.getFirstLinkSafely(codeLocationView, CodeLocationView.SCANS_LINK);
-            final List<ScanSummaryView> codeLocationScanSummaryViews = this.hubService.getAllResponses(scansLink, ScanSummaryView.class);
+            final String scansLink = hubService.getFirstLinkSafely(codeLocationView, CodeLocationView.SCANS_LINK);
+            final List<ScanSummaryView> codeLocationScanSummaryViews = hubService.getAllResponses(scansLink, ScanSummaryView.class);
             scanSummaryViews.addAll(codeLocationScanSummaryViews);
         }
         assertScansFinished(scanSummaryViews);
@@ -130,7 +130,7 @@ public class ScanStatusService extends DataService {
     }
 
     private void sleep(final String interruptedMessage, final String ongoingMessage) throws InterruptedException {
-        this.logger.info(ongoingMessage);
+        logger.info(ongoingMessage);
         Thread.sleep(FIVE_SECONDS);
     }
 
@@ -154,31 +154,31 @@ public class ScanStatusService extends DataService {
     private List<ScanSummaryView> getPendingScans(final String projectName, final String projectVersion) {
         List<ScanSummaryView> pendingScans = new ArrayList<>();
         try {
-            final ProjectView projectItem = this.projectDataService.getProjectByName(projectName);
-            final ProjectVersionView projectVersionItem = this.projectDataService.getProjectVersion(projectItem, projectVersion);
-            final String projectVersionUrl = this.hubService.getHref(projectVersionItem);
+            final ProjectView projectItem = projectDataService.getProjectByName(projectName);
+            final ProjectVersionView projectVersionItem = projectDataService.getProjectVersion(projectItem, projectVersion);
+            final String projectVersionUrl = hubService.getHref(projectVersionItem);
 
-            final List<CodeLocationView> allCodeLocations = this.codeLocationDataService.getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
+            final List<CodeLocationView> allCodeLocations = codeLocationDataService.getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
 
             final List<String> allScanSummariesLinks = new ArrayList<>();
             for (final CodeLocationView codeLocationItem : allCodeLocations) {
-                this.logger.debug("Checking codeLocation: " + codeLocationItem.name);
+                logger.debug("Checking codeLocation: " + codeLocationItem.name);
                 final String mappedProjectVersionUrl = codeLocationItem.mappedProjectVersion;
                 if (projectVersionUrl.equals(mappedProjectVersionUrl)) {
-                    final String scanSummariesLink = this.hubService.getFirstLink(codeLocationItem, CodeLocationView.SCANS_LINK);
+                    final String scanSummariesLink = hubService.getFirstLink(codeLocationItem, CodeLocationView.SCANS_LINK);
                     allScanSummariesLinks.add(scanSummariesLink);
                 }
             }
 
             final List<ScanSummaryView> allScanSummaries = new ArrayList<>();
             for (final String scanSummaryLink : allScanSummariesLinks) {
-                allScanSummaries.addAll(this.hubService.getAllResponses(scanSummaryLink, ScanSummaryView.class));
+                allScanSummaries.addAll(hubService.getAllResponses(scanSummaryLink, ScanSummaryView.class));
             }
 
             pendingScans = new ArrayList<>();
             for (final ScanSummaryView scanSummaryItem : allScanSummaries) {
                 if (isPending(scanSummaryItem.status)) {
-                    this.logger.debug("Adding pending scan: " + scanSummaryItem.json);
+                    logger.debug("Adding pending scan: " + scanSummaryItem.json);
                     pendingScans.add(scanSummaryItem);
                 }
             }
@@ -186,7 +186,7 @@ public class ScanStatusService extends DataService {
             // ignore, since we might not have found a project or version, etc
             // so just keep waiting until the timeout
             pendingScans = new ArrayList<>();
-            this.logger.debug("Not able to get pending scans: " + e.getMessage());
+            logger.debug("Not able to get pending scans: " + e.getMessage());
         }
 
         return pendingScans;
@@ -195,8 +195,8 @@ public class ScanStatusService extends DataService {
     private List<ScanSummaryView> getPendingScans(final List<ScanSummaryView> scanSummaries) throws IntegrationException {
         final List<ScanSummaryView> pendingScans = new ArrayList<>();
         for (final ScanSummaryView scanSummaryItem : scanSummaries) {
-            final String scanSummaryLink = this.hubService.getHref(scanSummaryItem);
-            final ScanSummaryView currentScanSummaryItem = this.hubService.getResponse(scanSummaryLink, ScanSummaryView.class);
+            final String scanSummaryLink = hubService.getHref(scanSummaryItem);
+            final ScanSummaryView currentScanSummaryItem = hubService.getResponse(scanSummaryLink, ScanSummaryView.class);
             if (isPending(currentScanSummaryItem.status)) {
                 pendingScans.add(currentScanSummaryItem);
             } else if (isError(currentScanSummaryItem.status)) {

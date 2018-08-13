@@ -2,17 +2,17 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.configuration.HubServerConfig
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.CodeLocationService
 import com.synopsys.integration.blackduck.service.HubServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionDistributionType
-import com.synopsys.integration.hub.api.generated.enumeration.ProjectVersionPhaseType
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView
-import com.synopsys.integration.hub.api.generated.view.ProjectView
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.rest.connection.RestConnection
 import com.synopsys.integration.test.tool.TestLogger

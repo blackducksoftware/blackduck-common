@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.hub.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 
 public class HubBucket {
     private final Map<String, HubBucketItem<HubResponse>> bucket = new ConcurrentHashMap<>();
@@ -68,7 +68,6 @@ public class HubBucket {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends HubResponse> T getResponseFromBucket(final HubBucketItem<HubResponse> bucketItem) {
         // the mapping of uri -> response type are assumed to be correct, so returning T is possible
         return (T) bucketItem.getHubResponse().orElse(null);

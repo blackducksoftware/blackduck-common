@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.hub.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
 
 public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
     private final List<NotificationDetailResult> resultList;

@@ -23,7 +23,7 @@
  */
 package com.synopsys.integration.blackduck.api.component;
 
-import com.synopsys.integration.hub.api.core.HubComponent;
+import com.synopsys.integration.blackduck.api.core.HubComponent;
 
 public class AffectedProjectVersion extends HubComponent {
     public String projectName;

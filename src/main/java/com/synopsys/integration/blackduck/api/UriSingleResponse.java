@@ -23,8 +23,8 @@
  */
 package com.synopsys.integration.blackduck.api;
 
-import com.synopsys.integration.hub.api.core.HubResponse;
-import com.synopsys.integration.hub.api.core.LinkResponse;
+import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.LinkResponse;
 
 public class UriSingleResponse<T extends HubResponse> extends LinkResponse {
     public String uri;

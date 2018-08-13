@@ -46,8 +46,8 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.hub.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 
 public class ProjectVersionWrapper {
     private ProjectView projectView;

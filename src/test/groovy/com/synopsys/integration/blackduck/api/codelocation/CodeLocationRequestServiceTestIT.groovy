@@ -22,19 +22,15 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.api.codelocation
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.exception.DoesNotExistException
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.DryRunUploadResponse
-import com.synopsys.integration.blackduck.service.DryRunUploadService
-import com.synopsys.integration.blackduck.service.HubService
-import com.synopsys.integration.blackduck.service.HubServicesFactory
-import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.exception.IntegrationException
-import com.synopsys.integration.hub.api.generated.component.ProjectRequest
-import com.synopsys.integration.hub.api.generated.view.CodeLocationView
-import com.synopsys.integration.hub.api.generated.view.ProjectVersionView
-import com.synopsys.integration.hub.api.generated.view.ProjectView
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
