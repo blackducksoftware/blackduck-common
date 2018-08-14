@@ -4,8 +4,8 @@ import java.io.File;
 
 import org.junit.Test;
 
-import com.synopsys.integration.hub.cli.simple.SimpleScanPaths;
-import com.synopsys.integration.hub.cli.simple.SimpleScanPathsUtility;
+import com.synopsys.integration.blackduck.cli.simple.SimpleScanPaths;
+import com.synopsys.integration.blackduck.cli.simple.SimpleScanPathsUtility;
 import com.synopsys.integration.test.TestLogger;
 
 public class SimpleScanPathsTest {
