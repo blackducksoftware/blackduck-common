@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,6 +35,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityV2View;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.blackduck.service.model.HubMediaTypes;
 import com.synopsys.integration.blackduck.service.model.HubQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
@@ -95,16 +96,24 @@ public class ComponentService extends DataService {
     }
 
     public List<VulnerabilityV2View> getVulnerabilitiesFromComponentVersion(final ExternalId externalId) throws IntegrationException {
+        return getComponentVersionVulnerabilities(externalId).getVulnerabilities();
+    }
+
+    public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
         final String componentVersionURL = componentSearchView.version;
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = hubService.getResponse(componentVersionURL, ComponentVersionView.class);
-            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().mimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-            final List<VulnerabilityV2View> vulnerabilityList = hubService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
-            return vulnerabilityList;
+            return getComponentVersionVulnerabilities(componentVersion);
         }
 
         throw new HubIntegrationException("Couldn't get a componentVersion url from the component matching " + externalId.createExternalId());
+    }
+
+    public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(final ComponentVersionView componentVersion) throws IntegrationException {
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().mimeType(HubMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
+        final List<VulnerabilityV2View> vulnerabilityList = hubService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
+        return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView

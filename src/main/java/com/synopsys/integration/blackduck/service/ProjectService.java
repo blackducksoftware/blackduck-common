@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,6 +36,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.MatchedFileView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -46,6 +47,7 @@ import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicySta
 import com.synopsys.integration.blackduck.api.generated.view.VulnerableComponentView;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.blackduck.service.model.HubQuery;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -322,6 +324,30 @@ public class ProjectService extends DataService {
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final ProjectVersionView projectVersionView) throws IntegrationException {
         final List<VulnerableComponentView> vulnerableBomComponentViews = hubService.getAllResponses(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE);
         return vulnerableBomComponentViews;
+    }
+
+    public List<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(final ProjectVersionView projectVersionView) throws IntegrationException {
+        final List<VersionBomComponentView> versionBomComponentViews = getComponentsForProjectVersion(projectVersionView);
+        final List<ComponentVersionView> componentVersionViews = new ArrayList<>();
+        for (final VersionBomComponentView versionBomComponentView : versionBomComponentViews) {
+            if (StringUtils.isNotBlank(versionBomComponentView.componentVersion)) {
+                final ComponentVersionView componentVersionView = hubService.getResponse(versionBomComponentView.componentVersion, ComponentVersionView.class);
+                componentVersionViews.add(componentVersionView);
+            }
+        }
+
+        final List<ComponentVersionVulnerabilities> componentVersionVulnerabilitiesList = new ArrayList<>();
+        for (final ComponentVersionView componentVersionView : componentVersionViews) {
+            final ComponentVersionVulnerabilities componentVersionVulnerabilities = componentDataService.getComponentVersionVulnerabilities(componentVersionView);
+            componentVersionVulnerabilitiesList.add(componentVersionVulnerabilities);
+        }
+        return componentVersionVulnerabilitiesList;
+    }
+
+    public List<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectVersionWrapper projectVersionWrapper = getProjectVersion(projectName, projectVersionName);
+        final ProjectVersionView projectVersionView = projectVersionWrapper.getProjectVersionView();
+        return getComponentVersionVulnerabilities(projectVersionView);
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
