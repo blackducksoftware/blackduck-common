@@ -36,9 +36,10 @@ public class PolicyOverrideNotificationContent extends NotificationContent {
     public String componentVersionName;
     public String firstName;
     public String lastName;
-    public String bomComponentVersionPolicyStatus;
-    public List<String> policies;
     public List<PolicyInfo> policyInfos;
+    public List<String> policies;
+    public String bomComponentVersionPolicyStatus;
+    public String bomComponent;
 
     // If version is specified, componentVersion will be populated
     // otherwise it will be null
