@@ -61,6 +61,7 @@ public class NotificationContentDetail extends Stringable {
 
     private final Optional<UriSingleResponse<VersionBomComponentView>> bomComponent;
 
+    public final static String CONTENT_KEY_GROUP_BOM_EDIT = "bom_edit";
     public final static String CONTENT_KEY_GROUP_LICENSE = "license";
     public final static String CONTENT_KEY_GROUP_POLICY = "policy";
     public final static String CONTENT_KEY_GROUP_VULNERABILITY = "vulnerability";
@@ -162,12 +163,18 @@ public class NotificationContentDetail extends Stringable {
         if (componentVersion.isPresent()) {
             keyBuilder.append(componentVersion.get().uri.hashCode());
         }
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (policy.isPresent()) {
-            keyBuilder.append(CONTENT_KEY_SEPARATOR);
             keyBuilder.append(policy.get().uri.hashCode());
+            keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        }
+
+        if (bomComponent.isPresent()) {
+            keyBuilder.append(bomComponent.get().uri.hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
+
         final String key = keyBuilder.toString();
         return key;
     }
