@@ -192,7 +192,11 @@ public class NotificationContentDetail extends Stringable {
     }
 
     public boolean isVulnerability() {
-        return !isPolicy();
+        return CONTENT_KEY_GROUP_VULNERABILITY.equals(notificationGroup);
+    }
+
+    public boolean isBomEdit() {
+        return CONTENT_KEY_GROUP_BOM_EDIT.equals(notificationGroup);
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
