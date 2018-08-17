@@ -77,7 +77,7 @@ public class NotificationContentDetailFactory {
             populateContentDetails(notificationContentDetails, notificationGroup, (RuleViolationClearedNotificationContent) notificationContent);
         } else if (NotificationType.VULNERABILITY.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), VulnerabilityNotificationContent.class);
-            notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_POLICY;
+            notificationGroup = NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY;
             populateContentDetails(notificationContentDetails, notificationGroup, (VulnerabilityNotificationContent) notificationContent);
         } else if (NotificationType.BOM_EDIT.equals(type)) {
             notificationContent = gson.fromJson(jsonObject.get("content"), BomEditContent.class);
