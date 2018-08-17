@@ -40,7 +40,7 @@ import com.synopsys.integration.phonehome.enums.ProductIdEnum;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
-    private static final int MAX_META_DATA_CHARACTERS = 1536;
+    public static final int MAX_META_DATA_CHARACTERS = 1536;
 
     private final IntLogger logger;
     private final HubService hubService;
