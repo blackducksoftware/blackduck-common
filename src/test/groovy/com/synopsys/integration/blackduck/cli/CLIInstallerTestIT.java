@@ -23,7 +23,10 @@
  */
 package com.synopsys.integration.blackduck.cli;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +46,8 @@ import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
-import com.synopsys.integration.test.TestLogger;
 import com.synopsys.integration.test.annotation.IntegrationTest;
+import com.synopsys.integration.test.tool.TestLogger;
 
 @Category(IntegrationTest.class)
 public class CLIInstallerTestIT {
