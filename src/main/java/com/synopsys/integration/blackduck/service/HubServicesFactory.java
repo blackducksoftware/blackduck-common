@@ -90,6 +90,10 @@ public class HubServicesFactory {
         intEnvironmentVariables.putAll(environmentVariables);
     }
 
+    public BinaryScannerService createBinaryScannerService() {
+        return new BinaryScannerService(createHubService(), logger);
+    }
+
     public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
         return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), executorService);
     }
