@@ -25,11 +25,13 @@ package com.synopsys.integration.blackduck.service.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionRequestPhaseType;
@@ -49,6 +51,8 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     private String versionNickname;
     private String releaseComments;
     private String releasedOn;
+    private List<ProjectCloneCategoriesType> cloneCategories;
+    private String cloneFromReleaseUrl;
 
     @Override
     public AbstractValidator createValidator() {
@@ -65,6 +69,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         projectVersionRequest.phase = phaseValue;
         projectVersionRequest.versionName = versionName;
         projectVersionRequest.releaseComments = releaseComments;
+        projectVersionRequest.cloneFromReleaseUrl = cloneFromReleaseUrl;
         if (StringUtils.isNotBlank(releasedOn)) {
             final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
             try {
@@ -82,6 +87,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         projectRequest.projectOwner = projectOwner;
         projectRequest.projectTier = projectTier;
         projectRequest.versionRequest = projectVersionRequest;
+        projectRequest.cloneCategories = cloneCategories;
         return projectRequest;
     }
 
@@ -137,6 +143,14 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         this.releasedOn = releasedOn;
     }
 
+    public void setCloneCategories(final List<ProjectCloneCategoriesType> cloneCategories) {
+        this.cloneCategories = cloneCategories;
+    }
+
+    public void setCloneFromReleaseUrl(final String cloneFromReleaseUrl) {
+        this.cloneFromReleaseUrl = cloneFromReleaseUrl;
+    }
+
     public String getProjectName() {
         return projectName;
     }
@@ -181,4 +195,11 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         return releasedOn;
     }
 
+    public List<ProjectCloneCategoriesType> getCloneCategories() {
+        return cloneCategories;
+    }
+
+    public String getCloneFromReleaseUrl() {
+        return cloneFromReleaseUrl;
+    }
 }
