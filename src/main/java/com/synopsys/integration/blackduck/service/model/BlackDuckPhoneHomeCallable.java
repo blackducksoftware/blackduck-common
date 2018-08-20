@@ -40,6 +40,8 @@ import com.synopsys.integration.phonehome.enums.ProductIdEnum;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
+    public static final int MAX_META_DATA_CHARACTERS = 1536;
+
     private final IntLogger logger;
     private final HubService hubService;
     private final HubRegistrationService hubRegistrationService;
@@ -84,6 +86,25 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
             logger.debug("Couldn't detail phone home request builder: " + e.getMessage());
         }
         return phoneHomeRequestBodyBuilder;
+    }
+
+    /**
+     * metaData map cannot exceed {@value #MAX_META_DATA_CHARACTERS}
+     *
+     * @return true if the data was successfully added, false if the new data would make the map exceed it's size limit
+     */
+    public boolean addMetaData(final String key, final String value) {
+        if (charactersInMetaDataMap(key, value) < MAX_META_DATA_CHARACTERS) {
+            phoneHomeRequestBodyBuilder.addToMetaData(key, value);
+            return true;
+        }
+        return false;
+    }
+
+    private int charactersInMetaDataMap(final String key, final String value) {
+        final int mapEntryWrappingCharacters = 6;
+        final String mapAsString = phoneHomeRequestBodyBuilder.getMetaData().toString();
+        return mapEntryWrappingCharacters + mapAsString.length() + key.length() + value.length();
     }
 
 }

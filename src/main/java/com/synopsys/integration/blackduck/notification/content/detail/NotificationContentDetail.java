@@ -34,6 +34,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.util.Stringable;
 
 public class NotificationContentDetail extends Stringable {
@@ -58,6 +59,9 @@ public class NotificationContentDetail extends Stringable {
 
     private final Optional<String> componentVersionOriginId;
 
+    private final Optional<UriSingleResponse<VersionBomComponentView>> bomComponent;
+
+    public final static String CONTENT_KEY_GROUP_BOM_EDIT = "bom_edit";
     public final static String CONTENT_KEY_GROUP_LICENSE = "license";
     public final static String CONTENT_KEY_GROUP_POLICY = "policy";
     public final static String CONTENT_KEY_GROUP_VULNERABILITY = "vulnerability";
@@ -78,6 +82,7 @@ public class NotificationContentDetail extends Stringable {
             ,final Optional<String> componentVersionOriginName
             ,final Optional<String> componentIssueUri
             ,final Optional<String> componentVersionOriginId
+            ,final Optional<String> bomComponent
             ) {
         return new NotificationContentDetail(
                 notificationGroup
@@ -93,6 +98,7 @@ public class NotificationContentDetail extends Stringable {
                 ,componentVersionOriginName
                 ,componentIssueUri
                 ,componentVersionOriginId
+                ,bomComponent
                 );
     }
     // @formatter:on
@@ -112,6 +118,7 @@ public class NotificationContentDetail extends Stringable {
             ,final Optional<String> componentVersionOriginName
             ,final Optional<String> componentIssue
             ,final Optional<String> componentVersionOriginId
+            ,final Optional<String> bomComponent
             ) {
         this.notificationGroup = notificationGroup;
         this.projectName = projectName;
@@ -126,6 +133,7 @@ public class NotificationContentDetail extends Stringable {
         this.componentVersionOriginName = componentVersionOriginName;
         this.componentIssue = createUriSingleResponse(componentIssue, IssueView.class);
         this.componentVersionOriginId = componentVersionOriginId;
+        this.bomComponent = createUriSingleResponse(bomComponent, VersionBomComponentView.class);
         contentDetailKey = createContentDetailKey();
     }
     // @formatter:on
@@ -155,12 +163,18 @@ public class NotificationContentDetail extends Stringable {
         if (componentVersion.isPresent()) {
             keyBuilder.append(componentVersion.get().uri.hashCode());
         }
+        keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (policy.isPresent()) {
-            keyBuilder.append(CONTENT_KEY_SEPARATOR);
             keyBuilder.append(policy.get().uri.hashCode());
+            keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        }
+
+        if (bomComponent.isPresent()) {
+            keyBuilder.append(bomComponent.get().uri.hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
+
         final String key = keyBuilder.toString();
         return key;
     }
@@ -178,7 +192,11 @@ public class NotificationContentDetail extends Stringable {
     }
 
     public boolean isVulnerability() {
-        return !isPolicy();
+        return CONTENT_KEY_GROUP_VULNERABILITY.equals(notificationGroup);
+    }
+
+    public boolean isBomEdit() {
+        return CONTENT_KEY_GROUP_BOM_EDIT.equals(notificationGroup);
     }
 
     public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
@@ -252,6 +270,10 @@ public class NotificationContentDetail extends Stringable {
 
     public Optional<String> getComponentVersionOriginId() {
         return componentVersionOriginId;
+    }
+
+    public Optional<UriSingleResponse<VersionBomComponentView>> getBomComponent() {
+        return bomComponent;
     }
 
 }
