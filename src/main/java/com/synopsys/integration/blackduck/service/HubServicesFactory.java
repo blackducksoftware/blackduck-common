@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -34,16 +34,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
-import com.synopsys.integration.blackduck.cli.CLIDownloadUtility;
-import com.synopsys.integration.blackduck.cli.SignatureScanConfig;
-import com.synopsys.integration.blackduck.cli.SimpleScanUtility;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckPhoneHomeCallable;
-import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeCallable;
@@ -90,14 +84,6 @@ public class HubServicesFactory {
 
     public void addEnvironmentVariables(final Map<String, String> environmentVariables) {
         intEnvironmentVariables.putAll(environmentVariables);
-    }
-
-    public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), executorService);
-    }
-
-    public SignatureScannerService createSignatureScannerService() {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
     }
 
     public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
@@ -149,17 +135,8 @@ public class HubServicesFactory {
         return new CodeLocationService(createHubService(), logger);
     }
 
-    public CLIDownloadUtility createCliDownloadUtility() {
-        return new CLIDownloadUtility(logger, restConnection);
-    }
-
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
-    }
-
-    public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig, final String projectName, final String versionName)
-            throws EncryptionException, HubIntegrationException {
-        return new SimpleScanUtility(logger, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {

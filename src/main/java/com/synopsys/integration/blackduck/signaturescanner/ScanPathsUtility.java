@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.cli.simple;
+package com.synopsys.integration.blackduck.signaturescanner;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -35,11 +35,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.SystemUtils;
 
-import com.synopsys.integration.blackduck.cli.CLILocation;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
-public class SimpleScanPathsUtility {
+public class ScanPathsUtility {
+    public static final String STANDARD_OUT_FILENAME = "CLI_Output.txt";
+
     private static final String JAVA_PATH_FORMAT = "bin" + File.separator + "%s";
     private static final String WINDOWS_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java.exe");
     private static final String OTHER_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java");
@@ -50,13 +51,18 @@ public class SimpleScanPathsUtility {
     private static final FileFilter LIB_DIRECTORY_FILTER = file -> "lib".equalsIgnoreCase(file.getName()) && file.isDirectory();
     private static final FileFilter SCAN_CLI_JAR_FILE_FILTER = file -> file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar") && file.isFile();
 
+    private final IntLogger logger;
+
+    public ScanPathsUtility(final IntLogger logger) {
+        this.logger = logger;
+    }
+
     /**
-     * The directory can either be the directory that contains Hub_Scan_Installation, or the directory that contains the bin, jre, lib (etc) directories.
-     * @param logger
+     * The directory can either be the directory that contains Black_Duck_Scan_Installation, or the directory that contains the bin, jre, lib (etc) directories.
      * @param directory
      * @throws HubIntegrationException
      */
-    public SimpleScanPaths determineSignatureScannerPaths(final IntLogger logger, final File directory) throws HubIntegrationException {
+    public ScanPaths determineSignatureScannerPaths(final File directory) throws HubIntegrationException {
         if (directory == null || !directory.isDirectory()) {
             throw new IllegalArgumentException(String.format("%s is not a valid directory", directory.getAbsolutePath()));
         }
@@ -70,9 +76,12 @@ public class SimpleScanPathsUtility {
         }
 
         File installDirectory = directory;
-        final File[] hubScanInstallationDirectories = directory.listFiles(file -> CLILocation.CLI_UNZIP_DIR.equals(file.getName()));
+        final File[] hubScanInstallationDirectories = directory.listFiles(file -> ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
         if (hubScanInstallationDirectories.length == 1) {
+            logger.debug("The directory structure was likely created by the installer");
             installDirectory = findFirstFilteredFile(hubScanInstallationDirectories[0], EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER, "No scan.cli directories could be found in %s.");
+        } else {
+            logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
 
         final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
@@ -82,11 +91,11 @@ public class SimpleScanPathsUtility {
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
-        return new SimpleScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable);
+        return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable);
     }
 
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws IOException, HubIntegrationException {
-        final String signatureScanOutputDirectoryName = "HubScanOutput";
+        final String signatureScanOutputDirectoryName = "BlackDuckScanOutput";
         final File signatureScanOutputDirectory = new File(generalOutputDirectory, signatureScanOutputDirectoryName);
 
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
@@ -108,6 +117,13 @@ public class SimpleScanPathsUtility {
         }
 
         return specificRunOutputDirectory;
+    }
+
+    public File createStandardOutFile(final File specificRunOutputDirectory) throws IOException {
+        final File standardOutFile = new File(specificRunOutputDirectory, STANDARD_OUT_FILENAME);
+        standardOutFile.createNewFile();
+
+        return standardOutFile;
     }
 
     private String findPathToJavaExe(final File jreContentsDirectory) throws HubIntegrationException {

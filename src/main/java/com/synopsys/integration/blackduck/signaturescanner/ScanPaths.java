@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,14 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.cli.simple;
+package com.synopsys.integration.blackduck.signaturescanner;
 
-public class SimpleScanPaths {
+public class ScanPaths {
     private final String pathToJavaExecutable;
     private final String pathToOneJar;
     private final String pathToScanExecutable;
 
-    public SimpleScanPaths(final String pathToJavaExecutable, final String pathToOneJar, final String pathToScanExecutable) {
+    public ScanPaths(final String pathToJavaExecutable, final String pathToOneJar, final String pathToScanExecutable) {
         this.pathToJavaExecutable = pathToJavaExecutable;
         this.pathToOneJar = pathToOneJar;
         this.pathToScanExecutable = pathToScanExecutable;

@@ -1,9 +1,9 @@
 /**
  * hub-common
- *
+ * <p>
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.cli.simple;
+package com.synopsys.integration.blackduck.signaturescanner;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 
-public class SimpleScanDownloadUtility {
+public class ScannerZipInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";
     public static final String WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-windows.zip";
     public static final String MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-macosx.zip";
@@ -54,15 +54,14 @@ public class SimpleScanDownloadUtility {
     private final RestConnection restConnection;
     private final CleanupZipExpander cleanupZipExpander;
     private final String blackDuckServerUrl;
-    private final File installDirectory;
 
-    public static SimpleScanDownloadUtility defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final File downloadTargetDirectory) throws EncryptionException {
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
         final BlackduckRestConnection restConnection = hubServerConfig.createRestConnection(logger);
         final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        return new SimpleScanDownloadUtility(logger, restConnection, cleanupZipExpander, hubServerConfig.getHubUrl().toString(), downloadTargetDirectory);
+        return new ScannerZipInstaller(logger, restConnection, cleanupZipExpander, hubServerConfig.getHubUrl().toString());
     }
 
-    public SimpleScanDownloadUtility(final IntLogger logger, final RestConnection restConnection, final CleanupZipExpander cleanupZipExpander, final String blackDuckServerUrl, final File downloadTargetDirectory) {
+    public ScannerZipInstaller(final IntLogger logger, final RestConnection restConnection, final CleanupZipExpander cleanupZipExpander, final String blackDuckServerUrl) {
         if (StringUtils.isBlank(blackDuckServerUrl)) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
@@ -71,12 +70,6 @@ public class SimpleScanDownloadUtility {
         this.restConnection = restConnection;
         this.cleanupZipExpander = cleanupZipExpander;
         this.blackDuckServerUrl = blackDuckServerUrl;
-        installDirectory = new File(downloadTargetDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
-
-        installDirectory.mkdirs();
-        if (!installDirectory.exists() || !installDirectory.isDirectory() || !installDirectory.canWrite()) {
-            throw new IllegalArgumentException("The provided directory must exist and be writable.");
-        }
     }
 
     /**
@@ -86,23 +79,26 @@ public class SimpleScanDownloadUtility {
      * downloaded or found successfully, otherwise an Optional.empty will be
      * returned and the log will contain details concerning the failure.
      */
-    public Optional<String> retrieveBlackDuckScanInstallPath() {
+    public Optional<String> retrieveBlackDuckScanInstallPath(final File installDirectory) {
+        installDirectory.mkdirs();
+
         File versionFile = null;
         try {
-            versionFile = retrieveVersionFile();
+            versionFile = retrieveVersionFile(installDirectory);
         } catch (final IOException e) {
             logger.error("Could not create the version file: " + e.getMessage());
             return Optional.empty();
         }
 
         final String downloadUrl = getDownloadUrl();
-        return retrieveBlackDuckScanInstallPath(versionFile, downloadUrl);
+        return retrieveBlackDuckScanInstallPath(installDirectory, versionFile, downloadUrl);
     }
 
-    public Optional<String> retrieveBlackDuckScanInstallPath(final File versionFile, final String downloadUrl) {
-        File installDirectory = null;
+    public Optional<String> retrieveBlackDuckScanInstallPath(final File installDirectory, final File versionFile, final String downloadUrl) {
+        installDirectory.mkdirs();
+
         try {
-            installDirectory = downloadIfModified(versionFile, downloadUrl);
+            downloadIfModified(installDirectory, versionFile, downloadUrl);
         } catch (final Exception e) {
             logger.error("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage());
         }
@@ -116,7 +112,9 @@ public class SimpleScanDownloadUtility {
         return Optional.empty();
     }
 
-    public File retrieveVersionFile() throws IOException {
+    public File retrieveVersionFile(final File installDirectory) throws IOException {
+        installDirectory.mkdirs();
+
         final File versionFile = new File(installDirectory, VERSION_FILENAME);
         if (!versionFile.exists()) {
             logger.info("The version file has not been created yet so creating it now.");
@@ -127,7 +125,7 @@ public class SimpleScanDownloadUtility {
         return versionFile;
     }
 
-    public String getDownloadUrl() {
+    private String getDownloadUrl() {
         final StringBuilder url = new StringBuilder(blackDuckServerUrl);
         if (!blackDuckServerUrl.endsWith("/")) {
             url.append("/");
@@ -144,7 +142,7 @@ public class SimpleScanDownloadUtility {
         return url.toString();
     }
 
-    private File downloadIfModified(final File versionFile, final String downloadUrl) throws IOException, IntegrationException, ArchiveException {
+    private void downloadIfModified(final File installDirectory, final File versionFile, final String downloadUrl) throws IOException, IntegrationException, ArchiveException {
         final long lastTimeDownloaded = versionFile.lastModified();
         logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
 
@@ -161,14 +159,11 @@ public class SimpleScanDownloadUtility {
                 versionFile.setLastModified(lastModifiedOnServer);
 
                 logger.info(String.format("Black Duck Signature Scanner downloaded successfully."));
-
-                return installDirectory;
             } finally {
                 response.close();
             }
         } else {
             logger.debug("The Black Duck Signature Scanner has not been modified since it was last downloaded - skipping download.");
-            return installDirectory;
         }
     }
 

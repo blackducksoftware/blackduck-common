@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.cli;
+package com.synopsys.integration.blackduck.signaturescanner;
 
 import java.io.File;
 import java.util.Optional;
@@ -8,13 +8,12 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
-import com.synopsys.integration.blackduck.cli.simple.SimpleScanDownloadUtility;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.test.TestLogger;
 
-public class SimpleScanDownloadUtilityTest {
+public class ScannerZipInstallerTest {
     @Test
     public void testActualDownload() throws Exception {
         final String signatureScannerDownloadPath = System.getenv("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
@@ -38,9 +37,9 @@ public class SimpleScanDownloadUtilityTest {
         hubServerConfigBuilder.setLogger(intLogger);
 
         final HubServerConfig hubServerConfig = hubServerConfigBuilder.build();
-        final SimpleScanDownloadUtility simpleScanDownloadUtility = SimpleScanDownloadUtility.defaultUtility(intLogger, hubServerConfig, downloadTarget);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(intLogger, hubServerConfig);
 
-        final Optional<String> scanInstallPath = simpleScanDownloadUtility.retrieveBlackDuckScanInstallPath();
+        final Optional<String> scanInstallPath = scannerZipInstaller.retrieveBlackDuckScanInstallPath(downloadTarget);
         Assert.assertTrue(scanInstallPath.isPresent());
         Assert.assertTrue(scanInstallPath.get().length() > 0);
     }
