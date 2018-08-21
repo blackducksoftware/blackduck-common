@@ -31,8 +31,9 @@ public class ComponentVersionStatus extends HubComponent {
     public String componentName;
     public String componentVersionName;
     public String bomComponentVersionPolicyStatus;
-    public List<String> policies;
     public String componentIssueLink;
+    public List<String> policies;
+    public String bomComponent;
 
     // If version is specified, componentVersion will be populated
     // otherwise it will be null

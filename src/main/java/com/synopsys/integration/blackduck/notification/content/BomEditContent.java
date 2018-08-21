@@ -21,15 +21,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.api.component;
+package com.synopsys.integration.blackduck.notification.content;
 
-import com.synopsys.integration.blackduck.api.core.HubComponent;
+import java.util.Collections;
+import java.util.List;
 
-public class AffectedProjectVersion extends HubComponent {
-    public String projectName;
-    public String projectVersionName;
-    public String projectVersion;
-    public String componentIssueUrl;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionDescription;
+
+public class BomEditContent extends NotificationContent {
     public String bomComponent;
+
+    @Override
+    public boolean providesPolicyDetails() {
+        return false;
+    }
+
+    @Override
+    public boolean providesVulnerabilityDetails() {
+        return false;
+    }
+
+    @Override
+    public boolean providesProjectComponentDetails() {
+        return false;
+    }
+
+    @Override
+    public boolean providesLicenseDetails() {
+        return false;
+    }
+
+    @Override
+    public List<ProjectVersionDescription> getAffectedProjectVersionDescriptions() {
+        return Collections.emptyList();
+    }
 
 }

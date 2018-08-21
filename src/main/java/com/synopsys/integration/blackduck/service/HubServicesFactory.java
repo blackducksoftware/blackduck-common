@@ -86,6 +86,10 @@ public class HubServicesFactory {
         intEnvironmentVariables.putAll(environmentVariables);
     }
 
+    public BinaryScannerService createBinaryScannerService() {
+        return new BinaryScannerService(createHubService(), logger);
+    }
+
     public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
         return new PhoneHomeService(logger, executorService);
     }
