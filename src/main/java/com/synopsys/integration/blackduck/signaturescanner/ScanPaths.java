@@ -27,11 +27,13 @@ public class ScanPaths {
     private final String pathToJavaExecutable;
     private final String pathToOneJar;
     private final String pathToScanExecutable;
+    private final boolean managedByLibrary;
 
-    public ScanPaths(final String pathToJavaExecutable, final String pathToOneJar, final String pathToScanExecutable) {
+    public ScanPaths(final String pathToJavaExecutable, final String pathToOneJar, final String pathToScanExecutable, final boolean managedByLibrary) {
         this.pathToJavaExecutable = pathToJavaExecutable;
         this.pathToOneJar = pathToOneJar;
         this.pathToScanExecutable = pathToScanExecutable;
+        this.managedByLibrary = managedByLibrary;
     }
 
     public String getPathToJavaExecutable() {
@@ -44,6 +46,10 @@ public class ScanPaths {
 
     public String getPathToScanExecutable() {
         return pathToScanExecutable;
+    }
+
+    public boolean isManagedByLibrary() {
+        return managedByLibrary;
     }
 
 }

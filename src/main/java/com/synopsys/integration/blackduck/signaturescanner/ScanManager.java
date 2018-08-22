@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,19 +19,12 @@ public class ScanManager {
 
     public static ScanManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger);
+        final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, operatingSystemType);
         final ScanJobRunner scanJobRunner = new ScanJobRunner(logger, intEnvironmentVariables, scanPathsUtility);
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, operatingSystemType);
 
         return new ScanManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanJobRunner);
-    }
-
-    public static ScanManager createOfflineScanManager(final IntLogger logger) {
-        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger);
-        final ScanJobRunner scanJobRunner = new ScanJobRunner(logger, intEnvironmentVariables, scanPathsUtility);
-
-        return new ScanManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanJobRunner);
     }
 
     public ScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanJobRunner scanJobRunner) {
@@ -42,9 +36,16 @@ public class ScanManager {
     }
 
     public List<ScanCommandOutput> executeScans(final ScanJob scanJob) throws IOException, HubIntegrationException {
-        if (scannerZipInstaller != null) {
-            scannerZipInstaller.retrieveBlackDuckScanInstallPath(scanJob.getSignatureScannerInstallDirectory());
+        final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
+        if (!installDirectory.exists()) {
+            scannerZipInstaller.installOrUpdateScanner(installDirectory);
+        } else {
+            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+            if (scanPaths.isManagedByLibrary()) {
+                scannerZipInstaller.installOrUpdateScanner(installDirectory);
+            }
         }
+
         return scanJobRunner.executeScans(scanJob);
     }
 

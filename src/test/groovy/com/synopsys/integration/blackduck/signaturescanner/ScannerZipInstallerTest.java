@@ -1,17 +1,29 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.test.TestLogger;
+import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.test.tool.TestLogger;
+import com.synopsys.integration.util.CleanupZipExpander;
 
 public class ScannerZipInstallerTest {
     @Test
@@ -27,98 +39,67 @@ public class ScannerZipInstallerTest {
 
         final File downloadTarget = new File(signatureScannerDownloadPath);
 
-        final IntLogger intLogger = new TestLogger();
+        final IntLogger logger = new TestLogger();
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setUsername(blackDuckUsername);
         hubServerConfigBuilder.setPassword(blackDuckPassword);
         hubServerConfigBuilder.setTimeout(120);
         hubServerConfigBuilder.setTrustCert(true);
-        hubServerConfigBuilder.setLogger(intLogger);
+        hubServerConfigBuilder.setLogger(logger);
 
         final HubServerConfig hubServerConfig = hubServerConfigBuilder.build();
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(intLogger, hubServerConfig);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, OperatingSystemType.determineFromSystem());
 
-        final Optional<String> scanInstallPath = scannerZipInstaller.retrieveBlackDuckScanInstallPath(downloadTarget);
-        Assert.assertTrue(scanInstallPath.isPresent());
-        Assert.assertTrue(scanInstallPath.get().length() > 0);
+        scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, OperatingSystemType.determineFromSystem());
+        final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+        assertTrue(scanPaths.isManagedByLibrary());
+        assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
+        assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
+        assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
+        assertTrue(new File(scanPaths.getPathToJavaExecutable()).canExecute());
+        assertTrue(new File(scanPaths.getPathToOneJar()).canExecute());
+        assertTrue(new File(scanPaths.getPathToScanExecutable()).canExecute());
     }
 
-    //    @Test
-    //    public void testInitialDownload() throws Exception {
-    //        final InputStream zipFileStream = getClass().getResourceAsStream("/swip_mac.zip");
-    //        final Response mockResponse = Mockito.mock(Response.class);
-    //        Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
-    //
-    //        final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
-    //        Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
-    //
-    //        final IntLogger intLogger = new TestLogger();
-    //        final Path tempDirectory = Files.createTempDirectory(null);
-    //        final File downloadTarget = tempDirectory.toFile();
-    //        downloadTarget.deleteOnExit();
-    //
-    //        final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(intLogger);
-    //        final SwipDownloadUtility swipDownloadUtility = new SwipDownloadUtility(intLogger, mockRestConnection, cleanupZipExpander, SwipDownloadUtility.DEFAULT_SWIP_SERVER_URL, downloadTarget);
-    //        final Optional<String> swipCliPath = swipDownloadUtility.retrieveSwipCliExecutablePath();
-    //
-    //        Assert.assertTrue(swipCliPath.isPresent());
-    //        Assert.assertTrue(swipCliPath.get().length() > 0);
-    //    }
-    //
-    //    @Test
-    //    public void testNotDownloadIfNotUpdatedOnServer() throws Exception {
-    //        final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
-    //        Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.empty());
-    //
-    //        final TestLogger intLogger = new TestLogger();
-    //
-    //        final Path tempDirectory = Files.createTempDirectory(null);
-    //        final File downloadTarget = tempDirectory.toFile();
-    //        downloadTarget.deleteOnExit();
-    //
-    //        final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(intLogger);
-    //        final SwipDownloadUtility swipDownloadUtility = new SwipDownloadUtility(intLogger, mockRestConnection, cleanupZipExpander, SwipDownloadUtility.DEFAULT_SWIP_SERVER_URL, downloadTarget);
-    //        final Optional<String> swipCliPath = swipDownloadUtility.retrieveSwipCliExecutablePath();
-    //
-    //        Assert.assertFalse(swipCliPath.isPresent());
-    //        Assert.assertTrue(intLogger.getOutputString().contains("skipping download"));
-    //    }
-    //
-    //    @Test
-    //    public void testDownloadIfServerUpdated() throws Exception {
-    //        final InputStream zipFileStream = getClass().getResourceAsStream("/swip_mac.zip");
-    //        final Response mockResponse = Mockito.mock(Response.class);
-    //        Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
-    //
-    //        final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
-    //        Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
-    //
-    //        final TestLogger intLogger = new TestLogger();
-    //
-    //        final Path tempDirectory = Files.createTempDirectory(null);
-    //        final File downloadTarget = tempDirectory.toFile();
-    //        downloadTarget.deleteOnExit();
-    //
-    //        final File installDirectory = new File(downloadTarget, SwipDownloadUtility.SWIP_CLI_INSTALL_DIRECTORY);
-    //        installDirectory.mkdirs();
-    //        installDirectory.deleteOnExit();
-    //
-    //        // create a directory that should be deleted by the update download/extract code
-    //        final File directoryOfPreviousExtraction = new File(installDirectory, "temp_swip_cli_version");
-    //        directoryOfPreviousExtraction.mkdirs();
-    //        Assert.assertTrue(directoryOfPreviousExtraction.isDirectory());
-    //        Assert.assertTrue(directoryOfPreviousExtraction.exists());
-    //
-    //        final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(intLogger);
-    //        final SwipDownloadUtility swipDownloadUtility = new SwipDownloadUtility(intLogger, mockRestConnection, cleanupZipExpander, SwipDownloadUtility.DEFAULT_SWIP_SERVER_URL, downloadTarget);
-    //        final Optional<String> swipCliPath = swipDownloadUtility.retrieveSwipCliExecutablePath();
-    //
-    //        Assert.assertTrue(swipCliPath.isPresent());
-    //        Assert.assertTrue(swipCliPath.get().length() > 0);
-    //        Assert.assertFalse(directoryOfPreviousExtraction.exists());
-    //        Assert.assertTrue(intLogger.getOutputString().contains("There were items"));
-    //        Assert.assertTrue(intLogger.getOutputString().contains("that are being deleted"));
-    //    }
+    @Test
+    public void testInitialDownload() throws Exception {
+        final InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
+        final Response mockResponse = Mockito.mock(Response.class);
+        Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
+
+        final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
+        Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+
+        final IntLogger logger = new TestLogger();
+        final Path tempDirectory = Files.createTempDirectory(null);
+        final File downloadTarget = tempDirectory.toFile();
+        try {
+            final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+            final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, OperatingSystemType.MAC);
+            final ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockRestConnection, cleanupZipExpander, scanPathsUtility, "http://www.google.com", OperatingSystemType.MAC);
+
+            try {
+                final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+                fail("Should have thrown");
+            } catch (final HubIntegrationException e) {
+            }
+
+            scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+
+            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+            assertTrue(scanPaths.isManagedByLibrary());
+            assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
+            assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
+            assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
+            assertTrue(new File(scanPaths.getPathToScanExecutable()).canExecute());
+            assertTrue(new File(scanPaths.getPathToOneJar()).canExecute());
+            assertTrue(new File(scanPaths.getPathToJavaExecutable()).canExecute());
+        } finally {
+            FileUtils.deleteQuietly(downloadTarget);
+        }
+    }
 
 }

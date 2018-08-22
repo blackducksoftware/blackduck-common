@@ -33,8 +33,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
@@ -52,9 +50,11 @@ public class ScanPathsUtility {
     private static final FileFilter SCAN_CLI_JAR_FILE_FILTER = file -> file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar") && file.isFile();
 
     private final IntLogger logger;
+    private final OperatingSystemType operatingSystemType;
 
-    public ScanPathsUtility(final IntLogger logger) {
+    public ScanPathsUtility(final IntLogger logger, final OperatingSystemType operatingSystemType) {
         this.logger = logger;
+        this.operatingSystemType = operatingSystemType;
     }
 
     /**
@@ -67,19 +67,17 @@ public class ScanPathsUtility {
             throw new IllegalArgumentException(String.format("%s is not a valid directory", directory.getAbsolutePath()));
         }
 
-        final boolean createdDirectories = directory.mkdirs();
-        if (createdDirectories) {
-            logger.info(String.format("The directory structure didn't exist so it was created: %s", directory.getAbsolutePath()));
-        }
         if (!directory.exists()) {
-            throw new IllegalArgumentException(String.format("%s could not be created and/or does not exist.", directory.getAbsolutePath()));
+            throw new IllegalArgumentException(String.format("%s does not exist.", directory.getAbsolutePath()));
         }
 
+        boolean managedByLibrary = false;
         File installDirectory = directory;
         final File[] hubScanInstallationDirectories = directory.listFiles(file -> ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
         if (hubScanInstallationDirectories.length == 1) {
             logger.debug("The directory structure was likely created by the installer");
             installDirectory = findFirstFilteredFile(hubScanInstallationDirectories[0], EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER, "No scan.cli directories could be found in %s.");
+            managedByLibrary = true;
         } else {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
@@ -91,7 +89,7 @@ public class ScanPathsUtility {
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
-        return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable);
+        return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws IOException, HubIntegrationException {
@@ -135,7 +133,7 @@ public class ScanPathsUtility {
         }
 
         File javaExe = new File(jreContents, OTHER_JAVA_PATH);
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OperatingSystemType.WINDOWS == operatingSystemType) {
             javaExe = new File(jreContents, WINDOWS_JAVA_PATH);
         }
 
@@ -143,7 +141,7 @@ public class ScanPathsUtility {
             throw new HubIntegrationException(String.format("The java executable does not exist at: %s", javaExe.getAbsolutePath()));
         }
 
-        return setExecutableAndGetAbsolutePath(javaExe);
+        return javaExe.getAbsolutePath();
     }
 
     private String findPathToStandaloneJar(final File libDirectory) throws HubIntegrationException {
@@ -153,7 +151,7 @@ public class ScanPathsUtility {
             throw new HubIntegrationException(String.format("The standalone jar does not exist at: %s", standaloneJarFile.getAbsolutePath()));
         }
 
-        return setExecutableAndGetAbsolutePath(standaloneJarFile);
+        return standaloneJarFile.getAbsolutePath();
     }
 
     private String findPathToScanCliJar(final File libDirectory) throws HubIntegrationException {
@@ -163,7 +161,7 @@ public class ScanPathsUtility {
             throw new HubIntegrationException(String.format("The scan.cli jar does not exist at: %s", scanCliJarFile.getAbsolutePath()));
         }
 
-        return setExecutableAndGetAbsolutePath(scanCliJarFile);
+        return scanCliJarFile.getAbsolutePath();
     }
 
     private File findFirstFilteredFile(final File directory, final FileFilter fileFilter, final String notFoundMessageFormat) throws HubIntegrationException {
@@ -173,11 +171,6 @@ public class ScanPathsUtility {
         }
 
         return potentialItems[0];
-    }
-
-    private String setExecutableAndGetAbsolutePath(final File file) {
-        file.setExecutable(true);
-        return file.getAbsolutePath();
     }
 
 }

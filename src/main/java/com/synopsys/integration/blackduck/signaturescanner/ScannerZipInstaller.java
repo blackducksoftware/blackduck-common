@@ -30,9 +30,9 @@ import java.util.Optional;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
 import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.exception.IntegrationException;
@@ -53,15 +53,23 @@ public class ScannerZipInstaller {
     private final IntLogger logger;
     private final RestConnection restConnection;
     private final CleanupZipExpander cleanupZipExpander;
+    private final ScanPathsUtility scanPathsUtility;
     private final String blackDuckServerUrl;
+    private final OperatingSystemType operatingSystemType;
 
-    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
-        final BlackduckRestConnection restConnection = hubServerConfig.createRestConnection(logger);
-        final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        return new ScannerZipInstaller(logger, restConnection, cleanupZipExpander, hubServerConfig.getHubUrl().toString());
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final OperatingSystemType operatingSystemType) throws EncryptionException {
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, operatingSystemType);
+        return defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
     }
 
-    public ScannerZipInstaller(final IntLogger logger, final RestConnection restConnection, final CleanupZipExpander cleanupZipExpander, final String blackDuckServerUrl) {
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final ScanPathsUtility scanPathsUtility, final OperatingSystemType operatingSystemType) throws EncryptionException {
+        final BlackduckRestConnection restConnection = hubServerConfig.createRestConnection(logger);
+        final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+        return new ScannerZipInstaller(logger, restConnection, cleanupZipExpander, scanPathsUtility, hubServerConfig.getHubUrl().toString(), operatingSystemType);
+    }
+
+    public ScannerZipInstaller(final IntLogger logger, final RestConnection restConnection, final CleanupZipExpander cleanupZipExpander, final ScanPathsUtility scanPathsUtility, final String blackDuckServerUrl,
+            final OperatingSystemType operatingSystemType) {
         if (StringUtils.isBlank(blackDuckServerUrl)) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
@@ -69,7 +77,9 @@ public class ScannerZipInstaller {
         this.logger = logger;
         this.restConnection = restConnection;
         this.cleanupZipExpander = cleanupZipExpander;
+        this.scanPathsUtility = scanPathsUtility;
         this.blackDuckServerUrl = blackDuckServerUrl;
+        this.operatingSystemType = operatingSystemType;
     }
 
     /**
@@ -79,43 +89,29 @@ public class ScannerZipInstaller {
      * downloaded or found successfully, otherwise an Optional.empty will be
      * returned and the log will contain details concerning the failure.
      */
-    public Optional<String> retrieveBlackDuckScanInstallPath(final File installDirectory) {
-        installDirectory.mkdirs();
+    public void installOrUpdateScanner(final File installDirectory) throws HubIntegrationException {
+        final File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
+        scannerExpansionDirectory.mkdirs();
 
         File versionFile = null;
         try {
-            versionFile = retrieveVersionFile(installDirectory);
+            versionFile = retrieveVersionFile(scannerExpansionDirectory);
         } catch (final IOException e) {
-            logger.error("Could not create the version file: " + e.getMessage());
-            return Optional.empty();
+            throw new HubIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage());
         }
 
         final String downloadUrl = getDownloadUrl();
-        return retrieveBlackDuckScanInstallPath(installDirectory, versionFile, downloadUrl);
-    }
-
-    public Optional<String> retrieveBlackDuckScanInstallPath(final File installDirectory, final File versionFile, final String downloadUrl) {
-        installDirectory.mkdirs();
-
         try {
-            downloadIfModified(installDirectory, versionFile, downloadUrl);
+            downloadIfModified(scannerExpansionDirectory, versionFile, downloadUrl);
         } catch (final Exception e) {
-            logger.error("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage());
+            throw new HubIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage());
         }
 
-        if (installDirectory != null && installDirectory.exists() && installDirectory.isDirectory()) {
-            logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
-            return Optional.of(installDirectory.getAbsolutePath());
-        }
-
-        logger.error("The Black Duck Signature Scanner executable could not be found or downloaded - check the logs for any errors.");
-        return Optional.empty();
+        logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
     }
 
-    public File retrieveVersionFile(final File installDirectory) throws IOException {
-        installDirectory.mkdirs();
-
-        final File versionFile = new File(installDirectory, VERSION_FILENAME);
+    private File retrieveVersionFile(final File scannerExpansionDirectory) throws IOException {
+        final File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
         if (!versionFile.exists()) {
             logger.info("The version file has not been created yet so creating it now.");
             versionFile.createNewFile();
@@ -131,9 +127,9 @@ public class ScannerZipInstaller {
             url.append("/");
         }
 
-        if (SystemUtils.IS_OS_MAC) {
+        if (OperatingSystemType.MAC == operatingSystemType) {
             url.append(MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
-        } else if (SystemUtils.IS_OS_WINDOWS) {
+        } else if (OperatingSystemType.WINDOWS == operatingSystemType) {
             url.append(WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
         } else {
             url.append(DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
@@ -142,7 +138,7 @@ public class ScannerZipInstaller {
         return url.toString();
     }
 
-    private void downloadIfModified(final File installDirectory, final File versionFile, final String downloadUrl) throws IOException, IntegrationException, ArchiveException {
+    private void downloadIfModified(final File scannerExpansionDirectory, final File versionFile, final String downloadUrl) throws IOException, IntegrationException, ArchiveException {
         final long lastTimeDownloaded = versionFile.lastModified();
         logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
 
@@ -153,10 +149,18 @@ public class ScannerZipInstaller {
             try {
                 logger.info("Downloading the Black Duck Signature Scanner.");
                 try (InputStream responseStream = response.getContent()) {
-                    cleanupZipExpander.expand(responseStream, installDirectory);
+                    cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
                 }
                 final long lastModifiedOnServer = response.getLastModified();
                 versionFile.setLastModified(lastModifiedOnServer);
+
+                final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scannerExpansionDirectory.getParentFile());
+                final File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
+                final File oneJar = new File(scanPaths.getPathToOneJar());
+                final File scanExecutable = new File(scanPaths.getPathToScanExecutable());
+                javaExecutable.setExecutable(true);
+                oneJar.setExecutable(true);
+                scanExecutable.setExecutable(true);
 
                 logger.info(String.format("Black Duck Signature Scanner downloaded successfully."));
             } finally {
