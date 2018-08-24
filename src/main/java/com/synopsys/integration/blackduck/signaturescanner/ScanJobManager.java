@@ -65,7 +65,6 @@ public class ScanJobManager {
         this.scanCommandRunner = scanCommandRunner;
     }
 
-    //TODO create scan job output
     public ScanJobOutput executeScans(final ScanJob scanJob) throws IOException, HubIntegrationException {
         final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
         if (!installDirectory.exists()) {

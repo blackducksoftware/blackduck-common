@@ -107,7 +107,6 @@ public class ScanJob extends Stringable {
         for (final ScanTarget scanTarget : scanTargets) {
             File commandOutputDirectory = null;
             if (StringUtils.isNotBlank(scanTarget.getOutputDirectoryPath())) {
-                // TODO we need to handle bdignore here
                 if (scanTarget.isOutputDirectoryPathAbsolute()) {
                     commandOutputDirectory = new File(scanTarget.getOutputDirectoryPath());
                 } else {
