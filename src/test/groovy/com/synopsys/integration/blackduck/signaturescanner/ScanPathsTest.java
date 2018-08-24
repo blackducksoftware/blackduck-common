@@ -14,6 +14,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanPaths;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.test.tool.TestLogger;
 
 public class ScanPathsTest {

@@ -1,9 +1,9 @@
 /**
  * hub-common
- * <p>
+ *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -46,7 +46,6 @@ import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 
@@ -175,7 +174,7 @@ public class HubServicesFactory {
         return new HubBucketService(createHubService(), logger, executorService);
     }
 
-    public RestConnection getRestConnection() {
+    public BlackduckRestConnection getRestConnection() {
         return restConnection;
     }
 
@@ -185,6 +184,10 @@ public class HubServicesFactory {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public IntEnvironmentVariables getEnvironmentVariables() {
+        return intEnvironmentVariables;
     }
 
     @Override

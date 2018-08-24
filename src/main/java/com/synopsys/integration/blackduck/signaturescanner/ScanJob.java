@@ -1,9 +1,9 @@
 /**
  * hub-common
- * <p>
+ *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,6 +32,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommand;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.Stringable;
 

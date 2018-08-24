@@ -1,9 +1,9 @@
 /**
  * hub-common
- * <p>
+ *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,6 +32,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
@@ -39,7 +41,7 @@ public class ScanJobBuilder {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
-    private File signatureScannerInstallDirectory;
+    private File installDirectory;
     private File outputDirectory;
     private boolean cleanupOutput;
 
@@ -68,7 +70,7 @@ public class ScanJobBuilder {
     public ScanJob build() throws IllegalArgumentException {
         assertValid();
 
-        return new ScanJob(signatureScannerInstallDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
+        return new ScanJob(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, shouldUseProxy, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -164,12 +166,12 @@ public class ScanJobBuilder {
         return this;
     }
 
-    public File getSignatureScannerInstallDirectory() {
-        return signatureScannerInstallDirectory;
+    public File getInstallDirectory() {
+        return installDirectory;
     }
 
-    public ScanJobBuilder signatureScannerInstallDirectory(final File signatureScannerInstallDirectory) {
-        this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
+    public ScanJobBuilder installDirectory(final File installDirectory) {
+        this.installDirectory = installDirectory;
         return this;
     }
 
@@ -321,18 +323,8 @@ public class ScanJobBuilder {
         return projectName;
     }
 
-    public ScanJobBuilder projectName(final String projectName) {
-        this.projectName = projectName;
-        return this;
-    }
-
     public String getProjectVersionName() {
         return projectVersionName;
-    }
-
-    public ScanJobBuilder projectVersionName(final String projectVersionName) {
-        this.projectVersionName = projectVersionName;
-        return this;
     }
 
     public List<ScanTarget> getScanTargets() {

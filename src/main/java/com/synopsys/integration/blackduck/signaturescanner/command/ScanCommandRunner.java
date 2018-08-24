@@ -1,9 +1,9 @@
 /**
  * hub-common
- * <p>
+ *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -11,9 +11,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,9 +21,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.signaturescanner.command;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,26 +30,25 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
 // takes a list of CommandCallable's OR SignatureScanJob
-public class ScanJobRunner {
+public class ScanCommandRunner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScanPathsUtility scanPathsUtility;
     private final Optional<ExecutorService> optionalExecutorService;
 
-    public ScanJobRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility) {
+    public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanPathsUtility = scanPathsUtility;
         optionalExecutorService = Optional.empty();
     }
 
-    public ScanJobRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
+    public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanPathsUtility = scanPathsUtility;
@@ -61,14 +59,6 @@ public class ScanJobRunner {
         logger.info("Starting the Black Duck Signature Scan commands.");
         final List<ScanCommandOutput> scanCommandOutputs = executeCommands(scanCommands, cleanupOutput);
         logger.info("Completed the Black Duck Signature Scan commands.");
-
-        return scanCommandOutputs;
-    }
-
-    public List<ScanCommandOutput> executeScans(final ScanJob scanJob) throws IOException, HubIntegrationException {
-        logger.info("Starting the Black Duck Signature Scan job.");
-        final List<ScanCommandOutput> scanCommandOutputs = executeCommands(scanJob.createScanCommands(scanPathsUtility), scanJob.isCleanupOutput());
-        logger.info("Completed the Black Duck Signature Scan job.");
 
         return scanCommandOutputs;
     }
