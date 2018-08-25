@@ -70,8 +70,13 @@ public class ScanJobManager {
         if (!installDirectory.exists()) {
             scannerZipInstaller.installOrUpdateScanner(installDirectory);
         } else {
-            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
-            if (scanPaths.isManagedByLibrary()) {
+            try {
+                final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+                if (scanPaths.isManagedByLibrary()) {
+                    scannerZipInstaller.installOrUpdateScanner(installDirectory);
+                }
+            } catch (final HubIntegrationException e) {
+                // a valid scanPaths could not be found so we will need to attempt an install
                 scannerZipInstaller.installOrUpdateScanner(installDirectory);
             }
         }
