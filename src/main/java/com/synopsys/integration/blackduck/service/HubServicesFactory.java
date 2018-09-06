@@ -34,10 +34,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
-import com.synopsys.integration.blackduck.cli.CLIDownloadUtility;
-import com.synopsys.integration.blackduck.cli.SignatureScanConfig;
-import com.synopsys.integration.blackduck.cli.SimpleScanUtility;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
@@ -50,7 +46,6 @@ import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 
@@ -94,27 +89,18 @@ public class HubServicesFactory {
         return new BinaryScannerService(createHubService(), logger);
     }
 
-    public SignatureScannerService createSignatureScannerService(final ExecutorService executorService) {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService(), executorService);
-    }
-
-    public SignatureScannerService createSignatureScannerService() {
-        return new SignatureScannerService(createHubService(), logger, intEnvironmentVariables, createCliDownloadUtility(), createProjectService());
-    }
-
     public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
         return new PhoneHomeService(logger, executorService);
     }
 
     public PhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
-        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion,
-                intEnvironmentVariables, createHubService(), createHubRegistrationService());
+        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion, intEnvironmentVariables, createHubService(), createHubRegistrationService());
         return phoneHomeCallable;
     }
 
     public PhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
-        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion,
-                intEnvironmentVariables, createHubService(), createHubRegistrationService(), phoneHomeRequestBodyBuilder);
+        final PhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion, intEnvironmentVariables, createHubService(), createHubRegistrationService(),
+                phoneHomeRequestBodyBuilder);
         return phoneHomeCallable;
     }
 
@@ -152,16 +138,8 @@ public class HubServicesFactory {
         return new CodeLocationService(createHubService(), logger);
     }
 
-    public CLIDownloadUtility createCliDownloadUtility() {
-        return new CLIDownloadUtility(logger, restConnection);
-    }
-
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
-    }
-
-    public SimpleScanUtility createSimpleScanUtility(final HubServerConfig hubServerConfig, final SignatureScanConfig signatureScanConfig, final String projectName, final String versionName) {
-        return new SimpleScanUtility(logger, hubServerConfig, intEnvironmentVariables, signatureScanConfig, projectName, versionName);
     }
 
     public HubRegistrationService createHubRegistrationService() {
@@ -196,7 +174,7 @@ public class HubServicesFactory {
         return new HubBucketService(createHubService(), logger, executorService);
     }
 
-    public RestConnection getRestConnection() {
+    public BlackduckRestConnection getRestConnection() {
         return restConnection;
     }
 
@@ -206,6 +184,10 @@ public class HubServicesFactory {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public IntEnvironmentVariables getEnvironmentVariables() {
+        return intEnvironmentVariables;
     }
 
     @Override

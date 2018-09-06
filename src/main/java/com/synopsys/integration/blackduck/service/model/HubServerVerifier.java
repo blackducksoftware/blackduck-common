@@ -28,8 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import com.synopsys.integration.blackduck.cli.CLILocation;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -43,8 +43,7 @@ import com.synopsys.integration.rest.request.Response;
 
 public class HubServerVerifier {
 
-    public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo,
-            final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
+    public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
         connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
         connectionBuilder.setBaseUrl(hubURL.toString());
@@ -69,7 +68,7 @@ public class HubServerVerifier {
             }
             final URL downloadURL;
             try {
-                downloadURL = new URL(hubURL, "download/" + CLILocation.DEFAULT_CLI_DOWNLOAD);
+                downloadURL = new URL(hubURL, ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
             }
