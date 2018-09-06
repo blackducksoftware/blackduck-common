@@ -27,6 +27,7 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.test.tool.TestLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
+import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScannerZipInstallerTest {
     @Test

@@ -18,6 +18,7 @@ import com.synopsys.integration.blackduck.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.test.tool.TestLogger;
+import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanPathsTest {
     private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new TestLogger(), OperatingSystemType.MAC);
