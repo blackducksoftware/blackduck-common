@@ -189,6 +189,23 @@ public class ProjectService extends DataService {
         }
     }
 
+    /**
+     * If the project exists, it will be updated, otherwise, it will be created.
+     * If the version exists, it will be updated, otherwise, it will be created.
+     */
+    public ProjectVersionWrapper syncProjectVersion(final ProjectRequest projectRequest) {
+
+    }
+
+    public ProjectRequest createProjectRequest(final ProjectView projectView) {
+        final ProjectRequest projectRequest = new ProjectRequest();
+
+        projectRequest.name = projectView.name;
+        projectRequest.description = projectView.description;
+        projectRequest.
+        return projectRequest;
+    }
+
     public void updateProjectAndVersion(final String projectUri, final ProjectRequest projectRequest) throws IntegrationException {
         updateProjectAndVersion(hubService.getResponse(projectUri, ProjectView.class), projectRequest);
     }
