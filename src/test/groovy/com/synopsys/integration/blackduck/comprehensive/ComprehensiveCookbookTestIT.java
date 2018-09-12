@@ -41,7 +41,6 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.CodeLocation
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionRequestPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -97,7 +96,7 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest.phase = ProjectVersionRequestPhaseType.DEVELOPMENT;
+        projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
         projectVersionRequest.versionName = "RestConnectionTest";
         final String projectVersionUrl = hubServicesFactory.createProjectService().createHubVersion(projectItem, projectVersionRequest);
         final ProjectVersionView projectVersionItem = hubServicesFactory.createHubService().getResponse(projectVersionUrl, ProjectVersionView.class);

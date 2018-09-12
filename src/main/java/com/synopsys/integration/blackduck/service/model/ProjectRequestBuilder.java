@@ -34,7 +34,6 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectVersion
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionRequestPhaseType;
 import com.synopsys.integration.builder.AbstractBuilder;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.validator.AbstractValidator;
@@ -63,7 +62,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     @Override
     public ProjectRequest buildObject() {
         final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution.toUpperCase());
-        final ProjectVersionRequestPhaseType phaseValue = ProjectVersionRequestPhaseType.valueOf(phase.toUpperCase());
+        final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase.toUpperCase());
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = distributionValue;
         projectVersionRequest.phase = phaseValue;
