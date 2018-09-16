@@ -40,6 +40,8 @@ import com.synopsys.integration.util.OperatingSystemType;
 public class ScanPathsUtility {
     public static final String STANDARD_OUT_FILENAME = "CLI_Output.txt";
 
+    public static final String BDS_JAVA_HOME = "BDS_JAVA_HOME";
+
     private static final String JAVA_PATH_FORMAT = "bin" + File.separator + "%s";
     private static final String WINDOWS_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java.exe");
     private static final String OTHER_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java");
@@ -83,10 +85,16 @@ public class ScanPathsUtility {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
 
-        final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
+        final String pathToJavaExecutable;
+        if(System.getenv(BDS_JAVA_HOME)!=null) {
+            pathToJavaExecutable = System.getenv(BDS_JAVA_HOME);
+        } else {
+            final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
+            pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
+        }
+
         final File libDirectory = findFirstFilteredFile(installDirectory, LIB_DIRECTORY_FILTER, "Could not find the 'lib' directory in %s.");
 
-        final String pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
