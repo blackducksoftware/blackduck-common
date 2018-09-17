@@ -159,7 +159,10 @@ public class HubServicesFactory {
     }
 
     public ProjectService createProjectService() {
-        return new ProjectService(createHubService(), logger, createComponentService());
+        final HubService hubService = createHubService();
+        final ProjectGetService projectGetService = new ProjectGetService(hubService, logger);
+        final ProjectUpdateService projectUpdateService = new ProjectUpdateService(hubService, logger, projectGetService);
+        return new ProjectService(hubService, logger, projectGetService, projectUpdateService, createComponentService());
     }
 
     public UserGroupService createUserGroupService() {

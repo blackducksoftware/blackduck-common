@@ -25,7 +25,10 @@ package com.synopsys.integration.blackduck.api.project;
 
 import static org.junit.Assert.*;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -34,6 +37,7 @@ import org.junit.experimental.categories.Category;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -42,6 +46,7 @@ import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
@@ -141,7 +146,7 @@ public class ProjectServiceTestIT {
         projectRequest.projectTier = 4;
         projectRequest.description = "New Description";
 
-        projectService.updateProjectAndVersion(project, projectRequest);
+        projectService.updateHubProject(projectUrl, projectRequest);
 
         project = hubService.getResponse(projectUrl, ProjectView.class);
 
@@ -181,13 +186,123 @@ public class ProjectServiceTestIT {
         projectVersionRequest.phase = ProjectVersionPhaseType.DEPRECATED;
         projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
 
-        projectService.updateProjectVersion(projectVersionView, projectVersionRequest);
+        final String projectVersionUrl = hubService.getHref(projectVersionView);
+        projectService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
 
         projectVersionView = hubService.getResponse(hubService.getHref(projectVersionView), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.versionName);
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.phase);
         assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.distribution);
+    }
+
+    @Test
+    public void testCreateProjectWithTwoVersions() throws Exception {
+        final HubService hubService = hubServicesFactory.createHubService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+
+        // first create a new project with a single version
+        final String projectName = "createWithTwo" + Instant.now().toString();
+        final String projectVersionName = "1.0.0";
+
+        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+        projectRequestBuilder.setProjectName(projectName);
+        projectRequestBuilder.setVersionName(projectVersionName);
+        final ProjectRequest projectRequest = projectRequestBuilder.build();
+
+        projectService.createHubProject(projectRequest);
+
+        final ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
+        project = projectVersionWrapper.getProjectView();
+        final String projectUrl = hubService.getHref(project);
+        final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(1, projectVersionViews.size());
+
+        final ProjectVersionRequest projectVersionRequest = projectRequest.versionRequest;
+        projectVersionRequest.versionName = "2.0.0";
+
+        projectService.createHubVersion(project, projectVersionRequest);
+
+        final List<ProjectVersionView> projectVersionViewsAfterUpdate = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(2, projectVersionViewsAfterUpdate.size());
+    }
+
+    @Test
+    public void testUpdatingAProjectDoesNotAffectVersion() throws Exception {
+        final HubService hubService = hubServicesFactory.createHubService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+
+        // first create a new project with a single version
+        final String projectName = "toBeUpdated" + Instant.now().toString();
+        final String projectVersionName = "1.0.0";
+
+        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+        projectRequestBuilder.setProjectName(projectName);
+        projectRequestBuilder.setVersionName(projectVersionName);
+        projectRequestBuilder.setVersionNickname("first nickname");
+        final ProjectRequest projectRequest = projectRequestBuilder.build();
+
+        final String projectUrl = projectService.createHubProject(projectRequest);
+
+        project = hubService.getResponse(projectUrl, ProjectView.class);
+        final ProjectVersionView projectVersionView = projectService.getProjectVersion(project, projectVersionName);
+        assertEquals("first nickname", projectVersionView.nickname);
+
+        final ProjectRequestBuilder updateRequestBuilder = new ProjectRequestBuilder();
+        updateRequestBuilder.setFromProjectAndVersion(project, projectVersionView);
+        updateRequestBuilder.setVersionNickname("second nickname");
+        final ProjectRequest updateRequest = updateRequestBuilder.build();
+
+        projectService.updateHubProject(projectUrl, updateRequest);
+
+        final ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
+        final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(projectVersionWrapper.getProjectView(), ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(1, projectVersionViews.size());
+        assertEquals("first nickname", projectVersionViews.get(0).nickname);
+    }
+
+    @Test
+    public void testCloning() throws Exception {
+        final HubService hubService = hubServicesFactory.createHubService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+
+        // first create a new project with a single version
+        final String projectName = "create" + Instant.now().toString();
+        final String projectVersionName = "1.0.0";
+
+        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+        projectRequestBuilder.setProjectName(projectName);
+        projectRequestBuilder.setVersionName(projectVersionName);
+        final ProjectRequest projectRequest = projectRequestBuilder.build();
+
+        projectService.createHubProject(projectRequest);
+
+        final ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
+        project = projectVersionWrapper.getProjectView();
+        final ProjectVersionView projectVersionView = projectVersionWrapper.getProjectVersionView();
+
+        assertNotNull(project);
+        assertNotNull(projectVersionView);
+
+        final String projectUrl = hubService.getHref(project);
+        final String projectVersionUrl = hubService.getHref(projectVersionView);
+
+        List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(1, projectVersionViews.size());
+
+        projectRequestBuilder.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
+        projectRequestBuilder.setCloneFromReleaseUrl(projectVersionUrl);
+        final ProjectRequest updateProjectRequest = projectRequestBuilder.build();
+        projectService.updateHubProject(projectUrl, updateProjectRequest);
+
+        final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.versionName = "1.0.0-clone";
+        projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
+        projectVersionRequest.distribution = ProjectVersionDistributionType.OPENSOURCE;
+        projectService.createHubVersion(project, projectVersionRequest);
+
+        projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(2, projectVersionViews.size());
     }
 
 }

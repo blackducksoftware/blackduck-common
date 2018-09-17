@@ -25,14 +25,15 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
@@ -48,7 +49,6 @@ import com.synopsys.integration.blackduck.api.generated.view.VulnerableComponent
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
-import com.synopsys.integration.blackduck.service.model.HubQuery;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
@@ -56,168 +56,39 @@ import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class ProjectService extends DataService {
+    private final ProjectGetService projectGetService;
+    private final ProjectUpdateService projectUpdateService;
     private final ComponentService componentDataService;
 
-    public ProjectService(final HubService hubService, final IntLogger logger, final ComponentService componentDataService) {
+    public ProjectService(final HubService hubService, final IntLogger logger, final ProjectGetService projectGetService, final ProjectUpdateService projectUpdateService, final ComponentService componentDataService) {
         super(hubService, logger);
+        this.projectGetService = projectGetService;
+        this.projectUpdateService = projectUpdateService;
         this.componentDataService = componentDataService;
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
-
-        final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
-        return allProjectItems;
+        return projectGetService.getAllProjectMatches(projectName);
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
-
-        final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
-        return projectItems;
+        return projectGetService.getProjectMatches(projectName, limit);
     }
 
     public ProjectView getProjectByName(final String projectName) throws IntegrationException {
-        final List<ProjectView> allProjectItems = getAllProjectMatches(projectName);
-        for (final ProjectView project : allProjectItems) {
-            if (projectName.equalsIgnoreCase(project.name)) {
-                return project;
-            }
-        }
-        throw new DoesNotExistException("This Project does not exist. Project : " + projectName);
-    }
-
-    public String createHubProject(final ProjectRequest projectRequest) throws IntegrationException {
-        final String json = hubService.convertToJson(projectRequest);
-        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(json);
-        return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.PROJECTS_LINK, requestBuilder);
-    }
-
-    public void deleteHubProject(final ProjectView project) throws IntegrationException {
-        final String uri = hubService.getHref(project);
-        final Request deleteRequest = new Request.Builder(uri).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(deleteRequest)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        return projectGetService.getProjectByName(projectName);
     }
 
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("versionName", projectVersionName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
-
-        final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
-        final ProjectVersionView projectVersion = findMatchingVersion(allProjectVersionMatchingItems, projectVersionName);
-        if (null != projectVersion) {
-            return projectVersion;
-        }
-        throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
-    }
-
-    public String createHubVersion(final ProjectView project, final ProjectVersionRequest versionRequest) throws IntegrationException {
-        final String uri = hubService.getFirstLink(project, ProjectView.VERSIONS_LINK);
-        return createHubVersion(uri, versionRequest);
-    }
-
-    public String createHubVersion(final String versionsUri, final ProjectVersionRequest versionRequest) throws IntegrationException {
-        final String json = hubService.convertToJson(versionRequest);
-        final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(versionsUri).build();
-        return hubService.executePostRequestAndRetrieveURL(request);
+        return projectGetService.getProjectVersion(project, projectVersionName);
     }
 
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView projectView = getProjectByName(projectName);
-        final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
-
-        final ProjectVersionWrapper projectVersionWrapper = new ProjectVersionWrapper();
-        projectVersionWrapper.setProjectView(projectView);
-        projectVersionWrapper.setProjectVersionView(projectVersionView);
-        return projectVersionWrapper;
-    }
-
-    public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(projectVersionName);
-
-        final ProjectRequest projectRequest = projectRequestBuilder.build();
-
-        return getProjectVersionAndCreateIfNeeded(projectRequest);
-    }
-
-    public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final ProjectRequest projectRequest) throws IntegrationException {
-        ProjectView project = null;
-        ProjectVersionView projectVersion = null;
-        try {
-            project = getProjectByName(projectRequest.name);
-        } catch (final DoesNotExistException e) {
-            final String projectURL = createHubProject(projectRequest);
-            project = hubService.getResponse(projectURL, ProjectView.class);
-        }
-        try {
-            projectVersion = getProjectVersion(project, projectRequest.versionRequest.versionName);
-        } catch (final DoesNotExistException e) {
-            final String versionURL = createHubVersion(project, projectRequest.versionRequest);
-            projectVersion = hubService.getResponse(versionURL, ProjectVersionView.class);
-        }
-        final ProjectVersionWrapper projectVersionWrapper = new ProjectVersionWrapper();
-        projectVersionWrapper.setProjectView(project);
-        projectVersionWrapper.setProjectVersionView(projectVersion);
-        return projectVersionWrapper;
-    }
-
-    public void updateProjectAndVersion(final ProjectView project, final ProjectRequest projectRequest) throws IntegrationException {
-        final String projectUri = hubService.getHref(project);
-        final String json = hubService.convertToJson(projectRequest);
-        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUri).build();
-        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-        if (null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
-            final ProjectVersionView projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
-            if (null != projectVersionView) {
-                updateProjectVersion(projectVersionView, projectRequest.versionRequest);
-            }
-        }
-    }
-
-    public void updateProjectAndVersion(final String projectUri, final ProjectRequest projectRequest) throws IntegrationException {
-        updateProjectAndVersion(hubService.getResponse(projectUri, ProjectView.class), projectRequest);
-    }
-
-    public void updateProjectAndVersion(final ProjectView project, final ProjectVersionView version, final ProjectRequest projectRequest) throws IntegrationException {
-        updateProjectAndVersion(hubService.getHref(project), hubService.getHref(version), projectRequest);
-    }
-
-    public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
-        final String json = hubService.convertToJson(projectRequest);
-        final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUri).build();
-        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-        updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
-    }
-
-    public void updateProjectVersion(final ProjectVersionView version, final ProjectVersionRequest versionRequest) throws IntegrationException {
-        updateProjectVersion(hubService.getHref(version), versionRequest);
-    }
-
-    public void updateProjectVersion(final String versionUri, final ProjectVersionRequest versionRequest) throws IntegrationException {
-        final String json = hubService.convertToJson(versionRequest);
-        final Request projectVersionUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(versionUri).build();
-        try (Response response = hubService.executeRequest(projectVersionUpdateRequest)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        return projectGetService.getProjectVersion(projectName, projectVersionName);
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(final String projectName) throws IntegrationException {
@@ -278,30 +149,33 @@ public class ProjectService extends DataService {
         return resolvedGroupViews;
     }
 
-    public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
+    /**
+     * This will get all explicitly assigned users for a project, as well as all users who are assigned to groups that are explicitly assigned to a project.
+     */
+    public Set<UserView> getAllActiveUsersForProject(final String projectName) throws IntegrationException {
+        final Set<UserView> users = new HashSet<>();
+
         final ProjectView projectView = getProjectByName(projectName);
-        final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
-        addComponentToProjectVersion(componentExternalId, projectVersionView);
-    }
 
-    public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
-        final String projectVersionComponentsUrl = hubService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
-        final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
-        String componentVersionUrl = null;
-        if (StringUtils.isNotBlank(componentSearchResultView.variant)) {
-            componentVersionUrl = componentSearchResultView.variant;
-        } else {
-            componentVersionUrl = componentSearchResultView.version;
+        final List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(projectView);
+        for (final AssignedUserGroupView assignedUserGroupView : assignedGroups) {
+            final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
+            if (userGroupView.active) {
+                final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
+                users.addAll(groupUsers);
+            }
         }
-        addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
-    }
 
-    public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
-        final Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
-        try (Response response = hubService.executeRequest(request)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
+        final List<AssignedUserView> assignedUsers = getAssignedUsersToProject(projectView);
+        for (final AssignedUserView assignedUser : assignedUsers) {
+            final UserView userView = hubService.getResponse(assignedUser.user, UserView.class);
+            users.add(userView);
         }
+
+        return users
+                       .stream()
+                       .filter(userView -> userView.active)
+                       .collect(Collectors.toSet());
     }
 
     public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
@@ -394,6 +268,134 @@ public class ProjectService extends DataService {
             }
         }
         return null;
+    }
+
+    public String createHubProject(final ProjectRequest projectRequest) throws IntegrationException {
+        return projectUpdateService.createProject(projectRequest);
+    }
+
+    public void updateHubProject(final String projectUrl, final ProjectRequest projectRequest) throws IntegrationException {
+        projectUpdateService.updateProject(projectUrl, projectRequest);
+    }
+
+    public void deleteHubProject(final ProjectView project) throws IntegrationException {
+        final String projectUrl = hubService.getHref(project);
+        projectUpdateService.deleteProject(projectUrl);
+    }
+
+    public String createHubVersion(final ProjectView project, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        final String projectVersionsUrl = hubService.getFirstLink(project, ProjectView.VERSIONS_LINK);
+        return projectUpdateService.createProjectVersion(projectVersionsUrl, projectVersionRequest);
+    }
+
+    public String createHubVersion(final String projectVersionsUrl, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        return projectUpdateService.createProjectVersion(projectVersionsUrl, projectVersionRequest);
+    }
+
+    public void updateProjectVersion(final ProjectVersionView version, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        final String projectVersionUrl = hubService.getHref(version);
+        projectUpdateService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
+    }
+
+    public void updateProjectVersion(final String projectVersionUrl, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        projectUpdateService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
+    }
+
+    public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest) throws IntegrationException {
+        return projectUpdateService.syncProjectAndVersion(projectRequest);
+    }
+
+    @Deprecated
+    /**
+     * @deprecated Please use syncProjectAndVersion instead. Note that synchProjectVersion will update the project and version if they exist, so a full projectRequest is recommended for existing projects/versions.
+     */
+    public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectRequest projectRequest = new ProjectRequestBuilder(projectName, projectVersionName).build();
+
+        return getProjectVersionAndCreateIfNeeded(projectRequest);
+    }
+
+    @Deprecated
+    /**
+     * @deprecated Please use syncProjectAndVersion instead. Note that synchProjectVersion will update the project and version if they exist, so a full projectRequest is recommended for existing projects/versions.
+     */
+    public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final ProjectRequest projectRequest) throws IntegrationException {
+        ProjectView project = null;
+        ProjectVersionView projectVersion = null;
+        try {
+            project = getProjectByName(projectRequest.name);
+        } catch (final DoesNotExistException e) {
+            final String projectURL = createHubProject(projectRequest);
+            project = hubService.getResponse(projectURL, ProjectView.class);
+        }
+        try {
+            projectVersion = getProjectVersion(project, projectRequest.versionRequest.versionName);
+        } catch (final DoesNotExistException e) {
+            final String versionURL = createHubVersion(project, projectRequest.versionRequest);
+            projectVersion = hubService.getResponse(versionURL, ProjectVersionView.class);
+        }
+
+        return new ProjectVersionWrapper(project, projectVersion);
+    }
+
+    /**
+     * If a versionRequest is provided, the version will be first found by the versionName in the versionRequest and then updated.
+     */
+    public void updateProjectAndVersion(final String projectUri, final ProjectRequest projectRequest) throws IntegrationException {
+        updateProjectAndVersion(hubService.getResponse(projectUri, ProjectView.class), projectRequest);
+    }
+
+    /**
+     * If a versionRequest is provided, the version will be first found by the versionName in the versionRequest and then updated.
+     */
+    public void updateProjectAndVersion(final ProjectView project, final ProjectRequest projectRequest) throws IntegrationException {
+        final String projectUrl = hubService.getHref(project);
+        projectUpdateService.updateProject(projectUrl, projectRequest);
+
+        if (null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
+            final ProjectVersionView projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
+            if (null != projectVersionView) {
+                updateProjectVersion(projectVersionView, projectRequest.versionRequest);
+            }
+        }
+    }
+
+    public void updateProjectAndVersion(final ProjectView project, final ProjectVersionView projectVersion, final ProjectRequest projectRequest) throws IntegrationException {
+        final String projectUrl = hubService.getHref(project);
+        final String projectVersionUrl = hubService.getHref(projectVersion);
+
+        updateProjectAndVersion(projectUrl, projectVersionUrl, projectRequest);
+    }
+
+    public void updateProjectAndVersion(final String projectUrl, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
+        projectUpdateService.updateProject(projectUrl, projectRequest);
+        updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
+    }
+
+    public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
+        final ProjectView projectView = getProjectByName(projectName);
+        final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
+        addComponentToProjectVersion(componentExternalId, projectVersionView);
+    }
+
+    public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
+        final String projectVersionComponentsUrl = hubService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
+        final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
+        String componentVersionUrl = null;
+        if (StringUtils.isNotBlank(componentSearchResultView.variant)) {
+            componentVersionUrl = componentSearchResultView.variant;
+        } else {
+            componentVersionUrl = componentSearchResultView.version;
+        }
+        addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
+    }
+
+    public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
+        final Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
+        try (Response response = hubService.executeRequest(request)) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
 }

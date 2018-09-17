@@ -42,7 +42,6 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubServerVerifier {
-
     public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
         connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));

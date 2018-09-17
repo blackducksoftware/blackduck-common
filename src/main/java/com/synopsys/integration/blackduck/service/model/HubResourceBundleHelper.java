@@ -26,6 +26,10 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+@Deprecated
+/**
+ * @deprecated This is no longer used.
+ */
 public class HubResourceBundleHelper {
     private static final String RESOURCE_BASE_NAME = "com.blackducksoftware.integration.hub.resources.HubResources";
 

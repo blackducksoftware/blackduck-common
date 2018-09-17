@@ -52,7 +52,7 @@ public class ScanJobManager {
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, operatingSystemType);
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, operatingSystemType);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
 
         return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
     }
