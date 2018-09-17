@@ -27,15 +27,18 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.test.tool.TestLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScannerZipInstallerTest {
     @Test
     public void testActualDownload() throws Exception {
-        final String signatureScannerDownloadPath = System.getenv("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
-        final String blackDuckUrl = System.getenv().get("BLACKDUCK_HUB_URL");
-        final String blackDuckUsername = System.getenv().get("BLACKDUCK_HUB_USERNAME");
-        final String blackDuckPassword = System.getenv().get("BLACKDUCK_HUB_PASSWORD");
+        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+
+        final String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
+        final String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_HUB_URL");
+        final String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_HUB_USERNAME");
+        final String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_HUB_PASSWORD");
         Assume.assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
         Assume.assumeTrue(StringUtils.isNotBlank(blackDuckUrl));
         Assume.assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
@@ -53,11 +56,11 @@ public class ScannerZipInstallerTest {
         hubServerConfigBuilder.setLogger(logger);
 
         final HubServerConfig hubServerConfig = hubServerConfigBuilder.build();
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, OperatingSystemType.determineFromSystem());
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, OperatingSystemType.determineFromSystem());
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
         final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
@@ -70,6 +73,8 @@ public class ScannerZipInstallerTest {
 
     @Test
     public void testInitialDownload() throws Exception {
+        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+
         final InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
         final Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
@@ -82,7 +87,7 @@ public class ScannerZipInstallerTest {
         final File downloadTarget = tempDirectory.toFile();
         try {
             final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, OperatingSystemType.MAC);
+            final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
             final ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockRestConnection, cleanupZipExpander, scanPathsUtility, "http://www.google.com", OperatingSystemType.MAC);
 
             try {

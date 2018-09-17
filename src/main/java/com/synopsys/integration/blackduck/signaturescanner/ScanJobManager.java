@@ -50,9 +50,9 @@ public class ScanJobManager {
     public static ScanJobManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, operatingSystemType);
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, operatingSystemType);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
 
         return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
     }

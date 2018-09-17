@@ -33,12 +33,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanPathsUtility {
     public static final String STANDARD_OUT_FILENAME = "CLI_Output.txt";
+
+    public static final String BDS_JAVA_HOME = "BDS_JAVA_HOME";
 
     private static final String JAVA_PATH_FORMAT = "bin" + File.separator + "%s";
     private static final String WINDOWS_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java.exe");
@@ -51,10 +56,12 @@ public class ScanPathsUtility {
     private static final FileFilter SCAN_CLI_JAR_FILE_FILTER = file -> file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar") && file.isFile();
 
     private final IntLogger logger;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final OperatingSystemType operatingSystemType;
 
-    public ScanPathsUtility(final IntLogger logger, final OperatingSystemType operatingSystemType) {
+    public ScanPathsUtility(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType) {
         this.logger = logger;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.operatingSystemType = operatingSystemType;
     }
 
@@ -83,10 +90,17 @@ public class ScanPathsUtility {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
 
-        final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
+        final String pathToJavaExecutable;
+        final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
+        if (StringUtils.isNotBlank(bdsJavaHome)) {
+            pathToJavaExecutable = bdsJavaHome;
+        } else {
+            final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
+            pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
+        }
+
         final File libDirectory = findFirstFilteredFile(installDirectory, LIB_DIRECTORY_FILTER, "Could not find the 'lib' directory in %s.");
 
-        final String pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
