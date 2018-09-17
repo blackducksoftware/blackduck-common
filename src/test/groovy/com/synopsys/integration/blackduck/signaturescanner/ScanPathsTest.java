@@ -1,7 +1,13 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
+import static com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +25,19 @@ import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtil
 import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.test.tool.TestLogger;
 import com.synopsys.integration.util.OperatingSystemType;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ScanPathsUtility.class})
 public class ScanPathsTest {
+
+    // Example ...BlackDuckScanOutput\2018-09-16_15-38-37-050_1
+    private static final String DATE_AND_THREAD_SPECIFIC_NAME = ".*\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}-\\d{3}_\\S+";
+
+    private static final String VALUE_OF_BDS_JAVA_HOME = "valueOfBdsJavaHome";
+
     private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new TestLogger(), OperatingSystemType.MAC);
     private final ScanPathsUtility windowsScanPathsUtility = new ScanPathsUtility(new TestLogger(), OperatingSystemType.WINDOWS);
     private final ScanPathsUtility linuxScanPathsUtility = new ScanPathsUtility(new TestLogger(), OperatingSystemType.LINUX);
@@ -65,6 +82,47 @@ public class ScanPathsTest {
         assertScanPathsOk(macScanPaths, false);
         assertScanPathsOk(windowsScanPaths, false);
         assertScanPathsOk(linuxScanPaths, false);
+    }
+
+    @Test
+    public void testCreateSpecificRunOutputDirectory() throws Exception {
+        final File macSpecificRunOutputDirectory = macScanPathsUtility.createSpecificRunOutputDirectory(new File(macSetup, getScannerPath()));
+        final File windowsSpecificRunOutputDirectory = windowsScanPathsUtility.createSpecificRunOutputDirectory(new File(windowsSetup, getScannerPath()));
+        final File linuxSpecificRunOutputDirectory = linuxScanPathsUtility.createSpecificRunOutputDirectory(new File(linuxSetup, getScannerPath()));
+
+        assertTrue(macSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
+        assertTrue(windowsSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
+        assertTrue(linuxSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
+    }
+
+    @Test
+    public void testJavaExecutablePathWithPackagedJre() throws Exception {
+
+        mockStatic(System.class);
+        when(System.getenv(BDS_JAVA_HOME)).thenReturn(null);
+
+        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
+        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
+        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+
+        assertThat(macScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "mac_setup" + File.separator + getScannerPath()));
+        assertThat(windowsScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "windows_setup" + File.separator + getScannerPath()));
+        assertThat(linuxScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "linux_setup" + File.separator + getScannerPath()));
+    }
+
+    @Test
+    public void testJavaExecutablePathWithBdsJavaHome() throws Exception {
+
+        mockStatic(System.class);
+        when(System.getenv(BDS_JAVA_HOME)).thenReturn(VALUE_OF_BDS_JAVA_HOME);
+
+        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
+        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
+        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+
+        assertThat(macScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
+        assertThat(windowsScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
+        assertThat(linuxScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
     }
 
     private void assertScanPathsOk(final ScanPaths scanPaths, final boolean managedByLibrary) {
