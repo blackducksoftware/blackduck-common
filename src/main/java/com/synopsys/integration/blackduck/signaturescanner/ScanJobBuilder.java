@@ -142,9 +142,12 @@ public class ScanJobBuilder {
             shouldUseProxy = hubServerConfig.shouldUseProxyForHub();
             proxyInfo = hubServerConfig.getProxyInfo();
             blackDuckUrl = hubServerConfig.getHubUrl();
-            blackDuckUsername = hubServerConfig.getGlobalCredentials().getUsername();
-            blackDuckPassword = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
-            blackDuckApiToken = hubServerConfig.getApiToken();
+            if (hubServerConfig.usingApiToken()) {
+                blackDuckApiToken = hubServerConfig.getApiToken();
+            } else {
+                blackDuckUsername = hubServerConfig.getGlobalCredentials().getUsername();
+                blackDuckPassword = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
+            }
             alwaysTrustServerCertificate = hubServerConfig.isAlwaysTrustServerCertificate();
         }
         return this;
