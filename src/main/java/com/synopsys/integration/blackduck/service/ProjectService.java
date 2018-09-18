@@ -305,9 +305,13 @@ public class ProjectService extends DataService {
         return projectUpdateService.syncProjectAndVersion(projectRequest);
     }
 
+    public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest, final boolean performUpdate) throws IntegrationException {
+        return projectUpdateService.syncProjectAndVersion(projectRequest, performUpdate);
+    }
+
     @Deprecated
     /**
-     * @deprecated Please use syncProjectAndVersion instead. Note that synchProjectVersion will update the project and version if they exist, so a full projectRequest is recommended for existing projects/versions.
+     * @deprecated Please use syncProjectAndVersion with performUpdate = false instead.
      */
     public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectRequest projectRequest = new ProjectRequestBuilder(projectName, projectVersionName).build();
@@ -317,7 +321,7 @@ public class ProjectService extends DataService {
 
     @Deprecated
     /**
-     * @deprecated Please use syncProjectAndVersion instead. Note that synchProjectVersion will update the project and version if they exist, so a full projectRequest is recommended for existing projects/versions.
+     * @deprecated Please use syncProjectAndVersion with performUpdate = false instead.
      */
     public ProjectVersionWrapper getProjectVersionAndCreateIfNeeded(final ProjectRequest projectRequest) throws IntegrationException {
         ProjectView project = null;

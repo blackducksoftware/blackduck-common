@@ -305,4 +305,31 @@ public class ProjectServiceTestIT {
         assertEquals(2, projectVersionViews.size());
     }
 
+    @Test
+    public void testSyncProjectVersionForExistingProjectWithNewVersion() throws Exception {
+        final HubService hubService = hubServicesFactory.createHubService();
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+
+        // first create a new project with a single version
+        final String projectName = "syncWithTwoVersions" + Instant.now().toString();
+        final String projectVersionName = "1.0.0";
+        final String secondVersionName = "2.0.0";
+
+        final ProjectRequest projectRequest = new ProjectRequestBuilder(projectName, projectVersionName).build();
+
+        projectService.createHubProject(projectRequest);
+
+        final ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
+        project = projectVersionWrapper.getProjectView();
+
+        List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(1, projectVersionViews.size());
+
+        final ProjectRequest secondVersionRequest = new ProjectRequestBuilder(projectName, secondVersionName).build();
+        projectService.syncProjectAndVersion(secondVersionRequest);
+
+        projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        assertEquals(2, projectVersionViews.size());
+    }
+
 }

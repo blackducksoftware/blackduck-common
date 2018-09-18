@@ -96,20 +96,39 @@ public class ProjectUpdateService extends DataService {
     }
 
     /**
-     * If the project exists, it will be updated, otherwise, it will be created.
-     * If the version is provided, if the version exists, it will be updated, otherwise, it will be created.
+     * If the project exists, the project will be updated.
+     * If the project does not exist it will be created.
+     *
+     * If the version is provided and the version exists, it will be updated.
+     * If the version is provided and the version does not exist, it will be created.
      *
      * This method should not be used to update the names of the project or version as these are used to find the necessary
      * urls to update with.
      */
     public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest) throws IntegrationException {
+        return syncProjectAndVersion(projectRequest, true);
+    }
+
+    /**
+     * If the project exists and performUpdate is true, the project will be updated.
+     * If the project does not exist it will be created.
+     *
+     * If the version is provided and the version exists and performUpdate is true, it will be updated.
+     * If the version is provided and the version does not exist, it will be created.
+     *
+     * This method should not be used to update the names of the project or version as these are used to find the necessary
+     * urls to update with.
+     */
+    public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest, final boolean performUpdate) throws IntegrationException {
         ProjectView projectView;
-        final ProjectVersionView projectVersionView;
+        ProjectVersionView projectVersionView = null;
 
         try {
             projectView = projectGetService.getProjectByName(projectRequest.name);
-            final String projectUrl = hubService.getHref(projectView);
-            updateProject(projectUrl, projectRequest);
+            if (performUpdate) {
+                final String projectUrl = hubService.getHref(projectView);
+                updateProject(projectUrl, projectRequest);
+            }
         } catch (final DoesNotExistException e) {
             final String projectUrl = createProject(projectRequest);
             projectView = hubService.getResponse(projectUrl, ProjectView.class);
@@ -117,12 +136,20 @@ public class ProjectUpdateService extends DataService {
 
         final ProjectVersionRequest projectVersionRequest = projectRequest.versionRequest;
         if (projectVersionRequest != null && StringUtils.isNotBlank(projectVersionRequest.versionName)) {
-            projectVersionView = projectGetService.getProjectVersion(projectView, projectVersionRequest.versionName);
-            final String projectVersionUrl = hubService.getHref(projectVersionView);
-            updateProjectVersion(projectVersionUrl, projectRequest.versionRequest);
+            try {
+                projectVersionView = projectGetService.getProjectVersion(projectView, projectVersionRequest.versionName);
+                if (performUpdate) {
+                    final String projectVersionUrl = hubService.getHref(projectVersionView);
+                    updateProjectVersion(projectVersionUrl, projectRequest.versionRequest);
+                }
+            } catch (final DoesNotExistException e) {
+                final String projectVersionsUrl = hubService.getFirstLinkSafely(projectView, ProjectView.VERSIONS_LINK);
+                final String projectVersionUrl = createProjectVersion(projectVersionsUrl, projectRequest.versionRequest);
+                projectVersionView = hubService.getResponse(projectVersionUrl, ProjectVersionView.class);
+            }
         }
 
-        return new ProjectVersionWrapper();
+        return new ProjectVersionWrapper(projectView, projectVersionView);
     }
 
     public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
