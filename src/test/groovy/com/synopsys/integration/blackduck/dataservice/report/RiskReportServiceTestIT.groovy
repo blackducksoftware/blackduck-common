@@ -24,10 +24,13 @@ package com.synopsys.integration.blackduck.dataservice.report
 
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.HubServicesFactory
+import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
+import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.Assert
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.experimental.categories.Category
@@ -38,7 +41,26 @@ class RiskReportServiceTestIT {
     @Rule
     public TemporaryFolder folderForReport = new TemporaryFolder()
 
-    private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
+    private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
+
+    @BeforeClass
+    public static void createProjectFirst() {
+        final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
+        final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
+        final String testPhase = restConnectionTestHelper.getProperty("TEST_PHASE")
+        final String testDistribution = restConnectionTestHelper.getProperty("TEST_DISTRIBUTION")
+
+        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
+        projectRequestBuilder.setProjectName(testProjectName);
+        projectRequestBuilder.setVersionName(testProjectVersionName);
+        projectRequestBuilder.setPhase(testPhase);
+        projectRequestBuilder.setDistribution(testDistribution);
+
+        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
+        final ProjectService projectService = hubServicesFactory.createProjectService();
+
+        projectService.getProjectVersionAndCreateIfNeeded(projectRequestBuilder.build());
+    }
 
     @Test
     public void createReportPdfFileTest() {
