@@ -38,10 +38,12 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         /**
          * in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
          */
+        hubServicesFactory.createCodeLocationService().importBomFile(file);
+        // TODO remove when we have a notification for bom calc complete
         try {
-            hubServicesFactory.createCodeLocationService().importBomFile(file);
-        } catch (final Exception e) {
-            System.out.println(e.getMessage());
+            Thread.sleep(30 * 1000);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
         }
 
         final ProjectService projectService = hubServicesFactory.createProjectService();
