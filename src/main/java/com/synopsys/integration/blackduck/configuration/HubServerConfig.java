@@ -50,18 +50,18 @@ public class HubServerConfig extends Stringable implements Serializable {
     private final boolean alwaysTrustServerCertificate;
 
     public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
-        this.hubUrl = url;
+        hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
-        this.apiToken = null;
+        apiToken = null;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
     public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
-        this.hubUrl = url;
+        hubUrl = url;
         this.timeoutSeconds = timeoutSeconds;
-        this.credentials = null;
+        credentials = null;
         this.apiToken = apiToken;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
@@ -101,7 +101,7 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public BlackduckRestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
-        if (StringUtils.isNotBlank(apiToken)) {
+        if (usingApiToken()) {
             return createApiTokenRestConnection(logger);
         } else {
             return createCredentialsRestConnection(logger);
@@ -130,6 +130,10 @@ public class HubServerConfig extends Stringable implements Serializable {
         builder.applyProxyInfo(getProxyInfo());
 
         return builder.build();
+    }
+
+    public boolean usingApiToken() {
+        return StringUtils.isNotBlank(apiToken);
     }
 
     public URL getHubUrl() {
