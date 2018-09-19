@@ -214,7 +214,6 @@ public class ProjectServiceTestIT {
 
         final ProjectVersionWrapper projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
         project = projectVersionWrapper.getProjectView();
-        final String projectUrl = hubService.getHref(project);
         final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
