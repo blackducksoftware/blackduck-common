@@ -24,7 +24,6 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +33,8 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectVersion
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.builder.AbstractBuilder;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.validator.AbstractValidator;
@@ -53,6 +54,14 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     private List<ProjectCloneCategoriesType> cloneCategories;
     private String cloneFromReleaseUrl;
 
+    public ProjectRequestBuilder() {
+    }
+
+    public ProjectRequestBuilder(final String projectName, final String versionName) {
+        this.projectName = projectName;
+        this.versionName = versionName;
+    }
+
     @Override
     public AbstractValidator createValidator() {
         final ProjectRequestValidator validator = new ProjectRequestValidator(this);
@@ -70,11 +79,10 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         projectVersionRequest.releaseComments = releaseComments;
         projectVersionRequest.cloneFromReleaseUrl = cloneFromReleaseUrl;
         if (StringUtils.isNotBlank(releasedOn)) {
-            final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
             try {
-                projectVersionRequest.releasedOn = sdf.parse(releasedOn);
+                projectVersionRequest.releasedOn = RestConstants.parseDateString(releasedOn);
             } catch (final ParseException e) {
-
+                // ignored
             }
         }
         projectVersionRequest.nickname = versionNickname;
@@ -88,6 +96,28 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         projectRequest.versionRequest = projectVersionRequest;
         projectRequest.cloneCategories = cloneCategories;
         return projectRequest;
+    }
+
+    public void setFromProject(final ProjectView projectView) {
+        cloneCategories = projectView.cloneCategories;
+        description = projectView.description;
+        projectName = projectView.name;
+        projectLevelAdjustments = projectView.projectLevelAdjustments;
+        projectOwner = projectView.projectOwner;
+        projectTier = projectView.projectTier;
+    }
+
+    public void setFromProjectAndVersion(final ProjectView projectView, final ProjectVersionView projectVersionView) {
+        setFromProject(projectView);
+
+        distribution = projectVersionView.distribution.name();
+        versionNickname = projectVersionView.nickname;
+        phase = projectVersionView.phase.name();
+        releaseComments = projectVersionView.releaseComments;
+        if (projectVersionView.releasedOn != null) {
+            releasedOn = RestConstants.formatDate(projectVersionView.releasedOn);
+        }
+        versionName = projectVersionView.versionName;
     }
 
     public void setProjectName(final String projectName) {

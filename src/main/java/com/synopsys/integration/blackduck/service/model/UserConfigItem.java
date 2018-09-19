@@ -28,6 +28,10 @@ import java.util.Map;
 import com.synopsys.integration.blackduck.api.generated.view.ExternalExtensionConfigValueView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 
+@Deprecated
+/**
+ * @deprecated We no longer support any extension code in this library
+ */
 public class UserConfigItem {
     private final UserView user;
 
