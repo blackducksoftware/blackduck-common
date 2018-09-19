@@ -59,28 +59,47 @@ public class ProjectGetService extends DataService {
         return projectItems;
     }
 
+    @Deprecated
+    /**
+     * @deprecated Please use getProjectViewByProjectName instead.
+     */
     public ProjectView getProjectByName(final String projectName) throws IntegrationException {
+        final Optional<ProjectView> projectView = getProjectViewByProjectName(projectName);
+        if (projectView.isPresent()) {
+            return projectView.get();
+        } else {
+            throw new DoesNotExistException("This Project does not exist. Project: " + projectName);
+        }
+    }
+
+    public Optional<ProjectView> getProjectViewByProjectName(final String projectName) throws IntegrationException {
         final List<ProjectView> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectView project : allProjectItems) {
             if (projectName.equalsIgnoreCase(project.name)) {
-                return project;
+                return Optional.of(project);
             }
         }
-        throw new DoesNotExistException("This Project does not exist. Project: " + projectName);
+
+        return Optional.empty();
     }
 
+    @Deprecated
+    /**
+     * @deprecated Please use getProjectVersionViewByProjectVersionName instead.
+     */
     public ProjectVersionView getProjectVersion(final ProjectView project, final String projectVersionName) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("versionName", projectVersionName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
-
-        final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
-        final ProjectVersionView projectVersion = findMatchingVersion(allProjectVersionMatchingItems, projectVersionName);
-        if (null != projectVersion) {
-            return projectVersion;
+        final Optional<ProjectVersionView> projectVersionView = getProjectVersionViewByProjectVersionName(project, projectVersionName);
+        if (projectVersionView.isPresent()) {
+            return projectVersionView.get();
+        } else {
+            throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
         }
-        throw new DoesNotExistException(String.format("Could not find the version: %s for project: %s", projectVersionName, project.name));
     }
 
+    @Deprecated
+    /**
+     * @deprecated Please use getProjectVersionViewByProjectVersionName instead.
+     */
     public ProjectVersionWrapper getProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
         final ProjectView projectView = getProjectByName(projectName);
         final ProjectVersionView projectVersionView = getProjectVersion(projectView, projectVersionName);
@@ -88,6 +107,20 @@ public class ProjectGetService extends DataService {
         return new ProjectVersionWrapper(projectView, projectVersionView);
     }
 
+    public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(final ProjectView projectView, final String projectVersionName) throws IntegrationException {
+        final Optional<HubQuery> hubQuery = HubQuery.createQuery("versionName", projectVersionName);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+
+        final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
+        final Optional<ProjectVersionView> projectVersion = findMatchingProjectVersionView(allProjectVersionMatchingItems, projectVersionName);
+
+        return projectVersion;
+    }
+
+    @Deprecated
+    /**
+     * @deprecated Please use findMatchingProjectVersionView instead.
+     */
     public ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
             if (projectVersionName.equals(version.versionName)) {
@@ -95,6 +128,16 @@ public class ProjectGetService extends DataService {
             }
         }
         return null;
+    }
+
+    public Optional<ProjectVersionView> findMatchingProjectVersionView(final List<ProjectVersionView> projectVersions, final String projectVersionName) {
+        for (final ProjectVersionView version : projectVersions) {
+            if (projectVersionName.equals(version.versionName)) {
+                return Optional.of(version);
+            }
+        }
+
+        return Optional.empty();
     }
 
 }
