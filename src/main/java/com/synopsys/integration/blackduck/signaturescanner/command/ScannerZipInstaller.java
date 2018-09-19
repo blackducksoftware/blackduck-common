@@ -41,6 +41,7 @@ import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScannerZipInstaller {
@@ -58,8 +59,9 @@ public class ScannerZipInstaller {
     private final String blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final OperatingSystemType operatingSystemType) throws EncryptionException {
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, operatingSystemType);
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType)
+            throws EncryptionException {
+        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         return defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
     }
 
