@@ -29,7 +29,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
             fail('Should have throws a DoesNotExistException')
         } catch (Exception e) {
             assertTrue(e instanceof DoesNotExistException)
-            assertEquals(String.format('This Project does not exist. Project : %s', uniqueName), e.getMessage())
+            assertEquals(String.format('This Project does not exist. Project: %s', uniqueName), e.getMessage())
         }
     }
 
