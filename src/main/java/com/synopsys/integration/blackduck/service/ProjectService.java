@@ -166,10 +166,12 @@ public class ProjectService extends DataService {
 
         final List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(projectView);
         for (final AssignedUserGroupView assignedUserGroupView : assignedGroups) {
-            final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
-            if (userGroupView.active) {
-                final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
-                users.addAll(groupUsers);
+            if (assignedUserGroupView.active) {
+                final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
+                if (userGroupView.active) {
+                    final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
+                    users.addAll(groupUsers);
+                }
             }
         }
 
