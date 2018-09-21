@@ -57,6 +57,15 @@ public class ScanJobManager {
         return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
     }
 
+    public static ScanJobManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
+        return new ScanJobManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner);
+    }
+
+    public static ScanJobManager createFullScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
+            final ScanCommandRunner scanCommandRunner) {
+        return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
+    }
+
     public ScanJobManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
@@ -66,18 +75,20 @@ public class ScanJobManager {
     }
 
     public ScanJobOutput executeScans(final ScanJob scanJob) throws IOException, HubIntegrationException {
-        final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
-        if (!installDirectory.exists()) {
-            scannerZipInstaller.installOrUpdateScanner(installDirectory);
-        } else {
-            try {
-                final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
-                if (scanPaths.isManagedByLibrary()) {
+        if (scannerZipInstaller != null) {
+            final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
+            if (!installDirectory.exists()) {
+                scannerZipInstaller.installOrUpdateScanner(installDirectory);
+            } else {
+                try {
+                    final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+                    if (scanPaths.isManagedByLibrary()) {
+                        scannerZipInstaller.installOrUpdateScanner(installDirectory);
+                    }
+                } catch (final HubIntegrationException e) {
+                    // a valid scanPaths could not be found so we will need to attempt an install
                     scannerZipInstaller.installOrUpdateScanner(installDirectory);
                 }
-            } catch (final HubIntegrationException e) {
-                // a valid scanPaths could not be found so we will need to attempt an install
-                scannerZipInstaller.installOrUpdateScanner(installDirectory);
             }
         }
 
