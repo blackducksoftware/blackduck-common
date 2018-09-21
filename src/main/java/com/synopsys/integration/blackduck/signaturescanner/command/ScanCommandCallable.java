@@ -159,10 +159,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         maskIndex(cmdToOutput, passwordIndex);
         maskIndex(cmdToOutput, proxyPasswordIndex);
 
-        logger.info("Hub CLI command :");
-        for (final String current : cmdToOutput) {
-            logger.info(current);
-        }
+        logger.info(String.format("Hub CLI command: %s", StringUtils.join(cmdToOutput, " ")));
     }
 
     private void maskIndex(final List<String> cmd, final int indexToMask) {
