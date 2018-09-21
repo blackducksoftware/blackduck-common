@@ -152,17 +152,26 @@ public class ProjectService extends DataService {
     /**
      * This will get all explicitly assigned users for a project, as well as all users who are assigned to groups that are explicitly assigned to a project.
      */
+    @Deprecated
     public Set<UserView> getAllActiveUsersForProject(final String projectName) throws IntegrationException {
-        final Set<UserView> users = new HashSet<>();
-
         final ProjectView projectView = getProjectByName(projectName);
+        return getAllActiveUsersForProject(projectView);
+    }
+
+    /**
+     * This will get all explicitly assigned users for a project, as well as all users who are assigned to groups that are explicitly assigned to a project.
+     */
+    public Set<UserView> getAllActiveUsersForProject(final ProjectView projectView) throws IntegrationException {
+        final Set<UserView> users = new HashSet<>();
 
         final List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(projectView);
         for (final AssignedUserGroupView assignedUserGroupView : assignedGroups) {
-            final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
-            if (userGroupView.active) {
-                final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
-                users.addAll(groupUsers);
+            if (assignedUserGroupView.active) {
+                final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
+                if (userGroupView.active) {
+                    final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
+                    users.addAll(groupUsers);
+                }
             }
         }
 
@@ -173,9 +182,9 @@ public class ProjectService extends DataService {
         }
 
         return users
-                       .stream()
-                       .filter(userView -> userView.active)
-                       .collect(Collectors.toSet());
+                   .stream()
+                   .filter(userView -> userView.active)
+                   .collect(Collectors.toSet());
     }
 
     public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
