@@ -36,8 +36,11 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanCommand {
+    // the final output directory for this command can not be reliably created until the actual scan is happening
+    // it is only at that time that we have the executing thread's id so that a unique directory can be created
+    private final OutputDirectoryCallable outputDirectoryCallable;
+
     private final File installDirectory;
-    private final File outputDirectory;
     private final boolean dryRun;
     private final boolean shouldUseProxy;
     private final ProxyInfo proxyInfo;
@@ -62,11 +65,12 @@ public class ScanCommand {
     private final String projectName;
     private final String versionName;
 
-    public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final boolean shouldUseProxy, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
+    public ScanCommand(final File installDirectory, final OutputDirectoryCallable outputDirectoryCallable, final boolean dryRun, final boolean shouldUseProxy, final ProxyInfo proxyInfo, final String scanCliOpts,
+            final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
             final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
-        this.outputDirectory = outputDirectory;
+        this.outputDirectoryCallable = outputDirectoryCallable;
         this.dryRun = dryRun;
         this.shouldUseProxy = shouldUseProxy;
         this.proxyInfo = proxyInfo;
@@ -228,8 +232,8 @@ public class ScanCommand {
         return installDirectory;
     }
 
-    public File getOutputDirectory() {
-        return outputDirectory;
+    public OutputDirectoryCallable getOutputDirectoryCallable() {
+        return outputDirectoryCallable;
     }
 
     public boolean isDryRun() {
