@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.signaturescanner.command;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
 import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
@@ -59,14 +61,17 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     }
 
     @Override
-    public ScanCommandOutput call() {
+    public ScanCommandOutput call() throws IOException, HubIntegrationException {
+        final File specificRunOutputDirectory = scanCommand.getOutputDirectoryCallable().call();
+
         try {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
-            final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
+
+            final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, specificRunOutputDirectory.getAbsolutePath());
 
             printCommand(cmd);
 
-            final File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
+            final File standardOutFile = scanPathsUtility.createStandardOutFile(specificRunOutputDirectory);
             try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
                 final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
                 final ProcessBuilder processBuilder = new ProcessBuilder(cmd);
@@ -108,7 +113,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info(IOUtils.toString(hubCliProcess.getInputStream(), StandardCharsets.UTF_8));
 
                 logger.info("Black Duck Signature Scanner return code: " + returnCode);
-                logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
+                logger.info("You can view the logs at: '" + specificRunOutputDirectory.getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
                     throw new ScanFailedException("The scan failed with return code: " + returnCode);
@@ -116,14 +121,14 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         } catch (final Exception e) {
             final String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
-            return ScanCommandOutput.FAILURE(logger, scanCommand, errorMessage, e);
+            return ScanCommandOutput.FAILURE(logger, specificRunOutputDirectory, scanCommand.getTargetPath(), scanCommand.isDryRun(), errorMessage, e);
         }
 
         if (!scanCommand.isDryRun() && cleanupOutput) {
-            FileUtils.deleteQuietly(scanCommand.getOutputDirectory());
+            FileUtils.deleteQuietly(specificRunOutputDirectory);
         } else if (scanCommand.isDryRun() && cleanupOutput) {
             // delete everything except dry run files
-            final File[] outputFiles = scanCommand.getOutputDirectory().listFiles();
+            final File[] outputFiles = specificRunOutputDirectory.listFiles();
             for (final File outputFile : outputFiles) {
                 if (!DRY_RUN_FILES_TO_KEEP.contains(outputFile.getName())) {
                     FileUtils.deleteQuietly(outputFile);
@@ -131,7 +136,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         }
 
-        final ScanCommandOutput success = ScanCommandOutput.SUCCESS(logger, scanCommand);
+        final ScanCommandOutput success = ScanCommandOutput.SUCCESS(logger, specificRunOutputDirectory, scanCommand.getTargetPath(), scanCommand.isDryRun());
         return success;
     }
 

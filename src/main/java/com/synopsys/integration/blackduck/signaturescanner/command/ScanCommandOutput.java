@@ -39,26 +39,30 @@ public class ScanCommandOutput {
     private final Result result;
     private final String errorMessage;
     private final Exception exception;
-    private final ScanCommand scanCommand;
+    private final File specificRunOutputDirectory;
+    private final String targetPath;
+    private final boolean dryRun;
 
-    public static ScanCommandOutput SUCCESS(final IntLogger logger, final ScanCommand scanCommand) {
-        return new ScanCommandOutput(logger, scanCommand, Result.SUCCESS, null, null);
+    public static ScanCommandOutput SUCCESS(final IntLogger logger, final File specificRunOutputDirectory, final String targetPath, final boolean dryRun) {
+        return new ScanCommandOutput(logger, specificRunOutputDirectory, targetPath, dryRun, Result.SUCCESS, null, null);
     }
 
-    public static ScanCommandOutput FAILURE(final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception) {
-        return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, exception);
+    public static ScanCommandOutput FAILURE(final IntLogger logger, final File specificRunOutputDirectory, final String targetPath, final boolean dryRun, final String errorMessage, final Exception exception) {
+        return new ScanCommandOutput(logger, specificRunOutputDirectory, targetPath, dryRun, Result.FAILURE, errorMessage, exception);
     }
 
-    private ScanCommandOutput(final IntLogger logger, final ScanCommand scanCommand, final Result result, final String errorMessage, final Exception exception) {
+    private ScanCommandOutput(final IntLogger logger, final File specificRunOutputDirectory, final String targetPath, final boolean dryRun, final Result result, final String errorMessage, final Exception exception) {
         this.logger = logger;
         this.result = result;
         this.errorMessage = errorMessage;
         this.exception = exception;
-        this.scanCommand = scanCommand;
+        this.specificRunOutputDirectory = specificRunOutputDirectory;
+        this.targetPath = targetPath;
+        this.dryRun = dryRun;
     }
 
     private Optional<File> getResultFile(final String resultDirectoryName) {
-        final File resultDirectory = new File(scanCommand.getOutputDirectory(), resultDirectoryName);
+        final File resultDirectory = new File(specificRunOutputDirectory, resultDirectoryName);
         if (null != resultDirectory && resultDirectory.exists()) {
             final File[] resultFiles = resultDirectory.listFiles((dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
             if (null != resultFiles && resultFiles.length == 1) {
@@ -70,7 +74,7 @@ public class ScanCommandOutput {
     }
 
     public boolean wasDryRun() {
-        return scanCommand.isDryRun();
+        return dryRun;
     }
 
     public Optional<File> getScanSummaryFile() {
@@ -82,7 +86,7 @@ public class ScanCommandOutput {
     }
 
     public File getSpecificRunOutputDirectory() {
-        return scanCommand.getOutputDirectory();
+        return specificRunOutputDirectory;
     }
 
     public Result getResult() {
@@ -90,7 +94,7 @@ public class ScanCommandOutput {
     }
 
     public String getScanTarget() {
-        return scanCommand.getTargetPath();
+        return targetPath;
     }
 
     public String getErrorMessage() {

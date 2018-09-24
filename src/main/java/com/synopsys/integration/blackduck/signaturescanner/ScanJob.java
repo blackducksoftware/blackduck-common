@@ -29,9 +29,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.signaturescanner.command.OutputDirectoryCallable;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
@@ -105,18 +104,8 @@ public class ScanJob extends Stringable {
         }
         final List<ScanCommand> scanCommands = new ArrayList<>();
         for (final ScanTarget scanTarget : scanTargets) {
-            File commandOutputDirectory = null;
-            if (StringUtils.isNotBlank(scanTarget.getOutputDirectoryPath())) {
-                if (scanTarget.isOutputDirectoryPathAbsolute()) {
-                    commandOutputDirectory = new File(scanTarget.getOutputDirectoryPath());
-                } else {
-                    commandOutputDirectory = new File(outputDirectory, scanTarget.getOutputDirectoryPath());
-                }
-                commandOutputDirectory.mkdirs();
-            } else {
-                commandOutputDirectory = scanPathsUtility.createSpecificRunOutputDirectory(outputDirectory);
-            }
-            final ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOpts, scanMemoryInMegabytes, commandScheme, commandHost,
+            final OutputDirectoryCallable outputDirectoryCallable = new OutputDirectoryCallable(scanPathsUtility, outputDirectory, scanTarget);
+            final ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, outputDirectoryCallable, commandDryRun, shouldUseProxy, proxyInfo, scanCliOpts, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
                     scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);
