@@ -59,7 +59,6 @@ public class HubBucketService extends DataService {
     public <T extends HubResponse> void addToTheBucket(final HubBucket hubBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
         final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses = new ArrayList<>();
         uriSingleResponses.add(new UriSingleResponse<>(uri, responseClass));
-
         addToTheBucket(hubBucket, uriSingleResponses);
     }
 
@@ -68,6 +67,7 @@ public class HubBucketService extends DataService {
         uriToResponseClass.forEach((key, value) -> {
             uriSingleResponses.add(new UriSingleResponse<>(key, value));
         });
+        addToTheBucket(hubBucket, uriSingleResponses);
     }
 
     public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
