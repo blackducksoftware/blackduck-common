@@ -32,6 +32,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,6 +55,9 @@ public class ScanPathsUtility {
     private static final FileFilter JRE_DIRECTORY_FILTER = file -> "jre".equalsIgnoreCase(file.getName()) && file.isDirectory();
     private static final FileFilter LIB_DIRECTORY_FILTER = file -> "lib".equalsIgnoreCase(file.getName()) && file.isDirectory();
     private static final FileFilter SCAN_CLI_JAR_FILE_FILTER = file -> file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar") && file.isFile();
+
+    // this will allow for multiple threads to always get a unique number
+    private final AtomicInteger defaultMultiThreadingId = new AtomicInteger(0);
 
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -108,12 +112,18 @@ public class ScanPathsUtility {
     }
 
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws IOException, HubIntegrationException {
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
+        final String timeStringPrefix = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
+
+        final int uniqueThreadIdSuffix = defaultMultiThreadingId.incrementAndGet();
+        return createRunOutputDirectory(generalOutputDirectory, timeStringPrefix, Integer.toString(uniqueThreadIdSuffix));
+    }
+
+    public File createRunOutputDirectory(final File generalOutputDirectory, final String userProvidedPrefix, final String userProvidedUniqueSuffix) throws IOException, HubIntegrationException {
         final String signatureScanOutputDirectoryName = "BlackDuckScanOutput";
         final File signatureScanOutputDirectory = new File(generalOutputDirectory, signatureScanOutputDirectoryName);
 
-        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
-        final String timeString = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
-        final String uniqueOutputDirectoryName = timeString + "_" + Thread.currentThread().getId();
+        final String uniqueOutputDirectoryName = userProvidedPrefix + "_" + userProvidedUniqueSuffix;
 
         final File specificRunOutputDirectory = new File(signatureScanOutputDirectory, uniqueOutputDirectoryName);
         if (!specificRunOutputDirectory.exists() && !specificRunOutputDirectory.mkdirs()) {
