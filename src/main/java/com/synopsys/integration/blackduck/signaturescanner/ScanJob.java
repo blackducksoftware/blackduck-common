@@ -37,6 +37,7 @@ import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtil
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
 
 public class ScanJob extends Stringable {
@@ -87,6 +88,17 @@ public class ScanJob extends Stringable {
     }
 
     public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility) throws IOException, HubIntegrationException {
+        return createScanCommands(scanPathsUtility, null);
+    }
+
+    public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws IOException, HubIntegrationException {
+        String scanCliOptsToUse = scanCliOpts;
+        if (StringUtils.isBlank(scanCliOptsToUse)) {
+            final String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
+            if (StringUtils.isNotBlank(scanCliOptsEnvironment)) {
+                scanCliOptsToUse = scanCliOptsEnvironment;
+            }
+        }
         final boolean commandDryRun = blackDuckUrl == null || dryRun;
         final boolean snippetMatching = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
         final boolean snippetMatchingOnly = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
@@ -116,7 +128,7 @@ public class ScanJob extends Stringable {
             } else {
                 commandOutputDirectory = scanPathsUtility.createSpecificRunOutputDirectory(outputDirectory);
             }
-            final ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOpts, scanMemoryInMegabytes, commandScheme, commandHost,
+            final ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
                     scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);

@@ -92,7 +92,7 @@ public class ScanJobManager {
             }
         }
 
-        final List<ScanCommand> scanCommands = scanJob.createScanCommands(scanPathsUtility);
+        final List<ScanCommand> scanCommands = scanJob.createScanCommands(scanPathsUtility, intEnvironmentVariables);
         final List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanJob.isCleanupOutput());
         return new ScanJobOutput(scanCommandOutputs);
     }
