@@ -87,6 +87,10 @@ public class ScanJob extends Stringable {
         this.scanTargets = scanTargets;
     }
 
+    @Deprecated
+    /**
+     * @deprecated Creating the scan commands now requires access to environment variables, so please use the method that allows for passing in IntEnvironmentVariables.
+     */
     public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility) throws IOException, HubIntegrationException {
         return createScanCommands(scanPathsUtility, null);
     }
