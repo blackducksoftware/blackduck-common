@@ -93,7 +93,7 @@ public class ScanJob extends Stringable {
 
     public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws IOException, HubIntegrationException {
         String scanCliOptsToUse = scanCliOpts;
-        if (StringUtils.isBlank(scanCliOptsToUse)) {
+        if (null != intEnvironmentVariables && StringUtils.isBlank(scanCliOptsToUse)) {
             final String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
             if (StringUtils.isNotBlank(scanCliOptsEnvironment)) {
                 scanCliOptsToUse = scanCliOptsEnvironment;
