@@ -97,7 +97,7 @@ public class ScanPathsUtility {
         final String pathToJavaExecutable;
         final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
         if (StringUtils.isNotBlank(bdsJavaHome)) {
-            pathToJavaExecutable = bdsJavaHome;
+            pathToJavaExecutable = findPathToJavaExe(new File(bdsJavaHome));
         } else {
             final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
             pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
