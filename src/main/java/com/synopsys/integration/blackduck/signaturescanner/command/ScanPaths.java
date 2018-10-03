@@ -41,20 +41,20 @@ public class ScanPaths {
 
     public List<String> createCommandForScannerVersion() {
         final List<String> cmd = new ArrayList<>();
-        addScanCommandPrefix(cmd);
-        addScanCommandSuffix(cmd);
+        addJavaAndOnePathArguments(cmd);
+        addScanExecutableArguments(cmd);
         cmd.add("--version");
 
         return cmd;
     }
 
-    public void addScanCommandPrefix(final List<String> cmd) {
+    public void addJavaAndOnePathArguments(final List<String> cmd) {
         cmd.add(getPathToJavaExecutable());
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + getPathToOneJar());
     }
 
-    public void addScanCommandSuffix(final List<String> cmd) {
+    public void addScanExecutableArguments(final List<String> cmd) {
         cmd.add("-jar");
         cmd.add(getPathToScanExecutable());
     }

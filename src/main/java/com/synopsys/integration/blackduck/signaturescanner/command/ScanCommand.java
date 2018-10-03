@@ -96,7 +96,7 @@ public class ScanCommand {
         final List<String> cmd = new ArrayList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
-        scannerPaths.addScanCommandPrefix(cmd);
+        scannerPaths.addJavaAndOnePathArguments(cmd);
         if (shouldUseProxy) {
             final ProxyInfo hubProxyInfo = proxyInfo;
             final String proxyHost = hubProxyInfo.getHost();
@@ -130,7 +130,7 @@ public class ScanCommand {
             }
         }
         cmd.add("-Xmx" + scanMemoryInMegabytes + "m");
-        scannerPaths.addScanCommandSuffix(cmd);
+        scannerPaths.addScanExecutableArguments(cmd);
 
         cmd.add("--no-prompt");
 
