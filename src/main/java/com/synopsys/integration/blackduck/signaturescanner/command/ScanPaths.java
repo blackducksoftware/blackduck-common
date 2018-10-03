@@ -23,6 +23,9 @@
  */
 package com.synopsys.integration.blackduck.signaturescanner.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScanPaths {
     private final String pathToJavaExecutable;
     private final String pathToOneJar;
@@ -34,6 +37,26 @@ public class ScanPaths {
         this.pathToOneJar = pathToOneJar;
         this.pathToScanExecutable = pathToScanExecutable;
         this.managedByLibrary = managedByLibrary;
+    }
+
+    public List<String> createCommandForScannerVersion() {
+        final List<String> cmd = new ArrayList<>();
+        addJavaAndOnePathArguments(cmd);
+        addScanExecutableArguments(cmd);
+        cmd.add("--version");
+
+        return cmd;
+    }
+
+    public void addJavaAndOnePathArguments(final List<String> cmd) {
+        cmd.add(getPathToJavaExecutable());
+        cmd.add("-Done-jar.silent=true");
+        cmd.add("-Done-jar.jar.path=" + getPathToOneJar());
+    }
+
+    public void addScanExecutableArguments(final List<String> cmd) {
+        cmd.add("-jar");
+        cmd.add(getPathToScanExecutable());
     }
 
     public String getPathToJavaExecutable() {
