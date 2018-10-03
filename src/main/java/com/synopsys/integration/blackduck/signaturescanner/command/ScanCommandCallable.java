@@ -34,6 +34,7 @@ import java.util.concurrent.Callable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
@@ -59,10 +60,15 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     }
 
     @Override
+    //BD_HUB_SCAN_PATH
     public ScanCommandOutput call() {
         try {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
+            //TODO remove this when we no longer need to support setting target paths on the command line (introduced ~2018-10-01)
+            final String versionResult = scanPathsUtility.determineBlackDuckVersion(scanPaths);
+
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
+            addScanTargetPathToCommand(cmd, scanCommand.getTargetPath(), versionResult);
 
             printCommand(cmd);
 
@@ -168,6 +174,16 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             final String[] maskedArray = new String[cmdToMask.length()];
             Arrays.fill(maskedArray, "*");
             cmd.set(indexToMask, StringUtils.join(maskedArray));
+        }
+    }
+
+    private void addScanTargetPathToCommand(final List<String> cmd, final String targetPath, final String version) {
+        final int majorVersion = NumberUtils.toInt(version.substring(0, 1), 0);
+        if (majorVersion >= 5) {
+            logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", targetPath));
+            intEnvironmentVariables.put("BD_HUB_SCAN_PATH", targetPath);
+        } else {
+            cmd.add(targetPath);
         }
     }
 

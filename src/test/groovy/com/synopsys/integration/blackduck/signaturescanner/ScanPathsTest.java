@@ -3,9 +3,7 @@ package com.synopsys.integration.blackduck.signaturescanner;
 import static com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
