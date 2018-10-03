@@ -178,6 +178,9 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     }
 
     private void addScanTargetPathToCommand(final List<String> cmd, final String targetPath, final String version) {
+        // this code is deliberately bad (it won't work for Black Duck versions >= 10)
+        // it needs to be removed as soon as possible once adoption of version 5 is pervasive
+        // ejk 2018-10-03
         final int majorVersion = NumberUtils.toInt(version.substring(0, 1), 0);
         if (majorVersion >= 5) {
             logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", targetPath));
