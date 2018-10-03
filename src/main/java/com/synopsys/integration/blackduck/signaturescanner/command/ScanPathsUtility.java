@@ -75,7 +75,11 @@ public class ScanPathsUtility {
      * @throws HubIntegrationException
      */
     public ScanPaths determineSignatureScannerPaths(final File directory) throws HubIntegrationException {
-        if (directory == null || !directory.isDirectory()) {
+        if (directory == null) {
+            throw new IllegalArgumentException("null is not a valid directory");
+        }
+
+        if (!directory.isDirectory()) {
             throw new IllegalArgumentException(String.format("%s is not a valid directory", directory.getAbsolutePath()));
         }
 
