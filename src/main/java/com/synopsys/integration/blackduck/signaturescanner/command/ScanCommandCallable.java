@@ -60,10 +60,10 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     }
 
     @Override
-    //BD_HUB_SCAN_PATH
     public ScanCommandOutput call() {
         try {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
+
             //TODO remove this when we no longer need to support setting target paths on the command line (introduced ~2018-10-01)
             final String versionResult = scanPathsUtility.determineBlackDuckVersion(scanPaths);
 
