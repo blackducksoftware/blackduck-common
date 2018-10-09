@@ -24,6 +24,7 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.net.URL;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,7 +49,7 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
     private final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder;
 
     public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion, final IntEnvironmentVariables intEnvironmentVariables,
-            final HubService hubService, final HubRegistrationService hubRegistrationService) {
+        final HubService hubService, final HubRegistrationService hubRegistrationService) {
         super(logger, client, productURL, artifactId, artifactVersion, intEnvironmentVariables);
         this.logger = logger;
         this.hubService = hubService;
@@ -57,7 +58,7 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
     }
 
     public BlackDuckPhoneHomeCallable(final IntLogger logger, final PhoneHomeClient client, final URL productURL, final String artifactId, final String artifactVersion, final IntEnvironmentVariables intEnvironmentVariables,
-            final HubService hubService, final HubRegistrationService hubRegistrationService, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
+        final HubService hubService, final HubRegistrationService hubRegistrationService, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
         super(logger, client, productURL, artifactId, artifactVersion, intEnvironmentVariables);
         this.logger = logger;
         this.hubService = hubService;
@@ -90,7 +91,6 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
 
     /**
      * metaData map cannot exceed {@value #MAX_META_DATA_CHARACTERS}
-     *
      * @return true if the data was successfully added, false if the new data would make the map exceed it's size limit
      */
     public boolean addMetaData(final String key, final String value) {
@@ -99,6 +99,16 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
             return true;
         }
         return false;
+    }
+
+    /**
+     * metaData map cannot exceed {@value #MAX_META_DATA_CHARACTERS}
+     * @return true if the all the data was successfully added,
+     * false if one or more of the entries entries would make the map exceed it's size limit
+     */
+    public boolean addAllMetadata(final Map<String, String> metadataMap) {
+        return metadataMap.entrySet().stream()
+                   .allMatch(entry -> addMetaData(entry.getKey(), entry.getValue()));
     }
 
     private int charactersInMetaDataMap(final String key, final String value) {
