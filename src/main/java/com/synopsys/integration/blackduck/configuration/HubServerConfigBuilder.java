@@ -49,8 +49,6 @@ import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.validator.AbstractValidator;
 
 public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
-    public static final String HUB_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_HUB_";
-    public static final String HUB_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.hub.";
     public static final String BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_";
     public static final String BLACKDUCK_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.";
 
@@ -333,8 +331,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         PROXY_NTLM_WORKSTATION,
         TRUST_CERT;
 
-        private final String hubEnvironmentVariableKey;
-        private final String hubPropertyKey;
         private final String blackDuckEnvironmentVariableKey;
         private final String blackDuckPropertyKey;
         private final String builderPropertyName;
@@ -342,9 +338,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
         private Property() {
             final String name = name();
-            hubEnvironmentVariableKey = HUB_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX + name;
-            hubPropertyKey = hubEnvironmentVariableKey.toLowerCase().replace("_", ".");
-
             blackDuckEnvironmentVariableKey = BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX + name;
             blackDuckPropertyKey = blackDuckEnvironmentVariableKey.toLowerCase().replace("_", ".");
 
@@ -354,44 +347,16 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         }
 
         public boolean isWithin(final Set<String> keys) {
-            return keys.contains(hubEnvironmentVariableKey) || keys.contains(hubPropertyKey) || keys.contains(blackDuckEnvironmentVariableKey) || keys.contains(blackDuckPropertyKey);
+            return keys.contains(blackDuckEnvironmentVariableKey) || keys.contains(blackDuckPropertyKey);
         }
 
         public String getValueFrom(final Map<String, String> values) {
-            String key = hubEnvironmentVariableKey;
-            if (values.containsKey(hubPropertyKey)) {
-                key = hubPropertyKey;
-            } else if (values.containsKey(blackDuckEnvironmentVariableKey)) {
-                key = blackDuckEnvironmentVariableKey;
-            } else if (values.containsKey(blackDuckPropertyKey)) {
+            String key = blackDuckEnvironmentVariableKey;
+            if (values.containsKey(blackDuckPropertyKey)) {
                 key = blackDuckPropertyKey;
             }
 
             return values.get(key);
-        }
-
-        @Deprecated
-        /**
-         * @deprecated Please use getHubEnvironmentVariableKey
-         */
-        public String getEnvironmentVariableKey() {
-            return hubEnvironmentVariableKey;
-        }
-
-        @Deprecated
-        /**
-         * @deprecated Please use getHubPropertyKey
-         */
-        public String getPropertyKey() {
-            return hubPropertyKey;
-        }
-
-        public String getHubEnvironmentVariableKey() {
-            return hubEnvironmentVariableKey;
-        }
-
-        public String getHubPropertyKey() {
-            return hubPropertyKey;
         }
 
         public String getBlackDuckEnvironmentVariableKey() {

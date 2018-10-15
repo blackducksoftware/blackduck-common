@@ -34,7 +34,6 @@ import java.util.concurrent.Callable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
@@ -64,11 +63,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         try {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
 
-            //TODO remove this when we no longer need to support setting target paths on the command line (introduced ~2018-10-01)
-            final String versionResult = scanPathsUtility.determineBlackDuckVersion(scanPaths);
-
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
-            addScanTargetPathToCommand(cmd, scanCommand.getTargetPath(), versionResult);
+            addScanTargetPathToCommand(cmd, scanCommand.getTargetPath());
 
             printCommand(cmd);
 
@@ -177,17 +173,9 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         }
     }
 
-    private void addScanTargetPathToCommand(final List<String> cmd, final String targetPath, final String version) {
-        // this code is deliberately bad (it won't work for Black Duck versions >= 10)
-        // it needs to be removed as soon as possible once adoption of version 5 is pervasive
-        // ejk 2018-10-03
-        final int majorVersion = NumberUtils.toInt(version.substring(0, 1), 0);
-        if (majorVersion >= 5) {
-            logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", targetPath));
-            intEnvironmentVariables.put("BD_HUB_SCAN_PATH", targetPath);
-        } else {
-            cmd.add(targetPath);
-        }
+    private void addScanTargetPathToCommand(final List<String> cmd, final String targetPath) {
+        logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", targetPath));
+        intEnvironmentVariables.put("BD_HUB_SCAN_PATH", targetPath);
     }
 
 }

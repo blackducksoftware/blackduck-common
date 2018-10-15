@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.api.core.HubPath;
 import com.synopsys.integration.blackduck.api.core.HubPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.CodeLocationType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
@@ -72,12 +71,6 @@ public class CodeLocationService extends DataService {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
-    }
-
-    public List<CodeLocationView> getAllCodeLocationsForCodeLocationType(final CodeLocationType codeLocationType) throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("codeLocationType", codeLocationType.toString());
-        final List<CodeLocationView> allCodeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
-        return allCodeLocations;
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
@@ -160,7 +153,6 @@ public class CodeLocationService extends DataService {
         requestCodeLocationView.createdAt = codeLocationView.createdAt;
         requestCodeLocationView.mappedProjectVersion = versionUrl;
         requestCodeLocationView.name = codeLocationView.name;
-        requestCodeLocationView.type = codeLocationView.type;
         requestCodeLocationView.updatedAt = codeLocationView.updatedAt;
         requestCodeLocationView.url = codeLocationView.url;
         return requestCodeLocationView;

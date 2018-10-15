@@ -36,6 +36,10 @@ public class ScanTarget {
         return new ScanTarget(path, null, null, null, false);
     }
 
+    public static ScanTarget createBasicTarget(final String path, final String codeLocationName) {
+        return new ScanTarget(path, null, codeLocationName, null, false);
+    }
+
     public static ScanTarget createBasicTarget(final String path, final Set<String> exclusionPatterns, final String codeLocationName) {
         return new ScanTarget(path, exclusionPatterns, codeLocationName, null, false);
     }

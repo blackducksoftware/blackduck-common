@@ -37,7 +37,6 @@ import org.junit.rules.TemporaryFolder;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.CodeLocationType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
@@ -178,7 +177,8 @@ public class ComprehensiveCookbookTestIT {
         System.out.println("Number of code locations: " + codeLocationItems.size());
 
         // since we imported bdio, we should also have some BOM_IMPORT code locations
-        codeLocationItems = hubServicesFactory.createCodeLocationService().getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
+        codeLocationItems = hubServicesFactory.createHubService().getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+        //().getAllCodeLocationsForCodeLocationType(CodeLocationType.BOM_IMPORT);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView item : codeLocationItems) {
