@@ -58,7 +58,7 @@ public class HubResponseTransformer {
             try {
                 jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
             } catch (final JsonSyntaxException e) {
-                logger.error(String.format("Could not parse the provided Json:%s %s", System.lineSeparator(), jsonResponse));
+                logger.error(String.format("Could not parse the provided Json:%s%s", System.lineSeparator(), jsonResponse));
                 throw new HubIntegrationException(e.getMessage(), e);
             }
             return getResponseAs(jsonObject, clazz);
@@ -78,7 +78,7 @@ public class HubResponseTransformer {
         try {
             hubItem = gson.fromJson(view, clazz);
         } catch (final JsonSyntaxException e) {
-            logger.error(String.format("Could not parse the provided Json:%s %s", System.lineSeparator(), view));
+            logger.error(String.format("Could not parse the provided Json:%s%s", System.lineSeparator(), view));
             throw new HubIntegrationException(e.getMessage(), e);
         }
         hubItem.json = view;
