@@ -32,22 +32,26 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubResponsesTransformer {
     private final BlackduckRestConnection restConnection;
     private final HubResponseTransformer hubResponseTransformer;
     private final JsonParser jsonParser;
+    private final IntLogger logger;
 
-    public HubResponsesTransformer(final BlackduckRestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser) {
+    public HubResponsesTransformer(final BlackduckRestConnection restConnection, final HubResponseTransformer hubResponseTransformer, final JsonParser jsonParser, final IntLogger logger) {
         this.restConnection = restConnection;
         this.hubResponseTransformer = hubResponseTransformer;
         this.jsonParser = jsonParser;
+        this.logger = logger;
     }
 
     public <T extends HubResponse> List<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz) throws IntegrationException {
@@ -62,9 +66,15 @@ public class HubResponsesTransformer {
         final List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
-        try (Response initialResponse = restConnection.executeRequest(pagedRequest.createRequest())) {
+        try (final Response initialResponse = restConnection.executeRequest(pagedRequest.createRequest())) {
             final String initialJsonResponse = initialResponse.getContentString();
-            final JsonObject initialJsonObject = jsonParser.parse(initialJsonResponse).getAsJsonObject();
+            final JsonObject initialJsonObject;
+            try {
+                initialJsonObject = jsonParser.parse(initialJsonResponse).getAsJsonObject();
+            } catch (final JsonSyntaxException e) {
+                logger.error(String.format("Could not parse the initial provided Json responses with JsonParser:%s%s", System.lineSeparator(), initialJsonResponse));
+                throw new HubIntegrationException(e.getMessage(), e);
+            }
             if (typeMap != null) {
                 allResponses.addAll(getResponses(initialJsonObject, clazz, typeMap));
             } else {
@@ -78,9 +88,15 @@ public class HubResponsesTransformer {
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += pagedRequest.getLimit();
                 final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
-                try (Response response = restConnection.executeRequest(offsetPagedRequest.createRequest())) {
+                try (final Response response = restConnection.executeRequest(offsetPagedRequest.createRequest())) {
                     final String jsonResponse = response.getContentString();
-                    final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
+                    final JsonObject jsonObject;
+                    try {
+                        jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
+                    } catch (final JsonSyntaxException e) {
+                        logger.error(String.format("Could not parse the provided Json responses with JsonParser:%s%s", System.lineSeparator(), jsonResponse));
+                        throw new HubIntegrationException(e.getMessage(), e);
+                    }
                     if (typeMap != null) {
                         allResponses.addAll(getResponses(jsonObject, clazz, typeMap));
                     } else {

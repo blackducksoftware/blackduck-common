@@ -72,8 +72,8 @@ public class HubService {
         this.jsonParser = jsonParser;
         this.gson = gson;
         metaHandler = new MetaHandler(logger);
-        hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser);
-        hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
+        hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser, logger);
+        hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser, logger);
     }
 
     public BlackduckRestConnection getRestConnection() {
@@ -154,7 +154,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
+        throws IntegrationException {
         final String uri = pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
@@ -196,7 +196,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
+        throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
         if (StringUtils.isBlank(uri)) {
             return Collections.emptyList();
@@ -275,7 +275,7 @@ public class HubService {
     }
 
     public String executePostRequestAndRetrieveURL(final Request request) throws IntegrationException {
-        try (Response response = executeRequest(request)) {
+        try (final Response response = executeRequest(request)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
