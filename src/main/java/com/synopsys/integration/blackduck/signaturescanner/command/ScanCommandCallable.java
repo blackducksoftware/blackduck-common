@@ -64,7 +64,9 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
 
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
-            addScanTargetPathToCommand(cmd, scanCommand.getTargetPath());
+            logger.info(String.format("NOTE: This will only work after Black Duck 5.0.0. You may need to upgrade your Black Duck server if you are running an older version.", scanCommand.getTargetPath()));
+            logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", scanCommand.getTargetPath()));
+            intEnvironmentVariables.put("BD_HUB_SCAN_PATH", scanCommand.getTargetPath());
 
             printCommand(cmd);
 
@@ -171,11 +173,6 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             Arrays.fill(maskedArray, "*");
             cmd.set(indexToMask, StringUtils.join(maskedArray));
         }
-    }
-
-    private void addScanTargetPathToCommand(final List<String> cmd, final String targetPath) {
-        logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", targetPath));
-        intEnvironmentVariables.put("BD_HUB_SCAN_PATH", targetPath);
     }
 
 }
