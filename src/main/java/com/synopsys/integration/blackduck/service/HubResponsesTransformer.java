@@ -72,7 +72,7 @@ public class HubResponsesTransformer {
             try {
                 initialJsonObject = jsonParser.parse(initialJsonResponse).getAsJsonObject();
             } catch (final JsonSyntaxException e) {
-                logger.error(String.format("Could not parse the provided Json responses with JsonParser:%s%s", System.lineSeparator(), initialJsonResponse));
+                logger.error(String.format("Could not parse the initial provided Json responses with JsonParser:%s%s", System.lineSeparator(), initialJsonResponse));
                 throw new HubIntegrationException(e.getMessage(), e);
             }
             if (typeMap != null) {
