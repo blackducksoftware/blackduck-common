@@ -24,11 +24,11 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
@@ -48,14 +48,14 @@ public class NotificationService extends DataService {
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
-        final List<String> allKnownNotificationTypes = getAllKnownTypesToInclude();
+        final List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
         final List<NotificationView> allNotificationItems = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
         return allNotificationItems;
     }
 
     public List<NotificationUserView> getAllUserNotifications(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
-        final List<String> allKnownNotificationTypes = getAllKnownTypesToInclude();
+        final List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
         final String userNotificationsUri = hubService.getFirstLink(user, UserView.NOTIFICATIONS_LINK);
         requestBuilder.uri(userNotificationsUri);
@@ -85,6 +85,7 @@ public class NotificationService extends DataService {
      */
     public Date getLatestNotificationDate() throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
+        RequestFactory.addHubFilter(requestBuilder, createFilterForAllKnownTypes());
         final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
             return notifications.get(0).createdAt;
@@ -93,20 +94,30 @@ public class NotificationService extends DataService {
         }
     }
 
+    private List<String> getAllKnownNotificationTypes() {
+        final List<String> allKnownTypes = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());
+        return allKnownTypes;
+    }
+
+    private HubFilter createFilterForAllKnownTypes() {
+        return createFilterForSpecificTypes(getAllKnownNotificationTypes());
+    }
+
+    private HubFilter createFilterForSpecificTypes(final List<String> notificationTypesToInclude) {
+        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
+        return hubFilter;
+    }
+
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) {
         final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String startDateString = sdf.format(startDate);
         final String endDateString = sdf.format(endDate);
 
-        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
-        RequestFactory.addHubFilter(requestBuilder, hubFilter);
+        final HubFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
+        RequestFactory.addHubFilter(requestBuilder, notificationTypeFilter);
         return requestBuilder;
-    }
-
-    private List<String> getAllKnownTypesToInclude() {
-        return Arrays.stream(NotificationType.values()).map(NotificationType::name).collect(Collectors.toList());
     }
 
 }

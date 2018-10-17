@@ -185,6 +185,10 @@ public class HubServicesFactory {
         return logger;
     }
 
+    public JsonParser getJsonParser() {
+        return jsonParser;
+    }
+
     public Gson getGson() {
         return gson;
     }

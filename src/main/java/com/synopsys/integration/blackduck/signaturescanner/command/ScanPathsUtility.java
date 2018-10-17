@@ -23,11 +23,9 @@
  */
 package com.synopsys.integration.blackduck.signaturescanner.command;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -142,20 +140,6 @@ public class ScanPathsUtility {
         }
 
         return specificRunOutputDirectory;
-    }
-
-    public String determineBlackDuckVersion(final ScanPaths scanPaths) throws IOException, HubIntegrationException {
-        final List<String> versionCmd = scanPaths.createCommandForScannerVersion();
-        final ProcessBuilder processBuilder = new ProcessBuilder(versionCmd);
-        final Process process = processBuilder.start();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line = null;
-            String lastLine = null;
-            while ((line = reader.readLine()) != null) {
-                lastLine = line;
-            }
-            return lastLine;
-        }
     }
 
     public File createStandardOutFile(final File specificRunOutputDirectory) throws IOException {
