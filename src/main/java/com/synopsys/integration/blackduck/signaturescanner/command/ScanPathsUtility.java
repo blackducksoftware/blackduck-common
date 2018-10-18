@@ -77,7 +77,11 @@ public class ScanPathsUtility {
      * @throws HubIntegrationException
      */
     public ScanPaths determineSignatureScannerPaths(final File directory) throws HubIntegrationException {
-        if (directory == null || !directory.isDirectory()) {
+        if (directory == null) {
+            throw new IllegalArgumentException("null is not a valid directory");
+        }
+
+        if (!directory.isDirectory()) {
             throw new IllegalArgumentException(String.format("%s is not a valid directory", directory.getAbsolutePath()));
         }
 
@@ -99,7 +103,7 @@ public class ScanPathsUtility {
         final String pathToJavaExecutable;
         final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
         if (StringUtils.isNotBlank(bdsJavaHome)) {
-            pathToJavaExecutable = bdsJavaHome;
+            pathToJavaExecutable = findPathToJavaExe(new File(bdsJavaHome));
         } else {
             final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
             pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
