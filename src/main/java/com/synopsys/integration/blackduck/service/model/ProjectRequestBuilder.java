@@ -64,7 +64,7 @@ public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
     }
 
     @Override
-    public ProjectRequest buildWithoutValidation() {
+    protected ProjectRequest buildWithoutValidation() {
         final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution);
         final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase);
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();

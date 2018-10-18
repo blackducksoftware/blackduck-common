@@ -99,7 +99,8 @@ public class ScanService extends DataService {
                 if (codeLocationUrls.containsAll(codeLocationUrlsToFind)) {
                     allCompleted = true;
                 } else {
-                    logger.info(String.format("All scans have not been added to the BOM yet, waiting another 5 seconds (try #%d)...", ++attemptCount));
+                    attemptCount++;
+                    logger.info(String.format("All scans have not been added to the BOM yet, waiting another 5 seconds (try #%d)...", attemptCount));
                     Thread.sleep(5000);
                 }
             }
