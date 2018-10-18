@@ -21,22 +21,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.configuration;
+package com.synopsys.integration.blackduck.rest;
 
-import com.synopsys.integration.validator.FieldEnum;
+import java.net.URL;
 
-public enum HubServerConfigFieldEnum implements FieldEnum {
-    HUBURL("hubUrl"), CREDENTIALS("hubCredentials"), PROXYINFO("hubProxyInfo"), HUBTIMEOUT("hubTimeout");
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-    private final String key;
-
-    private HubServerConfigFieldEnum(final String key) {
-        this.key = key;
+public abstract class BlackDuckRestConnection extends RestConnection {
+    public BlackDuckRestConnection(final IntLogger logger, final URL baseUrl, final int timeout, final ProxyInfo proxyInfo) {
+        super(logger, baseUrl, timeout, proxyInfo);
     }
 
+    public abstract void authenticateWithBlackDuck() throws IntegrationException;
+
     @Override
-    public String getKey() {
-        return key;
+    public void completeConnection() throws IntegrationException {
+        authenticateWithBlackDuck();
     }
 
 }

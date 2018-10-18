@@ -37,7 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.WordUtils;
 
-import com.synopsys.integration.builder.AbstractBuilder;
 import com.synopsys.integration.exception.IntegrationCertificateException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -46,24 +45,18 @@ import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
-import com.synopsys.integration.validator.AbstractValidator;
+import com.synopsys.integration.util.IntegrationBuilder;
 
-public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
+public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> {
     public static final String BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_";
     public static final String BLACKDUCK_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.";
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
-    private final HubServerConfigValidator validator;
     private final Map<Property, String> values = new HashMap<>();
     private IntLogger logger;
 
     public HubServerConfigBuilder() {
-        this(new HubServerConfigValidator());
-    }
-
-    public HubServerConfigBuilder(final HubServerConfigValidator validator) {
-        this.validator = validator;
         EnumSet.allOf(Property.class).forEach(property -> {
             values.put(property, null);
         });
@@ -71,7 +64,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     @Override
-    public HubServerConfig build() throws IllegalStateException {
+    public HubServerConfig build() {
         try {
             return super.build();
         } catch (final IllegalStateException stateException) {
@@ -83,7 +76,7 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     @Override
-    public HubServerConfig buildObject() {
+    public HubServerConfig buildWithoutValidation() {
         URL hubURL = null;
         try {
             String tempUrl = url();
@@ -96,54 +89,25 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         } catch (final MalformedURLException e) {
         }
 
-        final ProxyInfo proxyInfo = getHubProxyInfo();
+        final ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(apiToken())) {
             return new HubServerConfig(hubURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
         } else {
-            final Credentials credentials = getHubCredentials();
+            final Credentials credentials = new Credentials(values.get(Property.USERNAME), values.get(Property.PASSWORD));
             return new HubServerConfig(hubURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
         }
     }
 
-    private Credentials getHubCredentials() {
-        final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
-        credentialsBuilder.setUsername(values.get(Property.USERNAME));
-        credentialsBuilder.setPassword(values.get(Property.PASSWORD));
-        credentialsBuilder.setPasswordLength(passwordLength());
-        return credentialsBuilder.buildObject();
-    }
+    private ProxyInfo getProxyInfo() {
+        final String proxyHost = values.get(Property.PROXY_HOST);
+        final int proxyPort = NumberUtils.toInt(values.get(Property.PROXY_PORT), 0);
+        final String ignoredProxyHosts = values.get(Property.PROXY_IGNORED_HOSTS);
+        final Credentials proxyCredentials = new Credentials(values.get(Property.PROXY_USERNAME), values.get(Property.PROXY_PASSWORD));
+        final String proxyNtlmDomain = values.get(Property.PROXY_NTLM_DOMAIN);
+        final String proxyNtlmWorkstation = values.get(Property.PROXY_NTLM_WORKSTATION);
 
-    private ProxyInfo getHubProxyInfo() {
-        final ProxyInfoBuilder proxyBuilder = new ProxyInfoBuilder();
-        proxyBuilder.setHost(values.get(Property.PROXY_HOST));
-        proxyBuilder.setPort(values.get(Property.PROXY_PORT));
-        proxyBuilder.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
-        proxyBuilder.setUsername(values.get(Property.PROXY_USERNAME));
-        proxyBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
-        proxyBuilder.setPasswordLength(proxyPasswordLength());
-        proxyBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
-        proxyBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
-        return proxyBuilder.buildObject();
-    }
-
-    @Override
-    public AbstractValidator createValidator() {
-        validator.setHubUrl(url());
-        validator.setUsername(values.get(Property.USERNAME));
-        validator.setPassword(values.get(Property.PASSWORD));
-        validator.setPasswordLength(passwordLength());
-        validator.setApiToken(apiToken());
-        validator.setTimeout(values.get(Property.TIMEOUT));
-        validator.setProxyHost(values.get(Property.PROXY_HOST));
-        validator.setProxyPort(values.get(Property.PROXY_PORT));
-        validator.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
-        validator.setProxyUsername(values.get(Property.PROXY_USERNAME));
-        validator.setProxyPassword(values.get(Property.PROXY_PASSWORD));
-        validator.setProxyPasswordLength(proxyPasswordLength());
-        validator.setAlwaysTrustServerCertificate(trustCert());
-        validator.setProxyNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
-        validator.setProxyNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
-        return validator;
+        final ProxyInfo proxyInfo = new ProxyInfo(proxyHost, proxyPort, proxyCredentials, ignoredProxyHosts, proxyNtlmDomain, proxyNtlmWorkstation);
+        return proxyInfo;
     }
 
     public void setFromProperties(final Map<String, String> properties) {
@@ -170,6 +134,46 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         setFromProperties(propertiesMap);
     }
 
+    @Override
+    protected void populateIndividualErrorMessages() {
+        if (StringUtils.isBlank(values.get(Property.API_TOKEN))) {
+            final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
+            credentialsBuilder.setUsername(values.get(Property.USERNAME));
+            credentialsBuilder.setPassword(values.get(Property.PASSWORD));
+            if (!credentialsBuilder.isValid()) {
+                errorMessages.addAll(credentialsBuilder.getErrorMessages());
+            } else {
+                final Credentials credentials = credentialsBuilder.build();
+                if (credentials.isBlank()) {
+                    errorMessages.add("Either an API token or a username/password must be specified.");
+                }
+            }
+        }
+        final CredentialsBuilder proxyCredentialsBuilder = new CredentialsBuilder();
+        proxyCredentialsBuilder.setUsername(values.get(Property.PROXY_USERNAME));
+        proxyCredentialsBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
+        if (!proxyCredentialsBuilder.isValid()) {
+            errorMessages.add("The proxy credentials were not valid.");
+            errorMessages.addAll(proxyCredentialsBuilder.getErrorMessages());
+        } else {
+            final Credentials proxyCredentials = proxyCredentialsBuilder.build();
+            final ProxyInfoBuilder proxyInfoBuilder = new ProxyInfoBuilder();
+            proxyInfoBuilder.setCredentials(proxyCredentials);
+            proxyInfoBuilder.setHost(values.get(Property.PROXY_HOST));
+            proxyInfoBuilder.setPort(NumberUtils.toInt(values.get(Property.PROXY_PORT), 0));
+            proxyInfoBuilder.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
+            proxyInfoBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
+            proxyInfoBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
+            if (!proxyInfoBuilder.isValid()) {
+                errorMessages.addAll(proxyInfoBuilder.getErrorMessages());
+            }
+        }
+
+        if (timeoutSeconds() <= 0) {
+            errorMessages.add("The timeout must be greater than zero.");
+        }
+    }
+
     private String url() {
         return values.get(Property.URL);
     }
@@ -180,14 +184,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     private int timeoutSeconds() {
         return NumberUtils.toInt(values.get(Property.TIMEOUT), DEFAULT_TIMEOUT_SECONDS);
-    }
-
-    private int passwordLength() {
-        return NumberUtils.toInt(values.get(Property.PASSWORD_LENGTH), 0);
-    }
-
-    private int proxyPasswordLength() {
-        return NumberUtils.toInt(values.get(Property.PROXY_PASSWORD_LENGTH), 0);
     }
 
     private boolean trustCert() {
@@ -206,24 +202,13 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
     }
 
     // setters for the values of HubServerConfigBuilder
-    @Deprecated
-    /**
-     * @deprecated Please use setUrl(final String url) instead.
-     */
-    public void setHubUrl(final String hubUrl) {
-        setUrl(hubUrl);
-    }
-
-    @Deprecated
-    /**
-     * @deprecated Please use setTrustCert(final boolean trustCert) instead.
-     */
-    public void setAlwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
-        setTrustCert(alwaysTrustServerCertificate);
-    }
-
     public void setUrl(final String url) {
         values.put(Property.URL, url);
+    }
+
+    public void setCredentials(final Credentials credentials) {
+        values.put(Property.USERNAME, credentials.getUsername());
+        values.put(Property.PASSWORD, credentials.getPassword());
     }
 
     public void setUsername(final String username) {
@@ -232,20 +217,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
 
     public void setPassword(final String password) {
         values.put(Property.PASSWORD, password);
-    }
-
-    /**
-     * IMPORTANT : The password length should only be set if the password is already encrypted
-     */
-    public void setPasswordLength(final String passwordLength) {
-        values.put(Property.PASSWORD_LENGTH, passwordLength);
-    }
-
-    /**
-     * IMPORTANT : The password length should only be set if the password is already encrypted
-     */
-    public void setPasswordLength(final int passwordLength) {
-        setPasswordLength(String.valueOf(passwordLength));
     }
 
     public void setApiToken(final String apiToken) {
@@ -284,20 +255,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         values.put(Property.PROXY_PASSWORD, proxyPassword);
     }
 
-    /**
-     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
-     */
-    public void setProxyPasswordLength(final String proxyPasswordLength) {
-        values.put(Property.PROXY_PASSWORD_LENGTH, proxyPasswordLength);
-    }
-
-    /**
-     * IMPORTANT : The proxy password length should only be set if the proxy password is already encrypted
-     */
-    public void setProxyPasswordLength(final int proxyPasswordLength) {
-        setProxyPasswordLength(String.valueOf(proxyPasswordLength));
-    }
-
     public void setProxyNtlmDomain(final String proxyNtlmDomain) {
         values.put(Property.PROXY_NTLM_DOMAIN, proxyNtlmDomain);
     }
@@ -318,7 +275,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         URL,
         USERNAME,
         PASSWORD,
-        PASSWORD_LENGTH,
         API_TOKEN,
         TIMEOUT,
         PROXY_HOST,
@@ -326,7 +282,6 @@ public class HubServerConfigBuilder extends AbstractBuilder<HubServerConfig> {
         PROXY_IGNORED_HOSTS,
         PROXY_USERNAME,
         PROXY_PASSWORD,
-        PROXY_PASSWORD_LENGTH,
         PROXY_NTLM_DOMAIN,
         PROXY_NTLM_WORKSTATION,
         TRUST_CERT;

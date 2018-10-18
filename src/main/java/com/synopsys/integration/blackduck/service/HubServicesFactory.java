@@ -35,7 +35,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckPhoneHomeCallable;
 import com.synopsys.integration.exception.IntegrationException;
@@ -53,7 +53,7 @@ public class HubServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final JsonParser jsonParser;
-    private final BlackduckRestConnection restConnection;
+    private final BlackDuckRestConnection restConnection;
     private final IntLogger logger;
 
     public static Gson createDefaultGson() {
@@ -68,7 +68,7 @@ public class HubServicesFactory {
         return new JsonParser();
     }
 
-    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackduckRestConnection restConnection, final IntLogger logger) {
+    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackDuckRestConnection restConnection, final IntLogger logger) {
         intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
@@ -177,7 +177,7 @@ public class HubServicesFactory {
         return new HubBucketService(createHubService(), logger, executorService);
     }
 
-    public BlackduckRestConnection getRestConnection() {
+    public BlackDuckRestConnection getRestConnection() {
         return restConnection;
     }
 

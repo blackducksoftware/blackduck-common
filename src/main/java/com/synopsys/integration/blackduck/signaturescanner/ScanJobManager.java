@@ -35,7 +35,6 @@ import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommandRu
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
-import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -47,7 +46,7 @@ public class ScanJobManager {
     private final ScanPathsUtility scanPathsUtility;
     private final ScanCommandRunner scanCommandRunner;
 
-    public static ScanJobManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) throws EncryptionException {
+    public static ScanJobManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);

@@ -33,8 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
-import com.synopsys.integration.exception.EncryptionException;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.RestConnection;
@@ -59,16 +58,15 @@ public class ScannerZipInstaller {
     private final String blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType)
-            throws EncryptionException {
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType) {
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         return defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
     }
 
-    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final ScanPathsUtility scanPathsUtility, final OperatingSystemType operatingSystemType) throws EncryptionException {
-        final BlackduckRestConnection restConnection = hubServerConfig.createRestConnection(logger);
+    public static ScannerZipInstaller defaultUtility(final IntLogger logger, final HubServerConfig hubServerConfig, final ScanPathsUtility scanPathsUtility, final OperatingSystemType operatingSystemType) {
+        final BlackDuckRestConnection restConnection = hubServerConfig.createRestConnection(logger);
         final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        return new ScannerZipInstaller(logger, restConnection, cleanupZipExpander, scanPathsUtility, hubServerConfig.getHubUrl().toString(), operatingSystemType);
+        return new ScannerZipInstaller(logger, restConnection, cleanupZipExpander, scanPathsUtility, hubServerConfig.getBlackDuckUrl().toString(), operatingSystemType);
     }
 
     public ScannerZipInstaller(final IntLogger logger, final RestConnection restConnection, final CleanupZipExpander cleanupZipExpander, final ScanPathsUtility scanPathsUtility, final String blackDuckServerUrl,

@@ -32,19 +32,19 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubResponseTransformer {
-    private final BlackduckRestConnection restConnection;
+    private final BlackDuckRestConnection restConnection;
     private final JsonParser jsonParser;
     private final Gson gson;
     private final IntLogger logger;
 
-    public HubResponseTransformer(final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser, final IntLogger logger) {
+    public HubResponseTransformer(final BlackDuckRestConnection restConnection, final Gson gson, final JsonParser jsonParser, final IntLogger logger) {
         this.restConnection = restConnection;
         this.jsonParser = jsonParser;
         this.gson = gson;

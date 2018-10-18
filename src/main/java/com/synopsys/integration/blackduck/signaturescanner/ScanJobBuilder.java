@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
-import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanJobBuilder {
@@ -129,7 +128,7 @@ public class ScanJobBuilder {
         return StringUtils.join(errorMessages, ' ');
     }
 
-    public ScanJobBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) throws EncryptionException {
+    public ScanJobBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) {
         if (null == hubServerConfig) {
             shouldUseProxy = false;
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
@@ -141,12 +140,12 @@ public class ScanJobBuilder {
         } else {
             shouldUseProxy = hubServerConfig.shouldUseProxyForHub();
             proxyInfo = hubServerConfig.getProxyInfo();
-            blackDuckUrl = hubServerConfig.getHubUrl();
+            blackDuckUrl = hubServerConfig.getBlackDuckUrl();
             if (hubServerConfig.usingApiToken()) {
                 blackDuckApiToken = hubServerConfig.getApiToken();
             } else {
-                blackDuckUsername = hubServerConfig.getGlobalCredentials().getUsername();
-                blackDuckPassword = hubServerConfig.getGlobalCredentials().getDecryptedPassword();
+                blackDuckUsername = hubServerConfig.getCredentials().getUsername();
+                blackDuckPassword = hubServerConfig.getCredentials().getPassword();
             }
             alwaysTrustServerCertificate = hubServerConfig.isAlwaysTrustServerCertificate();
         }

@@ -30,8 +30,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
@@ -92,7 +90,7 @@ public class ScanCommand {
         this.versionName = versionName;
     }
 
-    public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException {
         final List<String> cmd = new ArrayList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
@@ -102,7 +100,7 @@ public class ScanCommand {
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
             final String proxyUsername = hubProxyInfo.getUsername();
-            final String proxyPassword = hubProxyInfo.getDecryptedPassword();
+            final String proxyPassword = hubProxyInfo.getPassword();
             final String proxyNtlmDomain = hubProxyInfo.getNtlmDomain();
             final String proxyNtlmWorkstation = hubProxyInfo.getNtlmWorkstation();
             cmd.add("-Dhttp.proxyHost=" + proxyHost);

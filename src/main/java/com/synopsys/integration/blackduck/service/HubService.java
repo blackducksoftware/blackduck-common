@@ -46,7 +46,7 @@ import com.synopsys.integration.blackduck.api.core.ResourceLink;
 import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -58,7 +58,7 @@ public class HubService {
     public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
     public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
 
-    private final BlackduckRestConnection restConnection;
+    private final BlackDuckRestConnection restConnection;
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;
     private final HubResponsesTransformer hubResponsesTransformer;
@@ -66,7 +66,7 @@ public class HubService {
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubService(final IntLogger logger, final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+    public HubService(final IntLogger logger, final BlackDuckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
         hubBaseUrl = restConnection.getBaseUrl();
         this.jsonParser = jsonParser;
@@ -76,7 +76,7 @@ public class HubService {
         hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser, logger);
     }
 
-    public BlackduckRestConnection getRestConnection() {
+    public BlackDuckRestConnection getRestConnection() {
         return restConnection;
     }
 
@@ -154,7 +154,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-        throws IntegrationException {
+            throws IntegrationException {
         final String uri = pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
@@ -196,7 +196,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-        throws IntegrationException {
+            throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
         if (StringUtils.isBlank(uri)) {
             return Collections.emptyList();

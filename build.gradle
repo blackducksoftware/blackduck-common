@@ -8,19 +8,15 @@ buildscript {
 }
 plugins { id 'groovy' }
 
-<<<<<<< HEAD
 version = '39.0.0-SNAPSHOT'
-=======
-version = '38.5.2-SNAPSHOT'
->>>>>>> master
 
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-common-rest:12.0.4'
+    compile 'com.blackducksoftware.integration:integration-rest:0.2.0-SNAPSHOT'
     compile 'com.blackducksoftware.integration:hub-common-api:5.0.0.0-SNAPSHOT'
     compile 'com.blackducksoftware.integration:hub-common-reporting:7.0.4'
-    compile 'com.blackducksoftware.integration:integration-bdio:16.1.1'
+    compile 'com.blackducksoftware.integration:integration-bdio:16.1.2-SNAPSHOT'
     compile 'com.blackducksoftware.integration:phone-home-client:0.16.0-SNAPSHOT'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.4.12'

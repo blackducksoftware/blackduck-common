@@ -23,18 +23,13 @@
 package com.synopsys.integration.blackduck.request.validator
 
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
-import com.synopsys.integration.blackduck.service.model.ProjectRequestField
-import com.synopsys.integration.blackduck.service.model.ProjectRequestValidator
-import com.synopsys.integration.blackduck.service.model.ProjectVersionRequestField
 import com.synopsys.integration.rest.RestConstants
-import com.synopsys.integration.validator.ValidationResults
 import org.junit.Assert
 import org.junit.Test
 
 import java.text.SimpleDateFormat
 
 class ProjectRequestValidatorTest {
-
     @Test
     public void testInvalidValues() {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
@@ -50,24 +45,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn(null)
         projectRequestBuilder.setVersionNickname(null)
 
-        ProjectRequestValidator projectRequestValidator = projectRequestBuilder.createValidator()
-
-        ValidationResults results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(!results.isSuccess())
-        Assert.assertTrue(results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
-        Assert.assertNotNull(results.getResultString(ProjectRequestField.NAME))
-        Assert.assertNull(results.getResultString(ProjectRequestField.DESCRIPTION))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTLEVELADJUSTMENTS))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTOWNER))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTTIER))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.VERSIONNAME))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.DISTRIBUTION))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.PHASE))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.RELEASEDCOMMENTS))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.RELEASEDON))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.NICKNAME))
+        Assert.assertFalse(projectRequestBuilder.isValid())
 
         projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName("FAKE")
@@ -82,24 +60,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn("FAKE")
         projectRequestBuilder.setVersionNickname("FAKE")
 
-        projectRequestValidator = projectRequestBuilder.createValidator()
-
-        results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(!results.isSuccess())
-        Assert.assertTrue(results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
-        Assert.assertNull(results.getResultString(ProjectRequestField.NAME))
-        Assert.assertNull(results.getResultString(ProjectRequestField.DESCRIPTION))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTLEVELADJUSTMENTS))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTOWNER))
-        Assert.assertNull(results.getResultString(ProjectRequestField.PROJECTTIER))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.VERSIONNAME))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.DISTRIBUTION))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.PHASE))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.RELEASEDCOMMENTS))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.RELEASEDON))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.NICKNAME))
+        Assert.assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -109,17 +70,7 @@ class ProjectRequestValidatorTest {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName(projectName)
 
-        ProjectRequestValidator projectRequestValidator = projectRequestBuilder.createValidator()
-
-        ValidationResults results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(!results.isSuccess())
-        Assert.assertTrue(results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
-        Assert.assertNull(results.getResultString(ProjectRequestField.NAME))
-        Assert.assertNotNull(results.getResultString(ProjectVersionRequestField.VERSIONNAME))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.DISTRIBUTION))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.PHASE))
+        Assert.assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -129,17 +80,7 @@ class ProjectRequestValidatorTest {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setVersionName(versionName)
 
-        ProjectRequestValidator projectRequestValidator = projectRequestBuilder.createValidator()
-
-        ValidationResults results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(!results.isSuccess())
-        Assert.assertTrue(results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
-        Assert.assertNotNull(results.getResultString(ProjectRequestField.NAME))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.VERSIONNAME))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.DISTRIBUTION))
-        Assert.assertNull(results.getResultString(ProjectVersionRequestField.PHASE))
+        Assert.assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -171,13 +112,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn(releasedOn)
         projectRequestBuilder.setVersionNickname(versionNickname)
 
-        ProjectRequestValidator projectRequestValidator = projectRequestBuilder.createValidator()
-
-        ValidationResults results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(results.isSuccess())
-        Assert.assertTrue(!results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
+        Assert.assertTrue(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -189,12 +124,6 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setProjectName(projectName)
         projectRequestBuilder.setVersionName(versionName)
 
-        ProjectRequestValidator projectRequestValidator = projectRequestBuilder.createValidator()
-
-        ValidationResults results = projectRequestValidator.assertValid()
-        Assert.assertNotNull(results)
-        Assert.assertTrue(results.isSuccess())
-        Assert.assertTrue(!results.hasErrors())
-        Assert.assertTrue(!results.hasWarnings())
+        Assert.assertTrue(projectRequestBuilder.isValid());
     }
 }

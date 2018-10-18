@@ -42,17 +42,17 @@ public class HubCertificateHandler {
     }
 
     public void importHttpsCertificateForHubServer(final HubServerConfig hubServerConfig) throws IntegrationException {
-        if (hubServerConfig == null || hubServerConfig.getHubUrl() == null || !hubServerConfig.getHubUrl().getProtocol().startsWith("https")) {
+        if (hubServerConfig == null || hubServerConfig.getBlackDuckUrl() == null || !hubServerConfig.getBlackDuckUrl().getProtocol().startsWith("https")) {
             return;
         }
         handler.setTimeout(hubServerConfig.getTimeout());
         if (hubServerConfig.getProxyInfo() != null) {
             handler.setProxyInfo(hubServerConfig.getProxyInfo());
         }
-        if (handler.isCertificateInTrustStore(hubServerConfig.getHubUrl())) {
+        if (handler.isCertificateInTrustStore(hubServerConfig.getBlackDuckUrl())) {
             return;
         }
-        handler.retrieveAndImportHttpsCertificate(hubServerConfig.getHubUrl());
+        handler.retrieveAndImportHttpsCertificate(hubServerConfig.getBlackDuckUrl());
     }
 
 }
