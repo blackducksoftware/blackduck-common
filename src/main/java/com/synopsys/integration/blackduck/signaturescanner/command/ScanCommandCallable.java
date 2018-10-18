@@ -35,7 +35,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
 import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
 import com.synopsys.integration.log.IntLogger;
@@ -115,7 +114,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
-                    throw new ScanFailedException("The scan failed with return code: " + returnCode);
+                    return ScanCommandOutput.FAILURE(logger, scanCommand, returnCode);
                 }
             }
         } catch (final Exception e) {
@@ -135,8 +134,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         }
 
-        final ScanCommandOutput success = ScanCommandOutput.SUCCESS(logger, scanCommand);
-        return success;
+        return ScanCommandOutput.SUCCESS(logger, scanCommand);
     }
 
     /**
