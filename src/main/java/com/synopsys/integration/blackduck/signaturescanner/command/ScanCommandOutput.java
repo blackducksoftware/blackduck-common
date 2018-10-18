@@ -40,21 +40,28 @@ public class ScanCommandOutput {
     private final String errorMessage;
     private final Exception exception;
     private final ScanCommand scanCommand;
+    private final Integer scanExitCode;
 
     public static ScanCommandOutput SUCCESS(final IntLogger logger, final ScanCommand scanCommand) {
-        return new ScanCommandOutput(logger, scanCommand, Result.SUCCESS, null, null);
+        return new ScanCommandOutput(logger, scanCommand, Result.SUCCESS, null, null, 0);
     }
 
     public static ScanCommandOutput FAILURE(final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception) {
-        return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, exception);
+        return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, exception, null);
     }
 
-    private ScanCommandOutput(final IntLogger logger, final ScanCommand scanCommand, final Result result, final String errorMessage, final Exception exception) {
+    public static ScanCommandOutput FAILURE(final IntLogger logger, final ScanCommand scanCommand, final int scanExitCode) {
+        final String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
+        return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, null, Integer.valueOf(scanExitCode));
+    }
+
+    private ScanCommandOutput(final IntLogger logger, final ScanCommand scanCommand, final Result result, final String errorMessage, final Exception exception, final Integer scanExitCode) {
         this.logger = logger;
         this.result = result;
         this.errorMessage = errorMessage;
         this.exception = exception;
         this.scanCommand = scanCommand;
+        this.scanExitCode = scanExitCode;
     }
 
     private Optional<File> getResultFile(final String resultDirectoryName) {
@@ -93,12 +100,16 @@ public class ScanCommandOutput {
         return scanCommand.getTargetPath();
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public Optional<String> getErrorMessage() {
+        return Optional.ofNullable(errorMessage);
     }
 
-    public Exception getException() {
-        return exception;
+    public Optional<Exception> getException() {
+        return Optional.ofNullable(exception);
+    }
+
+    public Optional<Integer> getScanExitCode() {
+        return Optional.ofNullable(scanExitCode);
     }
 
 }
