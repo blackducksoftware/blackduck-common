@@ -27,8 +27,6 @@ public class ScanPathsTest {
     // Example ...BlackDuckScanOutput\2018-09-16_15-38-37-050_1
     private static final String DATE_AND_THREAD_SPECIFIC_NAME = ".*\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}-\\d{3}_\\S+";
 
-    private static final String VALUE_OF_BDS_JAVA_HOME = "valueOfBdsJavaHome";
-
     private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
 
     private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new TestLogger(), intEnvironmentVariables, OperatingSystemType.MAC);
@@ -36,6 +34,7 @@ public class ScanPathsTest {
     private final ScanPathsUtility linuxScanPathsUtility = new ScanPathsUtility(new TestLogger(), intEnvironmentVariables, OperatingSystemType.LINUX);
 
     private File tempDirectory;
+    private File bdsJavaHomeDirectory;
     private File macSetup;
     private File windowsSetup;
     private File linuxSetup;
@@ -48,11 +47,18 @@ public class ScanPathsTest {
         createMacSetup(tempDirectory);
         createWindowsSetup(tempDirectory);
         createLinuxSetup(tempDirectory);
+
+        final Path bdsJavaHomeDirectoryPath = Files.createTempDirectory("bds_java_home");
+        bdsJavaHomeDirectory = bdsJavaHomeDirectoryPath.toFile();
+
+        createWindowsJvm(bdsJavaHomeDirectory);
+        createOtherJvm(bdsJavaHomeDirectory);
     }
 
     @After
     public void deleteTempDirectory() {
         FileUtils.deleteQuietly(tempDirectory);
+        FileUtils.deleteQuietly(bdsJavaHomeDirectory);
         intEnvironmentVariables = new IntEnvironmentVariables();
     }
 
@@ -104,15 +110,15 @@ public class ScanPathsTest {
 
     @Test
     public void testJavaExecutablePathWithBdsJavaHome() throws Exception {
-        intEnvironmentVariables.put(BDS_JAVA_HOME, VALUE_OF_BDS_JAVA_HOME);
+        intEnvironmentVariables.put(BDS_JAVA_HOME, bdsJavaHomeDirectory.getAbsolutePath());
 
         final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
         final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
         final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
 
-        assertThat(macScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
-        assertThat(windowsScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
-        assertThat(linuxScanPaths.getPathToJavaExecutable(), is(VALUE_OF_BDS_JAVA_HOME));
+        assertThat(macScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java"));
+        assertThat(windowsScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java.exe"));
+        assertThat(linuxScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java"));
     }
 
     private void assertScanPathsOk(final ScanPaths scanPaths, final boolean managedByLibrary) {
@@ -182,6 +188,22 @@ public class ScanPathsTest {
 
         final File implStandaloneJar = new File(cache, "scan.cli.impl-standalone.jar");
         implStandaloneJar.createNewFile();
+    }
+
+    private void createWindowsJvm(final File tempDirectory) throws IOException {
+        final File javaBin = new File(tempDirectory, "bin");
+        javaBin.mkdirs();
+
+        final File javaExe = new File(javaBin, "java.exe");
+        javaExe.createNewFile();
+    }
+
+    private void createOtherJvm(final File tempDirectory) throws IOException {
+        final File javaBin = new File(tempDirectory, "bin");
+        javaBin.mkdirs();
+
+        final File javaExe = new File(javaBin, "java");
+        javaExe.createNewFile();
     }
 
 }
