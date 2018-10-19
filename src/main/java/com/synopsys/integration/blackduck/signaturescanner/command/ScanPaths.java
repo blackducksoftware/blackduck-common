@@ -23,7 +23,6 @@
  */
 package com.synopsys.integration.blackduck.signaturescanner.command;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ScanPaths {
@@ -37,15 +36,6 @@ public class ScanPaths {
         this.pathToOneJar = pathToOneJar;
         this.pathToScanExecutable = pathToScanExecutable;
         this.managedByLibrary = managedByLibrary;
-    }
-
-    public List<String> createCommandForScannerVersion() {
-        final List<String> cmd = new ArrayList<>();
-        addJavaAndOnePathArguments(cmd);
-        addScanExecutableArguments(cmd);
-        cmd.add("--version");
-
-        return cmd;
     }
 
     public void addJavaAndOnePathArguments(final List<String> cmd) {
