@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.rest.connection.RestConnectionBuilder;
+import com.synopsys.integration.util.BuilderStatus;
 
 public class ApiTokenRestConnectionBuilder extends RestConnectionBuilder<ApiTokenRestConnection> {
     private String apiToken;
@@ -40,11 +41,11 @@ public class ApiTokenRestConnectionBuilder extends RestConnectionBuilder<ApiToke
     }
 
     @Override
-    public void populateIndividualErrorMessages() {
-        super.populateIndividualErrorMessages();
+    protected void validate(final BuilderStatus builderStatus) {
+        super.validate(builderStatus);
 
         if (StringUtils.isBlank(apiToken)) {
-            errorMessages.add("No API token was found.");
+            builderStatus.addErrorMessage("No API token was found.");
         }
     }
 

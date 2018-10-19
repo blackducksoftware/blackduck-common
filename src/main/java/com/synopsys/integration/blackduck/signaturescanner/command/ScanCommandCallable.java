@@ -35,7 +35,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
 import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
 import com.synopsys.integration.log.IntLogger;
@@ -64,9 +63,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
 
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
-            logger.info(String.format("NOTE: This will only work after Black Duck 5.0.0. You may need to upgrade your Black Duck server if you are running an older version.", scanCommand.getTargetPath()));
-            logger.info(String.format("Using BD_HUB_SCAN_PATH to scan target: %s", scanCommand.getTargetPath()));
-            intEnvironmentVariables.put("BD_HUB_SCAN_PATH", scanCommand.getTargetPath());
+            cmd.add(scanCommand.getTargetPath());
 
             printCommand(cmd);
 
@@ -115,7 +112,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
-                    throw new ScanFailedException("The scan failed with return code: " + returnCode);
+                    return ScanCommandOutput.FAILURE(logger, scanCommand, returnCode);
                 }
             }
         } catch (final Exception e) {
@@ -135,8 +132,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         }
 
-        final ScanCommandOutput success = ScanCommandOutput.SUCCESS(logger, scanCommand);
-        return success;
+        return ScanCommandOutput.SUCCESS(logger, scanCommand);
     }
 
     /**

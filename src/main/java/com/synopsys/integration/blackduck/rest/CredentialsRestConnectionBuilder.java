@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import com.synopsys.integration.rest.connection.RestConnectionBuilder;
 import com.synopsys.integration.rest.credentials.Credentials;
+import com.synopsys.integration.util.BuilderStatus;
 
 public class CredentialsRestConnectionBuilder extends RestConnectionBuilder<CredentialsRestConnection> {
     private Credentials credentials;
@@ -39,11 +40,11 @@ public class CredentialsRestConnectionBuilder extends RestConnectionBuilder<Cred
     }
 
     @Override
-    public void populateIndividualErrorMessages() {
-        super.populateIndividualErrorMessages();
+    protected void validate(final BuilderStatus builderStatus) {
+        super.validate(builderStatus);
 
         if (null == credentials || credentials.isBlank()) {
-            errorMessages.add("You must provide non-blank credentials.");
+            builderStatus.addErrorMessage("You must provide non-blank credentials.");
         }
     }
 
