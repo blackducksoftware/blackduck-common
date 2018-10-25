@@ -57,7 +57,7 @@ import com.synopsys.integration.rest.request.Response;
 
 public class HubService {
     public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
-    public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/codelocation-summaries");
+    public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
 
     private final BlackDuckRestConnection restConnection;
     private final MetaHandler metaHandler;

@@ -53,7 +53,7 @@ public class ScanCommandOutput extends CodeLocationCreationStatus {
     }
 
     public static ScanCommandOutput FAILURE(final IntLogger logger, final ScanCommand scanCommand, final int scanExitCode) {
-        final String errorMessage = String.format("The codelocation failed with return code: %d", scanExitCode);
+        final String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
         return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, null, Integer.valueOf(scanExitCode));
     }
 

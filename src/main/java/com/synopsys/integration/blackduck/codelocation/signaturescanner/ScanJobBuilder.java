@@ -118,7 +118,7 @@ public class ScanJobBuilder {
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
-            errorMessages.add(String.format("The minimum amount of memory for the codelocation is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
+            errorMessages.add(String.format("The minimum amount of memory for the scan is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
         }
 
         if (!StringUtils.isAllBlank(projectName, projectVersionName) && (StringUtils.isBlank(projectName) || StringUtils.isBlank(projectVersionName))) {

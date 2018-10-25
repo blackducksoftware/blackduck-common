@@ -85,7 +85,7 @@ public class ScanCommandRunner {
                 }
             }
         } catch (final Exception e) {
-            throw new ScanFailedException(String.format("Encountered a problem waiting for a codelocation to finish. %s", e.getMessage()), e);
+            throw new ScanFailedException(String.format("Encountered a problem waiting for a scan to finish. %s", e.getMessage()), e);
         }
 
         return scanCommandOutputs;
