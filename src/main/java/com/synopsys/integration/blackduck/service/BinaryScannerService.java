@@ -61,7 +61,7 @@ public class BinaryScannerService extends DataService {
             logger.info("Status code OK");
         } else {
             logger.error("Unknown status code: " + response.getStatusCode());
-            throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
+            throw new IntegrationException("Unkown status code when uploading binary codelocation: " + response.getStatusCode() + ", " + response.getStatusMessage());
         }
     }
 

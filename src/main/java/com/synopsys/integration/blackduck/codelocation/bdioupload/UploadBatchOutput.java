@@ -21,21 +21,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.List;
 
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommandOutput;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationStatus;
 
-public class ScanJobOutput {
-    private final List<ScanCommandOutput> scanCommandOutputs;
+public class UploadBatchOutput extends CodeLocationCreationStatus {
+    private final List<UploadOutput> uploadOutputs;
 
-    public ScanJobOutput(final List<ScanCommandOutput> scanCommandOutputs) {
-        this.scanCommandOutputs = scanCommandOutputs;
+    public UploadBatchOutput(final List<UploadOutput> uploadOutputs) {
+        super(uploadOutputs);
+        this.uploadOutputs = uploadOutputs;
     }
 
-    public List<ScanCommandOutput> getScanCommandOutputs() {
-        return scanCommandOutputs;
+    public List<UploadOutput> getUploadOutputs() {
+        return uploadOutputs;
     }
 
 }

@@ -38,6 +38,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.util.BuilderStatus;
 import com.synopsys.integration.util.IntegrationBuilder;
 
 public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
@@ -116,20 +117,20 @@ public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
     }
 
     @Override
-    protected void populateIndividualErrorMessages() {
+    protected void validate(final BuilderStatus builderStatus) {
         if (StringUtils.isBlank(projectName)) {
-            errorMessages.add("A project name is required.");
+            builderStatus.addErrorMessage("A project name is required.");
         }
 
         if (StringUtils.isBlank(versionName)) {
-            errorMessages.add("A version name is required.");
+            builderStatus.addErrorMessage("A version name is required.");
         }
 
         if (!EnumUtils.isValidEnum(ProjectVersionDistributionType.class, distribution)) {
-            errorMessages.add(String.format("A valid version distribution is required and '%s' is not valid.", distribution));
+            builderStatus.addErrorMessage(String.format("A valid version distribution is required and '%s' is not valid.", distribution));
         }
         if (!EnumUtils.isValidEnum(ProjectVersionPhaseType.class, phase)) {
-            errorMessages.add(String.format("A valid version phase is required and '%s' is not valid.", phase));
+            builderStatus.addErrorMessage(String.format("A valid version phase is required and '%s' is not valid.", phase));
         }
 
         if (StringUtils.isNotBlank(releasedOn)) {
@@ -137,7 +138,7 @@ public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
                 final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
                 sdf.parse(releasedOn);
             } catch (final ParseException e) {
-                errorMessages.add(String.format("The provided releasedOn value, '%s', could not be correctly parsed with the required format, '%s': %s.", releasedOn, RestConstants.JSON_DATE_FORMAT, e.getMessage()));
+                builderStatus.addErrorMessage(String.format("The provided releasedOn value, '%s', could not be correctly parsed with the required format, '%s': %s.", releasedOn, RestConstants.JSON_DATE_FORMAT, e.getMessage()));
             }
         }
     }

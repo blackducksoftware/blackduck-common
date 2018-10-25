@@ -74,8 +74,10 @@ class BasicRecipe {
 
     public void deleteProject(String projectName) {
         ProjectService projectDataService = hubServicesFactory.createProjectService()
-        ProjectView project = projectDataService.getProjectByName(projectName)
-        projectDataService.deleteHubProject(project)
+        Optional<ProjectView> project = projectDataService.getProjectByName(projectName)
+        if (project.isPresent()) {
+            projectDataService.deleteProject(project.get())
+        }
     }
 
     public void deleteCodeLocation(String codeLocationName) {

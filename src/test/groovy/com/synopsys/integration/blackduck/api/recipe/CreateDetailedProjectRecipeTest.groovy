@@ -23,7 +23,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          */
         ProjectRequest projectRequest = createProjectRequest(PROJECT_NAME, PROJECT_VERSION_NAME)
         ProjectService projectService = hubServicesFactory.createProjectService()
-        String projectUrl = projectService.createHubProject(projectRequest)
+        String projectUrl = projectService.createProject(projectRequest)
 
         /*
          * using the url of the created project, we can now verify that the
@@ -42,11 +42,13 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
         assertEquals(ProjectVersionDistributionType.OPENSOURCE, projectVersionView.distribution)
     }
 
-
     @After
     void cleanup() {
         def projectService = hubServicesFactory.createProjectService()
-        ProjectView createdProject = projectService.getProjectByName(PROJECT_NAME)
-        projectService.deleteHubProject(createdProject)
+        Optional<ProjectView> createdProject = projectService.getProjectByName(PROJECT_NAME)
+        if (createdProject.isPresent()) {
+            projectService.deleteProject(createdProject.get())
+        }
     }
+
 }

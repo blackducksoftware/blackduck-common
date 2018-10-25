@@ -51,12 +51,13 @@ import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubService {
     public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
-    public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
+    public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/codelocation-summaries");
 
     private final BlackDuckRestConnection restConnection;
     private final MetaHandler metaHandler;
@@ -241,6 +242,17 @@ public class HubService {
     public <T extends HubResponse> T getResponse(final UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
         final Request request = RequestFactory.createCommonGetRequest(uriSingleResponse.uri);
         return hubResponseTransformer.getResponse(request, uriSingleResponse.responseClass);
+    }
+
+    // ------------------------------------------------
+    // handling generic delete
+    // ------------------------------------------------
+    public void delete(final String url) throws IntegrationException {
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
+        try (Response response = executeRequest(requestBuilder.build())) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
     }
 
     // ------------------------------------------------

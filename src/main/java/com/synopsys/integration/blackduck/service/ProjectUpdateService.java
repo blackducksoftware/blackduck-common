@@ -24,6 +24,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +33,6 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectVersion
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -120,29 +120,31 @@ public class ProjectUpdateService extends DataService {
      * urls to update with.
      */
     public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest, final boolean performUpdate) throws IntegrationException {
-        ProjectView projectView;
+        ProjectView projectView = null;
         ProjectVersionView projectVersionView = null;
 
-        try {
-            projectView = projectGetService.getProjectByName(projectRequest.name);
+        final Optional<ProjectView> optionalProject = projectGetService.getProjectViewByProjectName(projectRequest.name);
+        if (optionalProject.isPresent()) {
+            projectView = optionalProject.get();
             if (performUpdate) {
                 final String projectUrl = hubService.getHref(projectView);
                 updateProject(projectUrl, projectRequest);
             }
-        } catch (final DoesNotExistException e) {
+        } else {
             final String projectUrl = createProject(projectRequest);
             projectView = hubService.getResponse(projectUrl, ProjectView.class);
         }
 
         final ProjectVersionRequest projectVersionRequest = projectRequest.versionRequest;
         if (projectVersionRequest != null && StringUtils.isNotBlank(projectVersionRequest.versionName)) {
-            try {
-                projectVersionView = projectGetService.getProjectVersion(projectView, projectVersionRequest.versionName);
+            final Optional<ProjectVersionView> optionalVersion = projectGetService.getProjectVersionViewByProjectVersionName(projectView, projectVersionRequest.versionName);
+            if (optionalVersion.isPresent()) {
+                projectVersionView = optionalVersion.get();
                 if (performUpdate) {
                     final String projectVersionUrl = hubService.getHref(projectVersionView);
                     updateProjectVersion(projectVersionUrl, projectRequest.versionRequest);
                 }
-            } catch (final DoesNotExistException e) {
+            } else {
                 final String projectVersionsUrl = hubService.getFirstLinkSafely(projectView, ProjectView.VERSIONS_LINK);
                 final String projectVersionUrl = createProjectVersion(projectVersionsUrl, projectRequest.versionRequest);
                 projectVersionView = hubService.getResponse(projectVersionUrl, ProjectVersionView.class);

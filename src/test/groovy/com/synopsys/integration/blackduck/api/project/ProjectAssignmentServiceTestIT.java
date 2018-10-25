@@ -56,7 +56,7 @@ public class ProjectAssignmentServiceTestIT {
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            hubServicesFactory.createProjectService().deleteHubProject(project);
+            hubServicesFactory.createProjectService().deleteProject(project);
         }
     }
 
@@ -67,7 +67,7 @@ public class ProjectAssignmentServiceTestIT {
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.name = testProjectName;
-        final String projectUrl = hubServicesFactory.createProjectService().createHubProject(projectRequest);
+        final String projectUrl = hubServicesFactory.createProjectService().createProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
         project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);

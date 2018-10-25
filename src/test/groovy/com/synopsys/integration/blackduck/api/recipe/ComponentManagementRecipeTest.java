@@ -30,7 +30,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
         /**
          * we can get the project and version like this, and if they don't exist they will be created for us
          */
-        projectVersionWrapper = projectService.getProjectVersionAndCreateIfNeeded(projectRequest);
+        projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false);
     }
 
     @After

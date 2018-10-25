@@ -186,7 +186,7 @@ public class HubServerConfigBuilderTestIT {
         try {
             config = builder.build();
             fail("Should have thrown an IllegalStateException with invalid proxy state");
-        } catch (final IllegalStateException e) {
+        } catch (final IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("proxy"));
         }
     }

@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner.command;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -115,7 +115,7 @@ public class ScanPathsUtility {
         return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
-    public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws IOException, HubIntegrationException {
+    public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws HubIntegrationException {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeStringPrefix = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
 
@@ -123,7 +123,7 @@ public class ScanPathsUtility {
         return createRunOutputDirectory(generalOutputDirectory, timeStringPrefix, Integer.toString(uniqueThreadIdSuffix));
     }
 
-    public File createRunOutputDirectory(final File generalOutputDirectory, final String userProvidedPrefix, final String userProvidedUniqueSuffix) throws IOException, HubIntegrationException {
+    public File createRunOutputDirectory(final File generalOutputDirectory, final String userProvidedPrefix, final String userProvidedUniqueSuffix) throws HubIntegrationException {
         final String signatureScanOutputDirectoryName = "BlackDuckScanOutput";
         final File signatureScanOutputDirectory = new File(generalOutputDirectory, signatureScanOutputDirectoryName);
 
@@ -136,11 +136,15 @@ public class ScanPathsUtility {
 
         final File bdIgnoreLogsFile = new File(generalOutputDirectory, ".bdignore");
         if (!bdIgnoreLogsFile.exists()) {
-            if (!bdIgnoreLogsFile.createNewFile()) {
-                throw new HubIntegrationException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
+            try {
+                if (!bdIgnoreLogsFile.createNewFile()) {
+                    throw new HubIntegrationException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
+                }
+                final String exclusionPattern = "/" + signatureScanOutputDirectoryName + "/";
+                Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
+            } catch (final IOException e) {
+                throw new HubIntegrationException(String.format("Unexpected error creating the .bdignore file in the %s directory: %s", bdIgnoreLogsFile.getAbsolutePath(), e.getMessage()));
             }
-            final String exclusionPattern = "/" + signatureScanOutputDirectoryName + "/";
-            Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
         }
 
         return specificRunOutputDirectory;

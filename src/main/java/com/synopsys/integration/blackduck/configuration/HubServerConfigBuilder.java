@@ -45,6 +45,7 @@ import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
+import com.synopsys.integration.util.BuilderStatus;
 import com.synopsys.integration.util.IntegrationBuilder;
 
 public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> {
@@ -67,11 +68,11 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
     public HubServerConfig build() {
         try {
             return super.build();
-        } catch (final IllegalStateException stateException) {
-            if (!stateException.getMessage().contains("SunCertPathBuilderException")) {
-                throw stateException;
+        } catch (final Exception e) {
+            if (!e.getMessage().contains("SunCertPathBuilderException")) {
+                throw e;
             }
-            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", url()), stateException);
+            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", url()), e);
         }
     }
 
@@ -135,26 +136,28 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
     }
 
     @Override
-    protected void populateIndividualErrorMessages() {
+    protected void validate(final BuilderStatus builderStatus) {
         if (StringUtils.isBlank(values.get(Property.API_TOKEN))) {
             final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
             credentialsBuilder.setUsername(values.get(Property.USERNAME));
             credentialsBuilder.setPassword(values.get(Property.PASSWORD));
-            if (!credentialsBuilder.isValid()) {
-                errorMessages.addAll(credentialsBuilder.getErrorMessages());
+            final BuilderStatus credentialsBuilderStatus = credentialsBuilder.validateAndGetBuilderStatus();
+            if (!credentialsBuilderStatus.isValid()) {
+                builderStatus.addAllErrorMessages(credentialsBuilderStatus.getErrorMessages());
             } else {
                 final Credentials credentials = credentialsBuilder.build();
                 if (credentials.isBlank()) {
-                    errorMessages.add("Either an API token or a username/password must be specified.");
+                    builderStatus.addErrorMessage("Either an API token or a username/password must be specified.");
                 }
             }
         }
         final CredentialsBuilder proxyCredentialsBuilder = new CredentialsBuilder();
         proxyCredentialsBuilder.setUsername(values.get(Property.PROXY_USERNAME));
         proxyCredentialsBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
-        if (!proxyCredentialsBuilder.isValid()) {
-            errorMessages.add("The proxy credentials were not valid.");
-            errorMessages.addAll(proxyCredentialsBuilder.getErrorMessages());
+        final BuilderStatus proxyCredentialsBuilderStatus = proxyCredentialsBuilder.validateAndGetBuilderStatus();
+        if (!proxyCredentialsBuilderStatus.isValid()) {
+            builderStatus.addErrorMessage("The proxy credentials were not valid.");
+            builderStatus.addAllErrorMessages(proxyCredentialsBuilderStatus.getErrorMessages());
         } else {
             final Credentials proxyCredentials = proxyCredentialsBuilder.build();
             final ProxyInfoBuilder proxyInfoBuilder = new ProxyInfoBuilder();
@@ -164,13 +167,14 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
             proxyInfoBuilder.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
             proxyInfoBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
             proxyInfoBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
-            if (!proxyInfoBuilder.isValid()) {
-                errorMessages.addAll(proxyInfoBuilder.getErrorMessages());
+            final BuilderStatus proxyInfoBuilderStatus = proxyInfoBuilder.validateAndGetBuilderStatus();
+            if (!proxyInfoBuilderStatus.isValid()) {
+                builderStatus.addAllErrorMessages(proxyInfoBuilderStatus.getErrorMessages());
             }
         }
 
         if (timeoutSeconds() <= 0) {
-            errorMessages.add("The timeout must be greater than zero.");
+            builderStatus.addErrorMessage("The timeout must be greater than zero.");
         }
     }
 

@@ -8,7 +8,8 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanJobBuilder;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanJobBuilderTest {

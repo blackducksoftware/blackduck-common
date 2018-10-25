@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner.command;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
 public enum SnippetMatching {
     SNIPPET_MATCHING,

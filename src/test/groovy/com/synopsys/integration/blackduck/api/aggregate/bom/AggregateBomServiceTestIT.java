@@ -23,10 +23,10 @@
  */
 package com.synopsys.integration.blackduck.api.aggregate.bom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -56,8 +56,9 @@ public class AggregateBomServiceTestIT {
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final Optional<ProjectView> project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
+        assertTrue(project.isPresent());
+        final List<ProjectVersionView> projectVersions = hubService.getAllResponses(project.get(), ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
@@ -90,8 +91,9 @@ public class AggregateBomServiceTestIT {
         final String testComponentName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT");
         final String testComponentVersionName = restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_VERSION");
 
-        final ProjectView project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
-        final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final Optional<ProjectView> project = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
+        assertTrue(project.isPresent());
+        final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getAllResponses(project.get(), ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
             if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {

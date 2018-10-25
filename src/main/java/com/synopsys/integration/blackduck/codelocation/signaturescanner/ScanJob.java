@@ -21,21 +21,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommand;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
@@ -87,15 +88,7 @@ public class ScanJob extends Stringable {
         this.scanTargets = scanTargets;
     }
 
-    @Deprecated
-    /**
-     * @deprecated Creating the scan commands now requires access to environment variables, so please use the method that allows for passing in IntEnvironmentVariables.
-     */
-    public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility) throws IOException, HubIntegrationException {
-        return createScanCommands(scanPathsUtility, null);
-    }
-
-    public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws IOException, HubIntegrationException {
+    public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws HubIntegrationException {
         String scanCliOptsToUse = scanCliOpts;
         if (null != intEnvironmentVariables && StringUtils.isBlank(scanCliOptsToUse)) {
             final String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
@@ -139,6 +132,15 @@ public class ScanJob extends Stringable {
         }
 
         return scanCommands;
+    }
+
+    public Set<String> getCodeLocationNames() {
+        return getScanTargets()
+                       .stream()
+                       .map(scanTarget -> scanTarget.getCodeLocationName())
+                       .filter(StringUtils::isBlank)
+                       .collect(Collectors.toSet());
+
     }
 
     public File getSignatureScannerInstallDirectory() {

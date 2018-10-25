@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner.command;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,6 @@ import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
-// takes a list of CommandCallable's OR SignatureScanJob
 public class ScanCommandRunner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -86,7 +85,7 @@ public class ScanCommandRunner {
                 }
             }
         } catch (final Exception e) {
-            throw new ScanFailedException(String.format("Encountered a problem waiting for a scan to finish. %s", e.getMessage()), e);
+            throw new ScanFailedException(String.format("Encountered a problem waiting for a codelocation to finish. %s", e.getMessage()), e);
         }
 
         return scanCommandOutputs;

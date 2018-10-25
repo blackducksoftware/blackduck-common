@@ -21,22 +21,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner.command;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationStatus;
 import com.synopsys.integration.blackduck.summary.Result;
 import com.synopsys.integration.log.IntLogger;
 
-public class ScanCommandOutput {
+public class ScanCommandOutput extends CodeLocationCreationStatus {
     public static final String DRY_RUN_RESULT_DIRECTORY = "data";
     public static final String SCAN_RESULT_DIRECTORY = "status";
 
     private final IntLogger logger;
-    private final Result result;
     private final String errorMessage;
     private final Exception exception;
     private final ScanCommand scanCommand;
@@ -51,13 +53,14 @@ public class ScanCommandOutput {
     }
 
     public static ScanCommandOutput FAILURE(final IntLogger logger, final ScanCommand scanCommand, final int scanExitCode) {
-        final String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
+        final String errorMessage = String.format("The codelocation failed with return code: %d", scanExitCode);
         return new ScanCommandOutput(logger, scanCommand, Result.FAILURE, errorMessage, null, Integer.valueOf(scanExitCode));
     }
 
     private ScanCommandOutput(final IntLogger logger, final ScanCommand scanCommand, final Result result, final String errorMessage, final Exception exception, final Integer scanExitCode) {
+        super(new HashSet<>(Arrays.asList(scanCommand.getName())), result);
+
         this.logger = logger;
-        this.result = result;
         this.errorMessage = errorMessage;
         this.exception = exception;
         this.scanCommand = scanCommand;
@@ -90,10 +93,6 @@ public class ScanCommandOutput {
 
     public File getSpecificRunOutputDirectory() {
         return scanCommand.getOutputDirectory();
-    }
-
-    public Result getResult() {
-        return result;
     }
 
     public String getScanTarget() {

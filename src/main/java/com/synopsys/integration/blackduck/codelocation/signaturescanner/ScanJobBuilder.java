@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +31,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanJobBuilder {
@@ -118,7 +118,7 @@ public class ScanJobBuilder {
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
-            errorMessages.add(String.format("The minimum amount of memory for the scan is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
+            errorMessages.add(String.format("The minimum amount of memory for the codelocation is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
         }
 
         if (!StringUtils.isAllBlank(projectName, projectVersionName) && (StringUtils.isBlank(projectName) || StringUtils.isBlank(projectVersionName))) {

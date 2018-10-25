@@ -23,13 +23,10 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.core.HubPath;
@@ -51,26 +48,6 @@ import com.synopsys.integration.rest.request.Response;
 public class CodeLocationService extends DataService {
     public CodeLocationService(final HubService hubService, final IntLogger logger) {
         super(hubService, logger);
-    }
-
-    public void importBomFile(final File file) throws IntegrationException {
-        importBomFile(file, "application/ld+json");
-    }
-
-    public void importBomFile(final File file, final String mimeType) throws IntegrationException {
-        final String jsonPayload;
-        try {
-            jsonPayload = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-        } catch (final IOException e) {
-            throw new IntegrationException("Failed to import Bom file: " + file.getAbsolutePath() + " to the Hub because : " + e.getMessage(), e);
-        }
-
-        final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
-        final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(mimeType).build();
-        try (Response response = hubService.executeRequest(request)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {

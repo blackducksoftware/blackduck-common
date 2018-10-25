@@ -21,20 +21,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommand;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommandOutput;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanCommandRunner;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanPaths;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -73,7 +72,7 @@ public class ScanJobManager {
         this.scanCommandRunner = scanCommandRunner;
     }
 
-    public ScanJobOutput executeScans(final ScanJob scanJob) throws IOException, HubIntegrationException {
+    public ScanJobOutput executeScans(final ScanJob scanJob) throws HubIntegrationException {
         if (scannerZipInstaller != null) {
             final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
             if (!installDirectory.exists()) {

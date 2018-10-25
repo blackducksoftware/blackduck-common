@@ -38,7 +38,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         /**
          * we can get the project and version like this, and if they don't
          * exist they will be created for us*/
-        projectVersionWrapper = projectService.getProjectVersionAndCreateIfNeeded(projectRequest)
+        projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
         policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService(), new MetaHandler(hubServicesFactory.getRestConnection().logger))
@@ -98,4 +98,5 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         externalId.version = "1.2.1"
         externalId
     }
+
 }
