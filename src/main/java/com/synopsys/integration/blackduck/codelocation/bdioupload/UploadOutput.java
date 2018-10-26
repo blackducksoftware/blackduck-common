@@ -27,10 +27,10 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationStatus;
 import com.synopsys.integration.blackduck.summary.Result;
 
-public class UploadOutput extends CodeLocationCreationStatus {
+public class UploadOutput {
+    private final Result result;
     private final String response;
     private final String errorMessage;
     private final Exception exception;
@@ -48,10 +48,14 @@ public class UploadOutput extends CodeLocationCreationStatus {
     }
 
     private UploadOutput(final Result result, final Set<String> codeLocationNames, final String response, final String errorMessage, final Exception exception) {
-        super(codeLocationNames, result);
+        this.result = result;
         this.response = response;
         this.errorMessage = errorMessage;
         this.exception = exception;
+    }
+
+    public Result getResult() {
+        return result;
     }
 
     public Optional<String> getResponse() {

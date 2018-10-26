@@ -23,42 +23,31 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.summary.Result;
+import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 
-public class CodeLocationCreationStatus {
+public class CodeLocationCreationData<T> {
+    private final NotificationTaskRange notificationTaskRange;
     private final Set<String> codeLocationNames;
-    private final Result result;
+    private final T output;
 
-    public CodeLocationCreationStatus(final Set<String> codeLocationNames, final Result result) {
+    public CodeLocationCreationData(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final T output) {
+        this.notificationTaskRange = notificationTaskRange;
         this.codeLocationNames = codeLocationNames;
-        this.result = result;
+        this.output = output;
     }
 
-    public CodeLocationCreationStatus(final List<? extends CodeLocationCreationStatus> statuses) {
-        codeLocationNames = statuses
-                                    .stream()
-                                    .map(output -> output.getCodeLocationNames())
-                                    .flatMap(Collection::stream)
-                                    .collect(Collectors.toSet());
-
-        final boolean allSuccess = statuses
-                                           .stream()
-                                           .map(output -> output.getResult())
-                                           .allMatch(result -> Result.SUCCESS == result);
-        result = allSuccess ? Result.SUCCESS : Result.FAILURE;
+    public NotificationTaskRange getNotificationTaskRange() {
+        return notificationTaskRange;
     }
 
     public Set<String> getCodeLocationNames() {
         return codeLocationNames;
     }
 
-    public Result getResult() {
-        return result;
+    public T getOutput() {
+        return output;
     }
 
 }

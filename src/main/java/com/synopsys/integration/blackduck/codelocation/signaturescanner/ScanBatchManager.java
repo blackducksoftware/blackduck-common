@@ -26,45 +26,45 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 import java.io.File;
 import java.util.List;
 
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
-public class ScanJobManager {
+public class ScanBatchManager {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScannerZipInstaller scannerZipInstaller;
     private final ScanPathsUtility scanPathsUtility;
     private final ScanCommandRunner scanCommandRunner;
 
-    public static ScanJobManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) {
+    public static ScanBatchManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
         final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
 
-        return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
+        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
     }
 
-    public static ScanJobManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
-        return new ScanJobManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner);
+    public static ScanBatchManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
+        return new ScanBatchManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner);
     }
 
-    public static ScanJobManager createFullScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
+    public static ScanBatchManager createFullScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
             final ScanCommandRunner scanCommandRunner) {
-        return new ScanJobManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
+        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
     }
 
-    public ScanJobManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
+    public ScanBatchManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scannerZipInstaller = scannerZipInstaller;
@@ -72,9 +72,9 @@ public class ScanJobManager {
         this.scanCommandRunner = scanCommandRunner;
     }
 
-    public ScanJobOutput executeScans(final ScanJob scanJob) throws HubIntegrationException {
+    public ScanBatchOutput executeScans(final ScanBatch scanBatch) throws HubIntegrationException {
         if (scannerZipInstaller != null) {
-            final File installDirectory = scanJob.getSignatureScannerInstallDirectory();
+            final File installDirectory = scanBatch.getSignatureScannerInstallDirectory();
             if (!installDirectory.exists()) {
                 scannerZipInstaller.installOrUpdateScanner(installDirectory);
             } else {
@@ -90,9 +90,9 @@ public class ScanJobManager {
             }
         }
 
-        final List<ScanCommand> scanCommands = scanJob.createScanCommands(scanPathsUtility, intEnvironmentVariables);
-        final List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanJob.isCleanupOutput());
-        return new ScanJobOutput(scanCommandOutputs);
+        final List<ScanCommand> scanCommands = scanBatch.createScanCommands(scanPathsUtility, intEnvironmentVariables);
+        final List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanBatch.isCleanupOutput());
+        return new ScanBatchOutput(scanCommandOutputs);
     }
 
 }

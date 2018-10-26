@@ -25,21 +25,12 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class UploadBatch {
     private final List<UploadTarget> uploadTargets = new ArrayList<>();
 
     public void addUploadTarget(final UploadTarget uploadTarget) {
         uploadTargets.add(uploadTarget);
-    }
-
-    public Set<String> getCodeLocationNames() {
-        return uploadTargets
-                       .stream()
-                       .map(scanTarget -> scanTarget.getCodeLocationName())
-                       .collect(Collectors.toSet());
     }
 
     public List<UploadTarget> getUploadTargets() {

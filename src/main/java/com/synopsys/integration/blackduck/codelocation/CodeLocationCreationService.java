@@ -49,6 +49,7 @@ import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.NotificationService;
+import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
@@ -66,27 +67,31 @@ public class CodeLocationCreationService extends DataService {
         this.notificationService = notificationService;
     }
 
-    public <T extends CodeLocationCreationStatus> CodeLocationCreationDateRangeStatus createCodeLocations(final CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
-        final CodeLocationCreationDateRange codeLocationCreationDateRange = calculateCodeLocationRange();
-        final T output = codeLocationCreationRequest.createCodeLocations();
+    public <T> CodeLocationCreationData<T> createCodeLocations(final CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
+        final Set<String> codeLocationNames = codeLocationCreationRequest.getCodeLocationNames();
+        final NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
+        final T output = codeLocationCreationRequest.executeRequest();
 
-        return new CodeLocationCreationDateRangeStatus(output.getCodeLocationNames(), output.getResult(), codeLocationCreationDateRange);
+        return new CodeLocationCreationData<>(notificationTaskRange, codeLocationNames, output);
     }
 
-    public <T extends CodeLocationCreationStatus> CodeLocationCreationDateRangeStatus createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds)
-            throws IntegrationException, InterruptedException {
-        final CodeLocationCreationDateRangeStatus output = createCodeLocations(codeLocationCreationRequest);
+    public <T> T createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        final CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
-        assertCodeLocationsAddedToBom(timeoutInSeconds, output.getCodeLocationNames(), output.getCodeLocationCreationDateRange());
+        final NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
+        final Set<String> codeLocationNames = codeLocationCreationData.getCodeLocationNames();
+        final T output = codeLocationCreationData.getOutput();
+
+        waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
 
         return output;
     }
 
-    public void waitForCodeLocations(final CodeLocationCreationDateRangeStatus codeLocationCreationDateRangeStatus, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        assertCodeLocationsAddedToBom(timeoutInSeconds, codeLocationCreationDateRangeStatus.getCodeLocationNames(), codeLocationCreationDateRangeStatus.getCodeLocationCreationDateRange());
+    public void waitForCodeLocations(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        assertCodeLocationsAddedToBom(notificationTaskRange, codeLocationNames, timeoutInSeconds);
     }
 
-    public CodeLocationCreationDateRange calculateCodeLocationRange() throws IntegrationException {
+    public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {
         final long startTime = System.currentTimeMillis();
         final LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
         final LocalDateTime twentyFourHoursLater = localStartTime.plusDays(3);
@@ -94,13 +99,13 @@ public class CodeLocationCreationService extends DataService {
         final Date startDate = notificationService.getLatestNotificationDate();
         final Date endDate = Date.from(twentyFourHoursLater.atZone(ZoneOffset.UTC).toInstant());
 
-        return new CodeLocationCreationDateRange(startTime, startDate, endDate);
+        return new NotificationTaskRange(startTime, startDate, endDate);
     }
 
-    private void assertCodeLocationsAddedToBom(final long timeout, final Set<String> codeLocationNames, final CodeLocationCreationDateRange notificationRange) throws IntegrationException, InterruptedException {
+    private void assertCodeLocationsAddedToBom(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
         boolean allCompleted = false;
         int attemptCount = 1;
-        while (!allCompleted && System.currentTimeMillis() - notificationRange.getStartTime() <= timeout * 1000) {
+        while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
             final List<CodeLocationView> codeLocations = new ArrayList<>();
             for (final String codeLocationName : codeLocationNames) {
                 try {
@@ -119,7 +124,8 @@ public class CodeLocationCreationService extends DataService {
                                                                    .collect(Collectors.toSet());
                 final Set<String> codeLocationUrls = new HashSet<>();
                 final List<NotificationView> notifications = notificationService
-                                                                     .getFilteredNotifications(notificationRange.getStartDate(), notificationRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+                                                                     .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                                                                             Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
                 logger.debug(String.format("There were %d notifications found.", notifications.size()));
 
                 for (final NotificationView notificationView : notifications) {
@@ -140,7 +146,7 @@ public class CodeLocationCreationService extends DataService {
         }
 
         if (!allCompleted) {
-            throw new HubTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeout));
+            throw new HubTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
         } else {
             logger.info("All code locations have been added to the BOM.");
         }

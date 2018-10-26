@@ -27,21 +27,19 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
 
-public class ScanJob extends Stringable {
+public class ScanBatch extends Stringable {
     private final File signatureScannerInstallDirectory;
     private final File outputDirectory;
     private final boolean cleanupOutput;
@@ -63,7 +61,7 @@ public class ScanJob extends Stringable {
     private final String projectVersionName;
     private final List<ScanTarget> scanTargets;
 
-    public ScanJob(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
+    public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
             final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
             final boolean shouldUseProxy, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
@@ -132,15 +130,6 @@ public class ScanJob extends Stringable {
         }
 
         return scanCommands;
-    }
-
-    public Set<String> getCodeLocationNames() {
-        return getScanTargets()
-                       .stream()
-                       .map(scanTarget -> scanTarget.getCodeLocationName())
-                       .filter(StringUtils::isBlank)
-                       .collect(Collectors.toSet());
-
     }
 
     public File getSignatureScannerInstallDirectory() {

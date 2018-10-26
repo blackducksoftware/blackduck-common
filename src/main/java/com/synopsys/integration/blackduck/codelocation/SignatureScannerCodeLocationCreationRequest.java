@@ -23,23 +23,37 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanJob;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanJobManager;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanJobOutput;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 
-public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanJobOutput> {
-    private final ScanJobManager scanJobManager;
-    private final ScanJob scanJob;
+public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
+    private final ScanBatchManager scanBatchManager;
+    private final ScanBatch scanBatch;
 
-    public SignatureScannerCodeLocationCreationRequest(final ScanJobManager scanJobManager, final ScanJob scanJob) {
-        this.scanJobManager = scanJobManager;
-        this.scanJob = scanJob;
+    public SignatureScannerCodeLocationCreationRequest(final ScanBatchManager scanBatchManager, final ScanBatch scanBatch) {
+        this.scanBatchManager = scanBatchManager;
+        this.scanBatch = scanBatch;
     }
 
     @Override
-    public ScanJobOutput createCodeLocations() throws HubIntegrationException {
-        return scanJobManager.executeScans(scanJob);
+    public Set<String> getCodeLocationNames() {
+        return scanBatch.getScanTargets()
+                       .stream()
+                       .map(scanTarget -> scanTarget.getCodeLocationName())
+                       .filter(StringUtils::isBlank)
+                       .collect(Collectors.toSet());
+    }
+
+    @Override
+    public ScanBatchOutput executeRequest() throws HubIntegrationException {
+        return scanBatchManager.executeScans(scanBatch);
     }
 
 }

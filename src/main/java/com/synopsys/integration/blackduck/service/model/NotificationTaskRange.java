@@ -21,23 +21,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.codelocation.signaturescanner;
+package com.synopsys.integration.blackduck.service.model;
 
-import java.util.List;
+import java.util.Date;
 
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationStatus;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
+public class NotificationTaskRange {
+    private final long taskStartTime;
+    private final Date startDate;
+    private final Date endDate;
 
-public class ScanJobOutput extends CodeLocationCreationStatus {
-    private final List<ScanCommandOutput> scanCommandOutputs;
-
-    public ScanJobOutput(final List<ScanCommandOutput> scanCommandOutputs) {
-        super(scanCommandOutputs);
-        this.scanCommandOutputs = scanCommandOutputs;
+    public NotificationTaskRange(final long taskStartTime, final Date startDate, final Date endDate) {
+        this.taskStartTime = taskStartTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
-    public List<ScanCommandOutput> getScanCommandOutputs() {
-        return scanCommandOutputs;
+    public long getTaskStartTime() {
+        return taskStartTime;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
     }
 
 }

@@ -23,9 +23,13 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 
-public abstract class CodeLocationCreationRequest<T extends CodeLocationCreationStatus> {
-    public abstract T createCodeLocations() throws HubIntegrationException;
+public abstract class CodeLocationCreationRequest<T> {
+    public abstract Set<String> getCodeLocationNames();
+
+    public abstract T executeRequest() throws HubIntegrationException;
 
 }

@@ -24,21 +24,19 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationStatus;
 import com.synopsys.integration.blackduck.summary.Result;
 import com.synopsys.integration.log.IntLogger;
 
-public class ScanCommandOutput extends CodeLocationCreationStatus {
+public class ScanCommandOutput {
     public static final String DRY_RUN_RESULT_DIRECTORY = "data";
     public static final String SCAN_RESULT_DIRECTORY = "status";
 
     private final IntLogger logger;
+    private final Result result;
     private final String errorMessage;
     private final Exception exception;
     private final ScanCommand scanCommand;
@@ -58,8 +56,7 @@ public class ScanCommandOutput extends CodeLocationCreationStatus {
     }
 
     private ScanCommandOutput(final IntLogger logger, final ScanCommand scanCommand, final Result result, final String errorMessage, final Exception exception, final Integer scanExitCode) {
-        super(new HashSet<>(Arrays.asList(scanCommand.getName())), result);
-
+        this.result = result;
         this.logger = logger;
         this.errorMessage = errorMessage;
         this.exception = exception;
@@ -77,6 +74,10 @@ public class ScanCommandOutput extends CodeLocationCreationStatus {
         }
         logger.error(String.format("Exactly 1 result file was not found in the result directory: %s", resultDirectory.getAbsolutePath()));
         return Optional.empty();
+    }
+
+    public Result getResult() {
+        return result;
     }
 
     public boolean wasDryRun() {

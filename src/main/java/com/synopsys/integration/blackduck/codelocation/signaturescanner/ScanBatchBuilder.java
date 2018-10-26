@@ -36,7 +36,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-public class ScanJobBuilder {
+public class ScanBatchBuilder {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -66,10 +66,10 @@ public class ScanJobBuilder {
 
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
-    public ScanJob build() throws IllegalArgumentException {
+    public ScanBatch build() throws IllegalArgumentException {
         assertValid();
 
-        return new ScanJob(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, shouldUseProxy, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -128,7 +128,7 @@ public class ScanJobBuilder {
         return StringUtils.join(errorMessages, ' ');
     }
 
-    public ScanJobBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) {
+    public ScanBatchBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) {
         if (null == hubServerConfig) {
             shouldUseProxy = false;
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
@@ -152,17 +152,17 @@ public class ScanJobBuilder {
         return this;
     }
 
-    public ScanJobBuilder addTarget(final ScanTarget scanTarget) {
+    public ScanBatchBuilder addTarget(final ScanTarget scanTarget) {
         scanTargets.add(scanTarget);
         return this;
     }
 
-    public ScanJobBuilder addTargets(final List<ScanTarget> scanTargets) {
+    public ScanBatchBuilder addTargets(final List<ScanTarget> scanTargets) {
         this.scanTargets.addAll(scanTargets);
         return this;
     }
 
-    public ScanJobBuilder projectAndVersionNames(final String projectName, final String projectVersionName) {
+    public ScanBatchBuilder projectAndVersionNames(final String projectName, final String projectVersionName) {
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         return this;
@@ -172,7 +172,7 @@ public class ScanJobBuilder {
         return installDirectory;
     }
 
-    public ScanJobBuilder installDirectory(final File installDirectory) {
+    public ScanBatchBuilder installDirectory(final File installDirectory) {
         this.installDirectory = installDirectory;
         return this;
     }
@@ -181,7 +181,7 @@ public class ScanJobBuilder {
         return outputDirectory;
     }
 
-    public ScanJobBuilder outputDirectory(final File outputDirectory) {
+    public ScanBatchBuilder outputDirectory(final File outputDirectory) {
         this.outputDirectory = outputDirectory;
         return this;
     }
@@ -190,7 +190,7 @@ public class ScanJobBuilder {
         return cleanupOutput;
     }
 
-    public ScanJobBuilder cleanupOutput(final boolean cleanupOutput) {
+    public ScanBatchBuilder cleanupOutput(final boolean cleanupOutput) {
         this.cleanupOutput = cleanupOutput;
         return this;
     }
@@ -199,7 +199,7 @@ public class ScanJobBuilder {
         return scanMemoryInMegabytes;
     }
 
-    public ScanJobBuilder scanMemoryInMegabytes(final int scanMemoryInMegabytes) {
+    public ScanBatchBuilder scanMemoryInMegabytes(final int scanMemoryInMegabytes) {
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
         return this;
     }
@@ -208,7 +208,7 @@ public class ScanJobBuilder {
         return dryRun;
     }
 
-    public ScanJobBuilder dryRun(final boolean dryRun) {
+    public ScanBatchBuilder dryRun(final boolean dryRun) {
         this.dryRun = dryRun;
         return this;
     }
@@ -217,7 +217,7 @@ public class ScanJobBuilder {
         return debug;
     }
 
-    public ScanJobBuilder debug(final boolean debug) {
+    public ScanBatchBuilder debug(final boolean debug) {
         this.debug = debug;
         return this;
     }
@@ -226,7 +226,7 @@ public class ScanJobBuilder {
         return verbose;
     }
 
-    public ScanJobBuilder verbose(final boolean verbose) {
+    public ScanBatchBuilder verbose(final boolean verbose) {
         this.verbose = verbose;
         return this;
     }
@@ -235,7 +235,7 @@ public class ScanJobBuilder {
         return scanCliOpts;
     }
 
-    public ScanJobBuilder scanCliOpts(final String scanCliOpts) {
+    public ScanBatchBuilder scanCliOpts(final String scanCliOpts) {
         this.scanCliOpts = scanCliOpts;
         return this;
     }
@@ -244,7 +244,7 @@ public class ScanJobBuilder {
         return additionalScanArguments;
     }
 
-    public ScanJobBuilder additionalScanArguments(final String additionalScanArguments) {
+    public ScanBatchBuilder additionalScanArguments(final String additionalScanArguments) {
         this.additionalScanArguments = additionalScanArguments;
         return this;
     }
@@ -253,7 +253,7 @@ public class ScanJobBuilder {
         return snippetMatching;
     }
 
-    public ScanJobBuilder snippetMatching(final SnippetMatching snippetMatching) {
+    public ScanBatchBuilder snippetMatching(final SnippetMatching snippetMatching) {
         this.snippetMatching = snippetMatching;
         return this;
     }
@@ -262,7 +262,7 @@ public class ScanJobBuilder {
         return blackDuckUrl;
     }
 
-    public ScanJobBuilder blackDuckUrl(final URL blackDuckUrl) {
+    public ScanBatchBuilder blackDuckUrl(final URL blackDuckUrl) {
         this.blackDuckUrl = blackDuckUrl;
         return this;
     }
@@ -271,7 +271,7 @@ public class ScanJobBuilder {
         return blackDuckUsername;
     }
 
-    public ScanJobBuilder blackDuckUsername(final String blackDuckUsername) {
+    public ScanBatchBuilder blackDuckUsername(final String blackDuckUsername) {
         this.blackDuckUsername = blackDuckUsername;
         return this;
     }
@@ -280,7 +280,7 @@ public class ScanJobBuilder {
         return blackDuckPassword;
     }
 
-    public ScanJobBuilder blackDuckPassword(final String blackDuckPassword) {
+    public ScanBatchBuilder blackDuckPassword(final String blackDuckPassword) {
         this.blackDuckPassword = blackDuckPassword;
         return this;
     }
@@ -289,7 +289,7 @@ public class ScanJobBuilder {
         return blackDuckApiToken;
     }
 
-    public ScanJobBuilder blackDuckApiToken(final String blackDuckApiToken) {
+    public ScanBatchBuilder blackDuckApiToken(final String blackDuckApiToken) {
         this.blackDuckApiToken = blackDuckApiToken;
         return this;
     }
@@ -298,7 +298,7 @@ public class ScanJobBuilder {
         return shouldUseProxy;
     }
 
-    public ScanJobBuilder shouldUseProxy(final boolean shouldUseProxy) {
+    public ScanBatchBuilder shouldUseProxy(final boolean shouldUseProxy) {
         this.shouldUseProxy = shouldUseProxy;
         return this;
     }
@@ -307,7 +307,7 @@ public class ScanJobBuilder {
         return proxyInfo;
     }
 
-    public ScanJobBuilder proxyInfo(final ProxyInfo proxyInfo) {
+    public ScanBatchBuilder proxyInfo(final ProxyInfo proxyInfo) {
         this.proxyInfo = proxyInfo;
         return this;
     }
@@ -316,7 +316,7 @@ public class ScanJobBuilder {
         return alwaysTrustServerCertificate;
     }
 
-    public ScanJobBuilder alwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+    public ScanBatchBuilder alwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
         return this;
     }
@@ -333,7 +333,7 @@ public class ScanJobBuilder {
         return scanTargets;
     }
 
-    public ScanJobBuilder simpleScanTargets(final List<ScanTarget> scanTargets) {
+    public ScanBatchBuilder simpleScanTargets(final List<ScanTarget> scanTargets) {
         this.scanTargets = scanTargets;
         return this;
     }

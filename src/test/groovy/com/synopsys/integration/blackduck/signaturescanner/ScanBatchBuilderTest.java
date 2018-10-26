@@ -8,14 +8,14 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanJobBuilder;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-public class ScanJobBuilderTest {
+public class ScanBatchBuilderTest {
     @Test
     public void testValidHubScanConfig() throws Exception {
-        final ScanJobBuilder builder = new ScanJobBuilder();
+        final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
 
         assertTrue(builder.isValid());
@@ -23,14 +23,14 @@ public class ScanJobBuilderTest {
 
     @Test
     public void testInvalidHubScanConfig() throws Exception {
-        final ScanJobBuilder builder = new ScanJobBuilder();
+        final ScanBatchBuilder builder = new ScanBatchBuilder();
 
         assertFalse(builder.isValid());
     }
 
     @Test
     public void testInvalidProxy() throws Exception {
-        final ScanJobBuilder builder = new ScanJobBuilder();
+        final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
         builder.blackDuckUrl(new URL("http://www.google.com"));
         builder.blackDuckApiToken("apitoken");
@@ -43,7 +43,7 @@ public class ScanJobBuilderTest {
 
     @Test
     public void testCredentials() throws Exception {
-        final ScanJobBuilder builder = new ScanJobBuilder();
+        final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
         builder.blackDuckUrl(new URL("http://www.google.com"));
         assertFalse(builder.isValid());
