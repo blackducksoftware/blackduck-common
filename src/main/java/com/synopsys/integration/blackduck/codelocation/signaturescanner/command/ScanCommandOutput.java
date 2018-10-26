@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.synopsys.integration.blackduck.summary.Result;
+import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.log.IntLogger;
 
 public class ScanCommandOutput {

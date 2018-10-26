@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.summary.Result;
+import com.synopsys.integration.blackduck.codelocation.Result;
 
 public class UploadOutput {
     private final Result result;

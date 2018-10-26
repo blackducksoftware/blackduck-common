@@ -21,8 +21,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.summary;
+package com.synopsys.integration.blackduck.codelocation;
 
 public enum Result {
-    SUCCESS, FAILURE;
+    SUCCESS,
+    FAILURE
 }

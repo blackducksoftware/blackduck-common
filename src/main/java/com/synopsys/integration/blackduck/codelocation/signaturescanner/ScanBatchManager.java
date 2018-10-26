@@ -44,6 +44,7 @@ public class ScanBatchManager {
     private final ScannerZipInstaller scannerZipInstaller;
     private final ScanPathsUtility scanPathsUtility;
     private final ScanCommandRunner scanCommandRunner;
+    private final File defaultInstallDirectory;
 
     public static ScanBatchManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
@@ -52,28 +53,32 @@ public class ScanBatchManager {
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
         final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
 
-        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
+        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public static ScanBatchManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner);
+    public static ScanBatchManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility,
+            final ScanCommandRunner scanCommandRunner) {
+        return new ScanBatchManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
     }
 
     public static ScanBatchManager createFullScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
             final ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner);
+        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public ScanBatchManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner) {
+    public ScanBatchManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner,
+            final File defaultInstallDirectory) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scannerZipInstaller = scannerZipInstaller;
         this.scanPathsUtility = scanPathsUtility;
         this.scanCommandRunner = scanCommandRunner;
+        this.defaultInstallDirectory = defaultInstallDirectory;
     }
 
     public ScanBatchOutput executeScans(final ScanBatch scanBatch) throws HubIntegrationException {
         if (scannerZipInstaller != null) {
+            // if an installer is specified, it will be used to install/update the scanner
             final File installDirectory = scanBatch.getSignatureScannerInstallDirectory();
             if (!installDirectory.exists()) {
                 scannerZipInstaller.installOrUpdateScanner(installDirectory);
@@ -90,7 +95,7 @@ public class ScanBatchManager {
             }
         }
 
-        final List<ScanCommand> scanCommands = scanBatch.createScanCommands(scanPathsUtility, intEnvironmentVariables);
+        final List<ScanCommand> scanCommands = scanBatch.createScanCommands(defaultInstallDirectory, scanPathsUtility, intEnvironmentVariables);
         final List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanBatch.isCleanupOutput());
         return new ScanBatchOutput(scanCommandOutputs);
     }

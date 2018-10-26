@@ -86,7 +86,10 @@ public class ScanBatch extends Stringable {
         this.scanTargets = scanTargets;
     }
 
-    public List<ScanCommand> createScanCommands(final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws HubIntegrationException {
+    /**
+     * The default install directory will be used if the batch does not already have an install directory.
+     */
+    public List<ScanCommand> createScanCommands(final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws HubIntegrationException {
         String scanCliOptsToUse = scanCliOpts;
         if (null != intEnvironmentVariables && StringUtils.isBlank(scanCliOptsToUse)) {
             final String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
@@ -123,7 +126,11 @@ public class ScanBatch extends Stringable {
             } else {
                 commandOutputDirectory = scanPathsUtility.createSpecificRunOutputDirectory(outputDirectory);
             }
-            final ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
+            File installDirectoryForCommand = signatureScannerInstallDirectory;
+            if (null == installDirectoryForCommand && null != defaultInstallDirectory) {
+                installDirectoryForCommand = defaultInstallDirectory;
+            }
+            final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
                     scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);
