@@ -16,8 +16,6 @@ import org.junit.experimental.categories.Category;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationDateRange;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationDateRangeStatus;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
@@ -26,9 +24,9 @@ import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.blackduck.summary.Result;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntBufferedLogger;
 import com.synopsys.integration.log.IntLogger;
@@ -65,7 +63,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
         final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonParser, gson, codeLocationService, notificationService);
-        final CodeLocationCreationDateRangeStatus status = codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
+        codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         final ProjectService projectService = hubServicesFactory.createProjectService();
         projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, "27.0.0-SNAPSHOT");
@@ -93,7 +91,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
         final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonParser, gson, codeLocationService, notificationService);
-        final CodeLocationCreationDateRangeStatus status = codeLocationCreationService.createCodeLocations(scanRequest);
+        codeLocationCreationService.createCodeLocations(scanRequest);
 
         /**
          * now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
@@ -109,12 +107,11 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         projectVersionWrapper = Optional.of(projectService.syncProjectAndVersion(projectRequestBuilder.build(), false));
 
-        final CodeLocationCreationDateRange codeLocationCreationDateRange = codeLocationCreationService.calculateCodeLocationRange();
-        final CodeLocationCreationDateRangeStatus codeLocationCreationDateRangeStatus = new CodeLocationCreationDateRangeStatus(new HashSet<>(Arrays.asList(codeLocationView.name)), Result.SUCCESS, codeLocationCreationDateRange);
+        final NotificationTaskRange notificationTaskRange = codeLocationCreationService.calculateCodeLocationRange();
 
         codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.get().getProjectVersionView());
 
-        codeLocationCreationService.waitForCodeLocations(codeLocationCreationDateRangeStatus, 15 * 60);
+        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.name)), 15 * 60);
 
         final List<CodeLocationView> versionCodeLocations = hubService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         final CodeLocationView versionCodeLocation = versionCodeLocations.get(0);

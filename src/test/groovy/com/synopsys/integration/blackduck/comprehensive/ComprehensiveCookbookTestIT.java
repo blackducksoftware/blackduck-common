@@ -48,7 +48,6 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
 import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationDateRangeStatus;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
@@ -192,7 +191,7 @@ public class ComprehensiveCookbookTestIT {
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
         final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, hubServicesFactory.getJsonParser(), hubServicesFactory.getGson(), codeLocationService, notificationService);
-        final CodeLocationCreationDateRangeStatus status = codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 10 * 60);
+        codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         // make sure we have some code locations now
         final List<CodeLocationView> codeLocationItems = hubServicesFactory.createHubService().getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
