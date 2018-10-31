@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
@@ -54,7 +55,6 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;

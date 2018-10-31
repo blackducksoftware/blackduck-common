@@ -40,6 +40,7 @@ import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
+import com.synopsys.integration.jsonfield.JsonFieldResolver;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -139,7 +140,8 @@ public class RestConnectionTestHelper {
 
         final Gson gson = HubServicesFactory.createDefaultGson();
         final JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser();
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, logger);
+        final JsonFieldResolver jsonFieldResolver = new JsonFieldResolver(gson);
+        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, jsonFieldResolver, restConnection, logger);
         return hubServicesFactory;
     }
 

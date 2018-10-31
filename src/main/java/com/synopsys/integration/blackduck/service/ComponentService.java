@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.gson.JsonElement;
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.component.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
@@ -40,7 +41,6 @@ import com.synopsys.integration.blackduck.service.model.HubMediaTypes;
 import com.synopsys.integration.blackduck.service.model.HubQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
@@ -58,7 +58,7 @@ public class ComponentService extends DataService {
                 return componentVersion;
             }
         }
-        final String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createHubOriginId();
+        final String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createBlackDuckOriginId();
         logger.error(errMsg);
         throw new HubIntegrationException(errMsg);
     }
@@ -73,7 +73,7 @@ public class ComponentService extends DataService {
 
     public ComponentSearchResultView getExactComponentMatch(final ExternalId externalId) throws IntegrationException {
         final List<ComponentSearchResultView> allComponents = getAllComponents(externalId);
-        final String hubOriginIdToMatch = externalId.createHubOriginId();
+        final String hubOriginIdToMatch = externalId.createBlackDuckOriginId();
         for (final ComponentSearchResultView componentItem : allComponents) {
             if (null != hubOriginIdToMatch) {
                 if (hubOriginIdToMatch.equals(componentItem.originId)) {
@@ -86,7 +86,7 @@ public class ComponentService extends DataService {
 
     public List<ComponentSearchResultView> getAllComponents(final ExternalId externalId) throws IntegrationException {
         final String forge = externalId.forge.getName();
-        final String hubOriginId = externalId.createHubOriginId();
+        final String hubOriginId = externalId.createBlackDuckOriginId();
         final String componentQuery = String.format("%s|%s", forge, hubOriginId);
         final Optional<HubQuery> hubQuery = HubQuery.createQuery("id", componentQuery);
 

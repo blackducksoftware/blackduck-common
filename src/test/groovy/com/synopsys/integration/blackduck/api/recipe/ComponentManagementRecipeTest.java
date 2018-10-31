@@ -9,12 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import com.synopsys.integration.bdio.model.Forge;
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.hub.bdio.model.Forge;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.test.annotation.IntegrationTest;
 
 @Category(IntegrationTest.class)

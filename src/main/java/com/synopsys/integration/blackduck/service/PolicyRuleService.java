@@ -26,6 +26,7 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.util.List;
 
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -36,7 +37,6 @@ import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;

@@ -112,12 +112,12 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
-                    return ScanCommandOutput.FAILURE(logger, scanCommand, returnCode);
+                    return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, returnCode);
                 }
             }
         } catch (final Exception e) {
             final String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
-            return ScanCommandOutput.FAILURE(logger, scanCommand, errorMessage, e);
+            return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, errorMessage, e);
         }
 
         if (!scanCommand.isDryRun() && cleanupOutput) {
@@ -132,7 +132,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         }
 
-        return ScanCommandOutput.SUCCESS(logger, scanCommand);
+        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand);
     }
 
     /**

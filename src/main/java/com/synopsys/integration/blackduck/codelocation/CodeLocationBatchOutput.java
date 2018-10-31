@@ -23,31 +23,29 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
+import org.apache.commons.lang3.StringUtils;
 
-public class CodeLocationCreationData<T> {
-    private final NotificationTaskRange notificationTaskRange;
-    private final Set<String> successfulCodeLocationNames;
-    private final T output;
+public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
+    private final List<T> outputs;
 
-    public CodeLocationCreationData(final NotificationTaskRange notificationTaskRange, final Set<String> successfulCodeLocationNames, final T output) {
-        this.notificationTaskRange = notificationTaskRange;
-        this.successfulCodeLocationNames = successfulCodeLocationNames;
-        this.output = output;
+    public CodeLocationBatchOutput(final List<T> outputs) {
+        this.outputs = outputs;
     }
 
-    public NotificationTaskRange getNotificationTaskRange() {
-        return notificationTaskRange;
+    public List<T> getOutputs() {
+        return outputs;
     }
 
     public Set<String> getSuccessfulCodeLocationNames() {
-        return successfulCodeLocationNames;
-    }
-
-    public T getOutput() {
-        return output;
+        return getOutputs().stream()
+                       .filter(output -> Result.SUCCESS == output.getResult())
+                       .map(output -> output.getCodeLocationName())
+                       .filter((codeLocationName -> StringUtils.isNotBlank(codeLocationName)))
+                       .collect(Collectors.toSet());
     }
 
 }

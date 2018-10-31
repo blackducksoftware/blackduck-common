@@ -23,51 +23,33 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
+import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
 import com.synopsys.integration.blackduck.codelocation.Result;
 
-public class UploadOutput {
-    private final Result result;
+public class UploadOutput extends CodeLocationOutput {
     private final String response;
-    private final String errorMessage;
-    private final Exception exception;
 
-    public static UploadOutput SUCCESS(final Set<String> codeLocationNames, final String response) {
-        return new UploadOutput(Result.SUCCESS, codeLocationNames, response, null, null);
+    public static UploadOutput SUCCESS(final String codeLocationName, final String response) {
+        return new UploadOutput(codeLocationName, Result.SUCCESS, response, null, null);
     }
 
-    public static UploadOutput FAILURE(final String errorMessage, final Exception exception) {
-        return new UploadOutput(Result.FAILURE, Collections.emptySet(), null, errorMessage, exception);
+    public static UploadOutput FAILURE(final String codeLocationName, final String errorMessage, final Exception exception) {
+        return new UploadOutput(codeLocationName, Result.FAILURE, null, errorMessage, exception);
     }
 
-    public static UploadOutput FAILURE(final String response, final String errorMessage, final Exception exception) {
-        return new UploadOutput(Result.FAILURE, Collections.emptySet(), response, errorMessage, exception);
+    public static UploadOutput FAILURE(final String codeLocationName, final String response, final String errorMessage, final Exception exception) {
+        return new UploadOutput(codeLocationName, Result.FAILURE, response, errorMessage, exception);
     }
 
-    private UploadOutput(final Result result, final Set<String> codeLocationNames, final String response, final String errorMessage, final Exception exception) {
-        this.result = result;
+    private UploadOutput(final String codeLocationName, final Result result, final String response, final String errorMessage, final Exception exception) {
+        super(result, codeLocationName, errorMessage, exception);
         this.response = response;
-        this.errorMessage = errorMessage;
-        this.exception = exception;
-    }
-
-    public Result getResult() {
-        return result;
     }
 
     public Optional<String> getResponse() {
         return Optional.ofNullable(response);
-    }
-
-    public Optional<String> getErrorMessage() {
-        return Optional.ofNullable(errorMessage);
-    }
-
-    public Optional<Exception> getException() {
-        return Optional.ofNullable(exception);
     }
 
 }

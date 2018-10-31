@@ -62,7 +62,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonParser, gson, codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         final ProjectService projectService = hubServicesFactory.createProjectService();
@@ -90,7 +90,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonParser, gson, codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocations(scanRequest);
 
         /**

@@ -25,15 +25,11 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.List;
 
-public class UploadBatchOutput {
-    private final List<UploadOutput> uploadOutputs;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
 
-    public UploadBatchOutput(final List<UploadOutput> uploadOutputs) {
-        this.uploadOutputs = uploadOutputs;
-    }
-
-    public List<UploadOutput> getUploadOutputs() {
-        return uploadOutputs;
+public class UploadBatchOutput extends CodeLocationBatchOutput<UploadOutput> {
+    public UploadBatchOutput(final List<UploadOutput> outputs) {
+        super(outputs);
     }
 
 }

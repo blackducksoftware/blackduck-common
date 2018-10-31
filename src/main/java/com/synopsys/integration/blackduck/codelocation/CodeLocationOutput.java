@@ -23,31 +23,35 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import java.util.Set;
+import java.util.Optional;
 
-import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
+public abstract class CodeLocationOutput {
+    private final Result result;
+    private final String codeLocationName;
+    private final String errorMessage;
+    private final Exception exception;
 
-public class CodeLocationCreationData<T> {
-    private final NotificationTaskRange notificationTaskRange;
-    private final Set<String> successfulCodeLocationNames;
-    private final T output;
-
-    public CodeLocationCreationData(final NotificationTaskRange notificationTaskRange, final Set<String> successfulCodeLocationNames, final T output) {
-        this.notificationTaskRange = notificationTaskRange;
-        this.successfulCodeLocationNames = successfulCodeLocationNames;
-        this.output = output;
+    public CodeLocationOutput(final Result result, final String codeLocationName, final String errorMessage, final Exception exception) {
+        this.result = result;
+        this.codeLocationName = codeLocationName;
+        this.errorMessage = errorMessage;
+        this.exception = exception;
     }
 
-    public NotificationTaskRange getNotificationTaskRange() {
-        return notificationTaskRange;
+    public Result getResult() {
+        return result;
     }
 
-    public Set<String> getSuccessfulCodeLocationNames() {
-        return successfulCodeLocationNames;
+    public String getCodeLocationName() {
+        return codeLocationName;
     }
 
-    public T getOutput() {
-        return output;
+    public Optional<String> getErrorMessage() {
+        return Optional.ofNullable(errorMessage);
+    }
+
+    public Optional<Exception> getException() {
+        return Optional.ofNullable(exception);
     }
 
 }

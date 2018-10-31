@@ -13,6 +13,7 @@ import com.synopsys.integration.blackduck.service.CodeLocationService
 import com.synopsys.integration.blackduck.service.HubServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
+import com.synopsys.integration.jsonfield.JsonFieldResolver
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.rest.connection.RestConnection
 import com.synopsys.integration.test.tool.TestLogger
@@ -27,6 +28,7 @@ class BasicRecipe {
 
     protected Gson gson;
     protected JsonParser jsonParser;
+    protected JsonFieldResolver jsonFieldResolver;
 
     @Before
     public void startRecipe() {
@@ -52,7 +54,8 @@ class BasicRecipe {
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
         gson = HubServicesFactory.createDefaultGson()
         jsonParser = HubServicesFactory.createDefaultJsonParser()
-        hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, intLogger)
+        jsonFieldResolver = new JsonFieldResolver(gson);
+        hubServicesFactory = new HubServicesFactory(gson, jsonParser, jsonFieldResolver, restConnection, intLogger)
     }
 
     public ProjectRequest createProjectRequest(String projectName, String projectVersionName) {

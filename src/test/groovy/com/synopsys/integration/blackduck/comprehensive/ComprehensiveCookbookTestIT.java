@@ -34,6 +34,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -63,8 +65,6 @@ import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.test.annotation.IntegrationTest;
 
@@ -190,7 +190,7 @@ public class ComprehensiveCookbookTestIT {
         uploadBatch.addUploadTarget(UploadTarget.createWithMediaType("ek_mtglist Black Duck I/O Export", file, "application/ld+json"));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, hubServicesFactory.getJsonParser(), hubServicesFactory.getGson(), codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, hubServicesFactory.getJsonFieldResolver(), codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         // make sure we have some code locations now

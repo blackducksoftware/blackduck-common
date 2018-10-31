@@ -35,11 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
@@ -51,38 +46,40 @@ import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.jsonfield.JsonField;
+import com.synopsys.integration.jsonfield.JsonFieldFactory;
+import com.synopsys.integration.jsonfield.JsonFieldResolver;
+import com.synopsys.integration.jsonfield.JsonFieldResult;
 import com.synopsys.integration.log.IntLogger;
 
 public class CodeLocationCreationService extends DataService {
-    private final JsonParser jsonParser;
-    private final Gson gson;
+    private final JsonFieldResolver jsonFieldResolver;
     private final CodeLocationService codeLocationService;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(final HubService hubService, final IntLogger logger, final JsonParser jsonParser, final Gson gson, final CodeLocationService codeLocationService, final NotificationService notificationService) {
+    public CodeLocationCreationService(final HubService hubService, final IntLogger logger, final JsonFieldResolver jsonFieldResolver, final CodeLocationService codeLocationService, final NotificationService notificationService) {
         super(hubService, logger);
-        this.jsonParser = jsonParser;
-        this.gson = gson;
+        this.jsonFieldResolver = jsonFieldResolver;
         this.codeLocationService = codeLocationService;
         this.notificationService = notificationService;
     }
 
-    public <T> CodeLocationCreationData<T> createCodeLocations(final CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
-        final Set<String> codeLocationNames = codeLocationCreationRequest.getCodeLocationNames();
+    public <T extends CodeLocationBatchOutput> CodeLocationCreationData<T> createCodeLocations(final CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
         final NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
         final T output = codeLocationCreationRequest.executeRequest();
 
-        return new CodeLocationCreationData<>(notificationTaskRange, codeLocationNames, output);
+        final Set<String> successfulCodeLocationNames = output.getSuccessfulCodeLocationNames();
+        return new CodeLocationCreationData<>(notificationTaskRange, successfulCodeLocationNames, output);
     }
 
-    public <T> T createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
         final CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
         final NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
-        final Set<String> codeLocationNames = codeLocationCreationData.getCodeLocationNames();
+        final Set<String> successfulCodeLocationNames = codeLocationCreationData.getSuccessfulCodeLocationNames();
         final T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
+        waitForCodeLocations(notificationTaskRange, successfulCodeLocationNames, timeoutInSeconds);
 
         return output;
     }
@@ -94,10 +91,10 @@ public class CodeLocationCreationService extends DataService {
     public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {
         final long startTime = System.currentTimeMillis();
         final LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
-        final LocalDateTime twentyFourHoursLater = localStartTime.plusDays(3);
+        final LocalDateTime threeDaysLater = localStartTime.plusDays(3);
 
         final Date startDate = notificationService.getLatestNotificationDate();
-        final Date endDate = Date.from(twentyFourHoursLater.atZone(ZoneOffset.UTC).toInstant());
+        final Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 
         return new NotificationTaskRange(startTime, startDate, endDate);
     }
@@ -153,24 +150,9 @@ public class CodeLocationCreationService extends DataService {
     }
 
     private Optional<String> getCodeLocationUrl(final NotificationView notificationView) {
-        try {
-            final JsonElement jsonElement = jsonParser.parse(notificationView.json);
-            if (jsonElement.isJsonObject() && jsonElement.getAsJsonObject().has("content")) {
-                final JsonElement content = jsonElement.getAsJsonObject().get("content");
-                if (content.isJsonObject() && content.getAsJsonObject().has("codeLocation")) {
-                    final JsonElement codeLocation = content.getAsJsonObject().get("codeLocation");
-                    final String codeLocationUrl = codeLocation.getAsString();
-                    if (StringUtils.isNotBlank(codeLocationUrl)) {
-                        return Optional.of(codeLocationUrl);
-                    }
-                }
-            }
-        } catch (final Exception e) {
-            logger.error("Error processing the json - it might not be possible to verify if the code location is added to the BOM.");
-            logger.error(e);
-        }
-
-        return Optional.empty();
+        final JsonField<String> codeLocationUrlField = JsonFieldFactory.createStringJsonField(Arrays.asList("content", "codeLocation"));
+        final JsonFieldResult<String> jsonFieldResult = jsonFieldResolver.resolveValues(notificationView.json, codeLocationUrlField);
+        return jsonFieldResult.getFirstValue();
     }
 
 }

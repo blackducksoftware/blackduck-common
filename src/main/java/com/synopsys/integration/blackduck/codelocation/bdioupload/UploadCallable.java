@@ -25,9 +25,6 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
@@ -53,20 +50,19 @@ public class UploadCallable implements Callable<UploadOutput> {
             try {
                 jsonPayload = FileUtils.readFileToString(uploadTarget.getUploadFile(), StandardCharsets.UTF_8);
             } catch (final IOException e) {
-                return UploadOutput.FAILURE("Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
+                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
             }
 
             final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
             final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = hubService.executeRequest(request)) {
                 final String responseString = response.getContentString();
-                final Set<String> codeLocationNames = new HashSet<>(Arrays.asList(uploadTarget.getCodeLocationName()));
-                return UploadOutput.SUCCESS(codeLocationNames, responseString);
+                return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
             } catch (final IOException e) {
-                return UploadOutput.FAILURE(e.getMessage(), e);
+                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), e.getMessage(), e);
             }
         } catch (final Exception e) {
-            return UploadOutput.FAILURE("An unknown error occurred trying to upload a file.", e);
+            return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "An unknown error occurred trying to upload a file.", e);
         }
     }
 

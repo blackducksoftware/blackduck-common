@@ -1,5 +1,7 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.bdio.model.Forge
+import com.synopsys.integration.bdio.model.externalid.ExternalId
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
@@ -14,8 +16,6 @@ import com.synopsys.integration.blackduck.service.PolicyRuleService
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
-import com.synopsys.integration.hub.bdio.model.Forge
-import com.synopsys.integration.hub.bdio.model.externalid.ExternalId
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After
 import org.junit.Assert
