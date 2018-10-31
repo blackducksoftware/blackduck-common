@@ -51,7 +51,7 @@ class ProjectRequestBuilderTest {
         try {
             projectRequestBuilder.build()
             Assert.fail("Should have thrown an exception")
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             Assert.assertNotNull(e)
         }
 
@@ -71,7 +71,7 @@ class ProjectRequestBuilderTest {
         try {
             projectRequestBuilder.build()
             Assert.fail("Should have thrown an exception")
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException e) {
             Assert.assertNotNull(e)
         }
     }

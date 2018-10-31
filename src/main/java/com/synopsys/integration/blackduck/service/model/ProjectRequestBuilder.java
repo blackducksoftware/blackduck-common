@@ -24,8 +24,10 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
@@ -35,11 +37,11 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.builder.AbstractBuilder;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.validator.AbstractValidator;
+import com.synopsys.integration.util.BuilderStatus;
+import com.synopsys.integration.util.IntegrationBuilder;
 
-public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
+public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
     private String projectName;
     private String description;
     private Boolean projectLevelAdjustments;
@@ -63,15 +65,9 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     }
 
     @Override
-    public AbstractValidator createValidator() {
-        final ProjectRequestValidator validator = new ProjectRequestValidator(this);
-        return validator;
-    }
-
-    @Override
-    public ProjectRequest buildObject() {
-        final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution.toUpperCase());
-        final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase.toUpperCase());
+    protected ProjectRequest buildWithoutValidation() {
+        final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution);
+        final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase);
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.distribution = distributionValue;
         projectVersionRequest.phase = phaseValue;
@@ -120,6 +116,33 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
         versionName = projectVersionView.versionName;
     }
 
+    @Override
+    protected void validate(final BuilderStatus builderStatus) {
+        if (StringUtils.isBlank(projectName)) {
+            builderStatus.addErrorMessage("A project name is required.");
+        }
+
+        if (StringUtils.isBlank(versionName)) {
+            builderStatus.addErrorMessage("A version name is required.");
+        }
+
+        if (!EnumUtils.isValidEnum(ProjectVersionDistributionType.class, distribution)) {
+            builderStatus.addErrorMessage(String.format("A valid version distribution is required and '%s' is not valid.", distribution));
+        }
+        if (!EnumUtils.isValidEnum(ProjectVersionPhaseType.class, phase)) {
+            builderStatus.addErrorMessage(String.format("A valid version phase is required and '%s' is not valid.", phase));
+        }
+
+        if (StringUtils.isNotBlank(releasedOn)) {
+            try {
+                final SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
+                sdf.parse(releasedOn);
+            } catch (final ParseException e) {
+                builderStatus.addErrorMessage(String.format("The provided releasedOn value, '%s', could not be correctly parsed with the required format, '%s': %s.", releasedOn, RestConstants.JSON_DATE_FORMAT, e.getMessage()));
+            }
+        }
+    }
+
     public void setProjectName(final String projectName) {
         this.projectName = projectName;
     }
@@ -141,7 +164,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     }
 
     public void setDistribution(final String distribution) {
-        this.distribution = distribution;
+        this.distribution = StringUtils.trimToEmpty(distribution).toUpperCase();
     }
 
     public void setDistribution(final ProjectVersionDistributionType distribution) {
@@ -149,7 +172,7 @@ public class ProjectRequestBuilder extends AbstractBuilder<ProjectRequest> {
     }
 
     public void setPhase(final String phase) {
-        this.phase = phase;
+        this.phase = StringUtils.trimToEmpty(phase).toUpperCase();
     }
 
     public void setPhase(final ProjectVersionPhaseType phase) {

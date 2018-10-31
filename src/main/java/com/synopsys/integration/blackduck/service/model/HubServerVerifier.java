@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -42,19 +42,19 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubServerVerifier {
-    public void verifyIsHubServer(final URL hubURL, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
+    public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
         connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
-        connectionBuilder.setBaseUrl(hubURL.toString());
+        connectionBuilder.setBaseUrl(blackDuckUrl.toString());
         connectionBuilder.setTimeout(timeoutSeconds);
         connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
         if (hubProxyInfo != null) {
-            connectionBuilder.applyProxyInfo(hubProxyInfo);
+            connectionBuilder.setProxyInfo(hubProxyInfo);
         }
         final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
 
         try {
-            Request request = new Request.Builder(hubURL.toURI().toString()).build();
+            Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();
             try (Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
@@ -67,7 +67,7 @@ public class HubServerVerifier {
             }
             final URL downloadURL;
             try {
-                downloadURL = new URL(hubURL, ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
+                downloadURL = new URL(blackDuckUrl, ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
             } catch (final MalformedURLException e) {
                 throw new HubIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
             }
@@ -82,7 +82,7 @@ public class HubServerVerifier {
                 throw new IntegrationException(e.getMessage(), e);
             }
         } catch (final URISyntaxException e) {
-            throw new IntegrationException("The Url does not appear to be a Hub server :" + hubURL.toString() + ", because: " + e.getMessage(), e);
+            throw new IntegrationException("The Url does not appear to be a Hub server :" + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
         }
     }
 

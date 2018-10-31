@@ -24,13 +24,14 @@ package com.synopsys.integration.blackduck.api.codelocation
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
-import com.synopsys.integration.blackduck.exception.DoesNotExistException
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.*
+import com.synopsys.integration.blackduck.service.DryRunUploadResponse
+import com.synopsys.integration.blackduck.service.DryRunUploadService
+import com.synopsys.integration.blackduck.service.HubServicesFactory
+import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
-import com.synopsys.integration.exception.IntegrationException
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
@@ -60,8 +61,10 @@ class CodeLocationRequestServiceTestIT {
     @After
     public void testCleanup() {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        ProjectView project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
-        services.createProjectService().deleteHubProject(project)
+        Optional<ProjectView> project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
+        if (project.isPresent()) {
+            services.createProjectService().deleteProject(project.get())
+        }
     }
 
     @Test
@@ -82,9 +85,12 @@ class CodeLocationRequestServiceTestIT {
         projectBuilder.setProjectName(projectName)
         projectBuilder.setVersionName(versionName)
 
-        ProjectVersionView version = getProjectVersion(services.createHubService(), services.createProjectService(), projectBuilder.build())
+        ProjectService projectService = services.createProjectService();
+        ProjectRequest projectRequest = projectBuilder.build();
 
-        services.createCodeLocationService().mapCodeLocation(codeLocationView, version)
+        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false);
+
+        services.createCodeLocationService().mapCodeLocation(codeLocationView, projectVersionWrapper.projectVersionView)
         codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
         Assert.assertNotNull(codeLocationView)
         Assert.assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
@@ -103,21 +109,4 @@ class CodeLocationRequestServiceTestIT {
         }
     }
 
-    private ProjectVersionView getProjectVersion(HubService hubService, ProjectService projectService, final ProjectRequest projectRequest) throws IntegrationException {
-        ProjectView project = null
-        try {
-            project = projectService.getProjectByName(projectRequest.name)
-        } catch (final DoesNotExistException e) {
-            final String projectURL = projectService.createHubProject(projectRequest)
-            project = hubService.getResponse(projectURL, ProjectView.class)
-        }
-        ProjectVersionView version = null
-        try {
-            version = projectService.getProjectVersion(project, projectRequest.versionRequest.versionName)
-        } catch (final DoesNotExistException e) {
-            final String versionURL = projectService.createHubVersion(project, projectRequest.versionRequest)
-            version = hubService.getResponse(versionURL, ProjectVersionView.class)
-        }
-        return version
-    }
 }

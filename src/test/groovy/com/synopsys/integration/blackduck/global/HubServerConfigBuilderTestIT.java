@@ -52,9 +52,9 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
-        assertEquals("User", config.getGlobalCredentials().getUsername());
-        assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals("User", config.getCredentials().getUsername());
+        assertEquals("Pass", config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
     }
@@ -68,14 +68,14 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
-        assertEquals("User", config.getGlobalCredentials().getUsername());
-        assertEquals("Pass", config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals("User", config.getCredentials().getUsername());
+        assertEquals("Pass", config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
         assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
 
-        assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getHubUrl()));
+        assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getBlackDuckUrl()));
     }
 
     @Test
@@ -102,10 +102,10 @@ public class HubServerConfigBuilderTestIT {
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().getPassword());
     }
 
     @Test
@@ -118,10 +118,10 @@ public class HubServerConfigBuilderTestIT {
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(120, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().getPassword());
     }
 
     @Test
@@ -138,10 +138,10 @@ public class HubServerConfigBuilderTestIT {
         builder.setProxyIgnoredHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getGlobalCredentials().getUsername());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getGlobalCredentials().getDecryptedPassword());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().getUsername());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"), String.valueOf(config.getProxyInfo().getPort()));
         assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
@@ -157,10 +157,10 @@ public class HubServerConfigBuilderTestIT {
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         final HubServerConfig config = builder.build();
-        assertFalse(config.getHubUrl().toString().endsWith("/"));
-        assertEquals("https", config.getHubUrl().getProtocol());
-        assertEquals(new URL(hubServer).getHost(), config.getHubUrl().getHost());
-        assertEquals(-1, config.getHubUrl().getPort());
+        assertFalse(config.getBlackDuckUrl().toString().endsWith("/"));
+        assertEquals("https", config.getBlackDuckUrl().getProtocol());
+        assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(-1, config.getBlackDuckUrl().getPort());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class HubServerConfigBuilderTestIT {
         try {
             config = builder.build();
             fail("Should have thrown an IllegalStateException with invalid proxy state");
-        } catch (final IllegalStateException e) {
+        } catch (final IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("proxy"));
         }
     }

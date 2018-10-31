@@ -46,11 +46,12 @@ import com.synopsys.integration.blackduck.api.core.ResourceLink;
 import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
@@ -58,7 +59,7 @@ public class HubService {
     public static final HubPath BOMIMPORT_PATH = new HubPath("/api/bom-import");
     public static final HubPath SCANSUMMARIES_PATH = new HubPath("/api/scan-summaries");
 
-    private final BlackduckRestConnection restConnection;
+    private final BlackDuckRestConnection restConnection;
     private final MetaHandler metaHandler;
     private final HubResponseTransformer hubResponseTransformer;
     private final HubResponsesTransformer hubResponsesTransformer;
@@ -66,17 +67,17 @@ public class HubService {
     private final JsonParser jsonParser;
     private final Gson gson;
 
-    public HubService(final IntLogger logger, final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+    public HubService(final IntLogger logger, final BlackDuckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
         this.restConnection = restConnection;
         hubBaseUrl = restConnection.getBaseUrl();
         this.jsonParser = jsonParser;
         this.gson = gson;
         metaHandler = new MetaHandler(logger);
-        hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser);
-        hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser);
+        hubResponseTransformer = new HubResponseTransformer(restConnection, gson, jsonParser, logger);
+        hubResponsesTransformer = new HubResponsesTransformer(restConnection, hubResponseTransformer, jsonParser, logger);
     }
 
-    public BlackduckRestConnection getRestConnection() {
+    public BlackDuckRestConnection getRestConnection() {
         return restConnection;
     }
 
@@ -244,6 +245,17 @@ public class HubService {
     }
 
     // ------------------------------------------------
+    // handling generic delete
+    // ------------------------------------------------
+    public void delete(final String url) throws IntegrationException {
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
+        try (Response response = executeRequest(requestBuilder.build())) {
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+    }
+
+    // ------------------------------------------------
     // handling plain requests
     // ------------------------------------------------
     public Response executeGetRequest(final String uri) throws IntegrationException {
@@ -275,7 +287,7 @@ public class HubService {
     }
 
     public String executePostRequestAndRetrieveURL(final Request request) throws IntegrationException {
-        try (Response response = executeRequest(request)) {
+        try (final Response response = executeRequest(request)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

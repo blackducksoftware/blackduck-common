@@ -59,7 +59,7 @@ class RiskReportServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final ProjectService projectService = hubServicesFactory.createProjectService();
 
-        projectService.getProjectVersionAndCreateIfNeeded(projectRequestBuilder.build());
+        projectService.syncProjectAndVersion(projectRequestBuilder.build(), false);
     }
 
     @Test
@@ -71,9 +71,10 @@ class RiskReportServiceTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportService riskReportService = hubServicesFactory.createReportService(30000)
         File folderForReport = folderForReport.getRoot()
-        File pdfFile = riskReportService.createReportPdfFile(folderForReport, testProjectName, testProjectVersionName)
-        Assert.assertNotNull(pdfFile)
-        Assert.assertTrue(pdfFile.exists())
+        Optional<File> pdfFile = riskReportService.createReportPdfFile(folderForReport, testProjectName, testProjectVersionName)
+        Assert.assertTrue(pdfFile.isPresent())
+        Assert.assertNotNull(pdfFile.get())
+        Assert.assertTrue(pdfFile.get().exists())
     }
 
     @Test
@@ -108,8 +109,10 @@ class RiskReportServiceTestIT {
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportService riskReportService = hubServicesFactory.createReportService(30000)
         File folderForReport = folderForReport.getRoot()
-        File noticeReportFile = riskReportService.createNoticesReportFile(folderForReport, testProjectName, testProjectVersionName);
-        Assert.assertNotNull(noticeReportFile)
-        Assert.assertTrue(noticeReportFile.exists())
+        Optional<File> noticeReportFile = riskReportService.createNoticesReportFile(folderForReport, testProjectName, testProjectVersionName);
+        Assert.assertTrue(noticeReportFile.isPresent())
+        Assert.assertNotNull(noticeReportFile.get())
+        Assert.assertTrue(noticeReportFile.get().exists())
     }
+
 }

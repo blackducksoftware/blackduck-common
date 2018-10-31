@@ -30,10 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
 import com.synopsys.integration.blackduck.rest.ApiTokenRestConnectionBuilder;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnectionBuilder;
-import com.synopsys.integration.exception.EncryptionException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -42,7 +41,7 @@ import com.synopsys.integration.util.Stringable;
 public class HubServerConfig extends Stringable implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
-    private final URL hubUrl;
+    private final URL blackDuckUrl;
     private final int timeoutSeconds;
     private final Credentials credentials;
     private final String apiToken;
@@ -50,7 +49,7 @@ public class HubServerConfig extends Stringable implements Serializable {
     private final boolean alwaysTrustServerCertificate;
 
     public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
-        hubUrl = url;
+        blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
         apiToken = null;
@@ -59,7 +58,7 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
-        hubUrl = url;
+        blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         credentials = null;
         this.apiToken = apiToken;
@@ -68,21 +67,21 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public boolean shouldUseProxyForHub() {
-        return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(hubUrl);
+        return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(blackDuckUrl);
     }
 
     public void print(final IntLogger logger) {
-        if (getHubUrl() != null) {
-            logger.alwaysLog("--> Hub Server Url: " + getHubUrl());
+        if (getBlackDuckUrl() != null) {
+            logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());
         }
-        if (getGlobalCredentials() != null && StringUtils.isNotBlank(getGlobalCredentials().getUsername())) {
-            logger.alwaysLog("--> Hub User: " + getGlobalCredentials().getUsername());
+        if (getCredentials() != null && StringUtils.isNotBlank(getCredentials().getUsername())) {
+            logger.alwaysLog("--> Black Duck User: " + getCredentials().getUsername());
         }
         if (StringUtils.isNotBlank(apiToken)) {
-            logger.alwaysLog("--> Hub API Token Used");
+            logger.alwaysLog("--> Black Duck API Token Used");
         }
         if (alwaysTrustServerCertificate) {
-            logger.alwaysLog("--> Trust Hub certificate: " + isAlwaysTrustServerCertificate());
+            logger.alwaysLog("--> Trust Black Duck certificate: " + isAlwaysTrustServerCertificate());
         }
         if (proxyInfo != null) {
             if (StringUtils.isNotBlank(proxyInfo.getHost())) {
@@ -100,7 +99,7 @@ public class HubServerConfig extends Stringable implements Serializable {
         }
     }
 
-    public BlackduckRestConnection createRestConnection(final IntLogger logger) throws EncryptionException {
+    public BlackDuckRestConnection createRestConnection(final IntLogger logger) {
         if (usingApiToken()) {
             return createApiTokenRestConnection(logger);
         } else {
@@ -108,14 +107,14 @@ public class HubServerConfig extends Stringable implements Serializable {
         }
     }
 
-    public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) throws EncryptionException {
+    public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) {
         final CredentialsRestConnectionBuilder builder = new CredentialsRestConnectionBuilder();
         builder.setLogger(logger);
-        builder.setBaseUrl(getHubUrl().toString());
+        builder.setBaseUrl(getBlackDuckUrl().toString());
         builder.setTimeout(getTimeout());
-        builder.applyCredentials(getGlobalCredentials());
+        builder.setCredentials(getCredentials());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
-        builder.applyProxyInfo(getProxyInfo());
+        builder.setProxyInfo(getProxyInfo());
 
         return builder.build();
     }
@@ -123,11 +122,11 @@ public class HubServerConfig extends Stringable implements Serializable {
     public ApiTokenRestConnection createApiTokenRestConnection(final IntLogger logger) {
         final ApiTokenRestConnectionBuilder builder = new ApiTokenRestConnectionBuilder();
         builder.setLogger(logger);
-        builder.setBaseUrl(getHubUrl().toString());
+        builder.setBaseUrl(getBlackDuckUrl().toString());
         builder.setTimeout(getTimeout());
         builder.setApiToken(getApiToken());
         builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
-        builder.applyProxyInfo(getProxyInfo());
+        builder.setProxyInfo(getProxyInfo());
 
         return builder.build();
     }
@@ -136,11 +135,11 @@ public class HubServerConfig extends Stringable implements Serializable {
         return StringUtils.isNotBlank(apiToken);
     }
 
-    public URL getHubUrl() {
-        return hubUrl;
+    public URL getBlackDuckUrl() {
+        return blackDuckUrl;
     }
 
-    public Credentials getGlobalCredentials() {
+    public Credentials getCredentials() {
         return credentials;
     }
 

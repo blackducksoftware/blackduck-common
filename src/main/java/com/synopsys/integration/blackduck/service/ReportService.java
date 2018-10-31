@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -87,10 +88,16 @@ public class ReportService extends DataService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    public String getNoticesReportData(final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
-        final ProjectView project = projectDataService.getProjectByName(projectName);
-        final ProjectVersionView version = projectDataService.getProjectVersion(project, projectVersionName);
-        return getNoticesReportData(project, version);
+    public Optional<String> getNoticesReportData(final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
+        final Optional<ProjectView> project = projectDataService.getProjectByName(projectName);
+        if (project.isPresent()) {
+            final Optional<ProjectVersionView> version = projectDataService.getProjectVersion(project.get(), projectVersionName);
+            if (version.isPresent()) {
+                return Optional.ofNullable(getNoticesReportData(project.get(), version.get()));
+            }
+        }
+
+        return Optional.empty();
     }
 
     public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -98,8 +105,12 @@ public class ReportService extends DataService {
         return generateHubNoticesReport(version, ReportFormatType.TEXT);
     }
 
-    public File createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
-        return createNoticesReportFile(outputDirectory, getNoticesReportData(projectName, projectVersionName), projectName, projectVersionName);
+    public Optional<File> createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
+        final Optional<String> noticesReportData = getNoticesReportData(projectName, projectVersionName);
+        if (noticesReportData.isPresent()) {
+            return Optional.ofNullable(createNoticesReportFile(outputDirectory, noticesReportData.get(), projectName, projectVersionName));
+        }
+        return Optional.empty();
     }
 
     public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -126,10 +137,16 @@ public class ReportService extends DataService {
         }
     }
 
-    public ReportData getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
-        final ProjectView project = projectDataService.getProjectByName(projectName);
-        final ProjectVersionView version = projectDataService.getProjectVersion(project, projectVersionName);
-        return getRiskReportData(project, version);
+    public Optional<ReportData> getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
+        final Optional<ProjectView> project = projectDataService.getProjectByName(projectName);
+        if (project.isPresent()) {
+            final Optional<ProjectVersionView> version = projectDataService.getProjectVersion(project.get(), projectVersionName);
+            if (version.isPresent()) {
+                return Optional.ofNullable(getRiskReportData(project.get(), version.get()));
+            }
+        }
+
+        return Optional.empty();
     }
 
     public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
@@ -176,8 +193,10 @@ public class ReportService extends DataService {
     }
 
     public void createReportFiles(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
-        final ReportData reportData = getRiskReportData(projectName, projectVersionName);
-        createReportFiles(outputDirectory, reportData);
+        final Optional<ReportData> reportData = getRiskReportData(projectName, projectVersionName);
+        if (reportData.isPresent()) {
+            createReportFiles(outputDirectory, reportData.get());
+        }
     }
 
     public void createReportFiles(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
@@ -195,9 +214,12 @@ public class ReportService extends DataService {
         }
     }
 
-    public File createReportPdfFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
-        final ReportData reportData = getRiskReportData(projectName, projectVersionName);
-        return createReportPdfFile(outputDirectory, reportData);
+    public Optional<File> createReportPdfFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
+        final Optional<ReportData> reportData = getRiskReportData(projectName, projectVersionName);
+        if (reportData.isPresent()) {
+            return Optional.ofNullable(createReportPdfFile(outputDirectory, reportData.get()));
+        }
+        return Optional.empty();
     }
 
     public File createReportPdfFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {

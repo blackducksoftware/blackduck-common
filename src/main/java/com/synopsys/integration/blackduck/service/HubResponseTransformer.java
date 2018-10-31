@@ -29,28 +29,38 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.HubResponse;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackduckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class HubResponseTransformer {
-    private final BlackduckRestConnection restConnection;
+    private final BlackDuckRestConnection restConnection;
     private final JsonParser jsonParser;
     private final Gson gson;
+    private final IntLogger logger;
 
-    public HubResponseTransformer(final BlackduckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+    public HubResponseTransformer(final BlackDuckRestConnection restConnection, final Gson gson, final JsonParser jsonParser, final IntLogger logger) {
         this.restConnection = restConnection;
         this.jsonParser = jsonParser;
         this.gson = gson;
+        this.logger = logger;
     }
 
     public <T extends HubResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {
-        try (Response response = restConnection.executeRequest(request)) {
+        try (final Response response = restConnection.executeRequest(request)) {
             final String jsonResponse = response.getContentString();
-            final JsonObject jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
+            final JsonObject jsonObject;
+            try {
+                jsonObject = jsonParser.parse(jsonResponse).getAsJsonObject();
+            } catch (final JsonSyntaxException e) {
+                logger.error(String.format("Could not parse the provided Json with JsonParser:%s%s", System.lineSeparator(), jsonResponse));
+                throw new HubIntegrationException(e.getMessage(), e);
+            }
             return getResponseAs(jsonObject, clazz);
         } catch (final IOException e) {
             throw new HubIntegrationException(e.getMessage(), e);
@@ -63,8 +73,14 @@ public class HubResponseTransformer {
         return hubItem;
     }
 
-    public <T extends HubResponse> T getResponseAs(final String view, final Class<T> clazz) {
-        final T hubItem = gson.fromJson(view, clazz);
+    public <T extends HubResponse> T getResponseAs(final String view, final Class<T> clazz) throws HubIntegrationException {
+        final T hubItem;
+        try {
+            hubItem = gson.fromJson(view, clazz);
+        } catch (final JsonSyntaxException e) {
+            logger.error(String.format("Could not parse the provided Json with Gson:%s%s", System.lineSeparator(), view));
+            throw new HubIntegrationException(e.getMessage(), e);
+        }
         hubItem.json = view;
         return hubItem;
     }

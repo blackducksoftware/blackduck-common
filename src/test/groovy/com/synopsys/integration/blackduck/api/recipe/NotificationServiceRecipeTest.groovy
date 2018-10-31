@@ -4,18 +4,22 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView
+import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest
+import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget
 import com.synopsys.integration.blackduck.notification.CommonNotificationView
 import com.synopsys.integration.blackduck.notification.NotificationDetailResult
 import com.synopsys.integration.blackduck.notification.NotificationDetailResults
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetail
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
-import com.synopsys.integration.blackduck.service.CodeLocationService
-import com.synopsys.integration.blackduck.service.CommonNotificationService
-import com.synopsys.integration.blackduck.service.NotificationService
-import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.HubBucket
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService
 import com.synopsys.integration.exception.IntegrationException
+import com.synopsys.integration.log.IntBufferedLogger
+import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.test.annotation.IntegrationTest
 import org.junit.After
 import org.junit.Test
@@ -35,14 +39,22 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     Date generateNotifications() {
         ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
         ProjectService projectService = hubServicesFactory.createProjectService()
-        String projectUrl = projectService.createHubProject(projectRequest)
+        String projectUrl = projectService.createProject(projectRequest)
         ZonedDateTime startTime = ZonedDateTime.now()
         startTime = startTime.withZoneSameInstant(ZoneOffset.UTC)
         startTime = startTime.withSecond(0).withNano(0)
         startTime = startTime.minusMinutes(1)
-        uploadBdio('bdio/clean_notifications_bdio.jsonld')
+
+        File cleanFile = restConnectionTestHelper.getFile('bdio/clean_notifications_bdio.jsonld')
+        UploadTarget cleanTarget = UploadTarget.createDefault("hub-notification-data-test-project/hub-notification-data-test/1.0.0 gradle/bom", cleanFile);
+
+        File generateNotificationsFile = restConnectionTestHelper.getFile('bdio/generate_notifications_bdio.jsonld')
+        UploadTarget generateNotificationsTarget = UploadTarget.createDefault("hub-notification-data-test-project/hub-notification-data-test/1.0.0 gradle/bom", generateNotificationsFile);
+
+        uploadBdio(cleanTarget)
         Thread.sleep(5000)
-        uploadBdio('bdio/generate_notifications_bdio.jsonld')
+        uploadBdio(generateNotificationsTarget)
+
         List<VersionBomComponentView> components = Collections.emptyList()
         int tryCount = 0;
         while (components.empty || tryCount < 30) {
@@ -56,10 +68,19 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         return Date.from(startTime.toInstant())
     }
 
-    void uploadBdio(final String bdioFile) throws IntegrationException, URISyntaxException, IOException {
-        final File file = restConnectionTestHelper.getFile(bdioFile)
-        final CodeLocationService service = hubServicesFactory.createCodeLocationService()
-        service.importBomFile(file)
+    void uploadBdio(UploadTarget uploadTarget) throws IntegrationException, URISyntaxException, IOException {
+        final IntLogger logger = new IntBufferedLogger();
+        final HubService hubService = hubServicesFactory.createHubService();
+        final CodeLocationService codeLocationService = hubServicesFactory.createCodeLocationService();
+        final NotificationService notificationService = hubServicesFactory.createNotificationService();
+
+        final UploadRunner uploadRunner = new UploadRunner(logger, hubService);
+        final UploadBatch uploadBatch = new UploadBatch();
+        uploadBatch.addUploadTarget(uploadTarget);
+        final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
+        codeLocationCreationService.createCodeLocations(scanRequest);
     }
 
     @Test
@@ -144,12 +165,11 @@ class NotificationServiceRecipeTest extends BasicRecipe {
 
     @After
     void cleanup() {
-        try {
-            def projectService = hubServicesFactory.createProjectService()
-            ProjectView createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
-            projectService.deleteHubProject(createdProject)
-        } catch (IntegrationException ex) {
-            println("Could not delete project ${NOTIFICATION_PROJECT_NAME} cause: ${ex}")
+        def projectService = hubServicesFactory.createProjectService()
+        Optional<ProjectView> createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
+        if (createdProject.isPresent()) {
+            projectService.deleteProject(createdProject.get())
         }
     }
+
 }

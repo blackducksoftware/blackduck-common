@@ -26,9 +26,15 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.util.List;
 
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
+import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
@@ -57,6 +63,25 @@ public class PolicyRuleService {
         final String json = hubService.convertToJson(policyRuleViewV2);
         final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(json);
         return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.POLICY_RULES_LINK, requestBuilder);
+    }
+
+    /**
+     * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
+     */
+    public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName, final MetaHandler metaHandler) throws IntegrationException {
+        final ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId);
+
+        final PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder(metaHandler);
+        builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView);
+        final PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
+
+        final PolicyRuleViewV2 policyRuleViewV2 = new PolicyRuleViewV2();
+        policyRuleViewV2.name = policyName;
+        policyRuleViewV2.enabled = true;
+        policyRuleViewV2.overridable = true;
+        policyRuleViewV2.expression = expressionSet;
+
+        return createPolicyRule(policyRuleViewV2);
     }
 
     public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {

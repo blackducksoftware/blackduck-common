@@ -1,6 +1,6 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
-import static com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
+import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.*;
@@ -16,9 +16,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanPaths;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.blackduck.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.test.tool.TestLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;

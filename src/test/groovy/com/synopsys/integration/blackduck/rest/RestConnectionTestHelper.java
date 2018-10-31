@@ -40,7 +40,7 @@ import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
-import com.synopsys.integration.exception.EncryptionException;
+import com.synopsys.integration.jsonfield.JsonFieldResolver;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -51,12 +51,12 @@ public class RestConnectionTestHelper {
 
     public RestConnectionTestHelper() {
         initProperties();
-        this.hubServerUrl = getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
+        hubServerUrl = getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
     }
 
     public RestConnectionTestHelper(final String hubServerUrlPropertyName) {
         initProperties();
-        this.hubServerUrl = testProperties.getProperty(hubServerUrlPropertyName);
+        hubServerUrl = testProperties.getProperty(hubServerUrlPropertyName);
     }
 
     private void initProperties() {
@@ -126,21 +126,22 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
-    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, HubIntegrationException {
         return createHubServicesFactory(createIntLogger());
     }
 
-    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
+    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, HubIntegrationException {
         final HubServerConfig hubServerConfig = getHubServerConfig();
         return createHubServicesFactory(hubServerConfig, logger);
     }
 
-    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException, EncryptionException, HubIntegrationException {
-        final BlackduckRestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
+    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException {
+        final BlackDuckRestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
 
         final Gson gson = HubServicesFactory.createDefaultGson();
         final JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser();
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, logger);
+        final JsonFieldResolver jsonFieldResolver = new JsonFieldResolver(gson);
+        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, jsonFieldResolver, restConnection, logger);
         return hubServicesFactory;
     }
 
