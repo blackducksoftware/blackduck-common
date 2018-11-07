@@ -37,7 +37,6 @@ public class ScanCommand {
     private final File installDirectory;
     private final File outputDirectory;
     private final boolean dryRun;
-    private final boolean shouldUseProxy;
     private final ProxyInfo proxyInfo;
     private final String scanCliOpts;
     private final int scanMemoryInMegabytes;
@@ -60,13 +59,12 @@ public class ScanCommand {
     private final String projectName;
     private final String versionName;
 
-    public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final boolean shouldUseProxy, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-            final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+    public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
+        final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
+        final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
-        this.shouldUseProxy = shouldUseProxy;
         this.proxyInfo = proxyInfo;
         this.scanCliOpts = scanCliOpts;
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
@@ -95,7 +93,7 @@ public class ScanCommand {
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
-        if (shouldUseProxy) {
+        if (proxyInfo.shouldUseProxy()) {
             final ProxyInfo hubProxyInfo = proxyInfo;
             final String proxyHost = hubProxyInfo.getHost();
             final int proxyPort = hubProxyInfo.getPort();
@@ -226,10 +224,6 @@ public class ScanCommand {
 
     public boolean isDryRun() {
         return dryRun;
-    }
-
-    public boolean isShouldUseProxy() {
-        return shouldUseProxy;
     }
 
     public ProxyInfo getProxyInfo() {

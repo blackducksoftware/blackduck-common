@@ -66,10 +66,6 @@ public class HubServerConfig extends Stringable implements Serializable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
-    public boolean shouldUseProxyForHub() {
-        return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(blackDuckUrl);
-    }
-
     public void print(final IntLogger logger) {
         if (getBlackDuckUrl() != null) {
             logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());

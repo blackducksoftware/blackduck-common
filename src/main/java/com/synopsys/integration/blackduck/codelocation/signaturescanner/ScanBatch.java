@@ -54,7 +54,6 @@ public class ScanBatch extends Stringable {
     private final String blackDuckUsername;
     private final String blackDuckPassword;
     private final String blackDuckApiToken;
-    private final boolean shouldUseProxy;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
     private final String projectName;
@@ -62,8 +61,8 @@ public class ScanBatch extends Stringable {
     private final List<ScanTarget> scanTargets;
 
     public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
-            final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
-            final boolean shouldUseProxy, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
+        final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
+        final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
@@ -78,7 +77,6 @@ public class ScanBatch extends Stringable {
         this.blackDuckUsername = blackDuckUsername;
         this.blackDuckPassword = blackDuckPassword;
         this.blackDuckApiToken = blackDuckApiToken;
-        this.shouldUseProxy = shouldUseProxy;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
         this.projectName = projectName;
@@ -130,9 +128,9 @@ public class ScanBatch extends Stringable {
             if (null == installDirectoryForCommand && null != defaultInstallDirectory) {
                 installDirectoryForCommand = defaultInstallDirectory;
             }
-            final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, shouldUseProxy, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
-                    blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
-                    scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
+            final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
+                blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
+                scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);
         }
 
@@ -193,10 +191,6 @@ public class ScanBatch extends Stringable {
 
     public String getBlackDuckApiToken() {
         return blackDuckApiToken;
-    }
-
-    public boolean isShouldUseProxy() {
-        return shouldUseProxy;
     }
 
     public ProxyInfo getProxyInfo() {
