@@ -1,10 +1,11 @@
 buildscript {
     repositories {
+        mavenLocal() // TODO: Remove mavenLocal
         jcenter()
         mavenCentral()
         maven { url 'https://plugins.gradle.org/m2/' }
     }
-    dependencies { classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+' }
+    dependencies { classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+' } // TODO: Set version to 0.0.+ when ready for JUnit 5
 }
 plugins { id 'groovy' }
 
@@ -13,7 +14,7 @@ version = '39.0.1-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    compile 'com.blackducksoftware.integration:integration-rest:0.2.0'
+    compile 'com.blackducksoftware.integration:integration-rest:0.2.1-SNAPSHOT' // TODO: Don't use snapshot
     compile 'com.blackducksoftware.integration:hub-common-api:5.0.0.0'
     compile 'com.blackducksoftware.integration:hub-common-reporting:7.0.5'
     compile 'com.blackducksoftware.integration:integration-bdio:16.2.0'

@@ -60,7 +60,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
     }
 
     @Override
-    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) throws IntegrationException {
+    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) {
         httpClientBuilder.setDefaultCookieStore(new BasicCookieStore());
         defaultRequestConfigBuilder.setCookieSpec(CookieSpecs.DEFAULT);
     }

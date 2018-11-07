@@ -24,15 +24,22 @@
 package com.synopsys.integration.blackduck.rest;
 
 import java.net.URL;
+import java.util.Map;
+
+import org.apache.http.client.methods.RequestBuilder;
 
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-public abstract class BlackDuckRestConnection extends RestConnection {
+public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
+    private final URL baseUrl;
+
     public BlackDuckRestConnection(final IntLogger logger, final URL baseUrl, final int timeout, final ProxyInfo proxyInfo) {
-        super(logger, baseUrl, timeout, proxyInfo);
+        super(logger, timeout, proxyInfo);
+        this.baseUrl = baseUrl;
     }
 
     public abstract void authenticateWithBlackDuck() throws IntegrationException;
@@ -42,4 +49,15 @@ public abstract class BlackDuckRestConnection extends RestConnection {
         authenticateWithBlackDuck();
     }
 
+    public RequestBuilder createRequestBuilder(final HttpMethod method) throws IntegrationException {
+        return super.createRequestBuilder(baseUrl, method);
+    }
+
+    public RequestBuilder createRequestBuilder(final HttpMethod method, final Map<String, String> additionalHeaders) throws IntegrationException {
+        return super.createRequestBuilder(baseUrl, method, additionalHeaders);
+    }
+
+    public URL getBaseUrl() {
+        return baseUrl;
+    }
 }

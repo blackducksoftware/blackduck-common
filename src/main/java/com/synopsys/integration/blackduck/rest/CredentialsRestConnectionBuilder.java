@@ -23,20 +23,15 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.net.URL;
-import java.util.Optional;
-
-import com.synopsys.integration.rest.connection.RestConnectionBuilder;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.util.BuilderStatus;
 
-public class CredentialsRestConnectionBuilder extends RestConnectionBuilder<CredentialsRestConnection> {
+public class CredentialsRestConnectionBuilder extends BlackDuckRestConnectionBuilder<CredentialsRestConnection> {
     private Credentials credentials;
 
     @Override
     protected CredentialsRestConnection buildWithoutValidation() {
-        final Optional<URL> url = getURL();
-        return new CredentialsRestConnection(getLogger(), url.orElse(null), credentials, getTimeout(), getProxyInfo());
+        return new CredentialsRestConnection(getLogger(), getBaseUrl(), credentials, getTimeout(), getProxyInfo());
     }
 
     @Override
@@ -52,8 +47,8 @@ public class CredentialsRestConnectionBuilder extends RestConnectionBuilder<Cred
         return credentials;
     }
 
-    public void setCredentials(final Credentials credentials) {
+    public CredentialsRestConnectionBuilder setCredentials(final Credentials credentials) {
         this.credentials = credentials;
+        return this;
     }
-
 }

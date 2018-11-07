@@ -23,21 +23,16 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.net.URL;
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.rest.connection.RestConnectionBuilder;
 import com.synopsys.integration.util.BuilderStatus;
 
-public class ApiTokenRestConnectionBuilder extends RestConnectionBuilder<ApiTokenRestConnection> {
+public class ApiTokenRestConnectionBuilder extends BlackDuckRestConnectionBuilder<ApiTokenRestConnection> {
     private String apiToken;
 
     @Override
     protected ApiTokenRestConnection buildWithoutValidation() {
-        final Optional<URL> url = getURL();
-        return new ApiTokenRestConnection(getLogger(), url.orElse(null), apiToken, getTimeout(), getProxyInfo());
+        return new ApiTokenRestConnection(getLogger(), getBaseUrl(), apiToken, getTimeout(), getProxyInfo());
     }
 
     @Override
