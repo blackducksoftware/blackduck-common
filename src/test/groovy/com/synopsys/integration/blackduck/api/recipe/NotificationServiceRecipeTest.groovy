@@ -87,7 +87,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         uploadBatch.addUploadTarget(uploadTarget);
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocations(scanRequest);
     }
 

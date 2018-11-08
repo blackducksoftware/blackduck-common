@@ -71,7 +71,8 @@ class RiskReportServiceTestIT {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
         final IntLogger logger = hubServicesFactory.getRestConnection().logger
         ReportService riskReportService = hubServicesFactory.createReportService(30000)
-        Optional<File> pdfFile = riskReportService.createReportPdfFile(folderForReport.toFile(), testProjectName, testProjectVersionName)
+        File folder = folderForReport.toFile();
+        Optional<File> pdfFile = riskReportService.createReportPdfFile(folder, testProjectName, testProjectVersionName)
         assertTrue(pdfFile.isPresent())
         assertNotNull(pdfFile.get())
         assertTrue(pdfFile.get().exists())
