@@ -82,7 +82,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword()));
         final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, Charsets.UTF_8);
 
-        final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST, null);
+        final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST);
         requestBuilder.setCharset(Charsets.UTF_8);
         requestBuilder.setUri(securityUrl.toString());
         requestBuilder.setEntity(entity);
