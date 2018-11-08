@@ -34890,8 +34890,8 @@
       "id": 2907,
       "parentId": 2906,
       "type": "FILE",
-      "name": "IntBufferedLogger.class",
-      "path": "\/com\/blackducksoftware\/integration\/log\/IntBufferedLogger.class",
+      "name": "BufferedIntLogger.class",
+      "path": "\/com\/blackducksoftware\/integration\/log\/BufferedIntLogger.class",
       "size": 4092,
       "archiveUri": "libs\/compile\/integration-common-6.0.0.jar!\/",
       "signatures": {

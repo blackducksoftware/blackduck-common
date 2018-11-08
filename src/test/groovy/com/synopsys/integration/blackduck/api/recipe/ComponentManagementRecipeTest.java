@@ -1,13 +1,13 @@
 package com.synopsys.integration.blackduck.api.recipe;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.bdio.model.Forge;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
@@ -15,13 +15,12 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class ComponentManagementRecipeTest extends BasicRecipe {
     private ProjectVersionWrapper projectVersionWrapper;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         final String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
         final ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME);
@@ -33,7 +32,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
         projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false);
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         if (projectVersionWrapper != null) {
             deleteProject(projectVersionWrapper.getProjectView().name);

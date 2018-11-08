@@ -23,20 +23,19 @@
  */
 package com.synopsys.integration.blackduck.global;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URL;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class HubServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

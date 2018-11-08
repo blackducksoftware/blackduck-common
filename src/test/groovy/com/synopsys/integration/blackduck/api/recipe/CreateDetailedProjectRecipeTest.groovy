@@ -7,15 +7,23 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.HubService
 import com.synopsys.integration.blackduck.service.ProjectService
-import com.synopsys.integration.test.annotation.IntegrationTest
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-import static org.junit.Assert.assertEquals
+import static org.junit.jupiter.api.Assertions.assertEquals
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 class CreateDetailedProjectRecipeTest extends BasicRecipe {
+    @AfterEach
+    void cleanup() {
+        def projectService = hubServicesFactory.createProjectService()
+        Optional<ProjectView> createdProject = projectService.getProjectByName(PROJECT_NAME)
+        if (createdProject.isPresent()) {
+            projectService.deleteProject(createdProject.get())
+        }
+    }
+
     @Test
     void testCreatingAProject() {
         /*
@@ -40,15 +48,6 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
         assertEquals(PROJECT_VERSION_NAME, projectVersionView.versionName)
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectVersionView.phase)
         assertEquals(ProjectVersionDistributionType.OPENSOURCE, projectVersionView.distribution)
-    }
-
-    @After
-    void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(PROJECT_NAME)
-        if (createdProject.isPresent()) {
-            projectService.deleteProject(createdProject.get())
-        }
     }
 
 }

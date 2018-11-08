@@ -23,25 +23,24 @@
  */
 package com.synopsys.integration.blackduck.api.view;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.core.HubView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.log.IntBufferedLogger;
-import com.synopsys.integration.test.annotation.IntegrationTest;
+import com.synopsys.integration.log.BufferedIntLogger;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class MetaHandlerTestIT {
     private static final Gson gson = new Gson();
 
-    private IntBufferedLogger logger;
+    private BufferedIntLogger logger;
 
     public HubView getTestHubItem() {
         final String json = "{\"name\":\"CITestProject\",\"projectLevelAdjustments\":false,\"source\":\"CUSTOM\",\"_meta\":{\"allow\":[\"GET\",\"PUT\",\"DELETE\"],\"href\":\"http://hub-server.com/api/projects/acae7891-cabb-4186-87ff-d650abb10a38\",\"links\":[{\"rel\":\"canonicalVersion\",\"href\":\"http://hub-server.com/api/projects/acae7891-cabb-4186-87ff-d650abb10a38/versions/96497043-89f9-4ae7-8b5a-e9945e0a57cf\"},{\"rel\":\"canonicalVersion\",\"href\":\"http://DoodleDoodleDoo\"}]}}";
@@ -51,7 +50,7 @@ public class MetaHandlerTestIT {
     }
 
     public MetaHandler getMetaService() {
-        logger = new IntBufferedLogger();
+        logger = new BufferedIntLogger();
         final MetaHandler metaService = new MetaHandler(logger);
         return metaService;
     }

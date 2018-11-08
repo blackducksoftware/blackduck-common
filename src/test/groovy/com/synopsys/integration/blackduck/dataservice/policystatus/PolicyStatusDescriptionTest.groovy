@@ -22,14 +22,15 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.dataservice.policystatus
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionPolicyViolationDetails
 import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class PolicyStatusDescriptionTest {
     @Test
@@ -74,10 +75,10 @@ class PolicyStatusDescriptionTest {
         int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityType.TRIVIAL)
         int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityType.MAJOR)
 
-        Assert.assertEquals(expectedInViolationOverall, actualInViolationOverall)
-        Assert.assertEquals(expectedNotInViolationOverall, actualNotInViolationOverall)
-        Assert.assertEquals(expectedBlockerSeverity, actualBlockerSeverity)
-        Assert.assertEquals(expectedTrivialSeverity, actualTrivialSeverity)
-        Assert.assertEquals(expectedMajorSeverity, actualMajorSeverity)
+        assertEquals(expectedInViolationOverall, actualInViolationOverall)
+        assertEquals(expectedNotInViolationOverall, actualNotInViolationOverall)
+        assertEquals(expectedBlockerSeverity, actualBlockerSeverity)
+        assertEquals(expectedTrivialSeverity, actualTrivialSeverity)
+        assertEquals(expectedMajorSeverity, actualMajorSeverity)
     }
 }

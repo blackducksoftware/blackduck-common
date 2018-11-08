@@ -36,15 +36,15 @@ import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
 import com.synopsys.integration.rest.exception.IntegrationRestException
-import com.synopsys.integration.test.annotation.IntegrationTest
 import org.apache.commons.lang3.StringUtils
-import org.junit.After
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Category(IntegrationTest.class)
+import static org.junit.jupiter.api.Assertions.*
+
+@Tag("integration")
 class CodeLocationRequestServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
@@ -52,13 +52,13 @@ class CodeLocationRequestServiceTestIT {
 
     private static File dryRunFile;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader()
         dryRunFile = new File(classLoader.getResource('dryRun.json').getFile())
     }
 
-    @After
+    @AfterEach
     public void testCleanup() {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         Optional<ProjectView> project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
@@ -75,11 +75,11 @@ class CodeLocationRequestServiceTestIT {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
-        Assert.assertNotNull(response)
+        assertNotNull(response)
 
         CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-        Assert.assertNotNull(codeLocationView)
-        Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
+        assertNotNull(codeLocationView)
+        assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
         ProjectRequestBuilder projectBuilder = new ProjectRequestBuilder()
         projectBuilder.setProjectName(projectName)
@@ -92,20 +92,20 @@ class CodeLocationRequestServiceTestIT {
 
         services.createCodeLocationService().mapCodeLocation(codeLocationView, projectVersionWrapper.projectVersionView)
         codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-        Assert.assertNotNull(codeLocationView)
-        Assert.assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
+        assertNotNull(codeLocationView)
+        assertTrue(StringUtils.isNotBlank(codeLocationView.mappedProjectVersion))
 
         services.createCodeLocationService().unmapCodeLocation(codeLocationView)
         codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-        Assert.assertNotNull(codeLocationView)
-        Assert.assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
+        assertNotNull(codeLocationView)
+        assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
         services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-            Assert.fail('This should have thrown an exception')
+            fail('This should have thrown an exception')
         } catch (IntegrationRestException e) {
-            Assert.assertEquals(404, e.getHttpStatusCode())
+            assertEquals(404, e.getHttpStatusCode())
         }
     }
 

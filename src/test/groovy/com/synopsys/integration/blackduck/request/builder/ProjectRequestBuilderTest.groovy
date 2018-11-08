@@ -22,13 +22,14 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.request.builder
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.rest.RestConstants
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 import java.text.SimpleDateFormat
 
@@ -50,9 +51,9 @@ class ProjectRequestBuilderTest {
 
         try {
             projectRequestBuilder.build()
-            Assert.fail("Should have thrown an exception")
+            fail("Should have thrown an exception")
         } catch (IllegalArgumentException e) {
-            Assert.assertNotNull(e)
+            assertNotNull(e)
         }
 
         projectRequestBuilder = new ProjectRequestBuilder()
@@ -70,9 +71,9 @@ class ProjectRequestBuilderTest {
 
         try {
             projectRequestBuilder.build()
-            Assert.fail("Should have thrown an exception")
+            fail("Should have thrown an exception")
         } catch (IllegalArgumentException e) {
-            Assert.assertNotNull(e)
+            assertNotNull(e)
         }
     }
 
@@ -106,19 +107,19 @@ class ProjectRequestBuilderTest {
         projectRequestBuilder.setVersionNickname(versionNickname)
         ProjectRequest request = projectRequestBuilder.build()
 
-        Assert.assertNotNull(request)
-        Assert.assertEquals(projectName, request.name)
-        Assert.assertEquals(projectLevelAdjustments, request.projectLevelAdjustments)
-        Assert.assertEquals(projectOwner, request.projectOwner)
-        Assert.assertEquals(projectTier, request.projectTier)
-        Assert.assertEquals(description, request.description)
-        Assert.assertNotNull(request.versionRequest)
-        Assert.assertEquals(versionName, request.versionRequest.versionName)
-        Assert.assertEquals(ProjectVersionDistributionType.valueOf(distribution.toUpperCase()), request.versionRequest.distribution)
-        Assert.assertEquals(ProjectVersionPhaseType.valueOf(phase.toUpperCase()), request.versionRequest.phase)
-        Assert.assertEquals(releaseComments, request.versionRequest.releaseComments)
-        Assert.assertEquals(sdf.parse(releasedOn), request.versionRequest.releasedOn)
-        Assert.assertEquals(versionNickname, request.versionRequest.nickname)
+        assertNotNull(request)
+        assertEquals(projectName, request.name)
+        assertEquals(projectLevelAdjustments, request.projectLevelAdjustments)
+        assertEquals(projectOwner, request.projectOwner)
+        assertEquals(projectTier, request.projectTier)
+        assertEquals(description, request.description)
+        assertNotNull(request.versionRequest)
+        assertEquals(versionName, request.versionRequest.versionName)
+        assertEquals(ProjectVersionDistributionType.valueOf(distribution.toUpperCase()), request.versionRequest.distribution)
+        assertEquals(ProjectVersionPhaseType.valueOf(phase.toUpperCase()), request.versionRequest.phase)
+        assertEquals(releaseComments, request.versionRequest.releaseComments)
+        assertEquals(sdf.parse(releasedOn), request.versionRequest.releasedOn)
+        assertEquals(versionNickname, request.versionRequest.nickname)
     }
 
     @Test
@@ -132,18 +133,18 @@ class ProjectRequestBuilderTest {
 
         ProjectRequest request = projectRequestBuilder.build()
 
-        Assert.assertNotNull(request)
-        Assert.assertEquals(projectName, request.name)
-        Assert.assertNull(request.projectLevelAdjustments)
-        Assert.assertNull(request.projectOwner)
-        Assert.assertNull(request.projectTier)
-        Assert.assertNull(request.description)
-        Assert.assertNotNull(request.versionRequest)
-        Assert.assertEquals(versionName, request.versionRequest.versionName)
-        Assert.assertEquals(ProjectVersionDistributionType.EXTERNAL, request.versionRequest.distribution)
-        Assert.assertEquals(ProjectVersionPhaseType.DEVELOPMENT, request.versionRequest.phase)
-        Assert.assertNull(request.versionRequest.releaseComments)
-        Assert.assertNull(request.versionRequest.releasedOn)
-        Assert.assertNull(request.versionRequest.nickname)
+        assertNotNull(request)
+        assertEquals(projectName, request.name)
+        assertNull(request.projectLevelAdjustments)
+        assertNull(request.projectOwner)
+        assertNull(request.projectTier)
+        assertNull(request.description)
+        assertNotNull(request.versionRequest)
+        assertEquals(versionName, request.versionRequest.versionName)
+        assertEquals(ProjectVersionDistributionType.EXTERNAL, request.versionRequest.distribution)
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, request.versionRequest.phase)
+        assertNull(request.versionRequest.releaseComments)
+        assertNull(request.versionRequest.releasedOn)
+        assertNull(request.versionRequest.nickname)
     }
 }

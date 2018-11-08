@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 
 public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
@@ -44,7 +45,7 @@ public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationR
     public Set<String> getCodeLocationNames() {
         return uploadBatch.getUploadTargets()
                        .stream()
-                       .map(scanTarget -> scanTarget.getCodeLocationName())
+                       .map(UploadTarget::getCodeLocationName)
                        .collect(Collectors.toSet());
     }
 

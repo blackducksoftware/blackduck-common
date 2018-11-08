@@ -1,12 +1,11 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.net.URL;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;

@@ -13,11 +13,10 @@ import com.synopsys.integration.blackduck.service.CodeLocationService
 import com.synopsys.integration.blackduck.service.HubServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
-import com.synopsys.integration.jsonfield.JsonFieldResolver
+import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.rest.connection.RestConnection
-import com.synopsys.integration.test.tool.TestLogger
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
@@ -28,15 +27,14 @@ class BasicRecipe {
 
     protected Gson gson;
     protected JsonParser jsonParser;
-    protected JsonFieldResolver jsonFieldResolver;
 
-    @Before
+    @BeforeEach
     public void startRecipe() {
         /*
          * the integration logger used to display log messages from our code
          * within a 3rd party integration environment
          */
-        IntLogger intLogger = new TestLogger()
+        IntLogger intLogger = new BufferedIntLogger()
 
         /*
          * any usage of the Hub API's has to begin with a url for the hub
@@ -54,8 +52,7 @@ class BasicRecipe {
         RestConnection restConnection = hubServerConfig.createCredentialsRestConnection(intLogger)
         gson = HubServicesFactory.createDefaultGson()
         jsonParser = HubServicesFactory.createDefaultJsonParser()
-        jsonFieldResolver = new JsonFieldResolver(gson);
-        hubServicesFactory = new HubServicesFactory(gson, jsonParser, jsonFieldResolver, restConnection, intLogger)
+        hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, intLogger)
     }
 
     public ProjectRequest createProjectRequest(String projectName, String projectVersionName) {

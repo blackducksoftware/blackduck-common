@@ -4,18 +4,27 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.rest.exception.IntegrationRestException
-import com.synopsys.integration.test.annotation.IntegrationTest
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-import static org.junit.Assert.*
+import static org.junit.jupiter.api.Assertions.*
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 class ProjectErrorsRecipeTest extends BasicRecipe {
     static final String PROJECT_NAME_NOT_FOUND = 'Project Name That Should Never Exist'
 
     private final String uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
+
+    @AfterEach
+    void cleanup() {
+        def projectService = hubServicesFactory.createProjectService()
+        Optional<ProjectView> createdProject = projectService.getProjectByName(uniqueName)
+        if (createdProject.isPresent()) {
+            //we may or may not have created a project, so there may not be something to delete
+            projectService.deleteProject(createdProject.get())
+        }
+    }
 
     @Test
     void testTryingToFindProjectThatDoesNotExist() {
@@ -46,16 +55,6 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
             assertTrue(e instanceof IntegrationRestException)
             //since the project already existed, a 412 Precondition Failed http error response should occur
             assertEquals(412, ((IntegrationRestException) e).httpStatusCode)
-        }
-    }
-
-    @After
-    void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(uniqueName)
-        if (createdProject.isPresent()) {
-            //we may or may not have created a project, so there may not be something to delete
-            projectService.deleteProject(createdProject.get())
         }
     }
 

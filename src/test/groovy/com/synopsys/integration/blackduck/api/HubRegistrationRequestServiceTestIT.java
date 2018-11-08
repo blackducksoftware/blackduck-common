@@ -23,18 +23,17 @@
  */
 package com.synopsys.integration.blackduck.api;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubRegistrationService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class HubRegistrationRequestServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

@@ -49,13 +49,13 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.report.RiskReportWriter;
-import com.synopsys.integration.blackduck.report.api.BomComponent;
-import com.synopsys.integration.blackduck.report.api.PolicyRule;
-import com.synopsys.integration.blackduck.report.api.ReportData;
-import com.synopsys.integration.blackduck.report.exception.RiskReportException;
-import com.synopsys.integration.blackduck.report.pdf.RiskReportPdfWriter;
+import com.synopsys.integration.blackduck.exception.RiskReportException;
+import com.synopsys.integration.blackduck.service.model.BomComponent;
+import com.synopsys.integration.blackduck.service.model.PolicyRule;
+import com.synopsys.integration.blackduck.service.model.ReportData;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.blackduck.service.model.pdf.RiskReportPdfWriter;
+import com.synopsys.integration.blackduck.service.model.pdf.RiskReportWriter;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
@@ -208,7 +208,7 @@ public class ReportService extends DataService {
         try {
             logger.trace("Creating Risk Report Files in : " + outputDirectory.getCanonicalPath());
             final RiskReportWriter writer = new RiskReportWriter();
-            writer.createHtmlReportFiles(outputDirectory, reportData);
+            writer.createHtmlReportFiles(hubService.getGson(), outputDirectory, reportData);
         } catch (final RiskReportException | IOException e) {
             throw new HubIntegrationException(e.getMessage(), e);
         }
@@ -294,9 +294,7 @@ public class ReportService extends DataService {
                 final List<PolicyRuleViewV2> rules = hubService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
-                    final PolicyRule ruleViolated = new PolicyRule();
-                    ruleViolated.setName(policyRuleView.name);
-                    ruleViolated.setDescription(policyRuleView.description);
+                    final PolicyRule ruleViolated = new PolicyRule(policyRuleView.name, policyRuleView.description);
                     rulesViolated.add(ruleViolated);
                 }
                 component.setPolicyRulesViolated(rulesViolated);
@@ -440,4 +438,5 @@ public class ReportService extends DataService {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
+
 }

@@ -23,8 +23,9 @@
  */
 package com.synopsys.integration.blackduck.global;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.rest.credentials.Credentials;
@@ -33,7 +34,7 @@ public class HubServerConfigBuilderTest {
     @Test
     public void testValidateHubURLEmpty() {
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
-        Assert.assertFalse(hubServerConfigBuilder.isValid());
+        assertFalse(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -42,7 +43,7 @@ public class HubServerConfigBuilderTest {
 
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
-        Assert.assertFalse(hubServerConfigBuilder.isValid());
+        assertFalse(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -51,7 +52,7 @@ public class HubServerConfigBuilderTest {
 
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
-        Assert.assertFalse(hubServerConfigBuilder.isValid());
+        assertFalse(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -61,7 +62,7 @@ public class HubServerConfigBuilderTest {
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setApiToken("a valid, non-empty api token");
-        Assert.assertTrue(hubServerConfigBuilder.isValid());
+        assertTrue(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class HubServerConfigBuilderTest {
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setCredentials(new Credentials("a valid, non-blank username", "a valid, non-blank password"));
-        Assert.assertTrue(hubServerConfigBuilder.isValid());
+        assertTrue(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -81,7 +82,7 @@ public class HubServerConfigBuilderTest {
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setCredentials(new Credentials("", null));
-        Assert.assertFalse(hubServerConfigBuilder.isValid());
+        assertFalse(hubServerConfigBuilder.isValid());
     }
 
     @Test
@@ -91,7 +92,7 @@ public class HubServerConfigBuilderTest {
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setTimeout(0);
-        Assert.assertFalse(hubServerConfigBuilder.isValid());
+        assertFalse(hubServerConfigBuilder.isValid());
     }
 
 }

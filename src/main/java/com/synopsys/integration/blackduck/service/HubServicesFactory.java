@@ -40,7 +40,6 @@ import com.synopsys.integration.blackduck.phonehome.BlackDuckPhoneHomeCallable;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.jsonfield.JsonFieldResolver;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
@@ -54,7 +53,6 @@ public class HubServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final JsonParser jsonParser;
-    private final JsonFieldResolver jsonFieldResolver;
     private final BlackDuckRestConnection restConnection;
     private final IntLogger logger;
 
@@ -73,12 +71,11 @@ public class HubServicesFactory {
     // NOTE
     //
     // The 'create' methods are alphabetical by return type - please keep this pattern consistent.
-    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final JsonFieldResolver jsonFieldResolver, final BlackDuckRestConnection restConnection, final IntLogger logger) {
+    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackDuckRestConnection restConnection, final IntLogger logger) {
         intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
         this.jsonParser = jsonParser;
-        this.jsonFieldResolver = jsonFieldResolver;
         this.restConnection = restConnection;
         this.logger = logger;
     }
@@ -92,7 +89,7 @@ public class HubServicesFactory {
         final CodeLocationService codeLocationService = createCodeLocationService();
         final NotificationService notificationService = createNotificationService();
 
-        return new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
+        return new CodeLocationCreationService(hubService, logger, codeLocationService, notificationService);
     }
 
     public CodeLocationService createCodeLocationService() {
@@ -198,10 +195,6 @@ public class HubServicesFactory {
 
     public IntLogger getLogger() {
         return logger;
-    }
-
-    public JsonFieldResolver getJsonFieldResolver() {
-        return jsonFieldResolver;
     }
 
     public JsonParser getJsonParser() {
