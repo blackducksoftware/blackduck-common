@@ -101,13 +101,17 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
 
     private ProxyInfo getProxyInfo() {
         final String proxyHost = values.get(Property.PROXY_HOST);
+
+        if (StringUtils.isBlank(proxyHost)) {
+            return ProxyInfo.NO_PROXY_INFO;
+        }
+
         final int proxyPort = NumberUtils.toInt(values.get(Property.PROXY_PORT), 0);
-        final String ignoredProxyHosts = values.get(Property.PROXY_IGNORED_HOSTS);
         final Credentials proxyCredentials = new Credentials(values.get(Property.PROXY_USERNAME), values.get(Property.PROXY_PASSWORD));
         final String proxyNtlmDomain = values.get(Property.PROXY_NTLM_DOMAIN);
         final String proxyNtlmWorkstation = values.get(Property.PROXY_NTLM_WORKSTATION);
 
-        final ProxyInfo proxyInfo = new ProxyInfo(proxyHost, proxyPort, proxyCredentials, ignoredProxyHosts, proxyNtlmDomain, proxyNtlmWorkstation);
+        final ProxyInfo proxyInfo = new ProxyInfo(proxyHost, proxyPort, proxyCredentials, proxyNtlmDomain, proxyNtlmWorkstation);
         return proxyInfo;
     }
 
@@ -119,7 +123,7 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
                 try {
                     final Method setter = getClass().getMethod(setterMethodName, String.class);
                     setter.invoke(this, value);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                } catch (final IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                     // who cares - ekerwin 2018-05-15
                 }
             }
@@ -164,7 +168,6 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
             proxyInfoBuilder.setCredentials(proxyCredentials);
             proxyInfoBuilder.setHost(values.get(Property.PROXY_HOST));
             proxyInfoBuilder.setPort(NumberUtils.toInt(values.get(Property.PROXY_PORT), 0));
-            proxyInfoBuilder.setIgnoredProxyHosts(values.get(Property.PROXY_IGNORED_HOSTS));
             proxyInfoBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
             proxyInfoBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
             final BuilderStatus proxyInfoBuilderStatus = proxyInfoBuilder.validateAndGetBuilderStatus();
@@ -247,10 +250,6 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
         setProxyPort(String.valueOf(proxyPort));
     }
 
-    public void setProxyIgnoredHosts(final String proxyIgnoredHosts) {
-        values.put(Property.PROXY_IGNORED_HOSTS, proxyIgnoredHosts);
-    }
-
     public void setProxyUsername(final String proxyUsername) {
         values.put(Property.PROXY_USERNAME, proxyUsername);
     }
@@ -283,7 +282,6 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
         TIMEOUT,
         PROXY_HOST,
         PROXY_PORT,
-        PROXY_IGNORED_HOSTS,
         PROXY_USERNAME,
         PROXY_PASSWORD,
         PROXY_NTLM_DOMAIN,

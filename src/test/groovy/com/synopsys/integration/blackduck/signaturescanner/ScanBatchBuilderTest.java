@@ -17,7 +17,6 @@ public class ScanBatchBuilderTest {
     public void testValidHubScanConfig() throws Exception {
         final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
-
         assertTrue(builder.isValid());
     }
 
@@ -34,7 +33,7 @@ public class ScanBatchBuilderTest {
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
         builder.blackDuckUrl(new URL("http://www.google.com"));
         builder.blackDuckApiToken("apitoken");
-        builder.shouldUseProxy(true);
+        builder.proxyInfo(null);
         assertFalse(builder.isValid());
 
         builder.proxyInfo(ProxyInfo.NO_PROXY_INFO);
@@ -46,6 +45,7 @@ public class ScanBatchBuilderTest {
         final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
         builder.blackDuckUrl(new URL("http://www.google.com"));
+        builder.proxyInfo(ProxyInfo.NO_PROXY_INFO);
         assertFalse(builder.isValid());
 
         builder.blackDuckApiToken("apitoken");

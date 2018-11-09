@@ -66,6 +66,10 @@ public class HubServerConfig extends Stringable implements Serializable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
+    public boolean shouldUseProxyForHub() {
+        return proxyInfo != null && proxyInfo.shouldUseProxy();
+    }
+
     public void print(final IntLogger logger) {
         if (getBlackDuckUrl() != null) {
             logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());
@@ -85,9 +89,6 @@ public class HubServerConfig extends Stringable implements Serializable {
             }
             if (proxyInfo.getPort() > 0) {
                 logger.alwaysLog("--> Proxy Port: " + proxyInfo.getPort());
-            }
-            if (StringUtils.isNotBlank(proxyInfo.getIgnoredProxyHosts())) {
-                logger.alwaysLog("--> No Proxy Hosts: " + proxyInfo.getIgnoredProxyHosts());
             }
             if (StringUtils.isNotBlank(proxyInfo.getUsername())) {
                 logger.alwaysLog("--> Proxy Username: " + proxyInfo.getUsername());

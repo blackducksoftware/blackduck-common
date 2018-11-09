@@ -57,7 +57,7 @@ public class ScanBatchBuilder {
     private String blackDuckUsername;
     private String blackDuckPassword;
     private String blackDuckApiToken;
-    private ProxyInfo proxyInfo;
+    private ProxyInfo proxyInfo = ProxyInfo.NO_PROXY_INFO;
     private boolean alwaysTrustServerCertificate;
 
     private String projectName;
@@ -119,6 +119,10 @@ public class ScanBatchBuilder {
 
         if (!StringUtils.isAllBlank(projectName, projectVersionName) && (StringUtils.isBlank(projectName) || StringUtils.isBlank(projectVersionName))) {
             errorMessages.add("Both projectName and projectVersionName must be provided or omitted together");
+        }
+
+        if (blackDuckUrl != null && proxyInfo == null) {
+            errorMessages.add("Must provide proxy info.");
         }
 
         return StringUtils.join(errorMessages, ' ');
