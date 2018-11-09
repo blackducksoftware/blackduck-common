@@ -25,9 +25,12 @@ package com.synopsys.integration.blackduck.phonehome;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.service.HubRegistrationService;
@@ -35,10 +38,13 @@ import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.enums.ProductIdEnum;
+import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
+import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class PhoneHomeHelper {
@@ -49,11 +55,32 @@ public class PhoneHomeHelper {
     private final IntEnvironmentVariables intEnvironmentVariables;
 
     public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory) {
-        return createPhoneHomeHelper(hubServicesFactory, null);
+        return createPhoneHomeHelper(hubServicesFactory, null, null);
+    }
+
+    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
+        return createPhoneHomeHelper(hubServicesFactory, executorService, null);
     }
 
     public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final IntEnvironmentVariables intEnvironmentVariables) {
-        return new PhoneHomeHelper(hubServicesFactory.getLogger(), hubServicesFactory.createHubService(), hubServicesFactory.createPhoneHomeService(), hubServicesFactory.createHubRegistrationService(), intEnvironmentVariables);
+        return createPhoneHomeHelper(hubServicesFactory, null, intEnvironmentVariables);
+    }
+
+    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService, final IntEnvironmentVariables intEnvironmentVariables) {
+        final IntLogger intLogger = hubServicesFactory.getLogger();
+        final PhoneHomeService intPhoneHomeService;
+        if (executorService != null) {
+            intPhoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, hubServicesFactory.getRestConnection(), hubServicesFactory.getGson()), executorService);
+        } else {
+            intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, hubServicesFactory.getRestConnection(), hubServicesFactory.getGson()));
+        }
+        return new PhoneHomeHelper(intLogger, hubServicesFactory.createHubService(), intPhoneHomeService, hubServicesFactory.createHubRegistrationService(), intEnvironmentVariables);
+    }
+
+    private static PhoneHomeClient createPhoneHomeClient(final IntLogger intLogger, final RestConnection restConnection, final Gson gson) {
+        final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
+        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
+        return new PhoneHomeClient(googleAnalyticsTrackingId, intLogger, httpClientBuilder, gson);
     }
 
     public PhoneHomeHelper(final IntLogger logger, final HubService hubService, final PhoneHomeService phoneHomeService, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
@@ -79,22 +106,23 @@ public class PhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(final String integrationRepoName, final String integrationVersion, final Map<String, String> metaData) {
-        final BlackDuckPhoneHomeRequestBuilder builder = new BlackDuckPhoneHomeRequestBuilder();
-        builder.setIntegrationRepoName(integrationRepoName);
-        builder.setIntegrationVersion(integrationVersion);
+        final BlackDuckPhoneHomeRequestBuilder blackDuckBuilder = new BlackDuckPhoneHomeRequestBuilder();
+        blackDuckBuilder.setIntegrationRepoName(integrationRepoName);
+        blackDuckBuilder.setIntegrationVersion(integrationVersion);
 
-        builder.setProduct(ProductIdEnum.BLACK_DUCK);
-        builder.setProductVersion(getProductVersion());
+        blackDuckBuilder.setProduct(ProductIdEnum.BLACK_DUCK);
+        blackDuckBuilder.setProductVersion(getProductVersion());
 
-        builder.setRegistrationKey(getRegistrationKey());
-        builder.setCustomerDomainName(getHostName());
+        blackDuckBuilder.setRegistrationKey(getRegistrationKey());
+        blackDuckBuilder.setCustomerDomainName(getHostName());
 
-        final boolean metaDataSuccess = builder.addAllToMetaData(metaData);
+        final PhoneHomeRequestBody.Builder actualBuilder = blackDuckBuilder.getBuilder();
+        final boolean metaDataSuccess = actualBuilder.addAllToMetaData(metaData);
         if (!metaDataSuccess) {
             logger.debug("The metadata provided exceeded its size limit. At least some metadata will be missing.");
         }
 
-        return builder.build();
+        return actualBuilder.build();
     }
 
     private Map<String, String> getEnvironmentVariables() {
@@ -111,7 +139,7 @@ public class PhoneHomeHelper {
             return currentVersion.version;
         } catch (final IntegrationException e) {
         }
-        return BlackDuckPhoneHomeRequestBuilder.UNKNOWN_ID;
+        return PhoneHomeRequestBody.Builder.UNKNOWN_ID;
     }
 
     private String getHostName() {
@@ -127,7 +155,7 @@ public class PhoneHomeHelper {
         }
         // We must check if the reg id is blank because of an edge case in which the hub can authenticate (while the webserver is coming up) without registration
         if (StringUtils.isBlank(registrationId)) {
-            registrationId = BlackDuckPhoneHomeRequestBuilder.UNKNOWN_ID;
+            registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
         }
         return registrationId;
     }
