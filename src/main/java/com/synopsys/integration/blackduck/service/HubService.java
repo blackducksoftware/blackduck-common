@@ -33,6 +33,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.HubPath;
@@ -249,7 +251,7 @@ public class HubService {
     // ------------------------------------------------
     public void delete(final String url) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
-        try (Response response = executeRequest(requestBuilder.build())) {
+        try (final Response response = executeRequest(requestBuilder.build())) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -292,6 +294,21 @@ public class HubService {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+    }
+
+    // ------------------------------------------------
+    // putting
+    // ------------------------------------------------
+    public Response executePut(final String resourceHref, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
+        final HubResponse originalResource = getResponse(resourceHref, HubResponse.class);
+        final Request updateRequest = createUpdateRequest(originalResource, fieldsToUpdate);
+        return executeRequest(updateRequest);
+    }
+
+    private Request createUpdateRequest(final HubResponse modelToUpdate, final Map<String, JsonElement> fieldsToUpdate) {
+        final JsonObject jsonObject = gson.fromJson(modelToUpdate.json, JsonObject.class);
+        fieldsToUpdate.forEach(jsonObject::add);
+        return RequestFactory.createCommonPutRequestBuilder(jsonObject.toString()).build();
     }
 
     private String pieceTogetherUri(final URL baseURL, final String spec) throws HubIntegrationException {
