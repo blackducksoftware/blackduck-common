@@ -304,6 +304,10 @@ public class HubService {
         return executePut(updateRequest.resourceUrl, updateRequest.fieldsToUpdate);
     }
 
+    public Response executePut(final HubView view, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
+        return executePut(getHref(view), fieldsToUpdate);
+    }
+
     public Response executePut(final String resourceUrl, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
         final HubResponse originalResource = getResponse(resourceUrl, HubResponse.class);
         final Request updateRequest = createPutRequest(originalResource, fieldsToUpdate);
