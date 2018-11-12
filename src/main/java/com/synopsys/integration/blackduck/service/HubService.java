@@ -36,6 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.synopsys.integration.blackduck.api.UpdateRequest;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.HubPath;
 import com.synopsys.integration.blackduck.api.core.HubPathMultipleResponses;
@@ -299,13 +300,17 @@ public class HubService {
     // ------------------------------------------------
     // putting
     // ------------------------------------------------
+    public Response update(final UpdateRequest updateRequest) throws IntegrationException {
+        return executePut(updateRequest.href, updateRequest.fieldsToUpdate);
+    }
+
     public Response executePut(final String resourceHref, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
         final HubResponse originalResource = getResponse(resourceHref, HubResponse.class);
-        final Request updateRequest = createUpdateRequest(originalResource, fieldsToUpdate);
+        final Request updateRequest = createPutRequest(originalResource, fieldsToUpdate);
         return executeRequest(updateRequest);
     }
 
-    private Request createUpdateRequest(final HubResponse modelToUpdate, final Map<String, JsonElement> fieldsToUpdate) {
+    private Request createPutRequest(final HubResponse modelToUpdate, final Map<String, JsonElement> fieldsToUpdate) {
         final JsonObject jsonObject = gson.fromJson(modelToUpdate.json, JsonObject.class);
         fieldsToUpdate.forEach(jsonObject::add);
         return RequestFactory.createCommonPutRequestBuilder(jsonObject.toString()).build();
