@@ -14,6 +14,11 @@ public class UpdateRequest {
         this.fieldsToUpdate = new HashMap<>();
     }
 
+    public UpdateRequest(final String resourceUrl, final Map<String, JsonElement> fieldsToUpdate) {
+        this.resourceUrl = resourceUrl;
+        this.fieldsToUpdate = new HashMap<>(fieldsToUpdate);
+    }
+
     public void addFieldToUpdate(final String fieldName, final JsonElement newValue) {
         fieldsToUpdate.put(fieldName, newValue);
     }
