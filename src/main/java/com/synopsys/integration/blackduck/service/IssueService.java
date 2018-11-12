@@ -30,7 +30,6 @@ import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
@@ -45,15 +44,6 @@ public class IssueService extends DataService {
         return hubService.executePostRequestAndRetrieveURL(request);
     }
 
-    public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
-        final String json = hubService.convertToJson(issueItem);
-        final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).build();
-        try (Response response = hubService.executeRequest(request)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
     public void deleteIssue(final IssueView issueItem) throws IntegrationException {
         final String codeLocationItemUrl = hubService.getHref(issueItem);
         deleteIssue(codeLocationItemUrl);
@@ -61,7 +51,7 @@ public class IssueService extends DataService {
 
     public void deleteIssue(final String issueItemUri) throws IntegrationException {
         final Request request = new Request.Builder(issueItemUri).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (final Response response = hubService.executeRequest(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

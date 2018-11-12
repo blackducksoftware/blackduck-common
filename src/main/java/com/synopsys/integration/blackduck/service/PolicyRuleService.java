@@ -38,7 +38,6 @@ import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetB
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
@@ -84,19 +83,9 @@ public class PolicyRuleService {
         return createPolicyRule(policyRuleViewV2);
     }
 
-    public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
-        final String json = hubService.convertToJson(policyRuleView);
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(hubService.getHref(policyRuleView));
-        try (Response response = hubService.executeRequest(requestBuilder.build())) {
-
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
     public void deletePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(hubService.getHref(policyRuleView));
-        try (Response response = hubService.executeRequest(requestBuilder.build())) {
+        try (final Response response = hubService.executeRequest(requestBuilder.build())) {
 
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
