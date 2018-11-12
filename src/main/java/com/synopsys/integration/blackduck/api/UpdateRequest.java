@@ -6,11 +6,11 @@ import java.util.Map;
 import com.google.gson.JsonElement;
 
 public class UpdateRequest {
-    public String href;
+    public String resourceUrl;
     public Map<String, JsonElement> fieldsToUpdate;
 
-    public UpdateRequest(final String href) {
-        this.href = href;
+    public UpdateRequest(final String resourceUrl) {
+        this.resourceUrl = resourceUrl;
         this.fieldsToUpdate = new HashMap<>();
     }
 

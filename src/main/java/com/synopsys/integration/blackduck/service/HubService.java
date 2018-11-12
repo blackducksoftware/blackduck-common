@@ -301,11 +301,11 @@ public class HubService {
     // putting
     // ------------------------------------------------
     public Response update(final UpdateRequest updateRequest) throws IntegrationException {
-        return executePut(updateRequest.href, updateRequest.fieldsToUpdate);
+        return executePut(updateRequest.resourceUrl, updateRequest.fieldsToUpdate);
     }
 
-    public Response executePut(final String resourceHref, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
-        final HubResponse originalResource = getResponse(resourceHref, HubResponse.class);
+    public Response executePut(final String resourceUrl, final Map<String, JsonElement> fieldsToUpdate) throws IntegrationException {
+        final HubResponse originalResource = getResponse(resourceUrl, HubResponse.class);
         final Request updateRequest = createPutRequest(originalResource, fieldsToUpdate);
         return executeRequest(updateRequest);
     }
