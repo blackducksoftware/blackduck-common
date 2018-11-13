@@ -119,7 +119,7 @@ public class PhoneHomeHelper {
         final PhoneHomeRequestBody.Builder actualBuilder = blackDuckBuilder.getBuilder();
         final boolean metaDataSuccess = actualBuilder.addAllToMetaData(metaData);
         if (!metaDataSuccess) {
-            logger.debug("The metadata provided exceeded its size limit. At least some metadata will be missing.");
+            logger.debug("The metadata provided to phone-home exceeded its size limit. At least some metadata will be missing.");
         }
 
         return actualBuilder.build();
