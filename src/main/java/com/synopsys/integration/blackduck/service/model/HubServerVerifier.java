@@ -31,11 +31,11 @@ import java.net.URL;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.UnauthenticatedRestConnection;
-import com.synopsys.integration.rest.connection.UnauthenticatedRestConnectionBuilder;
+import com.synopsys.integration.rest.connection.BasicRestConnection;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
@@ -43,14 +43,9 @@ import com.synopsys.integration.rest.request.Response;
 
 public class HubServerVerifier {
     public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
-        final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
-        connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
-        connectionBuilder.setTimeout(timeoutSeconds);
-        connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
-        if (hubProxyInfo != null) {
-            connectionBuilder.setProxyInfo(hubProxyInfo);
-        }
-        final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
+        final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
+        final ProxyInfo proxyInfo = hubProxyInfo != null ? hubProxyInfo : ProxyInfo.NO_PROXY_INFO;
+        final BasicRestConnection restConnection = new BasicRestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
 
         try {
             Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();

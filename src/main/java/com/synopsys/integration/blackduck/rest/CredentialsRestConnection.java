@@ -43,19 +43,18 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
 
 public class CredentialsRestConnection extends BlackDuckRestConnection {
     private final Credentials credentials;
 
-    public CredentialsRestConnection(final IntLogger logger, final URL baseUrl, final Credentials credentials, final int timeout, final ProxyInfo proxyInfo) {
-        super(logger, baseUrl, timeout, proxyInfo);
+    public CredentialsRestConnection(final RestConnection restConnection, final String baseUrl, final Credentials credentials) {
+        super(restConnection, baseUrl);
         this.credentials = credentials;
     }
 
@@ -102,7 +101,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
                 if (csrfToken != null) {
                     addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
                 } else {
-                    logger.error("No CSRF token found when authenticating");
+                    getLogger().error("No CSRF token found when authenticating");
                 }
             }
         } catch (final IOException e) {
