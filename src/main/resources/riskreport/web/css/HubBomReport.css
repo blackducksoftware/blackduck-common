@@ -1,0 +1,298 @@
+.riskReportBackgroundColor {
+	background-color: rgb(255,255,255);
+}
+
+.riskReportText, .linkText, .h1, .riskSummaryContainerLabel, .riskSummaryLabel, .riskSummaryCount, .risk-count, .table-summary,.versionSummaryLabel, .summaryLabel,.versionSummaryLargeLabel, .summaryValue, .columnLabel, .riskColumnLabel, .licenseColumn, .riskColumn, .componentColumn, .clickable {
+	text-align: left;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 14px;
+	color: #000;
+}
+
+.hidden {
+	display: none;
+}
+
+.violation {
+	color: #9c251f;
+}
+
+.infoIcon{
+	color: #CCCCCC;
+	padding-left: 10px;
+}
+
+.reportHeader{
+	height: 60px;
+	padding-top: 5px;
+	background-color: #2D343E;
+}
+
+.reportHeaderTitle{
+	display: inline-block;
+	padding-left: 10px;
+	padding-top : 5px;
+	padding-right : 5px;
+	padding-bottom : 5px;
+}
+
+.reportHeaderIcon{
+	width: 285px;
+	height: 50px;
+	padding: 5px;
+	background-image: url(../images/Hub_BD_logo.png);
+}
+
+.versionSummaryTable{
+	padding-top: 5px;
+}
+
+.versionSummaryLargeLabel{
+	font-size: 22px;
+}
+
+.versionSummaryLabel, .versionSummaryLargeLabel{
+	display: inline-block;
+	padding-left: 10px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+}
+
+.linkText{
+	color: #46759E;
+}
+
+.clickable:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.h1 {
+	font-size: 26px;
+	font-weight: bold;
+	color: white;
+}
+
+.h1, .riskSummaryContainerLabel {
+	vertical-align: bottom;
+}
+
+.riskSummaryContainerLabel {
+	text-align: left;
+	font-size: 16px;
+	padding-left: 10px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.riskSummaryContainer {
+	width: 450px;
+	height: 160px;
+	background: #fff;
+	overflow: hidden;
+	display: table-cell;
+	padding-left: 0px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.filterSelected {
+	color: darkRed;
+	background-color: rgba(255, 238, 0, .4);
+	border-radius: 3px;
+	border: 1px solid #FFB900;
+}
+
+.rowFilteredSecurity, .rowFilteredLicense, .rowFilteredOperational {
+	display: none;
+}
+
+.riskSummaryLabel, .riskSummaryCount {
+	vertical-align: top;
+	display: inline-block;
+	background-color: #fff;
+	padding-left: 10px;
+}
+
+.riskSummaryLabel{
+	min-width: 72px;
+	width: 15%;
+}
+
+.riskSummaryCount {
+	min-width: 35px;
+	width: 20%;
+	text-align: center;
+}
+
+.horizontal .progress-bar {
+	height: 25px;
+	width: 100%;
+	display: table;
+}
+
+.horizontal .progress-track {
+	display: inline-block;
+	width: 55%;
+	height: 20px;
+}
+
+.horizontal .progress-fill, .progress-fill-high, .progress-fill-medium, .progress-fill-low, .progress-fill-none {
+	height: 20px;
+	width: 0%;
+}
+
+.progress-fill-high, .security-risk-high-count  {
+	background-color: #b52b24;
+}
+
+.progress-fill-medium, .security-risk-med-count {
+	background-color: #eca4a0;
+}
+
+.progress-fill-low, .security-risk-low-count {
+	background-color: #999;
+}
+
+.progress-fill-none {
+	 background-color: #ddd;
+}
+
+.risk-unknown-count {
+	/* background: linear-gradient(45deg, #eca4a0 0%, #eca4a0 25%, #b52b24 25%, #b52b24 50%, #eca4a0 50%, #eca4a0 75%, #b52b24 75%, #b52b24); */
+	background-color: rgb(239, 174, 74);
+}
+
+.rounded .progress-track, .rounded .progress-fill {
+	border-radius: 3px;
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, .2);
+}
+
+.risk-count {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.risk-span {
+	width: 100%;
+}
+
+.risk-unknown-count {
+	font-weight: bold;
+	color: white;
+}
+
+.security-risk-low-count {
+	font-weight: bold;
+	color: white;
+}
+
+.security-risk-med-count {
+	font-weight: bold;
+	color: white;
+}
+
+.security-risk-high-count {
+	font-weight: bold;
+	color: white;
+}
+
+.table-summary {
+	margin-top: 10px;
+}
+
+.table {
+	background-color: #f5f5f5;
+	border: 1px solid #e7e7e7 !important;
+	border-spacing: 0px !important;
+	font-weight: 100;
+	width: 100%;
+	margin-top: 6px;
+}
+
+.evenPadding {
+	padding: 5px;
+}
+
+
+.columnLabel, .riskColumnLabel {
+	margin-left: 20px;
+	margin-right: 10px;
+	color: #444 !important;
+}
+
+.summaryLabel{
+	padding-left: 10px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+}
+
+.summaryValue{
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 2px;
+	padding-bottom: 1px;
+}
+
+.riskColumnLabel {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.clickable, .componentColumn, .riskColumn, .licenseColumn  {
+	border-collapse: collapse !important;
+	border-spacing: 0px !important;
+	min-width: 65px;
+	white-space: normal;
+	word-wrap: break-word;
+	max-width: 300px;
+	height: 25px;
+	text-decoration: none;
+}
+
+.componentColumn {
+	padding-left: 10px;
+}
+
+.riskColumn {
+	min-width: 25px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.licenseColumn {
+	-o-text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+  	white-space: nowrap;
+}
+
+.oddRow {
+	background-color: #ffffff;
+}
+
+.evenRow {
+	background-color: #f9f9f9;
+}
+
+.pageBody {
+	display: inline-flex;
+}
+
+#main-panel, #side-panel {
+	position: relative;
+}
+
+#main-panel {
+	float: right;
+	margin-left: 0px !important;
+}
+
+#side-panel {
+	float: left;
+}
