@@ -23,28 +23,21 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
-import com.synopsys.integration.blackduck.phonehome.BlackDuckPhoneHomeCallable;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.phonehome.PhoneHomeClient;
-import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
-import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
@@ -134,29 +127,6 @@ public class HubServicesFactory {
 
     public NotificationService createNotificationService() {
         return new NotificationService(createHubService(), logger);
-    }
-
-    public PhoneHomeService createPhoneHomeService(final ExecutorService executorService) {
-        return new PhoneHomeService(logger, executorService);
-    }
-
-    public BlackDuckPhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion) {
-        final BlackDuckPhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion, intEnvironmentVariables, createHubService(),
-                createHubRegistrationService());
-        return phoneHomeCallable;
-    }
-
-    public BlackDuckPhoneHomeCallable createBlackDuckPhoneHomeCallable(final URL productURL, final String artifactId, final String artifactVersion, final PhoneHomeRequestBody.Builder phoneHomeRequestBodyBuilder) {
-        final BlackDuckPhoneHomeCallable phoneHomeCallable = new BlackDuckPhoneHomeCallable(logger, createPhoneHomeClient(), productURL, artifactId, artifactVersion, intEnvironmentVariables, createHubService(),
-                createHubRegistrationService(),
-                phoneHomeRequestBodyBuilder);
-        return phoneHomeCallable;
-    }
-
-    public PhoneHomeClient createPhoneHomeClient() {
-        final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
-        final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
-        return new PhoneHomeClient(googleAnalyticsTrackingId, logger, httpClientBuilder, gson);
     }
 
     public PolicyRuleService createPolicyRuleService() {
