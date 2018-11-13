@@ -58,15 +58,15 @@ public class PhoneHomeHelper {
         return createPhoneHomeHelper(hubServicesFactory, null, null);
     }
 
-    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
-        return createPhoneHomeHelper(hubServicesFactory, executorService, null);
+    public static PhoneHomeHelper createAsynchronousPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
+        return createPhoneHomeHelper(hubServicesFactory, null, executorService);
     }
 
     public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final IntEnvironmentVariables intEnvironmentVariables) {
-        return createPhoneHomeHelper(hubServicesFactory, null, intEnvironmentVariables);
+        return createPhoneHomeHelper(hubServicesFactory, intEnvironmentVariables, null);
     }
 
-    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService, final IntEnvironmentVariables intEnvironmentVariables) {
+    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final IntEnvironmentVariables intEnvironmentVariables, final ExecutorService executorService) {
         final IntLogger intLogger = hubServicesFactory.getLogger();
         final PhoneHomeService intPhoneHomeService;
         if (executorService != null) {
