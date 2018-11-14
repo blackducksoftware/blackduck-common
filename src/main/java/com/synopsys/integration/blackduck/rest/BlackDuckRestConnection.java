@@ -30,35 +30,30 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.connection.RestConnection;
-import com.synopsys.integration.rest.connection.RestConnectionDecorator;
-import com.synopsys.integration.util.BuilderStatus;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
-public abstract class BlackDuckRestConnection extends RestConnectionDecorator {
+public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
     private final String baseUrl;
 
-    public BlackDuckRestConnection(final RestConnection restConnection, final String baseUrl) {
-        super(restConnection);
+    public BlackDuckRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
         this.baseUrl = baseUrl;
-    }
-
-    @Override
-    public void validate(final BuilderStatus builderStatus) {
-        super.validate(builderStatus);
 
         if (StringUtils.isBlank(baseUrl)) {
-            builderStatus.addErrorMessage("No base url was provided.");
+            throw new IllegalArgumentException("No base url was provided.");
         } else {
             try {
                 final URL url = new URL(baseUrl);
                 url.toURI();
             } catch (final MalformedURLException e) {
-                builderStatus.addErrorMessage("The provided base url is not a valid java.net.URL.");
+                throw new IllegalArgumentException("The provided base url is not a valid java.net.URL.", e);
             } catch (final URISyntaxException e) {
-                builderStatus.addErrorMessage("The provided base url is not a valid java.net.URI.");
+                throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
             }
         }
     }
@@ -67,7 +62,6 @@ public abstract class BlackDuckRestConnection extends RestConnectionDecorator {
 
     @Override
     public void completeConnection() throws IntegrationException {
-        super.completeConnection();
         authenticateWithBlackDuck();
     }
 

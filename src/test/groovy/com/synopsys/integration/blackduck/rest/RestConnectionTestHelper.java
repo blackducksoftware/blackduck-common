@@ -38,8 +38,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -125,16 +125,16 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
-    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, HubIntegrationException {
+    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, IntegrationException {
         return createHubServicesFactory(createIntLogger());
     }
 
-    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, HubIntegrationException {
+    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, IntegrationException {
         final HubServerConfig hubServerConfig = getHubServerConfig();
         return createHubServicesFactory(hubServerConfig, logger);
     }
 
-    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException {
+    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException, IntegrationException {
         final BlackDuckRestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
 
         final Gson gson = HubServicesFactory.createDefaultGson();

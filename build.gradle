@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal() // TODO: REMOVE
         jcenter()
         mavenCentral()
         maven { url 'https://plugins.gradle.org/m2/' }
@@ -13,7 +14,7 @@ version = '40.0.0-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    implementation 'com.blackducksoftware.integration:integration-rest:0.3.0'
+    implementation 'com.blackducksoftware.integration:integration-rest:1.0.0-SNAPSHOT' // TODO: DON'T USE SNAPSHOT
     implementation 'com.blackducksoftware.integration:integration-reporting:0.1.6'
     implementation 'com.blackducksoftware.integration:hub-common-api:5.0.0.0'
     implementation 'com.blackducksoftware.integration:integration-bdio:16.2.1'

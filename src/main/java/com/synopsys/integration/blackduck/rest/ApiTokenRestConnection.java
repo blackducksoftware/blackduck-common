@@ -33,19 +33,21 @@ import java.util.Map;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
-import com.synopsys.integration.util.BuilderStatus;
 
 /**
  * Connection to the Hub application which authenticates using the API token feature (added in Hub 4.4.0)
@@ -55,18 +57,18 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
 
     private final String apiToken;
 
-    public ApiTokenRestConnection(final RestConnection restConnection, final String hubBaseUrl, final String apiToken) {
-        super(restConnection, hubBaseUrl);
+    public ApiTokenRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl, final String apiToken) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.apiToken = apiToken;
+
+        if (StringUtils.isBlank(apiToken)) {
+            throw new IllegalArgumentException("No API token was found.");
+        }
     }
 
     @Override
-    public void validate(final BuilderStatus builderStatus) {
-        super.validate(builderStatus);
-
-        if (StringUtils.isBlank(apiToken)) {
-            builderStatus.addErrorMessage("No API token was found.");
-        }
+    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) {
+        // Nothing to add to the client builder
     }
 
     /**

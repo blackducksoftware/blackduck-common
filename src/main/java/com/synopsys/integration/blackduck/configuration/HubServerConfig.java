@@ -32,9 +32,6 @@ import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.connection.BasicRestConnection;
-import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
-import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.Stringable;
@@ -106,19 +103,11 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) {
-        final BasicRestConnection basicRestConnection = new BasicRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo());
-        final ReconnectingRestConnection reconnectingRestConnection = new ReconnectingRestConnection(basicRestConnection);
-        final CredentialsRestConnection credentialsRestConnection = new CredentialsRestConnection(reconnectingRestConnection, getBlackDuckUrl().toString(), getCredentials());
-
-        return credentialsRestConnection;
+        return new CredentialsRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getCredentials());
     }
 
     public ApiTokenRestConnection createApiTokenRestConnection(final IntLogger logger) {
-        final RestConnection basicRestConnection = new BasicRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo());
-        final RestConnection reconnectingRestConnection = new ReconnectingRestConnection(basicRestConnection);
-        final ApiTokenRestConnection apiTokenRestConnection = new ApiTokenRestConnection(reconnectingRestConnection, getBlackDuckUrl().toString(), getApiToken());
-
-        return apiTokenRestConnection;
+        return new ApiTokenRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getApiToken());
     }
 
     public boolean usingApiToken() {

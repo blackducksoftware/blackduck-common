@@ -155,7 +155,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubPathMultipleResponses<T> hubPathMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
+        throws IntegrationException {
         final String uri = pieceTogetherUri(hubBaseUrl, hubPathMultipleResponses.hubPath.getPath());
         requestBuilder.uri(uri);
         return hubResponsesTransformer.getResponses(new PagedRequest(requestBuilder), hubPathMultipleResponses.responseClass, getAll, typeMap);
@@ -197,7 +197,7 @@ public class HubService {
     }
 
     public <T extends HubResponse> List<T> getResponses(final HubView hubView, final LinkMultipleResponses<T> linkMultipleResponses, final Request.Builder requestBuilder, final boolean getAll, final Map<String, Class<? extends T>> typeMap)
-            throws IntegrationException {
+        throws IntegrationException {
         final String uri = metaHandler.getFirstLinkSafely(hubView, linkMultipleResponses.link);
         if (StringUtils.isBlank(uri)) {
             return Collections.emptyList();
@@ -249,7 +249,7 @@ public class HubService {
     // ------------------------------------------------
     public void delete(final String url) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
-        try (Response response = executeRequest(requestBuilder.build())) {
+        try (final Response response = executeRequest(requestBuilder.build())) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

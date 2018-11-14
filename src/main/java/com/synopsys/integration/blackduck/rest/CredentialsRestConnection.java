@@ -43,19 +43,24 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
 
 public class CredentialsRestConnection extends BlackDuckRestConnection {
     private final Credentials credentials;
 
-    public CredentialsRestConnection(final RestConnection restConnection, final String baseUrl, final Credentials credentials) {
-        super(restConnection, baseUrl);
+    public CredentialsRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl, final Credentials credentials) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.credentials = credentials;
+
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials cannot be null.");
+        }
     }
 
     @Override
@@ -108,5 +113,4 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
-
 }

@@ -35,7 +35,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.BasicRestConnection;
+import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.connection.UnauthenticatedRestConnection;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
@@ -45,7 +46,7 @@ public class HubServerVerifier {
     public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
         final ProxyInfo proxyInfo = hubProxyInfo != null ? hubProxyInfo : ProxyInfo.NO_PROXY_INFO;
-        final BasicRestConnection restConnection = new BasicRestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
+        final RestConnection restConnection = new UnauthenticatedRestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
 
         try {
             Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();
