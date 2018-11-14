@@ -47,26 +47,18 @@ import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConsta
 import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
-public class PhoneHomeHelper {
+public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
     private final HubService hubService;
     private final PhoneHomeService phoneHomeService;
     private final HubRegistrationService hubRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory) {
-        return createPhoneHomeHelper(hubServicesFactory, null, null);
+    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory) {
+        return createAsynchronousPhoneHomeHelper(hubServicesFactory, null);
     }
 
-    public static PhoneHomeHelper createAsynchronousPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
-        return createPhoneHomeHelper(hubServicesFactory, null, executorService);
-    }
-
-    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final IntEnvironmentVariables intEnvironmentVariables) {
-        return createPhoneHomeHelper(hubServicesFactory, intEnvironmentVariables, null);
-    }
-
-    public static PhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final IntEnvironmentVariables intEnvironmentVariables, final ExecutorService executorService) {
+    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
         final IntLogger intLogger = hubServicesFactory.getLogger();
         final PhoneHomeService intPhoneHomeService;
         if (executorService != null) {
@@ -74,16 +66,16 @@ public class PhoneHomeHelper {
         } else {
             intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, hubServicesFactory.getRestConnection(), hubServicesFactory.getGson()));
         }
-        return new PhoneHomeHelper(intLogger, hubServicesFactory.createHubService(), intPhoneHomeService, hubServicesFactory.createHubRegistrationService(), intEnvironmentVariables);
+        return new BlackDuckPhoneHomeHelper(intLogger, hubServicesFactory.createHubService(), intPhoneHomeService, hubServicesFactory.createHubRegistrationService(), hubServicesFactory.getEnvironmentVariables());
     }
 
-    private static PhoneHomeClient createPhoneHomeClient(final IntLogger intLogger, final RestConnection restConnection, final Gson gson) {
+    public static PhoneHomeClient createPhoneHomeClient(final IntLogger intLogger, final RestConnection restConnection, final Gson gson) {
         final String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
         final HttpClientBuilder httpClientBuilder = restConnection.getClientBuilder();
         return new PhoneHomeClient(googleAnalyticsTrackingId, intLogger, httpClientBuilder, gson);
     }
 
-    public PhoneHomeHelper(final IntLogger logger, final HubService hubService, final PhoneHomeService phoneHomeService, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
+    public BlackDuckPhoneHomeHelper(final IntLogger logger, final HubService hubService, final PhoneHomeService phoneHomeService, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.hubService = hubService;
         this.phoneHomeService = phoneHomeService;
