@@ -18,7 +18,7 @@ dependencies {
     implementation 'com.blackducksoftware.integration:integration-reporting:0.1.6'
     implementation 'com.blackducksoftware.integration:hub-common-api:5.0.0.0'
     implementation 'com.blackducksoftware.integration:integration-bdio:16.2.1'
-    implementation 'com.blackducksoftware.integration:phone-home-client:0.17.0'
+    implementation 'com.blackducksoftware.integration:phone-home-client:0.18.0'
 
     testImplementation 'org.hamcrest:hamcrest-core:1.3'
     testImplementation 'org.codehaus.groovy:groovy-all:2.4.12'
