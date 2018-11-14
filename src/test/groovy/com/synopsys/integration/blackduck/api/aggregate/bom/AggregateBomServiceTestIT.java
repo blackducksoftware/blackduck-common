@@ -23,13 +23,13 @@
  */
 package com.synopsys.integration.blackduck.api.aggregate.bom;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -39,9 +39,8 @@ import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class AggregateBomServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

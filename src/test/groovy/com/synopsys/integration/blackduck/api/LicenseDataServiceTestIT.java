@@ -23,11 +23,11 @@
  */
 package com.synopsys.integration.blackduck.api;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
@@ -37,9 +37,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ComplexLicenseView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.blackduck.service.LicenseService;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class LicenseDataServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 

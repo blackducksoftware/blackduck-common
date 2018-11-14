@@ -3,7 +3,9 @@ package com.synopsys.integration.blackduck.signaturescanner;
 import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,14 +14,14 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
-import com.synopsys.integration.test.tool.TestLogger;
+import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
@@ -29,9 +31,9 @@ public class ScanPathsTest {
 
     private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
 
-    private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new TestLogger(), intEnvironmentVariables, OperatingSystemType.MAC);
-    private final ScanPathsUtility windowsScanPathsUtility = new ScanPathsUtility(new TestLogger(), intEnvironmentVariables, OperatingSystemType.WINDOWS);
-    private final ScanPathsUtility linuxScanPathsUtility = new ScanPathsUtility(new TestLogger(), intEnvironmentVariables, OperatingSystemType.LINUX);
+    private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new BufferedIntLogger(), intEnvironmentVariables, OperatingSystemType.MAC);
+    private final ScanPathsUtility windowsScanPathsUtility = new ScanPathsUtility(new BufferedIntLogger(), intEnvironmentVariables, OperatingSystemType.WINDOWS);
+    private final ScanPathsUtility linuxScanPathsUtility = new ScanPathsUtility(new BufferedIntLogger(), intEnvironmentVariables, OperatingSystemType.LINUX);
 
     private File tempDirectory;
     private File bdsJavaHomeDirectory;
@@ -39,7 +41,7 @@ public class ScanPathsTest {
     private File windowsSetup;
     private File linuxSetup;
 
-    @Before
+    @BeforeEach
     public void createFileSetups() throws Exception {
         final Path tempDirectoryPath = Files.createTempDirectory("scan_setups");
         tempDirectory = tempDirectoryPath.toFile();
@@ -55,7 +57,7 @@ public class ScanPathsTest {
         createOtherJvm(bdsJavaHomeDirectory);
     }
 
-    @After
+    @AfterEach
     public void deleteTempDirectory() {
         FileUtils.deleteQuietly(tempDirectory);
         FileUtils.deleteQuietly(bdsJavaHomeDirectory);

@@ -18,12 +18,11 @@ import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.HubBucket
 import com.synopsys.integration.blackduck.service.bucket.HubBucketService
 import com.synopsys.integration.exception.IntegrationException
-import com.synopsys.integration.log.IntBufferedLogger
+import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
-import com.synopsys.integration.test.annotation.IntegrationTest
-import org.junit.After
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -31,10 +30,19 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 class NotificationServiceRecipeTest extends BasicRecipe {
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
     private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
+
+    @AfterEach
+    void cleanup() {
+        def projectService = hubServicesFactory.createProjectService()
+        Optional<ProjectView> createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
+        if (createdProject.isPresent()) {
+            projectService.deleteProject(createdProject.get())
+        }
+    }
 
     Date generateNotifications() {
         ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
@@ -69,7 +77,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     }
 
     void uploadBdio(UploadTarget uploadTarget) throws IntegrationException, URISyntaxException, IOException {
-        final IntLogger logger = new IntBufferedLogger();
+        final IntLogger logger = new BufferedIntLogger();
         final HubService hubService = hubServicesFactory.createHubService();
         final CodeLocationService codeLocationService = hubServicesFactory.createCodeLocationService();
         final NotificationService notificationService = hubServicesFactory.createNotificationService();
@@ -79,7 +87,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         uploadBatch.addUploadTarget(uploadTarget);
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, jsonFieldResolver, codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocations(scanRequest);
     }
 
@@ -161,15 +169,6 @@ class NotificationServiceRecipeTest extends BasicRecipe {
                 println("ContentDetailKey: ${contentDetailKey} ProjectName: ${projectName} Project Version: ${projectVersion} Component: ${componentName} Component Version: ${componentVersion} Policy: ${policyName} isVulnerability: ${isVulnerability}")
             })
         })
-    }
-
-    @After
-    void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
-        if (createdProject.isPresent()) {
-            projectService.deleteProject(createdProject.get())
-        }
     }
 
 }

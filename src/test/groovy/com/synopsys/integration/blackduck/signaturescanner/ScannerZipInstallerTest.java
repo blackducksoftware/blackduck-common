@@ -1,7 +1,8 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.File;
 import java.io.InputStream;
@@ -11,21 +12,20 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
-import com.synopsys.integration.test.tool.TestLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -39,14 +39,14 @@ public class ScannerZipInstallerTest {
         final String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_HUB_URL");
         final String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_HUB_USERNAME");
         final String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_HUB_PASSWORD");
-        Assume.assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
-        Assume.assumeTrue(StringUtils.isNotBlank(blackDuckUrl));
-        Assume.assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
-        Assume.assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
+        assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
+        assumeTrue(StringUtils.isNotBlank(blackDuckUrl));
+        assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
+        assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
 
         final File downloadTarget = new File(signatureScannerDownloadPath);
 
-        final IntLogger logger = new TestLogger();
+        final IntLogger logger = new BufferedIntLogger();
         final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
         hubServerConfigBuilder.setUrl(blackDuckUrl);
         hubServerConfigBuilder.setUsername(blackDuckUsername);
@@ -82,7 +82,7 @@ public class ScannerZipInstallerTest {
         final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
         Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
 
-        final IntLogger logger = new TestLogger();
+        final IntLogger logger = new BufferedIntLogger();
         final Path tempDirectory = Files.createTempDirectory(null);
         final File downloadTarget = tempDirectory.toFile();
         try {

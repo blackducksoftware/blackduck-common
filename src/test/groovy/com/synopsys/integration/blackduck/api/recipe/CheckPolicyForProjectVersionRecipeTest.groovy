@@ -16,20 +16,20 @@ import com.synopsys.integration.blackduck.service.PolicyRuleService
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
-import com.synopsys.integration.test.annotation.IntegrationTest
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Category(IntegrationTest.class)
+import static org.junit.jupiter.api.Assertions.assertEquals
+
+@Tag("integration")
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
     PolicyRuleView policyRuleView
     PolicyRuleViewV2 policyRuleViewV2
 
-    @Before
+    @BeforeEach
     void setup() {
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
@@ -49,14 +49,13 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         policyRuleViewV2 = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleViewV2.class)
     }
 
-    @After
+    @AfterEach
     void cleanup() {
         deleteProject(projectVersionWrapper.getProjectView().name)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
         policyRuleService.deletePolicyRule(policyRuleViewV2)
     }
-
 
     @Test
     void testCheckingThePolicyForAProjectVersion() {
@@ -69,9 +68,8 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
         VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView())
-        Assert.assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
+        assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
-
 
     private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService, MetaHandler metaHandler) {
         ExternalId externalId = constructExternalId()

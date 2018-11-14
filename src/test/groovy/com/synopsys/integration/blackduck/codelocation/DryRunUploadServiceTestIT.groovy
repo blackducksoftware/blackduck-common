@@ -31,21 +31,21 @@ import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
 import com.synopsys.integration.rest.exception.IntegrationRestException
-import com.synopsys.integration.test.annotation.IntegrationTest
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 
-@Category(IntegrationTest.class)
-class DryRunUploadServiceTestIT {
+import static org.junit.jupiter.api.Assertions.*
+
+@Tag("integration")
+public class DryRunUploadServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private static File dryRunFile;
 
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO)
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader()
         dryRunFile = new File(classLoader.getResource('dryRun.json').getFile())
@@ -56,18 +56,18 @@ class DryRunUploadServiceTestIT {
         HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
-        Assert.assertNotNull(response)
+        assertNotNull(response)
 
         CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-        Assert.assertNotNull(codeLocationView)
+        assertNotNull(codeLocationView)
 
         //cleanup
         services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
-            Assert.fail('This should have thrown an exception')
+            fail('This should have thrown an exception')
         } catch (IntegrationRestException e) {
-            Assert.assertEquals(404, e.getHttpStatusCode())
+            assertEquals(404, e.getHttpStatusCode())
         }
     }
 }

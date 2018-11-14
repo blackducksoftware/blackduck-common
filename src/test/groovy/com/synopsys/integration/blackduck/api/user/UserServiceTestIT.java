@@ -23,13 +23,12 @@
  */
 package com.synopsys.integration.blackduck.api.user;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
@@ -37,9 +36,8 @@ import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class UserServiceTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper(TestingPropertyKey.TEST_HTTPS_HUB_SERVER_URL.toString());
 

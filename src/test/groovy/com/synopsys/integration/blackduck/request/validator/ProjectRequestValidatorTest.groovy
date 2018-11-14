@@ -22,10 +22,11 @@
  * under the License.*/
 package com.synopsys.integration.blackduck.request.validator
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.rest.RestConstants
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 import java.text.SimpleDateFormat
 
@@ -45,7 +46,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn(null)
         projectRequestBuilder.setVersionNickname(null)
 
-        Assert.assertFalse(projectRequestBuilder.isValid())
+        assertFalse(projectRequestBuilder.isValid())
 
         projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName("FAKE")
@@ -60,7 +61,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn("FAKE")
         projectRequestBuilder.setVersionNickname("FAKE")
 
-        Assert.assertFalse(projectRequestBuilder.isValid());
+        assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -70,7 +71,7 @@ class ProjectRequestValidatorTest {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setProjectName(projectName)
 
-        Assert.assertFalse(projectRequestBuilder.isValid());
+        assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -80,7 +81,7 @@ class ProjectRequestValidatorTest {
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
         projectRequestBuilder.setVersionName(versionName)
 
-        Assert.assertFalse(projectRequestBuilder.isValid());
+        assertFalse(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -112,7 +113,7 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setReleasedOn(releasedOn)
         projectRequestBuilder.setVersionNickname(versionNickname)
 
-        Assert.assertTrue(projectRequestBuilder.isValid());
+        assertTrue(projectRequestBuilder.isValid());
     }
 
     @Test
@@ -124,6 +125,6 @@ class ProjectRequestValidatorTest {
         projectRequestBuilder.setProjectName(projectName)
         projectRequestBuilder.setVersionName(versionName)
 
-        Assert.assertTrue(projectRequestBuilder.isValid());
+        assertTrue(projectRequestBuilder.isValid());
     }
 }

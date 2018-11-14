@@ -23,7 +23,7 @@
  */
 package com.synopsys.integration.blackduck.api.project;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -31,10 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
@@ -51,20 +51,19 @@ import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class ProjectServiceTestIT {
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
     private static HubServicesFactory hubServicesFactory;
     private static ProjectView project = null;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
     }
 
-    @After
+    @AfterEach
     public void tearDownAfterTest() throws Exception {
         if (project != null) {
             hubServicesFactory.createProjectService().deleteProject(project);

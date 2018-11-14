@@ -23,16 +23,14 @@
  */
 package com.synopsys.integration.blackduck.comprehensive;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
@@ -57,24 +55,18 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
-import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.ComponentService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
-import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
-@Category(IntegrationTest.class)
+@Tag("integration")
 public class ComprehensiveCookbookTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
     private static final long TWENTY_MINUTES = FIVE_MINUTES * 4;
-
-    @Rule
-    public TemporaryFolder folderForCli = new TemporaryFolder();
 
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
@@ -182,15 +174,13 @@ public class ComprehensiveCookbookTestIT {
         // import the bdio
         final File file = restConnectionTestHelper.getFile("bdio/mtglist_bdio.jsonld");
         final HubService hubService = hubServicesFactory.createHubService();
-        final CodeLocationService codeLocationService = hubServicesFactory.createCodeLocationService();
-        final NotificationService notificationService = hubServicesFactory.createNotificationService();
 
         final UploadRunner uploadRunner = new UploadRunner(logger, hubService);
         final UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createWithMediaType("ek_mtglist Black Duck I/O Export", file, "application/ld+json"));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(hubService, logger, hubServicesFactory.getJsonFieldResolver(), codeLocationService, notificationService);
+        final CodeLocationCreationService codeLocationCreationService = hubServicesFactory.createCodeLocationCreationService();
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         // make sure we have some code locations now

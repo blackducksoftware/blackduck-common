@@ -1,13 +1,12 @@
 package com.synopsys.integration.blackduck.service.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.rest.request.Request;
 

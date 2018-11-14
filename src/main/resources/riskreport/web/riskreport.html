@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	   <meta charset="UTF-8">
+	   <title>Hub Risk Report</title>
+	   <link rel="stylesheet" type="text/css" href="css/HubBomReport.css"/>
+	   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	   <script src="js/jquery-3.1.1.min.js"></script>
+	   <script src="js/HubBomReportFunctions.js"></script>
+	   <script src="js/HubRiskReport.js"></script>
+	   <script src="js/Sortable.js"></script>
+	   <script type="text/javascript">
+	   var myJQuery = jQuery.noConflict();
+	   myJQuery(document).ready(function () {
+           console.log("Risk Report Document ready.");
+           var data = TOKEN_RISK_REPORT_JSON_TOKEN;
+           var riskReport = new RiskReport(myJQuery,data);
+           riskReport.createReport();
+	   });
+	   </script>
+	</head>
+	<body>
+	    <div id="riskReportDiv"></div>
+	</body>
+</html>

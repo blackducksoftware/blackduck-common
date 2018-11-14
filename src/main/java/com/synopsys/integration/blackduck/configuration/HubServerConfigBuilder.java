@@ -37,12 +37,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.WordUtils;
 
-import com.synopsys.integration.exception.IntegrationCertificateException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
+import com.synopsys.integration.rest.exception.IntegrationCertificateException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.util.BuilderStatus;

@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
@@ -46,20 +47,14 @@ import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.jsonfield.JsonField;
-import com.synopsys.integration.jsonfield.JsonFieldFactory;
-import com.synopsys.integration.jsonfield.JsonFieldResolver;
-import com.synopsys.integration.jsonfield.JsonFieldResult;
 import com.synopsys.integration.log.IntLogger;
 
 public class CodeLocationCreationService extends DataService {
-    private final JsonFieldResolver jsonFieldResolver;
     private final CodeLocationService codeLocationService;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(final HubService hubService, final IntLogger logger, final JsonFieldResolver jsonFieldResolver, final CodeLocationService codeLocationService, final NotificationService notificationService) {
+    public CodeLocationCreationService(final HubService hubService, final IntLogger logger, final CodeLocationService codeLocationService, final NotificationService notificationService) {
         super(hubService, logger);
-        this.jsonFieldResolver = jsonFieldResolver;
         this.codeLocationService = codeLocationService;
         this.notificationService = notificationService;
     }
@@ -150,9 +145,8 @@ public class CodeLocationCreationService extends DataService {
     }
 
     private Optional<String> getCodeLocationUrl(final NotificationView notificationView) {
-        final JsonField<String> codeLocationUrlField = JsonFieldFactory.createStringJsonField(Arrays.asList("content", "codeLocation"));
-        final JsonFieldResult<String> jsonFieldResult = jsonFieldResolver.resolveValues(notificationView.json, codeLocationUrlField);
-        return jsonFieldResult.getFirstValue();
+        final String codeLocationUrl = JsonPath.read(notificationView.json, "$.content.codeLocation");
+        return Optional.ofNullable(codeLocationUrl);
     }
 
 }

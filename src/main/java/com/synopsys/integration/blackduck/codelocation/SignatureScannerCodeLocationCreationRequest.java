@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 
 public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
@@ -46,7 +47,7 @@ public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCre
     public Set<String> getCodeLocationNames() {
         return scanBatch.getScanTargets()
                        .stream()
-                       .map(scanTarget -> scanTarget.getCodeLocationName())
+                       .map(ScanTarget::getCodeLocationName)
                        .filter(StringUtils::isBlank)
                        .collect(Collectors.toSet());
     }
