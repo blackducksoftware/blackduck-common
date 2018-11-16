@@ -29,7 +29,6 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -56,13 +55,6 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
                 throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
             }
         }
-    }
-
-    public abstract void authenticateWithBlackDuck() throws IntegrationException;
-
-    @Override
-    public void completeConnection() throws IntegrationException {
-        authenticateWithBlackDuck();
     }
 
     public URL getBaseUrl() {
