@@ -124,12 +124,12 @@ public class ProjectService extends DataService {
     }
 
     public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
-        logger.debug("Attempting to get the assigned users for Project: " + project.name);
+        logger.debug("Attempting to get the assigned users for Project: " + project.getName());
         final List<AssignedUserView> assignedUsers = getAssignedUsersToProject(project);
 
         final List<UserView> resolvedUserViews = new ArrayList<>();
         for (final AssignedUserView assigned : assignedUsers) {
-            final UserView userView = hubService.getResponse(assigned.user, UserView.class);
+            final UserView userView = hubService.getResponse(assigned.getUser(), UserView.class);
             if (userView != null) {
                 resolvedUserViews.add(userView);
             }
@@ -161,12 +161,12 @@ public class ProjectService extends DataService {
     }
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
-        logger.debug("Attempting to get the assigned users for Project: " + project.name);
+        logger.debug("Attempting to get the assigned users for Project: " + project.getName());
         final List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(project);
 
         final List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (final AssignedUserGroupView assigned : assignedGroups) {
-            final UserGroupView groupView = hubService.getResponse(assigned.group, UserGroupView.class);
+            final UserGroupView groupView = hubService.getResponse(assigned.getGroup(), UserGroupView.class);
             if (groupView != null) {
                 resolvedGroupViews.add(groupView);
             }
@@ -182,9 +182,9 @@ public class ProjectService extends DataService {
 
         final List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(projectView);
         for (final AssignedUserGroupView assignedUserGroupView : assignedGroups) {
-            if (assignedUserGroupView.active) {
-                final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.group, UserGroupView.class);
-                if (userGroupView.active) {
+            if (assignedUserGroupView.getActive()) {
+                final UserGroupView userGroupView = hubService.getResponse(assignedUserGroupView.getGroup(), UserGroupView.class);
+                if (userGroupView.getActive()) {
                     final List<UserView> groupUsers = hubService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
                     users.addAll(groupUsers);
                 }
@@ -193,13 +193,13 @@ public class ProjectService extends DataService {
 
         final List<AssignedUserView> assignedUsers = getAssignedUsersToProject(projectView);
         for (final AssignedUserView assignedUser : assignedUsers) {
-            final UserView userView = hubService.getResponse(assignedUser.user, UserView.class);
+            final UserView userView = hubService.getResponse(assignedUser.getUser(), UserView.class);
             users.add(userView);
         }
 
         return users
                        .stream()
-                       .filter(userView -> userView.active)
+                       .filter(userView -> userView.getActive())
                        .collect(Collectors.toSet());
     }
 
@@ -241,8 +241,8 @@ public class ProjectService extends DataService {
         final List<VersionBomComponentView> versionBomComponentViews = getComponentsForProjectVersion(projectVersionView);
         final List<ComponentVersionView> componentVersionViews = new ArrayList<>();
         for (final VersionBomComponentView versionBomComponentView : versionBomComponentViews) {
-            if (StringUtils.isNotBlank(versionBomComponentView.componentVersion)) {
-                final ComponentVersionView componentVersionView = hubService.getResponse(versionBomComponentView.componentVersion, ComponentVersionView.class);
+            if (StringUtils.isNotBlank(versionBomComponentView.getComponentVersion())) {
+                final ComponentVersionView componentVersionView = hubService.getResponse(versionBomComponentView.getComponentVersion(), ComponentVersionView.class);
                 componentVersionViews.add(componentVersionView);
             }
         }
@@ -300,19 +300,19 @@ public class ProjectService extends DataService {
             final List<ProjectVersionView> projectVersions = hubService.getAllResponses(projectItem.get(), ProjectView.VERSIONS_LINK_RESPONSE);
             final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
 
-            return Optional.ofNullable(getPolicyStatusForVersion(projectVersionView));
+            return getPolicyStatusForVersion(projectVersionView);
         }
 
         return Optional.empty();
     }
 
-    public VersionBomPolicyStatusView getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
+    public Optional<VersionBomPolicyStatusView> getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
         return hubService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
     private ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws HubIntegrationException {
         for (final ProjectVersionView version : projectVersions) {
-            if (projectVersionName.equals(version.versionName)) {
+            if (projectVersionName.equals(version.getVersionName())) {
                 return version;
             }
         }
@@ -328,13 +328,19 @@ public class ProjectService extends DataService {
     }
 
     public void deleteProject(final ProjectView project) throws IntegrationException {
-        final String projectUrl = hubService.getHref(project);
-        projectUpdateService.deleteProject(projectUrl);
+        final Optional<String> projectUrl = project.getHref();
+        if (projectUrl.isPresent()) {
+            projectUpdateService.deleteProject(projectUrl.get());
+        }
     }
 
-    public String createVersion(final ProjectView project, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
-        final String projectVersionsUrl = hubService.getFirstLink(project, ProjectView.VERSIONS_LINK);
-        return projectUpdateService.createProjectVersion(projectVersionsUrl, projectVersionRequest);
+    public Optional<String> createVersion(final ProjectView project, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        final Optional<String> projectVersionsUrl = project.getFirstLink(ProjectView.VERSIONS_LINK);
+        if (projectVersionsUrl.isPresent()) {
+            return Optional.of(projectUpdateService.createProjectVersion(projectVersionsUrl.get(), projectVersionRequest));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public String createVersion(final String projectVersionsUrl, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
@@ -342,8 +348,10 @@ public class ProjectService extends DataService {
     }
 
     public void updateProjectVersion(final ProjectVersionView version, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
-        final String projectVersionUrl = hubService.getHref(version);
-        projectUpdateService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
+        final Optional<String> projectVersionUrl = version.getHref();
+        if (projectVersionUrl.isPresent()) {
+            projectUpdateService.updateProjectVersion(projectVersionUrl.get(), projectVersionRequest);
+        }
     }
 
     public void updateProjectVersion(final String projectVersionUrl, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
@@ -369,27 +377,27 @@ public class ProjectService extends DataService {
      * If a versionRequest is provided, the version will be first found by the versionName in the versionRequest and then updated.
      */
     public void updateProjectAndVersion(final ProjectView project, final ProjectRequest projectRequest) throws IntegrationException {
-        final String projectUrl = hubService.getHref(project);
+        final String projectUrl = project.getHref().orElse(null);
         projectUpdateService.updateProject(projectUrl, projectRequest);
 
-        if (null != projectRequest.versionRequest && StringUtils.isNotBlank(projectRequest.versionRequest.versionName)) {
-            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(project, projectRequest.versionRequest.versionName);
+        if (null != projectRequest.getVersionRequest() && StringUtils.isNotBlank(projectRequest.getVersionRequest().getVersionName())) {
+            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(project, projectRequest.getVersionRequest().getVersionName());
             if (projectVersionView.isPresent()) {
-                updateProjectVersion(projectVersionView.get(), projectRequest.versionRequest);
+                updateProjectVersion(projectVersionView.get(), projectRequest.getVersionRequest());
             }
         }
     }
 
     public void updateProjectAndVersion(final ProjectView project, final ProjectVersionView projectVersion, final ProjectRequest projectRequest) throws IntegrationException {
-        final String projectUrl = hubService.getHref(project);
-        final String projectVersionUrl = hubService.getHref(projectVersion);
+        final String projectUrl = project.getHref().orElse(null);
+        final String projectVersionUrl = projectVersion.getHref().orElse(null);
 
         updateProjectAndVersion(projectUrl, projectVersionUrl, projectRequest);
     }
 
     public void updateProjectAndVersion(final String projectUrl, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
         projectUpdateService.updateProject(projectUrl, projectRequest);
-        updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
+        updateProjectVersion(projectVersionUri, projectRequest.getVersionRequest());
     }
 
     public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
@@ -403,13 +411,13 @@ public class ProjectService extends DataService {
     }
 
     public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
-        final String projectVersionComponentsUrl = hubService.getFirstLink(projectVersionView, ProjectVersionView.COMPONENTS_LINK);
+        final String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK).orElse(null);
         final ComponentSearchResultView componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
         String componentVersionUrl = null;
-        if (StringUtils.isNotBlank(componentSearchResultView.variant)) {
-            componentVersionUrl = componentSearchResultView.variant;
+        if (StringUtils.isNotBlank(componentSearchResultView.getVariant())) {
+            componentVersionUrl = componentSearchResultView.getVariant();
         } else {
-            componentVersionUrl = componentSearchResultView.version;
+            componentVersionUrl = componentSearchResultView.getVersion();
         }
         addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
     }

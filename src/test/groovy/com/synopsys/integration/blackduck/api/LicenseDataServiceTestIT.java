@@ -26,8 +26,8 @@ package com.synopsys.integration.blackduck.api;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
@@ -51,12 +51,12 @@ public class LicenseDataServiceTestIT {
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
         final ComplexLicenseView complexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
 
-        assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.codeSharing);
-        assertTrue(StringUtils.isNotBlank(complexLicense.license));
-        assertEquals("Apache License 2.0", complexLicense.name);
-        assertEquals(LicenseOwnershipType.OPEN_SOURCE, complexLicense.ownership);
-        assertNull(complexLicense.type);
-        assertEquals(0, complexLicense.licenses.size());
+        assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.getCodeSharing());
+        assertTrue(StringUtils.isNotBlank(complexLicense.getLicense()));
+        assertEquals("Apache License 2.0", complexLicense.getName());
+        assertEquals(LicenseOwnershipType.OPEN_SOURCE, complexLicense.getOwnership());
+        assertNull(complexLicense.getType());
+        assertEquals(0, complexLicense.getLicenses().size());
 
         System.out.println(complexLicense);
     }

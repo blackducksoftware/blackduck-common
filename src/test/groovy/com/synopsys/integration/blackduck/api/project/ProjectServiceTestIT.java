@@ -38,12 +38,14 @@ import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
+import com.synopsys.integration.blackduck.service.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
@@ -67,7 +69,16 @@ public class ProjectServiceTestIT {
     public void tearDownAfterTest() throws Exception {
         if (project != null) {
             hubServicesFactory.createProjectService().deleteProject(project);
+            project = null;
         }
+    }
+
+    @Test
+    public void testGettingAllProjects() throws IntegrationException {
+        final HubService hubService = hubServicesFactory.createHubService();
+        final BlackDuckPageResponse<ProjectView> projectViews = hubService.getAllPageResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+        assertTrue(projectViews.getItems().size() > 0);
+        assertEquals(projectViews.getTotalCount(), projectViews.getItems().size());
     }
 
     @Test
@@ -79,38 +90,38 @@ public class ProjectServiceTestIT {
         final String testProjectVersion3Name = "3";
 
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = testProjectName;
+        projectRequest.setName(testProjectName);
         final String projectUrl = hubServicesFactory.createProjectService().createProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
         project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
         final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
-        projectVersionRequest1.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest1.phase = ProjectVersionPhaseType.DEVELOPMENT;
-        projectVersionRequest1.versionName = testProjectVersion1Name;
+        projectVersionRequest1.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest1.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest1.setVersionName(testProjectVersion1Name);
 
         final ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
-        projectVersionRequest2.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest2.phase = ProjectVersionPhaseType.DEVELOPMENT;
-        projectVersionRequest2.versionName = testProjectVersion2Name;
+        projectVersionRequest2.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest2.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest2.setVersionName(testProjectVersion2Name);
 
         final ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
-        projectVersionRequest3.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest3.phase = ProjectVersionPhaseType.DEVELOPMENT;
-        projectVersionRequest3.versionName = testProjectVersion3Name;
+        projectVersionRequest3.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest3.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest3.setVersionName(testProjectVersion3Name);
 
         hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest1);
         hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest2);
         hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest3);
 
         final Optional<ProjectVersionView> projectVersion1 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion1Name);
-        assertEquals(testProjectVersion1Name, projectVersion1.get().versionName);
+        assertEquals(testProjectVersion1Name, projectVersion1.get().getVersionName());
 
         final Optional<ProjectVersionView> projectVersion2 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion2Name);
-        assertEquals(testProjectVersion2Name, projectVersion2.get().versionName);
+        assertEquals(testProjectVersion2Name, projectVersion2.get().getVersionName());
 
         final Optional<ProjectVersionView> projectVersion3 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion3Name);
-        assertEquals(testProjectVersion3Name, projectVersion3.get().versionName);
+        assertEquals(testProjectVersion3Name, projectVersion3.get().getVersionName());
 
         hubServicesFactory.createProjectService().deleteProject(project);
         project = null;
@@ -131,28 +142,28 @@ public class ProjectServiceTestIT {
         final ProjectService projectService = hubServicesFactory.createProjectService();
 
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = "InitialName";
-        projectRequest.projectTier = 2;
-        projectRequest.description = "Initial Description";
+        projectRequest.setName("InitialName");
+        projectRequest.setProjectTier(2);
+        projectRequest.setDescription("Initial Description");
         final String projectUrl = projectService.createProject(projectRequest);
 
         project = hubService.getResponse(projectUrl, ProjectView.class);
 
-        assertEquals("InitialName", project.name);
-        assertTrue(2 == project.projectTier);
-        assertEquals("Initial Description", project.description);
+        assertEquals("InitialName", project.getName());
+        assertTrue(2 == project.getProjectTier());
+        assertEquals("Initial Description", project.getDescription());
 
-        projectRequest.name = "New Name";
-        projectRequest.projectTier = 4;
-        projectRequest.description = "New Description";
+        projectRequest.setName("New Name");
+        projectRequest.setProjectTier(4);
+        projectRequest.setDescription("New Description");
 
         projectService.updateProject(projectUrl, projectRequest);
 
         project = hubService.getResponse(projectUrl, ProjectView.class);
 
-        assertEquals("New Name", project.name);
-        assertTrue(4 == project.projectTier);
-        assertEquals("New Description", project.description);
+        assertEquals("New Name", project.getName());
+        assertTrue(4 == project.getProjectTier());
+        assertEquals("New Description", project.getDescription());
     }
 
     @Test
@@ -161,14 +172,14 @@ public class ProjectServiceTestIT {
         final ProjectService projectService = hubServicesFactory.createProjectService();
 
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = "InitialName";
-        projectRequest.projectTier = 2;
-        projectRequest.description = "Initial Description";
+        projectRequest.setName("InitialName");
+        projectRequest.setProjectTier(2);
+        projectRequest.setDescription("Initial Description");
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.versionName = "Initial VersionName";
-        projectVersionRequest.phase = ProjectVersionPhaseType.PLANNING;
-        projectVersionRequest.distribution = ProjectVersionDistributionType.EXTERNAL;
-        projectRequest.versionRequest = projectVersionRequest;
+        projectVersionRequest.setVersionName("Initial VersionName");
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.PLANNING);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.EXTERNAL);
+        projectRequest.setVersionRequest(projectVersionRequest);
 
         final String projectUrl = projectService.createProject(projectRequest);
 
@@ -178,22 +189,22 @@ public class ProjectServiceTestIT {
 
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
 
-        assertEquals("Initial VersionName", projectVersionView.versionName);
-        assertEquals(ProjectVersionPhaseType.PLANNING, projectVersionView.phase);
-        assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.distribution);
+        assertEquals("Initial VersionName", projectVersionView.getVersionName());
+        assertEquals(ProjectVersionPhaseType.PLANNING, projectVersionView.getPhase());
+        assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.getDistribution());
 
-        projectVersionRequest.versionName = "New VersionName";
-        projectVersionRequest.phase = ProjectVersionPhaseType.DEPRECATED;
-        projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
+        projectVersionRequest.setVersionName("New VersionName");
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.DEPRECATED);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
 
-        final String projectVersionUrl = hubService.getHref(projectVersionView);
+        final String projectVersionUrl = projectVersionView.getHref().get();
         projectService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
 
-        projectVersionView = hubService.getResponse(hubService.getHref(projectVersionView), ProjectVersionView.class);
+        projectVersionView = hubService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
 
-        assertEquals("New VersionName", projectVersionView.versionName);
-        assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.phase);
-        assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.distribution);
+        assertEquals("New VersionName", projectVersionView.getVersionName());
+        assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
+        assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.getDistribution());
     }
 
     @Test
@@ -217,8 +228,8 @@ public class ProjectServiceTestIT {
         final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
-        final ProjectVersionRequest projectVersionRequest = projectRequest.versionRequest;
-        projectVersionRequest.versionName = "2.0.0";
+        final ProjectVersionRequest projectVersionRequest = projectRequest.getVersionRequest();
+        projectVersionRequest.setVersionName("2.0.0");
 
         projectService.createVersion(project, projectVersionRequest);
 
@@ -245,7 +256,7 @@ public class ProjectServiceTestIT {
 
         project = hubService.getResponse(projectUrl, ProjectView.class);
         final Optional<ProjectVersionView> projectVersionView = projectService.getProjectVersion(project, projectVersionName);
-        assertEquals("first nickname", projectVersionView.get().nickname);
+        assertEquals("first nickname", projectVersionView.get().getNickname());
 
         final ProjectRequestBuilder updateRequestBuilder = new ProjectRequestBuilder();
         updateRequestBuilder.setFromProjectAndVersion(project, projectVersionView.get());
@@ -257,7 +268,7 @@ public class ProjectServiceTestIT {
         final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
         final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(projectVersionWrapper.get().getProjectView(), ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
-        assertEquals("first nickname", projectVersionViews.get(0).nickname);
+        assertEquals("first nickname", projectVersionViews.get(0).getNickname());
     }
 
     @Test
@@ -283,8 +294,8 @@ public class ProjectServiceTestIT {
         assertNotNull(project);
         assertNotNull(projectVersionView);
 
-        final String projectUrl = hubService.getHref(project);
-        final String projectVersionUrl = hubService.getHref(projectVersionView);
+        final String projectUrl = project.getHref().get();
+        final String projectVersionUrl = projectVersionView.getHref().get();
 
         List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
@@ -295,9 +306,9 @@ public class ProjectServiceTestIT {
         projectService.updateProject(projectUrl, updateProjectRequest);
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.versionName = "1.0.0-clone";
-        projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
-        projectVersionRequest.distribution = ProjectVersionDistributionType.OPENSOURCE;
+        projectVersionRequest.setVersionName("1.0.0-clone");
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
         projectService.createVersion(project, projectVersionRequest);
 
         projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);

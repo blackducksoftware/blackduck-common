@@ -112,7 +112,9 @@ public class CodeLocationCreationService extends DataService {
                 logger.debug("All code locations have been found, now looking for notifications.");
                 final Set<String> codeLocationUrlsToFind = codeLocations
                                                                    .stream()
-                                                                   .map(codeLocation -> codeLocation._meta.href)
+                                                                   .map(CodeLocationView::getHref)
+                                                                   .filter(Optional::isPresent)
+                                                                   .map(Optional::get)
                                                                    .collect(Collectors.toSet());
                 final Set<String> codeLocationUrls = new HashSet<>();
                 final List<NotificationView> notifications = notificationService
@@ -145,7 +147,7 @@ public class CodeLocationCreationService extends DataService {
     }
 
     private Optional<String> getCodeLocationUrl(final NotificationView notificationView) {
-        final String codeLocationUrl = JsonPath.read(notificationView.json, "$.content.codeLocation");
+        final String codeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
         return Optional.ofNullable(codeLocationUrl);
     }
 

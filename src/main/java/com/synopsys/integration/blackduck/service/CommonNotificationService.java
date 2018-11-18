@@ -33,7 +33,7 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 import com.synopsys.integration.blackduck.notification.CommonNotificationView;
@@ -101,7 +101,7 @@ public class CommonNotificationService {
     }
 
     public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
-        final List<UriSingleResponse<? extends HubResponse>> uriResponseList = new ArrayList<>();
+        final List<UriSingleResponse<? extends BlackDuckResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(notificationDetailResults.getAllLinks());
         hubBucketService.addToTheBucket(hubBucket, uriResponseList);
     }

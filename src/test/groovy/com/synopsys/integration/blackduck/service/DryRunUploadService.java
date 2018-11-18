@@ -25,7 +25,7 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
 
-import com.synopsys.integration.blackduck.api.core.HubPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
@@ -37,12 +37,12 @@ public class DryRunUploadService extends DataService {
     }
 
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = hubService.getUri(new HubPath("/api/v1/scans"));
+        final String uri = hubService.getUri(new BlackDuckPath("/api/v1/scans"));
         final Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
         try (Response response = hubService.executeRequest(request)) {
             final String responseString = response.getContentString();
             final DryRunUploadResponse uploadResponse = hubService.getGson().fromJson(responseString, DryRunUploadResponse.class);
-            uploadResponse.json = responseString;
+            uploadResponse.setJson(responseString);
             return uploadResponse;
         }
     }

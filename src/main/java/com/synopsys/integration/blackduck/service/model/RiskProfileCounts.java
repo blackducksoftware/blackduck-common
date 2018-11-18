@@ -39,8 +39,8 @@ public class RiskProfileCounts {
             countsMap.put(value, 0);
         }
         if (view != null) {
-            for (final RiskCountView count : view.counts) {
-                countsMap.put(count.countType, count.count);
+            for (final RiskCountView count : view.getCounts()) {
+                countsMap.put(count.getCountType(), count.getCount());
             }
         }
     }

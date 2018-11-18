@@ -24,15 +24,15 @@
 package com.synopsys.integration.blackduck.service.bucket;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.service.HubService;
 
 public class HubBucketFillTask implements Runnable {
     private final HubService hubService;
     private final HubBucket hubBucket;
-    private final UriSingleResponse<? extends HubResponse> uriSingleResponse;
+    private final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse;
 
-    public HubBucketFillTask(final HubService hubService, final HubBucket hubBucket, final UriSingleResponse<? extends HubResponse> uriSingleResponse) {
+    public HubBucketFillTask(final HubService hubService, final HubBucket hubBucket, final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse) {
         this.hubService = hubService;
         this.hubBucket = hubBucket;
         this.uriSingleResponse = uriSingleResponse;
@@ -42,8 +42,8 @@ public class HubBucketFillTask implements Runnable {
     public void run() {
         if (!hubBucket.contains(uriSingleResponse.uri)) {
             try {
-                final HubResponse hubResponse = hubService.getResponse(uriSingleResponse);
-                hubBucket.addValid(uriSingleResponse.uri, hubResponse);
+                final BlackDuckResponse blackDuckResponse = hubService.getResponse(uriSingleResponse);
+                hubBucket.addValid(uriSingleResponse.uri, blackDuckResponse);
             } catch (final Exception e) {
                 // it is up to the consumer of the bucket to log or handle any/all Exceptions
                 hubBucket.addError(uriSingleResponse.uri, e);

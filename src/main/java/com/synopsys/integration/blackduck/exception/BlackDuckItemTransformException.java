@@ -21,24 +21,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.api.view;
+package com.synopsys.integration.blackduck.exception;
 
-import java.util.ArrayList;
-import java.util.List;
+public class BlackDuckItemTransformException extends BlackDuckIntegrationException {
+    private static final long serialVersionUID = 1L;
 
-import com.synopsys.integration.blackduck.api.core.HubView;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+    public BlackDuckItemTransformException() {
+        super();
+    }
 
-public class HubViewFilter<T extends HubView> {
-    public List<T> getAccessibleItems(final MetaHandler metaHandler, final List<T> hubItems) throws HubIntegrationException {
-        final List<T> accessibleItems = new ArrayList<>();
-        for (final T hubItem : hubItems) {
-            final List<String> allow = metaHandler.getAllowedMethods(hubItem);
-            if (allow != null && !allow.isEmpty() && allow.contains("GET") && allow.contains("PUT")) {
-                accessibleItems.add(hubItem);
-            }
-        }
-        return accessibleItems;
+    public BlackDuckItemTransformException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public BlackDuckItemTransformException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public BlackDuckItemTransformException(final String message) {
+        super(message);
+    }
+
+    public BlackDuckItemTransformException(final Throwable cause) {
+        super(cause);
     }
 
 }

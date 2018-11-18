@@ -50,7 +50,7 @@ public class UserGroupService {
     public UserView getUserByUsername(final String username) throws IntegrationException {
         final List<UserView> allUsers = hubService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         for (final UserView user : allUsers) {
-            if (user.userName.equalsIgnoreCase(username)) {
+            if (user.getUserName().equalsIgnoreCase(username)) {
                 return user;
             }
         }
@@ -63,12 +63,12 @@ public class UserGroupService {
     }
 
     public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
-        logger.debug("Attempting to get the assigned projects for User: " + userView.userName);
+        logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
         final List<AssignedProjectView> assignedProjectViews = hubService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (final AssignedProjectView assigned : assignedProjectViews) {
-            final ProjectView project = hubService.getResponse(assigned.project, ProjectView.class);
+            final ProjectView project = hubService.getResponse(assigned.getProject(), ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
@@ -110,7 +110,7 @@ public class UserGroupService {
     public UserGroupView getGroupByName(final String groupName) throws IntegrationException {
         final List<UserGroupView> allGroups = hubService.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
         for (final UserGroupView group : allGroups) {
-            if (group.name.equalsIgnoreCase(groupName)) {
+            if (group.getName().equalsIgnoreCase(groupName)) {
                 return group;
             }
         }

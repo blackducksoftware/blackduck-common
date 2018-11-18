@@ -29,8 +29,8 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.api.core.HubPath;
-import com.synopsys.integration.blackduck.api.core.HubPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -57,23 +57,23 @@ public class CodeLocationService extends DataService {
     }
 
     public void unmapCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, "");
         updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationView, final ProjectVersionView version) throws IntegrationException {
-        mapCodeLocation(codeLocationView, hubService.getHref(version));
+        mapCodeLocation(codeLocationView, version.getHref().orElse(null));
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationView, final String versionUrl) throws IntegrationException {
-        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
         final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, versionUrl);
         updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
     }
 
     public void updateCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
         updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(codeLocationView));
     }
 
@@ -92,7 +92,7 @@ public class CodeLocationService extends DataService {
     }
 
     public void deleteCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = hubService.getHref(codeLocationView);
+        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
         deleteCodeLocation(codeLocationViewUrl);
     }
 
@@ -110,7 +110,7 @@ public class CodeLocationService extends DataService {
             final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
             final List<CodeLocationView> codeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
-                if (codeLocationName.equals(codeLocation.name)) {
+                if (codeLocationName.equals(codeLocation.getName())) {
                     return codeLocation;
                 }
             }
@@ -120,18 +120,18 @@ public class CodeLocationService extends DataService {
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final HubPath hubPath = new HubPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
-        final HubPathSingleResponse<CodeLocationView> codeLocationResponse = new HubPathSingleResponse<>(hubPath, CodeLocationView.class);
+        final BlackDuckPath blackDuckPath = new BlackDuckPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
+        final BlackDuckPathSingleResponse<CodeLocationView> codeLocationResponse = new BlackDuckPathSingleResponse<>(blackDuckPath, CodeLocationView.class);
         return hubService.getResponse(codeLocationResponse);
     }
 
     private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationView, final String versionUrl) {
         final CodeLocationView requestCodeLocationView = new CodeLocationView();
-        requestCodeLocationView.createdAt = codeLocationView.createdAt;
-        requestCodeLocationView.mappedProjectVersion = versionUrl;
-        requestCodeLocationView.name = codeLocationView.name;
-        requestCodeLocationView.updatedAt = codeLocationView.updatedAt;
-        requestCodeLocationView.url = codeLocationView.url;
+        requestCodeLocationView.setCreatedAt(codeLocationView.getCreatedAt());
+        requestCodeLocationView.setMappedProjectVersion(versionUrl);
+        requestCodeLocationView.setName(codeLocationView.getName());
+        requestCodeLocationView.setUpdatedAt(codeLocationView.getUpdatedAt());
+        requestCodeLocationView.setUrl(codeLocationView.getUrl());
         return requestCodeLocationView;
     }
 

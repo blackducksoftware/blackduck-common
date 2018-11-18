@@ -35,7 +35,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
     @AfterEach
     public void cleanup() {
         if (projectVersionWrapper != null) {
-            deleteProject(projectVersionWrapper.getProjectView().name);
+            deleteProject(projectVersionWrapper.getProjectView().getName());
         }
     }
 
@@ -52,8 +52,8 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
 
         final List<VersionBomComponentView> bomComponents = projectService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         final VersionBomComponentView component = bomComponents.get(0);
-        assertEquals("Apache Commons FileUpload", component.componentName);
-        assertEquals("1.2.1", component.componentVersionName);
+        assertEquals("Apache Commons FileUpload", component.getComponentName());
+        assertEquals("1.2.1", component.getComponentVersionName());
     }
 
 }

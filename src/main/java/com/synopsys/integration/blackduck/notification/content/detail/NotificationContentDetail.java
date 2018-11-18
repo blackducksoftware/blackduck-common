@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
@@ -138,7 +138,7 @@ public class NotificationContentDetail extends Stringable {
     }
     // @formatter:on
 
-    private <T extends HubResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
+    private <T extends BlackDuckResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
         if (uri.isPresent()) {
             return Optional.of(new UriSingleResponse<>(uri.get(), responseClass));
         }
@@ -199,8 +199,8 @@ public class NotificationContentDetail extends Stringable {
         return CONTENT_KEY_GROUP_BOM_EDIT.equals(notificationGroup);
     }
 
-    public List<UriSingleResponse<? extends HubResponse>> getPresentLinks() {
-        final List<UriSingleResponse<? extends HubResponse>> presentLinks = new ArrayList<>();
+    public List<UriSingleResponse<? extends BlackDuckResponse>> getPresentLinks() {
+        final List<UriSingleResponse<? extends BlackDuckResponse>> presentLinks = new ArrayList<>();
         if (projectVersion.isPresent()) {
             presentLinks.add(projectVersion.get());
         }

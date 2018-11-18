@@ -56,7 +56,7 @@ public class NotificationContentDetailFactory {
 
     public NotificationDetailResult generateContentDetails(final CommonNotificationView view) {
         final NotificationType type = view.getType();
-        final String notificationJson = view.json;
+        final String notificationJson = view.getJson();
         final JsonObject jsonObject = jsonParser.parse(notificationJson).getAsJsonObject();
 
         NotificationContent notificationContent = null;
@@ -85,7 +85,7 @@ public class NotificationContentDetailFactory {
             populateContentDetails(notificationContentDetails, notificationGroup, (BomEditContent) notificationContent);
         }
 
-        return new NotificationDetailResult(notificationContent, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, Optional.ofNullable(view.getNotificationState()), notificationContentDetails);
+        return new NotificationDetailResult(notificationContent, view.getContentType(), view.getCreatedAt(), view.getType(), notificationGroup, view.getNotificationState(), notificationContentDetails);
     }
 
     public void populateContentDetails(final List<NotificationContentDetail> notificationContentDetails, final String notificationGroup, final PolicyOverrideNotificationContent content) {
@@ -144,18 +144,18 @@ public class NotificationContentDetailFactory {
     public void populateContentDetails(final List<NotificationContentDetail> notificationContentDetails, final String notificationGroup, final VulnerabilityNotificationContent content) {
         for (final AffectedProjectVersion projectVersion : content.affectedProjectVersions) {
             final NotificationContentDetail detail = NotificationContentDetail
-                    .createDetail(notificationGroup, Optional.of(projectVersion.projectName), Optional.of(projectVersion.projectVersionName), Optional.of(projectVersion.projectVersion),
-                            Optional.of(content.componentName), Optional.empty(), Optional.of(content.versionName), Optional.of(content.componentVersion), Optional.empty(), Optional.empty(),
-                            Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId),
-                            Optional.ofNullable(projectVersion.bomComponent));
+                                                             .createDetail(notificationGroup, Optional.of(projectVersion.projectName), Optional.of(projectVersion.projectVersionName), Optional.of(projectVersion.projectVersion),
+                                                                     Optional.of(content.componentName), Optional.empty(), Optional.of(content.versionName), Optional.of(content.componentVersion), Optional.empty(), Optional.empty(),
+                                                                     Optional.ofNullable(content.componentVersionOriginName), Optional.ofNullable(projectVersion.componentIssueUrl), Optional.ofNullable(content.componentVersionOriginId),
+                                                                     Optional.ofNullable(projectVersion.bomComponent));
             notificationContentDetails.add(detail);
         }
     }
 
     private void populateContentDetails(final List<NotificationContentDetail> notificationContentDetails, final String notificationGroup, final BomEditContent notificationContent) {
         final NotificationContentDetail detail = NotificationContentDetail
-                .createDetail(notificationGroup, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                        Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.ofNullable(notificationContent.bomComponent));
+                                                         .createDetail(notificationGroup, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                                                                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.ofNullable(notificationContent.bomComponent));
         notificationContentDetails.add(detail);
     }
 

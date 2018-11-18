@@ -43,12 +43,12 @@ public class ComponentVersionPolicyViolationCount extends Stringable {
     public ComponentVersionPolicyViolationCount(final NameValuePairView nameValuePair) {
         final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);
         final Set<String> policyStatusTypeValues = policySeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
-        if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicySeverityType.valueOf(nameValuePair.name);
+        if (policyStatusTypeValues.contains(nameValuePair.getName())) {
+            name = PolicySeverityType.valueOf(nameValuePair.getName());
         }
 
-        if (nameValuePair.value != null) {
-            final String valueString = nameValuePair.value.toString();
+        if (nameValuePair.getValue() != null) {
+            final String valueString = nameValuePair.getValue().toString();
             if (NumberUtils.isCreatable(valueString)) {
                 value = NumberUtils.createNumber(valueString).intValue();
             }

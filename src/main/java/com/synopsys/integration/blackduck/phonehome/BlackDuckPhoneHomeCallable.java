@@ -79,7 +79,7 @@ public class BlackDuckPhoneHomeCallable extends PhoneHomeCallable {
             }
             phoneHomeRequestBodyBuilder.setCustomerId(registrationId);
             phoneHomeRequestBodyBuilder.setProductId(ProductIdEnum.HUB);
-            phoneHomeRequestBodyBuilder.setProductVersion(currentVersion.version);
+            phoneHomeRequestBodyBuilder.setProductVersion(currentVersion.getVersion());
         } catch (final Exception e) {
             logger.debug("Couldn't detail phone home request builder: " + e.getMessage());
         }

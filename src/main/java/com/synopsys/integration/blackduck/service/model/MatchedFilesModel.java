@@ -38,12 +38,12 @@ public class MatchedFilesModel {
     private final Set<MatchedFileUsagesType> usages;
 
     public MatchedFilesModel(final MatchedFileView matchedFile) {
-        final CompositePathWithArchiveContext pathView = matchedFile.filePath;
-        path = pathView.path;
-        archiveContext = pathView.archiveContext;
-        fileName = pathView.fileName;
-        compositePathContext = pathView.compositePathContext;
-        usages = new HashSet<>(matchedFile.usages);
+        final CompositePathWithArchiveContext pathView = matchedFile.getFilePath();
+        path = pathView.getPath();
+        archiveContext = pathView.getArchiveContext();
+        fileName = pathView.getFileName();
+        compositePathContext = pathView.getCompositePathContext();
+        usages = new HashSet<>(matchedFile.getUsages());
     }
 
     public String getPath() {

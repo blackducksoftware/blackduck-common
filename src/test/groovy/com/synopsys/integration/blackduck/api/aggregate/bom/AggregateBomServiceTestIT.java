@@ -28,13 +28,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
-import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.HubServicesFactory;
@@ -47,7 +46,6 @@ public class AggregateBomServiceTestIT {
     @Test
     public void testGetBomEntriesForUrl() throws IllegalArgumentException, IntegrationException {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
-        final MetaHandler metaHandler = new MetaHandler(restConnectionTestHelper.createIntLogger());
         final HubService hubService = hubServicesFactory.createHubService();
 
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT");
@@ -60,25 +58,25 @@ public class AggregateBomServiceTestIT {
         final List<ProjectVersionView> projectVersions = hubService.getAllResponses(project.get(), ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
-            if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
+            if (projectVersionCandidate.getVersionName().equals(testProjectVersionName)) {
                 projectVersion = projectVersionCandidate;
             }
         }
         assertNotNull(projectVersion);
 
-        final String bomUrl = metaHandler.getFirstLink(projectVersion, "components");
+        final String bomUrl = projectVersion.getFirstLink(ProjectVersionView.COMPONENTS_LINK).get();
         final List<VersionBomComponentView> bomComponents = hubService.getResponses(bomUrl, VersionBomComponentView.class, true);
         System.out.println("BOM size: " + bomComponents.size());
 
         // Look for testComponent in BOM
         VersionBomComponentView foundComp = null;
         for (final VersionBomComponentView comp : bomComponents) {
-            if ((testComponentName.equals(comp.componentName) && (testComponentVersionName.equals(comp.componentVersionName)))) {
+            if ((testComponentName.equals(comp.getComponentName()) && (testComponentVersionName.equals(comp.getComponentVersionName())))) {
                 foundComp = comp;
             }
         }
         assertNotNull(foundComp);
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_USAGE"), foundComp.usages.get(0).toString());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_USAGE"), foundComp.getUsages().get(0).toString());
     }
 
     @Test
@@ -95,7 +93,7 @@ public class AggregateBomServiceTestIT {
         final List<ProjectVersionView> projectVersions = hubServicesFactory.createHubService().getAllResponses(project.get(), ProjectView.VERSIONS_LINK_RESPONSE);
         ProjectVersionView projectVersion = null;
         for (final ProjectVersionView projectVersionCandidate : projectVersions) {
-            if (projectVersionCandidate.versionName.equals(testProjectVersionName)) {
+            if (projectVersionCandidate.getVersionName().equals(testProjectVersionName)) {
                 projectVersion = projectVersionCandidate;
             }
         }
@@ -107,12 +105,12 @@ public class AggregateBomServiceTestIT {
         // Look for testComponent in BOM
         VersionBomComponentView foundComp = null;
         for (final VersionBomComponentView comp : bomComponents) {
-            if (testComponentName.equals(comp.componentName) && (testComponentVersionName.equals(comp.componentVersionName))) {
+            if (testComponentName.equals(comp.getComponentName()) && (testComponentVersionName.equals(comp.getComponentVersionName()))) {
                 foundComp = comp;
             }
         }
         assertNotNull(foundComp);
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_USAGE"), foundComp.usages.get(0).toString());
+        assertEquals(restConnectionTestHelper.getProperty("TEST_PROJECT_COMPONENT_USAGE"), foundComp.getUsages().get(0).toString());
     }
 
 }

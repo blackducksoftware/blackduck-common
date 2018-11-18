@@ -49,12 +49,12 @@ public class PolicyStatusDescription {
     }
 
     private void populatePolicySeverityMap() {
-        final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.componentVersionPolicyViolationDetails;
-        if (policyViolationDetails != null && PolicySummaryStatusType.IN_VIOLATION.equals(policyStatusItem.overallStatus)) {
-            final List<NameValuePairView> nameValuePairs = policyViolationDetails.severityLevels;
+        final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.getComponentVersionPolicyViolationDetails();
+        if (policyViolationDetails != null && PolicySummaryStatusType.IN_VIOLATION.equals(policyStatusItem.getOverallStatus())) {
+            final List<NameValuePairView> nameValuePairs = policyViolationDetails.getSeverityLevels();
             if (nameValuePairs != null) {
                 for (final NameValuePairView nameValuePairView : nameValuePairs) {
-                    if (nameValuePairView.name != null) {
+                    if (nameValuePairView.getName() != null) {
                         final ComponentVersionPolicyViolationCount componentVersionPolicyViolationCount = new ComponentVersionPolicyViolationCount(nameValuePairView);
                         policySeverityCount.put(componentVersionPolicyViolationCount.name, componentVersionPolicyViolationCount);
                     }
@@ -64,10 +64,10 @@ public class PolicyStatusDescription {
     }
 
     private void populatePolicyStatusMap() {
-        final List<NameValuePairView> nameValuePairs = policyStatusItem.componentVersionStatusCounts;
+        final List<NameValuePairView> nameValuePairs = policyStatusItem.getComponentVersionStatusCounts();
         if (nameValuePairs != null) {
             for (final NameValuePairView nameValuePairView : nameValuePairs) {
-                if (nameValuePairView.name != null) {
+                if (nameValuePairView.getName() != null) {
                     final ComponentVersionStatusCount componentVersionStatusCount = new ComponentVersionStatusCount(nameValuePairView);
                     policyStatusCount.put(componentVersionStatusCount.name, componentVersionStatusCount);
                 }
@@ -76,7 +76,7 @@ public class PolicyStatusDescription {
     }
 
     public String getPolicyStatusMessage() {
-        if (policyStatusItem.componentVersionStatusCounts == null || policyStatusItem.componentVersionStatusCounts.size() == 0) {
+        if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().size() == 0) {
             return "The Hub found no components.";
         }
 

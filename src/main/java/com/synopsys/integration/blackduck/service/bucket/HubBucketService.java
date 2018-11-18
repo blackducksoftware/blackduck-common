@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -50,27 +50,27 @@ public class HubBucketService extends DataService {
         this.executorService = Optional.of(executorService);
     }
 
-    public HubBucket startTheBucket(final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
+    public HubBucket startTheBucket(final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
         final HubBucket hubBucket = new HubBucket();
         addToTheBucket(hubBucket, uriSingleResponses);
         return hubBucket;
     }
 
-    public <T extends HubResponse> void addToTheBucket(final HubBucket hubBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
-        final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses = new ArrayList<>();
+    public <T extends BlackDuckResponse> void addToTheBucket(final HubBucket hubBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
+        final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriSingleResponses.add(new UriSingleResponse<>(uri, responseClass));
         addToTheBucket(hubBucket, uriSingleResponses);
     }
 
-    public void addToTheBucket(final HubBucket hubBucket, final Map<String, Class<? extends HubResponse>> uriToResponseClass) throws IntegrationException {
-        final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses = new ArrayList<>();
+    public void addToTheBucket(final HubBucket hubBucket, final Map<String, Class<? extends BlackDuckResponse>> uriToResponseClass) throws IntegrationException {
+        final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriToResponseClass.forEach((key, value) -> {
             uriSingleResponses.add(new UriSingleResponse<>(key, value));
         });
         addToTheBucket(hubBucket, uriSingleResponses);
     }
 
-    public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends HubResponse>> uriSingleResponses) throws IntegrationException {
+    public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
         final List<HubBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
             return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
         }).collect(Collectors.toList());

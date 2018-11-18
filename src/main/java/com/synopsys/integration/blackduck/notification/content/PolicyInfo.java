@@ -23,9 +23,9 @@
  */
 package com.synopsys.integration.blackduck.notification.content;
 
-import com.synopsys.integration.blackduck.api.core.HubComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 
-public class PolicyInfo extends HubComponent {
+public class PolicyInfo extends BlackDuckComponent {
     public String policyName;
     public String policy;
 

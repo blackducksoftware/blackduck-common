@@ -21,15 +21,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.api.component;
+package com.synopsys.integration.blackduck.exception;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
+import com.synopsys.integration.exception.IntegrationException;
 
-public class AffectedProjectVersion extends BlackDuckComponent {
-    public String projectName;
-    public String projectVersionName;
-    public String projectVersion;
-    public String componentIssueUrl;
-    public String bomComponent;
+public class BlackDuckIntegrationException extends IntegrationException {
+    private static final long serialVersionUID = 1L;
+
+    public BlackDuckIntegrationException() {
+        super();
+    }
+
+    public BlackDuckIntegrationException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public BlackDuckIntegrationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public BlackDuckIntegrationException(final String message) {
+        super(message);
+    }
+
+    public BlackDuckIntegrationException(final Throwable cause) {
+        super(cause);
+    }
 
 }

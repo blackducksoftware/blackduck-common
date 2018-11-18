@@ -40,7 +40,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
     @AfterEach
     public void cleanup() {
         if (projectVersionWrapper.isPresent()) {
-            deleteProject(projectVersionWrapper.get().getProjectView().name);
+            deleteProject(projectVersionWrapper.get().getProjectView().getName());
         }
         deleteCodeLocation(codeLocationName);
     }
@@ -70,7 +70,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         final List<CodeLocationView> versionCodeLocations = hubService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertEquals(1, versionCodeLocations.size());
         final CodeLocationView versionCodeLocation = versionCodeLocations.get(0);
-        assertEquals(codeLocationName, versionCodeLocation.name);
+        assertEquals(codeLocationName, versionCodeLocation.getName());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
          * now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
          */
         final CodeLocationView codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
-        System.out.println(codeLocationView._meta.href);
+        System.out.println(codeLocationView.getHref().get());
 
         /**
          * then we map the code location to a version
@@ -110,11 +110,11 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.get().getProjectVersionView());
 
-        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.name)), 15 * 60);
+        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.getName())), 15 * 60);
 
         final List<CodeLocationView> versionCodeLocations = hubService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         final CodeLocationView versionCodeLocation = versionCodeLocations.get(0);
-        assertEquals(codeLocationName, versionCodeLocation.name);
+        assertEquals(codeLocationName, versionCodeLocation.getName());
     }
 
 }

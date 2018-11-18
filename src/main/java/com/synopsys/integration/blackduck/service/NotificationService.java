@@ -57,7 +57,7 @@ public class NotificationService extends DataService {
     public List<NotificationUserView> getAllUserNotifications(final UserView user, final Date startDate, final Date endDate) throws IntegrationException {
         final List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
-        final String userNotificationsUri = hubService.getFirstLink(user, UserView.NOTIFICATIONS_LINK);
+        final String userNotificationsUri = user.getFirstLink(UserView.NOTIFICATIONS_LINK).orElse(null);
         requestBuilder.uri(userNotificationsUri);
 
         final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(requestBuilder, NotificationUserView.class, true);
@@ -72,7 +72,7 @@ public class NotificationService extends DataService {
 
     public List<NotificationUserView> getFilteredUserNotifications(final UserView user, final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        final String userNotificationsUri = hubService.getFirstLink(user, UserView.NOTIFICATIONS_LINK);
+        final String userNotificationsUri = user.getFirstLink(UserView.NOTIFICATIONS_LINK).orElse(null);
         requestBuilder.uri(userNotificationsUri);
 
         final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(requestBuilder, NotificationUserView.class, true);
@@ -88,7 +88,7 @@ public class NotificationService extends DataService {
         RequestFactory.addHubFilter(requestBuilder, createFilterForAllKnownTypes());
         final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
-            return notifications.get(0).createdAt;
+            return notifications.get(0).getCreatedAt();
         } else {
             return new Date();
         }

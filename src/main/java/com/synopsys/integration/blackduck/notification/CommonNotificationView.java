@@ -24,19 +24,20 @@
 package com.synopsys.integration.blackduck.notification;
 
 import java.util.Date;
+import java.util.Optional;
 
-import com.synopsys.integration.blackduck.api.core.HubView;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationStateRequestStateType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 
 /**
- * This is a flattened view of both NotificationView and NotificationUserView and must be manually maintained to support both views and their api. The only common class between both views is HubView which is why sourceView is of that type,
+ * This is a flattened view of both NotificationView and NotificationUserView and must be manually maintained to support both views and their api. The only common class between both views is BlackDuckView which is why sourceView is of that type,
  * but it should only ever be either NotificationView or NotificationUserView.
  */
-public class CommonNotificationView extends HubView {
-    private final HubView sourceView;
+public class CommonNotificationView extends BlackDuckView {
+    private final BlackDuckView sourceView;
     private final String contentType;
     private final Date createdAt;
     private final NotificationType type;
@@ -44,25 +45,29 @@ public class CommonNotificationView extends HubView {
 
     public CommonNotificationView(final NotificationView notificationView) {
         sourceView = notificationView;
-        contentType = notificationView.contentType;
-        createdAt = notificationView.createdAt;
-        type = notificationView.type;
+        contentType = notificationView.getContentType();
+        createdAt = notificationView.getCreatedAt();
+        type = notificationView.getType();
         notificationState = null;
-        _meta = notificationView._meta;
-        json = notificationView.json;
+        setMeta(notificationView.getMeta());
+        setJson(notificationView.getJson());
+        setGson(notificationView.getGson());
+        setJsonElement(notificationView.getJsonElement());
     }
 
     public CommonNotificationView(final NotificationUserView notificationUserView) {
         sourceView = notificationUserView;
-        contentType = notificationUserView.contentType;
-        createdAt = notificationUserView.createdAt;
-        type = notificationUserView.type;
-        notificationState = notificationUserView.notificationState;
-        _meta = notificationUserView._meta;
-        json = notificationUserView.json;
+        contentType = notificationUserView.getContentType();
+        createdAt = notificationUserView.getCreatedAt();
+        type = notificationUserView.getType();
+        notificationState = notificationUserView.getNotificationState();
+        setMeta(notificationUserView.getMeta());
+        setJson(notificationUserView.getJson());
+        setGson(notificationUserView.getGson());
+        setJsonElement(notificationUserView.getJsonElement());
     }
 
-    public HubView getSourceView() {
+    public BlackDuckView getSourceView() {
         return sourceView;
     }
 
@@ -78,8 +83,8 @@ public class CommonNotificationView extends HubView {
         return type;
     }
 
-    public NotificationStateRequestStateType getNotificationState() {
-        return notificationState;
+    public Optional<NotificationStateRequestStateType> getNotificationState() {
+        return Optional.ofNullable(notificationState);
     }
 
 }

@@ -65,7 +65,7 @@ public class ProjectAssignmentServiceTestIT {
         final String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
 
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = testProjectName;
+        projectRequest.setName(testProjectName);
         final String projectUrl = hubServicesFactory.createProjectService().createProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
@@ -73,6 +73,6 @@ public class ProjectAssignmentServiceTestIT {
         final List<AssignedUserView> assignedUsers = hubServicesFactory.createProjectService().getAssignedUsersToProject(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
-        assertEquals("sysadmin", assignedUsers.get(0).name);
+        assertEquals("sysadmin", assignedUsers.get(0).getName());
     }
 }

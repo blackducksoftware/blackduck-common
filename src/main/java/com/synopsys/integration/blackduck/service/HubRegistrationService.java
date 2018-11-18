@@ -26,7 +26,7 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 
 import com.google.gson.JsonObject;
-import com.synopsys.integration.blackduck.api.core.HubPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Response;
@@ -37,7 +37,7 @@ public class HubRegistrationService extends DataService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        try (Response response = hubService.executeGetRequest(new HubPath("/api/v1/registrations"))) {
+        try (Response response = hubService.executeGetRequest(new BlackDuckPath("/api/v1/registrations"))) {
             final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();

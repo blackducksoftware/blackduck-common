@@ -49,11 +49,11 @@ public class VersionBomComponentModel {
     }
 
     public ActivityDataView getActivityData() {
-        return component.activityData;
+        return component.getActivityData();
     }
 
     public RiskProfileCounts getActivityRiskProfile() {
-        return new RiskProfileCounts(component.activityRiskProfile);
+        return new RiskProfileCounts(component.getActivityRiskProfile());
     }
 
     public boolean hasActivityRisk() {
@@ -61,23 +61,23 @@ public class VersionBomComponentModel {
     }
 
     public String getComponent() {
-        return component.component;
+        return component.getComponent();
     }
 
     public String getComponentName() {
-        return component.componentName;
+        return component.getComponentName();
     }
 
     public String getComponentVersion() {
-        return component.componentVersion;
+        return component.getComponentVersion();
     }
 
     public String getComponentVersionName() {
-        return component.componentVersionName;
+        return component.getComponentVersionName();
     }
 
     public RiskProfileCounts getLicenseRiskProfile() {
-        return new RiskProfileCounts(component.licenseRiskProfile);
+        return new RiskProfileCounts(component.getLicenseRiskProfile());
     }
 
     public boolean hasLicenseRisk() {
@@ -85,11 +85,11 @@ public class VersionBomComponentModel {
     }
 
     public List<VersionBomLicenseView> getLicenses() {
-        return component.licenses;
+        return component.getLicenses();
     }
 
     public RiskProfileCounts getOperationalRiskProfile() {
-        return new RiskProfileCounts(component.operationalRiskProfile);
+        return new RiskProfileCounts(component.getOperationalRiskProfile());
     }
 
     public boolean hasOperationalRisk() {
@@ -97,19 +97,19 @@ public class VersionBomComponentModel {
     }
 
     public List<VersionBomOriginView> getOrigins() {
-        return component.origins;
+        return component.getOrigins();
     }
 
     public List<VersionBomComponentMatchType> getMatchTypes() {
-        return component.matchTypes;
+        return component.getMatchTypes();
     }
 
     public Date getReleasedOn() {
-        return component.releasedOn;
+        return component.getReleasedOn();
     }
 
     public RiskProfileCounts getSecurityRiskProfile() {
-        return new RiskProfileCounts(component.securityRiskProfile);
+        return new RiskProfileCounts(component.getSecurityRiskProfile());
     }
 
     public boolean hasSecurityRisk() {
@@ -117,11 +117,11 @@ public class VersionBomComponentModel {
     }
 
     public List<MatchedFileUsagesType> getUsages() {
-        return component.usages;
+        return component.getUsages();
     }
 
     public RiskProfileCounts getVersionRiskProfile() {
-        return new RiskProfileCounts(component.versionRiskProfile);
+        return new RiskProfileCounts(component.getVersionRiskProfile());
     }
 
     public boolean hasVersionRisk() {
@@ -129,15 +129,15 @@ public class VersionBomComponentModel {
     }
 
     public VersionBomComponentReviewStatusType getReviewStatus() {
-        return component.reviewStatus;
+        return component.getReviewStatus();
     }
 
     public ReviewedDetails getReviewedDetails() {
-        return component.reviewedDetails;
+        return component.getReviewedDetails();
     }
 
     public PolicySummaryStatusType getApprovalStatus() {
-        return component.approvalStatus;
+        return component.getApprovalStatus();
     }
 
     public List<MatchedFilesModel> getMatchedFiles() {

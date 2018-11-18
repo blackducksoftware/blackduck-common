@@ -42,32 +42,26 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.rest.RestConstants;
 
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionView> expressions = new ArrayList<>();
-    private final MetaHandler metaHandler;
-
-    public PolicyRuleExpressionSetBuilder(final MetaHandler metaHandler) {
-        this.metaHandler = metaHandler;
-    }
 
     public void addProjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ProjectView projectView) throws HubIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, metaHandler.getHref(projectView));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref().orElse(null));
     }
 
     public void addComponentVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentVersionView componentVersionView) throws HubIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, metaHandler.getHref(componentVersionView));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref().orElse(null));
     }
 
     public void addComponentCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentView componentView) throws HubIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, metaHandler.getHref(componentView));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref().orElse(null));
     }
 
     public void addLicenseCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final LicenseView licenseView) throws HubIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, metaHandler.getHref(licenseView));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref().orElse(null));
     }
 
     public void addReviewStatusCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ReviewStatusType reviewType) throws HubIntegrationException {
@@ -136,11 +130,11 @@ public class PolicyRuleExpressionSetBuilder {
 
     public void addMultiCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<String> values) throws HubIntegrationException {
         final PolicyRuleExpressionParameter expressionParameter = new PolicyRuleExpressionParameter();
-        expressionParameter.values = values;
+        expressionParameter.setValues(values);
         final PolicyRuleExpressionView expression = new PolicyRuleExpressionView();
-        expression.name = policyRuleConditionType.toString();
-        expression.operation = policyRuleConditionOperator.toString();
-        expression.parameters = expressionParameter;
+        expression.setName(policyRuleConditionType.toString());
+        expression.setOperation(policyRuleConditionOperator.toString());
+        expression.setParameters(expressionParameter);
         expressions.add(expression);
     }
 
@@ -150,8 +144,8 @@ public class PolicyRuleExpressionSetBuilder {
 
     public PolicyRuleExpressionSetView createPolicyRuleExpressionSetView(final PolicyRuleExpressionSetOperatorType expressionOperatorType) {
         final PolicyRuleExpressionSetView expressionSet = new PolicyRuleExpressionSetView();
-        expressionSet.operator = expressionOperatorType;
-        expressionSet.expressions = expressions;
+        expressionSet.setOperator(expressionOperatorType);
+        expressionSet.setExpressions(expressions);
         return expressionSet;
     }
 

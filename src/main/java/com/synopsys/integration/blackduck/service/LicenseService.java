@@ -45,18 +45,18 @@ public class LicenseService extends DataService {
 
     public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = componentDataService.getExactComponentMatch(externalId);
-        final String componentVersionUrl = componentSearchView.version;
+        final String componentVersionUrl = componentSearchView.getVersion();
         final ComponentVersionView componentVersion = hubService.getResponse(componentVersionUrl, ComponentVersionView.class);
 
-        return componentVersion.license;
+        return componentVersion.getLicense();
     }
 
     public LicenseView getLicenseView(final VersionBomLicenseView versionBomLicenseView) throws IntegrationException {
-        return getLicenseView(versionBomLicenseView.license);
+        return getLicenseView(versionBomLicenseView.getLicense());
     }
 
     public LicenseView getLicenseView(final ComplexLicenseView complexLicenseView) throws IntegrationException {
-        return getLicenseView(complexLicenseView.license);
+        return getLicenseView(complexLicenseView.getLicense());
     }
 
     public LicenseView getLicenseView(final String licenseUrl) throws IntegrationException {
@@ -68,7 +68,7 @@ public class LicenseService extends DataService {
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
-        final String licenseTextUrl = hubService.getFirstLinkSafely(licenseView, LicenseView.TEXT_LINK);
+        final String licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK).orElse(null);
         try (Response response = hubService.executeGetRequest(licenseTextUrl)) {
             return response.getContentString();
         } catch (final IOException e) {

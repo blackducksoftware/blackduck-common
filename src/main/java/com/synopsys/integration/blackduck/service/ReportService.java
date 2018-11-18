@@ -114,7 +114,7 @@ public class ReportService extends DataService {
     }
 
     public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
-        return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version), project.name, version.versionName);
+        return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version), project.getName(), version.getVersionName());
     }
 
     private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws HubIntegrationException {
@@ -150,34 +150,34 @@ public class ReportService extends DataService {
     }
 
     public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
-        final String originalProjectUrl = hubService.getHref(project);
-        final String originalVersionUrl = hubService.getHref(version);
+        final String originalProjectUrl = project.getHref().orElse(null);
+        final String originalVersionUrl = version.getHref().orElse(null);
         final ReportData reportData = new ReportData();
-        reportData.setProjectName(project.name);
+        reportData.setProjectName(project.getName());
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
-        reportData.setProjectVersion(version.versionName);
+        reportData.setProjectVersion(version.getVersionName());
         reportData.setProjectVersionURL(getReportVersionUrl(originalVersionUrl, false));
-        reportData.setPhase(version.phase.toString());
-        reportData.setDistribution(version.distribution.toString());
+        reportData.setPhase(version.getPhase().toString());
+        reportData.setDistribution(version.getDistribution().toString());
         final List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
         final List<VersionBomComponentView> bomEntries = hubService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
         for (final VersionBomComponentView bomEntry : bomEntries) {
             final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-            String policyStatus = bomEntry.approvalStatus.toString();
+            String policyStatus = bomEntry.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(bomEntry.componentVersion)) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.componentVersion);
+                if (!StringUtils.isBlank(bomEntry.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.component);
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
                 }
                 if (!policyFailure) {
                     // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
                     try {
                         final PolicyStatusView bomPolicyStatus = hubService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
-                        policyStatus = bomPolicyStatus.approvalStatus.toString();
+                        policyStatus = bomPolicyStatus.getApprovalStatus().toString();
                     } catch (final IntegrationException e) {
                         policyFailure = true;
                         logger.debug("Could not get the component policy status, the Hub policy module is not enabled");
@@ -246,41 +246,41 @@ public class ReportService extends DataService {
 
     private BomComponent createBomComponentFromBomComponentView(final VersionBomComponentView bomEntry) {
         final BomComponent component = new BomComponent();
-        component.setComponentName(bomEntry.componentName);
-        component.setComponentURL(getReportProjectUrl(bomEntry.component));
-        component.setComponentVersion(bomEntry.componentVersionName);
-        component.setComponentVersionURL(getReportVersionUrl(bomEntry.componentVersion, true));
-        component.setLicense(bomEntry.licenses.get(0).licenseDisplay);
-        if (bomEntry.securityRiskProfile != null && bomEntry.securityRiskProfile.counts != null && !bomEntry.securityRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.securityRiskProfile.counts) {
-                if (count.countType == RiskCountType.HIGH && count.count > 0) {
-                    component.setSecurityRiskHighCount(count.count);
-                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
-                    component.setSecurityRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
-                    component.setSecurityRiskLowCount(count.count);
+        component.setComponentName(bomEntry.getComponentName());
+        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
+        component.setComponentVersion(bomEntry.getComponentVersionName());
+        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
+        component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
+        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
+                    component.setSecurityRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
+                    component.setSecurityRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
+                    component.setSecurityRiskLowCount(count.getCount());
                 }
             }
         }
-        if (bomEntry.licenseRiskProfile != null && bomEntry.licenseRiskProfile.counts != null && !bomEntry.licenseRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.licenseRiskProfile.counts) {
-                if (count.countType == RiskCountType.HIGH && count.count > 0) {
-                    component.setLicenseRiskHighCount(count.count);
-                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
-                    component.setLicenseRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
-                    component.setLicenseRiskLowCount(count.count);
+        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().getCounts() != null && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getLicenseRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
+                    component.setLicenseRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
+                    component.setLicenseRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
+                    component.setLicenseRiskLowCount(count.getCount());
                 }
             }
         }
-        if (bomEntry.operationalRiskProfile != null && bomEntry.operationalRiskProfile.counts != null && !bomEntry.operationalRiskProfile.counts.isEmpty()) {
-            for (final RiskCountView count : bomEntry.operationalRiskProfile.counts) {
-                if (count.countType == RiskCountType.HIGH && count.count > 0) {
-                    component.setOperationalRiskHighCount(count.count);
-                } else if (count.countType == RiskCountType.MEDIUM && count.count > 0) {
-                    component.setOperationalRiskMediumCount(count.count);
-                } else if (count.countType == RiskCountType.LOW && count.count > 0) {
-                    component.setOperationalRiskLowCount(count.count);
+        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().getCounts() != null && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
+            for (final RiskCountView count : bomEntry.getOperationalRiskProfile().getCounts()) {
+                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
+                    component.setOperationalRiskHighCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
+                    component.setOperationalRiskMediumCount(count.getCount());
+                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
+                    component.setOperationalRiskLowCount(count.getCount());
                 }
             }
         }
@@ -288,13 +288,13 @@ public class ReportService extends DataService {
     }
 
     public void populatePolicyRuleInfo(final BomComponent component, final VersionBomComponentView bomEntry) throws IntegrationException {
-        if (bomEntry != null && bomEntry.approvalStatus != null) {
-            final PolicySummaryStatusType status = bomEntry.approvalStatus;
+        if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
+            final PolicySummaryStatusType status = bomEntry.getApprovalStatus();
             if (status == PolicySummaryStatusType.IN_VIOLATION) {
                 final List<PolicyRuleViewV2> rules = hubService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
-                    final PolicyRule ruleViolated = new PolicyRule(policyRuleView.name, policyRuleView.description);
+                    final PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
                     rulesViolated.add(ruleViolated);
                 }
                 component.setPolicyRulesViolated(rulesViolated);
@@ -340,7 +340,7 @@ public class ReportService extends DataService {
      * Assumes the BOM has already been updated
      */
     public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
-        if (hubService.hasLink(version, ProjectVersionView.LICENSEREPORTS_LINK)) {
+        if (version.hasLink(ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
                 final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
@@ -348,7 +348,7 @@ public class ReportService extends DataService {
                 logger.debug("Waiting for the Notices Report to complete.");
                 final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-                final String contentLink = hubService.getFirstLink(reportInfo, ReportView.CONTENT_LINK);
+                final String contentLink = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
 
                 if (contentLink == null) {
                     throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
@@ -375,7 +375,7 @@ public class ReportService extends DataService {
     }
 
     public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
-        final String reportUri = hubService.getFirstLink(version, ProjectVersionView.LICENSEREPORTS_LINK);
+        final String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
 
         final JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("reportFormat", reportFormat.toString());
@@ -397,7 +397,7 @@ public class ReportService extends DataService {
 
         while (timeFinished == null) {
             reportInfo = hubService.getResponse(reportUri, ReportView.class);
-            timeFinished = reportInfo.finishedAt;
+            timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;
             }

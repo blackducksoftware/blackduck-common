@@ -32,7 +32,6 @@ import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpr
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
-import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
@@ -52,7 +51,7 @@ public class PolicyRuleService {
     public PolicyRuleViewV2 getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
         final List<PolicyRuleViewV2> allPolicyRules = hubService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
         for (final PolicyRuleViewV2 policyRule : allPolicyRules) {
-            if (policyRuleName.equals(policyRule.name)) {
+            if (policyRuleName.equals(policyRule.getName())) {
                 return policyRule;
             }
         }
@@ -68,25 +67,25 @@ public class PolicyRuleService {
     /**
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
-    public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName, final MetaHandler metaHandler) throws IntegrationException {
+    public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName) throws IntegrationException {
         final ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId);
 
-        final PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder(metaHandler);
+        final PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView);
         final PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
 
         final PolicyRuleViewV2 policyRuleViewV2 = new PolicyRuleViewV2();
-        policyRuleViewV2.name = policyName;
-        policyRuleViewV2.enabled = true;
-        policyRuleViewV2.overridable = true;
-        policyRuleViewV2.expression = expressionSet;
+        policyRuleViewV2.setName(policyName);
+        policyRuleViewV2.setEnabled(true);
+        policyRuleViewV2.setOverridable(true);
+        policyRuleViewV2.setExpression(expressionSet);
 
         return createPolicyRule(policyRuleViewV2);
     }
 
     public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
         final String json = hubService.convertToJson(policyRuleView);
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(hubService.getHref(policyRuleView));
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(policyRuleView.getHref().orElse(null));
         try (Response response = hubService.executeRequest(requestBuilder.build())) {
 
         } catch (final IOException e) {
@@ -95,7 +94,7 @@ public class PolicyRuleService {
     }
 
     public void deletePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(hubService.getHref(policyRuleView));
+        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(policyRuleView.getHref().orElse(null));
         try (Response response = hubService.executeRequest(requestBuilder.build())) {
 
         } catch (final IOException e) {

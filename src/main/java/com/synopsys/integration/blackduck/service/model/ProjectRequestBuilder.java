@@ -69,51 +69,51 @@ public class ProjectRequestBuilder extends IntegrationBuilder<ProjectRequest> {
         final ProjectVersionDistributionType distributionValue = ProjectVersionDistributionType.valueOf(distribution);
         final ProjectVersionPhaseType phaseValue = ProjectVersionPhaseType.valueOf(phase);
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.distribution = distributionValue;
-        projectVersionRequest.phase = phaseValue;
-        projectVersionRequest.versionName = versionName;
-        projectVersionRequest.releaseComments = releaseComments;
-        projectVersionRequest.cloneFromReleaseUrl = cloneFromReleaseUrl;
+        projectVersionRequest.setDistribution(distributionValue);
+        projectVersionRequest.setPhase(phaseValue);
+        projectVersionRequest.setVersionName(versionName);
+        projectVersionRequest.setReleaseComments(releaseComments);
+        projectVersionRequest.setCloneFromReleaseUrl(cloneFromReleaseUrl);
         if (StringUtils.isNotBlank(releasedOn)) {
             try {
-                projectVersionRequest.releasedOn = RestConstants.parseDateString(releasedOn);
+                projectVersionRequest.setReleasedOn(RestConstants.parseDateString(releasedOn));
             } catch (final ParseException e) {
                 // ignored
             }
         }
-        projectVersionRequest.nickname = versionNickname;
+        projectVersionRequest.setNickname(versionNickname);
 
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = projectName;
-        projectRequest.description = description;
-        projectRequest.projectLevelAdjustments = projectLevelAdjustments;
-        projectRequest.projectOwner = projectOwner;
-        projectRequest.projectTier = projectTier;
-        projectRequest.versionRequest = projectVersionRequest;
-        projectRequest.cloneCategories = cloneCategories;
+        projectRequest.setName(projectName);
+        projectRequest.setDescription(description);
+        projectRequest.setProjectLevelAdjustments(projectLevelAdjustments);
+        projectRequest.setProjectOwner(projectOwner);
+        projectRequest.setProjectTier(projectTier);
+        projectRequest.setVersionRequest(projectVersionRequest);
+        projectRequest.setCloneCategories(cloneCategories);
         return projectRequest;
     }
 
     public void setFromProject(final ProjectView projectView) {
-        cloneCategories = projectView.cloneCategories;
-        description = projectView.description;
-        projectName = projectView.name;
-        projectLevelAdjustments = projectView.projectLevelAdjustments;
-        projectOwner = projectView.projectOwner;
-        projectTier = projectView.projectTier;
+        cloneCategories = projectView.getCloneCategories();
+        description = projectView.getDescription();
+        projectName = projectView.getName();
+        projectLevelAdjustments = projectView.getProjectLevelAdjustments();
+        projectOwner = projectView.getProjectOwner();
+        projectTier = projectView.getProjectTier();
     }
 
     public void setFromProjectAndVersion(final ProjectView projectView, final ProjectVersionView projectVersionView) {
         setFromProject(projectView);
 
-        distribution = projectVersionView.distribution.name();
-        versionNickname = projectVersionView.nickname;
-        phase = projectVersionView.phase.name();
-        releaseComments = projectVersionView.releaseComments;
-        if (projectVersionView.releasedOn != null) {
-            releasedOn = RestConstants.formatDate(projectVersionView.releasedOn);
+        distribution = projectVersionView.getDistribution().name();
+        versionNickname = projectVersionView.getNickname();
+        phase = projectVersionView.getPhase().name();
+        releaseComments = projectVersionView.getReleaseComments();
+        if (projectVersionView.getReleasedOn() != null) {
+            releasedOn = RestConstants.formatDate(projectVersionView.getReleasedOn());
         }
-        versionName = projectVersionView.versionName;
+        versionName = projectVersionView.getVersionName();
     }
 
     @Override

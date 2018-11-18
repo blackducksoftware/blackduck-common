@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
 public class NotificationDetailResults extends NotificationResults<NotificationDetailResult> {
     private final List<NotificationDetailResult> resultList;
@@ -39,8 +39,8 @@ public class NotificationDetailResults extends NotificationResults<NotificationD
         this.resultList = resultList;
     }
 
-    public List<UriSingleResponse<? extends HubResponse>> getAllLinks() {
-        final List<UriSingleResponse<? extends HubResponse>> uriResponses = new ArrayList<>();
+    public List<UriSingleResponse<? extends BlackDuckResponse>> getAllLinks() {
+        final List<UriSingleResponse<? extends BlackDuckResponse>> uriResponses = new ArrayList<>();
         resultList.forEach(result -> {
             result.getNotificationContentDetails().forEach(contentDetail -> {
                 uriResponses.addAll(contentDetail.getPresentLinks());

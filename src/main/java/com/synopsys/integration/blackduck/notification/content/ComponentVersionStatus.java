@@ -25,9 +25,9 @@ package com.synopsys.integration.blackduck.notification.content;
 
 import java.util.List;
 
-import com.synopsys.integration.blackduck.api.core.HubComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 
-public class ComponentVersionStatus extends HubComponent {
+public class ComponentVersionStatus extends BlackDuckComponent {
     public String componentName;
     public String componentVersionName;
     public String bomComponentVersionPolicyStatus;

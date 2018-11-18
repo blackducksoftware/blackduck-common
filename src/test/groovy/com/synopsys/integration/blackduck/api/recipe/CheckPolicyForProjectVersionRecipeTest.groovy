@@ -10,7 +10,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
-import com.synopsys.integration.blackduck.api.view.MetaHandler
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.PolicyRuleService
 import com.synopsys.integration.blackduck.service.ProjectService
@@ -41,7 +40,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
 
         PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
-        policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService(), new MetaHandler(hubServicesFactory.getRestConnection().logger))
+        policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService())
 
         /**
          * to create a Policy Rule we can construct a PolicyRuleViewV2 and Post it to the Hub*/
@@ -67,17 +66,17 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          * We add a new component to the Version that will violate our 'Test Rule'*/
         projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
-        VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView())
+        VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
-    private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService, MetaHandler metaHandler) {
+    private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService) {
         ExternalId externalId = constructExternalId()
         ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId)
 
         /**
          * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleViewV2*/
-        PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder(metaHandler)
+        PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder()
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView)
         PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView()
 

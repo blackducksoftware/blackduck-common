@@ -25,10 +25,10 @@ package com.synopsys.integration.blackduck.notification.content;
 
 import java.util.List;
 
-import com.synopsys.integration.blackduck.api.core.HubComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionDescription;
 
-public abstract class NotificationContent extends HubComponent {
+public abstract class NotificationContent extends BlackDuckComponent {
     public abstract boolean providesPolicyDetails();
 
     public abstract boolean providesVulnerabilityDetails();

@@ -1,8 +1,8 @@
 package com.synopsys.integration.blackduck.service;
 
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
-public class DryRunUploadResponse extends HubResponse {
+public class DryRunUploadResponse extends BlackDuckResponse {
     public String codeLocationId;
     public String scannerVersion;
     public String signatureVersion;

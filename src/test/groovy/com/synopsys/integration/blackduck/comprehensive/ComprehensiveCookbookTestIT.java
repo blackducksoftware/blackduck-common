@@ -46,7 +46,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
-import com.synopsys.integration.blackduck.api.view.MetaHandler;
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
@@ -76,17 +75,16 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getLogger();
-        final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubServicesFactory, testProjectName);
 
         // get the count of all projects now
         final int projectCount = hubServicesFactory.createHubService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         // create the project
         final ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.name = testProjectName;
+        projectRequest.setName(testProjectName);
         final String projectUrl = hubServicesFactory.createProjectService().createProject(projectRequest);
         final ProjectView projectItem = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
         final Optional<ProjectView> projectItemFromName = hubServicesFactory.createProjectService().getProjectByName(testProjectName);
@@ -100,11 +98,11 @@ public class ComprehensiveCookbookTestIT {
         final int projectVersionCount = hubServicesFactory.createHubService().getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.distribution = ProjectVersionDistributionType.INTERNAL;
-        projectVersionRequest.phase = ProjectVersionPhaseType.DEVELOPMENT;
-        projectVersionRequest.versionName = "RestConnectionTest";
-        final String projectVersionUrl = hubServicesFactory.createProjectService().createVersion(projectItem, projectVersionRequest);
-        final ProjectVersionView projectVersionItem = hubServicesFactory.createHubService().getResponse(projectVersionUrl, ProjectVersionView.class);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest.setVersionName("RestConnectionTest");
+        final Optional<String> projectVersionUrl = hubServicesFactory.createProjectService().createVersion(projectItem, projectVersionRequest);
+        final ProjectVersionView projectVersionItem = hubServicesFactory.createHubService().getResponse(projectVersionUrl.get(), ProjectVersionView.class);
         final Optional<ProjectVersionView> projectVersionItemFromName = hubServicesFactory.createProjectService().getProjectVersion(projectItem, "RestConnectionTest");
         // should return the same project version
         assertTrue(projectVersionItemFromName.isPresent());
@@ -119,10 +117,9 @@ public class ComprehensiveCookbookTestIT {
 
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getLogger();
-        final MetaHandler metaHandler = new MetaHandler(logger);
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, testProjectName);
+        deleteIfProjectExists(logger, hubServicesFactory, testProjectName);
 
         // get the count of all projects now
         final int projectCount = hubServicesFactory.createHubService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
@@ -151,25 +148,24 @@ public class ComprehensiveCookbookTestIT {
 
         final Optional<ProjectVersionView> projectVersionItem = hubServicesFactory.createProjectService().getProjectVersion(projectItem, versionName);
         assertTrue(projectVersionItem.isPresent());
-        assertEquals(versionName, projectVersionItem.get().versionName);
+        assertEquals(versionName, projectVersionItem.get().getVersionName());
     }
 
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
         final IntLogger logger = hubServicesFactory.getLogger();
-        final MetaHandler metaHandler = new MetaHandler(logger);
         final ProjectService projectService = hubServicesFactory.createProjectService();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, hubServicesFactory, metaHandler, "ek_mtglist");
+        deleteIfProjectExists(logger, hubServicesFactory, "ek_mtglist");
 
         // make sure there is a policy that will be in violation
         final ExternalId externalId = new ExternalIdFactory().createMavenExternalId("org.apache.poi", "poi", "3.9");
         final ComponentService componentService = hubServicesFactory.createComponentService();
         final PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService();
         final String policyNameToDeleteLater = "Test Rule for comprehensive policy status/bdio " + System.currentTimeMillis();
-        final String policyRuleUrl = policyRuleService.createPolicyRuleForExternalId(componentService, externalId, policyNameToDeleteLater, metaHandler);
+        final String policyRuleUrl = policyRuleService.createPolicyRuleForExternalId(componentService, externalId, policyNameToDeleteLater);
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile("bdio/mtglist_bdio.jsonld");
@@ -202,7 +198,7 @@ public class ComprehensiveCookbookTestIT {
         // verify the policy
         final Optional<VersionBomPolicyStatusView> policyStatusItem = projectService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
         assertTrue(policyStatusItem.isPresent());
-        assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().overallStatus);
+        assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
         System.out.println(policyStatusItem);
 
         final PolicyRuleViewV2 checkPolicyRule = policyRuleService.getPolicyRuleViewByName(policyNameToDeleteLater);
@@ -341,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubServicesFactory, final MetaHandler metaHandler, final String projectName) throws Exception {
+    private void deleteIfProjectExists(final IntLogger logger, final HubServicesFactory hubServicesFactory, final String projectName) throws Exception {
         try {
             final ProjectService projectService = hubServicesFactory.createProjectService();
             final Optional<ProjectView> project = projectService.getProjectByName(projectName);

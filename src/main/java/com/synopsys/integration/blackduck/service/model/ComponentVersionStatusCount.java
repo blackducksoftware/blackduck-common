@@ -43,12 +43,12 @@ public class ComponentVersionStatusCount extends Stringable {
     public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
         final Set<PolicySummaryStatusType> policyStatusTypes = EnumSet.allOf(PolicySummaryStatusType.class);
         final Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
-        if (policyStatusTypeValues.contains(nameValuePair.name)) {
-            name = PolicySummaryStatusType.valueOf(nameValuePair.name);
+        if (policyStatusTypeValues.contains(nameValuePair.getName())) {
+            name = PolicySummaryStatusType.valueOf(nameValuePair.getName());
         }
 
-        if (nameValuePair.value != null) {
-            final String valueString = nameValuePair.value.toString();
+        if (nameValuePair.getValue() != null) {
+            final String valueString = nameValuePair.getValue().toString();
             if (NumberUtils.isCreatable(valueString)) {
                 value = NumberUtils.createNumber(valueString).intValue();
             }

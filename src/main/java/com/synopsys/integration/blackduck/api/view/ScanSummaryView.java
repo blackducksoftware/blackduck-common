@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.synopsys.integration.blackduck.api.core.HubView;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.enumeration.ScanSummaryStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 
-public class ScanSummaryView extends HubView {
+public class ScanSummaryView extends BlackDuckView {
     public static final Map<String, Type> links = new HashMap<>();
 
     public static final String CODELOCATION_LINK = "codelocation";

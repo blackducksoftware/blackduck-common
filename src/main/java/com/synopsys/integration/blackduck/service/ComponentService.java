@@ -54,7 +54,7 @@ public class ComponentService extends DataService {
 
     public ComponentVersionView getComponentVersion(final ExternalId externalId) throws IntegrationException {
         for (final ComponentVersionView componentVersion : getAllComponentVersions(externalId)) {
-            if (componentVersion.versionName.equals(externalId.version)) {
+            if (componentVersion.getVersionName().equals(externalId.version)) {
                 return componentVersion;
             }
         }
@@ -65,7 +65,7 @@ public class ComponentService extends DataService {
 
     public List<ComponentVersionView> getAllComponentVersions(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
-        final ComponentView componentView = hubService.getResponse(componentSearchView.component, ComponentView.class);
+        final ComponentView componentView = hubService.getResponse(componentSearchView.getComponent(), ComponentView.class);
 
         final List<ComponentVersionView> componentVersionViews = hubService.getAllResponses(componentView, ComponentView.VERSIONS_LINK_RESPONSE);
         return componentVersionViews;
@@ -76,7 +76,7 @@ public class ComponentService extends DataService {
         final String hubOriginIdToMatch = externalId.createBlackDuckOriginId();
         for (final ComponentSearchResultView componentItem : allComponents) {
             if (null != hubOriginIdToMatch) {
-                if (hubOriginIdToMatch.equals(componentItem.originId)) {
+                if (hubOriginIdToMatch.equals(componentItem.getOriginId())) {
                     return componentItem;
                 }
             }
@@ -101,7 +101,7 @@ public class ComponentService extends DataService {
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(final ExternalId externalId) throws IntegrationException {
         final ComponentSearchResultView componentSearchView = getExactComponentMatch(externalId);
-        final String componentVersionURL = componentSearchView.version;
+        final String componentVersionURL = componentSearchView.getVersion();
         if (null != componentVersionURL) {
             final ComponentVersionView componentVersion = hubService.getResponse(componentVersionURL, ComponentVersionView.class);
             return getComponentVersionVulnerabilities(componentVersion);
@@ -118,7 +118,7 @@ public class ComponentService extends DataService {
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
     public RemediationOptionsView getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
-        final String href = hubService.getHref(componentVersionView);
+        final String href = componentVersionView.getHref().orElse(null);
         try {
             final String remediatingURL = href + "/" + REMEDIATING_LINK;
             try (final Response response = hubService.executeGetRequest(remediatingURL)) {

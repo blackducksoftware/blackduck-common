@@ -59,7 +59,7 @@ public class ProjectGetService extends DataService {
     public Optional<ProjectView> getProjectViewByProjectName(final String projectName) throws IntegrationException {
         final List<ProjectView> allProjectItems = getAllProjectMatches(projectName);
         for (final ProjectView project : allProjectItems) {
-            if (projectName.equalsIgnoreCase(project.name)) {
+            if (projectName.equalsIgnoreCase(project.getName())) {
                 return Optional.of(project);
             }
         }
@@ -79,7 +79,7 @@ public class ProjectGetService extends DataService {
 
     public Optional<ProjectVersionView> findMatchingProjectVersionView(final List<ProjectVersionView> projectVersions, final String projectVersionName) {
         for (final ProjectVersionView version : projectVersions) {
-            if (projectVersionName.equals(version.versionName)) {
+            if (projectVersionName.equals(version.getVersionName())) {
                 return Optional.of(version);
             }
         }

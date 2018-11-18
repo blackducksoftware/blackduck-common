@@ -21,15 +21,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.api.component;
+package com.synopsys.integration.blackduck.service;
+
+import java.util.List;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
-public class AffectedProjectVersion extends BlackDuckComponent {
-    public String projectName;
-    public String projectVersionName;
-    public String projectVersion;
-    public String componentIssueUrl;
-    public String bomComponent;
+public class BlackDuckPageResponse<T extends BlackDuckResponse> extends BlackDuckComponent {
+    private int totalCount;
+    private List<T> items;
+
+    public BlackDuckPageResponse(final int totalCount, final List<T> items) {
+        this.totalCount = totalCount;
+        this.items = items;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(final int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public List<T> getItems() {
+        return items;
+    }
+
+    public void setItems(final List<T> items) {
+        this.items = items;
+    }
 
 }

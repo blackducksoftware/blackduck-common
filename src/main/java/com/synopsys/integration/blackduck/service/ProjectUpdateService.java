@@ -123,11 +123,11 @@ public class ProjectUpdateService extends DataService {
         ProjectView projectView = null;
         ProjectVersionView projectVersionView = null;
 
-        final Optional<ProjectView> optionalProject = projectGetService.getProjectViewByProjectName(projectRequest.name);
+        final Optional<ProjectView> optionalProject = projectGetService.getProjectViewByProjectName(projectRequest.getName());
         if (optionalProject.isPresent()) {
             projectView = optionalProject.get();
             if (performUpdate) {
-                final String projectUrl = hubService.getHref(projectView);
+                final String projectUrl = projectView.getHref().orElse(null);
                 updateProject(projectUrl, projectRequest);
             }
         } else {
@@ -135,18 +135,18 @@ public class ProjectUpdateService extends DataService {
             projectView = hubService.getResponse(projectUrl, ProjectView.class);
         }
 
-        final ProjectVersionRequest projectVersionRequest = projectRequest.versionRequest;
-        if (projectVersionRequest != null && StringUtils.isNotBlank(projectVersionRequest.versionName)) {
-            final Optional<ProjectVersionView> optionalVersion = projectGetService.getProjectVersionViewByProjectVersionName(projectView, projectVersionRequest.versionName);
+        final ProjectVersionRequest projectVersionRequest = projectRequest.getVersionRequest();
+        if (projectVersionRequest != null && StringUtils.isNotBlank(projectVersionRequest.getVersionName())) {
+            final Optional<ProjectVersionView> optionalVersion = projectGetService.getProjectVersionViewByProjectVersionName(projectView, projectVersionRequest.getVersionName());
             if (optionalVersion.isPresent()) {
                 projectVersionView = optionalVersion.get();
                 if (performUpdate) {
-                    final String projectVersionUrl = hubService.getHref(projectVersionView);
-                    updateProjectVersion(projectVersionUrl, projectRequest.versionRequest);
+                    final String projectVersionUrl = projectVersionView.getHref().orElse(null);
+                    updateProjectVersion(projectVersionUrl, projectRequest.getVersionRequest());
                 }
             } else {
-                final String projectVersionsUrl = hubService.getFirstLinkSafely(projectView, ProjectView.VERSIONS_LINK);
-                final String projectVersionUrl = createProjectVersion(projectVersionsUrl, projectRequest.versionRequest);
+                final String projectVersionsUrl = projectView.getFirstLink(ProjectView.VERSIONS_LINK).orElse(null);
+                final String projectVersionUrl = createProjectVersion(projectVersionsUrl, projectRequest.getVersionRequest());
                 projectVersionView = hubService.getResponse(projectVersionUrl, ProjectVersionView.class);
             }
         }
@@ -161,7 +161,7 @@ public class ProjectUpdateService extends DataService {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
-        updateProjectVersion(projectVersionUri, projectRequest.versionRequest);
+        updateProjectVersion(projectVersionUri, projectRequest.getVersionRequest());
     }
 
 }

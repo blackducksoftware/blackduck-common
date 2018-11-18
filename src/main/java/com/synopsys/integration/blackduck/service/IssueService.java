@@ -55,7 +55,7 @@ public class IssueService extends DataService {
     }
 
     public void deleteIssue(final IssueView issueItem) throws IntegrationException {
-        final String codeLocationItemUrl = hubService.getHref(issueItem);
+        final String codeLocationItemUrl = issueItem.getHref().orElse(null);
         deleteIssue(codeLocationItemUrl);
     }
 

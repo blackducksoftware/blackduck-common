@@ -29,10 +29,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.HubResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
 public class HubBucket {
-    private final Map<String, HubBucketItem<HubResponse>> bucket = new ConcurrentHashMap<>();
+    private final Map<String, HubBucketItem<BlackDuckResponse>> bucket = new ConcurrentHashMap<>();
 
     public boolean contains(final String uri) {
         return bucket.containsKey(uri);
@@ -42,24 +42,24 @@ public class HubBucket {
         return bucket.keySet();
     }
 
-    public HubBucketItem<HubResponse> get(final String uri) {
+    public HubBucketItem<BlackDuckResponse> get(final String uri) {
         return bucket.get(uri);
     }
 
-    public <T extends HubResponse> T get(final String uri, final Class<T> responseClass) {
+    public <T extends BlackDuckResponse> T get(final String uri, final Class<T> responseClass) {
         final UriSingleResponse<T> uriSingleResponse = new UriSingleResponse<>(uri, responseClass);
         return get(uriSingleResponse);
     }
 
-    public <T extends HubResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
+    public <T extends BlackDuckResponse> T get(final UriSingleResponse<T> uriSingleResponse) {
         final String uri = uriSingleResponse.uri;
         if (contains(uri)) {
-            final HubBucketItem<HubResponse> bucketItem = get(uri);
+            final HubBucketItem<BlackDuckResponse> bucketItem = get(uri);
             if (bucketItem.hasValidResponse()) {
-                final Optional<HubResponse> optionalHubResponse = bucketItem.getHubResponse();
-                if (optionalHubResponse.isPresent()) {
-                    final HubResponse hubResponse = optionalHubResponse.get();
-                    if (hubResponse.getClass().equals(uriSingleResponse.responseClass)) {
+                final Optional<BlackDuckResponse> optionalBlackDuckResponse = bucketItem.getBlackDuckResponse();
+                if (optionalBlackDuckResponse.isPresent()) {
+                    final BlackDuckResponse blackDuckResponse = optionalBlackDuckResponse.get();
+                    if (blackDuckResponse.getClass().equals(uriSingleResponse.responseClass)) {
                         return getResponseFromBucket(bucketItem);
                     }
                 }
@@ -68,28 +68,28 @@ public class HubBucket {
         return null;
     }
 
-    private <T extends HubResponse> T getResponseFromBucket(final HubBucketItem<HubResponse> bucketItem) {
+    private <T extends BlackDuckResponse> T getResponseFromBucket(final HubBucketItem<BlackDuckResponse> bucketItem) {
         // the mapping of uri -> response type are assumed to be correct, so returning T is possible
-        return (T) bucketItem.getHubResponse().orElse(null);
+        return (T) bucketItem.getBlackDuckResponse().orElse(null);
     }
 
-    public Optional<HubResponse> getResponse(final String uri) {
-        return bucket.get(uri).getHubResponse();
+    public Optional<BlackDuckResponse> getResponse(final String uri) {
+        return bucket.get(uri).getBlackDuckResponse();
     }
 
     public Optional<Exception> getError(final String uri) {
         return bucket.get(uri).getE();
     }
 
-    public void addValid(final String uri, final HubResponse hubResponse) {
-        bucket.put(uri, new HubBucketItem<>(uri, hubResponse));
+    public void addValid(final String uri, final BlackDuckResponse blackDuckResponse) {
+        bucket.put(uri, new HubBucketItem<>(uri, blackDuckResponse));
     }
 
     public void addError(final String uri, final Exception e) {
         bucket.put(uri, new HubBucketItem<>(uri, e));
     }
 
-    public HubBucketItem<HubResponse> remove(final String uri) {
+    public HubBucketItem<BlackDuckResponse> remove(final String uri) {
         return bucket.remove(uri);
     }
 
