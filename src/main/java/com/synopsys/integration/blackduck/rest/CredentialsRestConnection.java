@@ -39,6 +39,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -54,13 +55,17 @@ import com.synopsys.integration.rest.request.Response;
 public class CredentialsRestConnection extends BlackDuckRestConnection {
     private final Credentials credentials;
 
-    public CredentialsRestConnection(final IntLogger logger, final URL baseUrl, final Credentials credentials, final int timeout, final ProxyInfo proxyInfo) {
-        super(logger, baseUrl, timeout, proxyInfo);
+    public CredentialsRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl, final Credentials credentials) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.credentials = credentials;
+
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials cannot be null.");
+        }
     }
 
     @Override
-    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) throws IntegrationException {
+    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) {
         httpClientBuilder.setDefaultCookieStore(new BasicCookieStore());
         defaultRequestConfigBuilder.setCookieSpec(CookieSpecs.DEFAULT);
     }
@@ -69,7 +74,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
      * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
      */
     @Override
-    public void authenticateWithBlackDuck() throws IntegrationException {
+    public void completeConnection() throws IntegrationException {
         final URL securityUrl;
         try {
             securityUrl = new URL(getBaseUrl(), "j_spring_security_check");
@@ -82,32 +87,36 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword()));
         final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, Charsets.UTF_8);
 
-        final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST, null);
+        final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST);
         requestBuilder.setCharset(Charsets.UTF_8);
         requestBuilder.setUri(securityUrl.toString());
         requestBuilder.setEntity(entity);
         final HttpUriRequest request = requestBuilder.build();
         logRequestHeaders(request);
-        try (final CloseableHttpResponse closeableHttpResponse = getClient().execute(request)) {
+
+        try {
+            final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
+            final CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(request);
             logResponseHeaders(closeableHttpResponse);
-            final Response response = new Response(closeableHttpResponse);
-            final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-            final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-            if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                final String httpResponseContent = response.getContentString();
-                throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-            } else {
-                // get the CSRF token
-                final Header csrfToken = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
-                if (csrfToken != null) {
-                    addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
+
+            try (final Response response = new Response(closeableHttpClient, closeableHttpResponse)) {
+                final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
+                final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
+                if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
+                    final String httpResponseContent = response.getContentString();
+                    throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
                 } else {
-                    logger.error("No CSRF token found when authenticating");
+                    // get the CSRF token
+                    final Header csrfToken = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
+                    if (csrfToken != null) {
+                        addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
+                    } else {
+                        getLogger().error("No CSRF token found when authenticating");
+                    }
                 }
             }
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
-
 }

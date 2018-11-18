@@ -23,13 +23,17 @@
  */
 package com.synopsys.integration.blackduck.global;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URL;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
@@ -63,7 +67,6 @@ public class HubServerConfigBuilderTestIT {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        builder.setProxyIgnoredHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
@@ -72,9 +75,8 @@ public class HubServerConfigBuilderTestIT {
         assertEquals("Pass", config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
 
-        assertFalse(config.getProxyInfo().shouldUseProxyForUrl(config.getBlackDuckUrl()));
+        assertFalse(config.getProxyInfo().shouldUseProxy());
     }
 
     @Test
@@ -134,7 +136,6 @@ public class HubServerConfigBuilderTestIT {
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        builder.setProxyIgnoredHosts(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"));
         final HubServerConfig config = builder.build();
 
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
@@ -143,7 +144,6 @@ public class HubServerConfigBuilderTestIT {
         assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"), String.valueOf(config.getProxyInfo().getPort()));
-        assertEquals(restConnectionTestHelper.getProperty("TEST_HTTPS_IGNORE_HOST"), config.getProxyInfo().getIgnoredProxyHosts());
     }
 
     @Test

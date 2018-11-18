@@ -29,10 +29,8 @@ import java.net.URL;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
-import com.synopsys.integration.blackduck.rest.ApiTokenRestConnectionBuilder;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
-import com.synopsys.integration.blackduck.rest.CredentialsRestConnectionBuilder;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -67,7 +65,7 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public boolean shouldUseProxyForHub() {
-        return proxyInfo != null && proxyInfo.shouldUseProxyForUrl(blackDuckUrl);
+        return proxyInfo != null && proxyInfo.shouldUseProxy();
     }
 
     public void print(final IntLogger logger) {
@@ -90,9 +88,6 @@ public class HubServerConfig extends Stringable implements Serializable {
             if (proxyInfo.getPort() > 0) {
                 logger.alwaysLog("--> Proxy Port: " + proxyInfo.getPort());
             }
-            if (StringUtils.isNotBlank(proxyInfo.getIgnoredProxyHosts())) {
-                logger.alwaysLog("--> No Proxy Hosts: " + proxyInfo.getIgnoredProxyHosts());
-            }
             if (StringUtils.isNotBlank(proxyInfo.getUsername())) {
                 logger.alwaysLog("--> Proxy Username: " + proxyInfo.getUsername());
             }
@@ -108,27 +103,11 @@ public class HubServerConfig extends Stringable implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) {
-        final CredentialsRestConnectionBuilder builder = new CredentialsRestConnectionBuilder();
-        builder.setLogger(logger);
-        builder.setBaseUrl(getBlackDuckUrl().toString());
-        builder.setTimeout(getTimeout());
-        builder.setCredentials(getCredentials());
-        builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
-        builder.setProxyInfo(getProxyInfo());
-
-        return builder.build();
+        return new CredentialsRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getCredentials());
     }
 
     public ApiTokenRestConnection createApiTokenRestConnection(final IntLogger logger) {
-        final ApiTokenRestConnectionBuilder builder = new ApiTokenRestConnectionBuilder();
-        builder.setLogger(logger);
-        builder.setBaseUrl(getBlackDuckUrl().toString());
-        builder.setTimeout(getTimeout());
-        builder.setApiToken(getApiToken());
-        builder.setAlwaysTrustServerCertificate(isAlwaysTrustServerCertificate());
-        builder.setProxyInfo(getProxyInfo());
-
-        return builder.build();
+        return new ApiTokenRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getApiToken());
     }
 
     public boolean usingApiToken() {

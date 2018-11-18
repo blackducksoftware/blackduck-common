@@ -23,23 +23,45 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-import com.synopsys.integration.exception.IntegrationException;
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-public abstract class BlackDuckRestConnection extends RestConnection {
-    public BlackDuckRestConnection(final IntLogger logger, final URL baseUrl, final int timeout, final ProxyInfo proxyInfo) {
-        super(logger, baseUrl, timeout, proxyInfo);
+/**
+ * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
+ */
+public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
+    private final String baseUrl;
+
+    public BlackDuckRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
+        this.baseUrl = baseUrl;
+
+        if (StringUtils.isBlank(baseUrl)) {
+            throw new IllegalArgumentException("No base url was provided.");
+        } else {
+            try {
+                final URL url = new URL(baseUrl);
+                url.toURI();
+            } catch (final MalformedURLException e) {
+                throw new IllegalArgumentException("The provided base url is not a valid java.net.URL.", e);
+            } catch (final URISyntaxException e) {
+                throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
+            }
+        }
     }
 
-    public abstract void authenticateWithBlackDuck() throws IntegrationException;
-
-    @Override
-    public void completeConnection() throws IntegrationException {
-        authenticateWithBlackDuck();
+    public URL getBaseUrl() {
+        try {
+            return new URL(baseUrl);
+        } catch (final MalformedURLException e) {
+            return null;
+        }
     }
-
 }

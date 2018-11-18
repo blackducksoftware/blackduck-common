@@ -57,8 +57,7 @@ public class ScanBatchBuilder {
     private String blackDuckUsername;
     private String blackDuckPassword;
     private String blackDuckApiToken;
-    private boolean shouldUseProxy;
-    private ProxyInfo proxyInfo;
+    private ProxyInfo proxyInfo = ProxyInfo.NO_PROXY_INFO;
     private boolean alwaysTrustServerCertificate;
 
     private String projectName;
@@ -70,7 +69,7 @@ public class ScanBatchBuilder {
         assertValid();
 
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
-                blackDuckPassword, blackDuckApiToken, shouldUseProxy, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
+            blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
     public void assertValid() throws IllegalArgumentException {
@@ -112,9 +111,6 @@ public class ScanBatchBuilder {
             if (StringUtils.isBlank(blackDuckApiToken) && (StringUtils.isBlank(blackDuckUsername) || StringUtils.isBlank(blackDuckPassword))) {
                 errorMessages.add("Either an api token or a username and password is required.");
             }
-            if (shouldUseProxy && proxyInfo == null) {
-                errorMessages.add("If a proxy should be used, the details must be provided.");
-            }
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
@@ -125,12 +121,15 @@ public class ScanBatchBuilder {
             errorMessages.add("Both projectName and projectVersionName must be provided or omitted together");
         }
 
+        if (blackDuckUrl != null && proxyInfo == null) {
+            errorMessages.add("Must provide proxy info.");
+        }
+
         return StringUtils.join(errorMessages, ' ');
     }
 
     public ScanBatchBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) {
         if (null == hubServerConfig) {
-            shouldUseProxy = false;
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
             blackDuckUrl = null;
             blackDuckUsername = null;
@@ -138,7 +137,6 @@ public class ScanBatchBuilder {
             blackDuckApiToken = null;
             alwaysTrustServerCertificate = false;
         } else {
-            shouldUseProxy = hubServerConfig.shouldUseProxyForHub();
             proxyInfo = hubServerConfig.getProxyInfo();
             blackDuckUrl = hubServerConfig.getBlackDuckUrl();
             if (hubServerConfig.usingApiToken()) {
@@ -291,15 +289,6 @@ public class ScanBatchBuilder {
 
     public ScanBatchBuilder blackDuckApiToken(final String blackDuckApiToken) {
         this.blackDuckApiToken = blackDuckApiToken;
-        return this;
-    }
-
-    public boolean isShouldUseProxy() {
-        return shouldUseProxy;
-    }
-
-    public ScanBatchBuilder shouldUseProxy(final boolean shouldUseProxy) {
-        this.shouldUseProxy = shouldUseProxy;
         return this;
     }
 

@@ -216,7 +216,7 @@ public class HubService {
     // ------------------------------------------------
     public void delete(final String url) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
-        try (Response response = executeRequest(requestBuilder.build())) {
+        try (final Response response = executeRequest(requestBuilder.build())) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

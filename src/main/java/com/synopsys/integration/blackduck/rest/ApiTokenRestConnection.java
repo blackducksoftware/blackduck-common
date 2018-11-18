@@ -37,6 +37,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.JsonObject;
@@ -57,20 +58,25 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
 
     private final String apiToken;
 
-    public ApiTokenRestConnection(final IntLogger logger, final URL hubBaseUrl, final String apiToken, final int timeout, final ProxyInfo proxyInfo) {
-        super(logger, hubBaseUrl, timeout, proxyInfo);
+    public ApiTokenRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl, final String apiToken) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.apiToken = apiToken;
+
+        if (StringUtils.isBlank(apiToken)) {
+            throw new IllegalArgumentException("No API token was found.");
+        }
     }
 
     @Override
-    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) throws IntegrationException {
+    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) {
+        // Nothing to add to the client builder
     }
 
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
      */
     @Override
-    public void authenticateWithBlackDuck() throws IntegrationException {
+    public void completeConnection() throws IntegrationException {
         final URL authenticationUrl;
         try {
             authenticationUrl = new URL(getBaseUrl(), "api/tokens/authenticate");
@@ -84,20 +90,28 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             requestBuilder.setUri(authenticationUrl.toString());
             final HttpUriRequest request = requestBuilder.build();
             logRequestHeaders(request);
-            try (final CloseableHttpResponse closeableHttpResponse = getClient().execute(request)) {
+
+            final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
+            final CloseableHttpResponse closeableHttpResponse;
+            try {
+                closeableHttpResponse = closeableHttpClient.execute(request);
                 logResponseHeaders(closeableHttpResponse);
-                final Response response = new Response(closeableHttpResponse);
-                final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                    final String httpResponseContent = response.getContentString();
-                    throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                } else {
-                    addCommonRequestHeader(AUTHORIZATION_HEADER, "Bearer " + readBearerToken(closeableHttpResponse));
+                try (final Response response = new Response(closeableHttpClient, closeableHttpResponse)) {
+                    final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
+                    final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
+                    if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
+                        final String httpResponseContent = response.getContentString();
+                        throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
+                    } else {
+                        addCommonRequestHeader(AUTHORIZATION_HEADER, "Bearer " + readBearerToken(closeableHttpResponse));
+                    }
+                } catch (final IOException e) {
+                    throw new IntegrationException(e.getMessage(), e);
                 }
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
+
         }
     }
 

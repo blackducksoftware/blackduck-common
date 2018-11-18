@@ -28,14 +28,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.UnauthenticatedRestConnection;
-import com.synopsys.integration.rest.connection.UnauthenticatedRestConnectionBuilder;
+import com.synopsys.integration.rest.connection.RestConnection;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
@@ -43,19 +43,13 @@ import com.synopsys.integration.rest.request.Response;
 
 public class HubServerVerifier {
     public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
-        final UnauthenticatedRestConnectionBuilder connectionBuilder = new UnauthenticatedRestConnectionBuilder();
-        connectionBuilder.setLogger(new PrintStreamIntLogger(System.out, LogLevel.INFO));
-        connectionBuilder.setBaseUrl(blackDuckUrl.toString());
-        connectionBuilder.setTimeout(timeoutSeconds);
-        connectionBuilder.setAlwaysTrustServerCertificate(alwaysTrustServerCertificate);
-        if (hubProxyInfo != null) {
-            connectionBuilder.setProxyInfo(hubProxyInfo);
-        }
-        final UnauthenticatedRestConnection restConnection = connectionBuilder.build();
+        final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
+        final ProxyInfo proxyInfo = hubProxyInfo != null ? hubProxyInfo : ProxyInfo.NO_PROXY_INFO;
+        final RestConnection restConnection = new RestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
 
         try {
             Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();
-            try (Response response = restConnection.executeRequest(request)) {
+            try (final Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
                     // This could be a Hub server
@@ -73,7 +67,7 @@ public class HubServerVerifier {
             }
             final String downloadUri = downloadURL.toString();
             request = RequestFactory.createCommonGetRequest(downloadUri);
-            try (Response response = restConnection.executeRequest(request)) {
+            try (final Response response = restConnection.executeRequest(request)) {
             } catch (final IntegrationRestException e) {
                 throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (final IntegrationException e) {
