@@ -29,16 +29,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -68,15 +67,39 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
     }
 
     @Override
-    public void populateHttpClientBuilder(final HttpClientBuilder httpClientBuilder, final RequestConfig.Builder defaultRequestConfigBuilder) {
-        // Nothing to add to the client builder
+    public void handleErrorResponse(final HttpUriRequest request, final Response response) {
+        super.handleErrorResponse(request, response);
+
+        if (isUnauthorized(response.getStatusCode()) && request.containsHeader(AUTHORIZATION_HEADER)) {
+            request.removeHeaders(AUTHORIZATION_HEADER);
+            removeCommonRequestHeader(AUTHORIZATION_HEADER);
+        }
     }
 
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
      */
     @Override
-    public void completeConnection() throws IntegrationException {
+    public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {
+        super.finalizeRequest(request);
+
+        if (request.containsHeader(AUTHORIZATION_HEADER)) {
+            // Already authenticated
+            return;
+        }
+
+        final Optional<String> bearerToken = retrieveBearerToken();
+        if (bearerToken.isPresent()) {
+            final String headerValue = "Bearer " + bearerToken.get();
+            addCommonRequestHeader(AUTHORIZATION_HEADER, headerValue);
+            request.addHeader(AUTHORIZATION_HEADER, headerValue);
+        } else {
+            getLogger().error("No Bearer token found when authenticating");
+        }
+    }
+
+    private Optional<String> retrieveBearerToken() throws IntegrationException {
+        String bearerToken = null;
         final URL authenticationUrl;
         try {
             authenticationUrl = new URL(getBaseUrl(), "api/tokens/authenticate");
@@ -103,16 +126,16 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
                         final String httpResponseContent = response.getContentString();
                         throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
                     } else {
-                        addCommonRequestHeader(AUTHORIZATION_HEADER, "Bearer " + readBearerToken(closeableHttpResponse));
+                        bearerToken = readBearerToken(closeableHttpResponse);
                     }
                 } catch (final IOException e) {
                     throw new IntegrationException(e.getMessage(), e);
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-
         }
+        return Optional.ofNullable(bearerToken);
     }
 
     private Map<String, String> getRequestHeaders() {

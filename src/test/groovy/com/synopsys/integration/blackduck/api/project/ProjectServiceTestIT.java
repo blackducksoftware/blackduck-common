@@ -23,7 +23,10 @@
  */
 package com.synopsys.integration.blackduck.api.project;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -117,6 +120,7 @@ public class ProjectServiceTestIT {
 
         try {
             project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+            // TODO: Expects exception. integration-rest no longer throws an exception by default
             if (project != null) {
                 fail("This project should have been deleted");
             }
