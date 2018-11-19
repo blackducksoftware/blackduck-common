@@ -128,7 +128,7 @@ public class BlackDuckPhoneHomeHelper {
         final CurrentVersionView currentVersion;
         try {
             currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-            return currentVersion.version;
+            return currentVersion.getVersion();
         } catch (final IntegrationException e) {
         }
         return PhoneHomeRequestBody.Builder.UNKNOWN_ID;
