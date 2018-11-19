@@ -50,6 +50,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          */
         try {
             projectService.createProject(projectRequest)
+            // TODO: Expects exception. integration-rest no longer throws an exception by default
             fail('Should have thrown an IntegrationRestException')
         } catch (Exception e) {
             assertTrue(e instanceof IntegrationRestException)

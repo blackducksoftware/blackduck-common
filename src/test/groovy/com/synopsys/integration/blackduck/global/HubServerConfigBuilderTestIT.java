@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import com.synopsys.integration.blackduck.configuration.HubServerConfig;
 import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 @Tag("integration")
 public class HubServerConfigBuilderTestIT {
@@ -60,21 +61,26 @@ public class HubServerConfigBuilderTestIT {
         assertEquals("Pass", config.getCredentials().getPassword());
         assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
         assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
+
+        assertTrue(config.getProxyInfo().shouldUseProxy());
     }
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
         final HubServerConfigBuilder builder = new HubServerConfigBuilder();
         setBuilderDefaults(builder);
-        setBuilderProxyDefaults(builder);
+        builder.setProxyPort(ProxyInfo.NO_PROXY_INFO.getPort());
+        builder.setProxyHost(ProxyInfo.NO_PROXY_INFO.getHost());
+        builder.setProxyNtlmDomain(ProxyInfo.NO_PROXY_INFO.getNtlmDomain());
+        builder.setProxyNtlmWorkstation(ProxyInfo.NO_PROXY_INFO.getNtlmDomain());
+        builder.setProxyUsername(ProxyInfo.NO_PROXY_INFO.getUsername());
+        builder.setProxyPassword(ProxyInfo.NO_PROXY_INFO.getPassword());
         final HubServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals("User", config.getCredentials().getUsername());
         assertEquals("Pass", config.getCredentials().getPassword());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost());
-        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
 
         assertFalse(config.getProxyInfo().shouldUseProxy());
     }
