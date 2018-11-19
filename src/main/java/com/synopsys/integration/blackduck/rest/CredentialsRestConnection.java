@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.Header;
@@ -91,16 +92,18 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             return;
         }
 
-        final Header csrfToken = requestCSRFTokenHeader();
-        if (csrfToken != null) {
-            addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
-            request.addHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
+        final Optional<Header> csrfToken = requestCSRFTokenHeader();
+        if (csrfToken.isPresent()) {
+            final String headerValue = csrfToken.get().getValue();
+            addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, headerValue);
+            request.addHeader(RestConstants.X_CSRF_TOKEN, headerValue);
         } else {
             getLogger().error("No CSRF token found when authenticating");
         }
     }
 
-    private Header requestCSRFTokenHeader() throws IntegrationException {
+    private Optional<Header> requestCSRFTokenHeader() throws IntegrationException {
+        Header header = null;
         final URL securityUrl;
         try {
             securityUrl = new URL(getBaseUrl(), "j_spring_security_check");
@@ -133,11 +136,13 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
                     throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
                 } else {
                     // Return the CSRF token
-                    return closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
+                    header = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
                 }
             }
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+
+        return Optional.ofNullable(header);
     }
 }

@@ -103,6 +103,7 @@ class CodeLocationRequestServiceTestIT {
         services.createCodeLocationService().deleteCodeLocation(codeLocationView)
         try {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
+            // TODO: Expects exception. integration-rest no longer throws an exception by default
             fail('This should have thrown an exception')
         } catch (IntegrationRestException e) {
             assertEquals(404, e.getHttpStatusCode())
