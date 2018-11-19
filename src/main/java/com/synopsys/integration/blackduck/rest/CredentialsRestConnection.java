@@ -70,11 +70,37 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         defaultRequestConfigBuilder.setCookieSpec(CookieSpecs.DEFAULT);
     }
 
+    @Override
+    public void handleErrorResponse(final HttpUriRequest request, final Response response) {
+        super.handleErrorResponse(request, response);
+        if (isUnauthorized(response.getStatusCode()) && request.containsHeader(RestConstants.X_CSRF_TOKEN)) {
+            request.removeHeaders(RestConstants.X_CSRF_TOKEN);
+            removeCommonRequestHeader(RestConstants.X_CSRF_TOKEN);
+        }
+    }
+
     /**
      * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
      */
     @Override
-    public void completeConnection() throws IntegrationException {
+    public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {
+        super.finalizeRequest(request);
+
+        if (request.containsHeader(RestConstants.X_CSRF_TOKEN)) {
+            // Already authenticated
+            return;
+        }
+
+        final Header csrfToken = requestCSRFTokenHeader();
+        if (csrfToken != null) {
+            addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
+            request.addHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
+        } else {
+            getLogger().error("No CSRF token found when authenticating");
+        }
+    }
+
+    private Header requestCSRFTokenHeader() throws IntegrationException {
         final URL securityUrl;
         try {
             securityUrl = new URL(getBaseUrl(), "j_spring_security_check");
@@ -106,13 +132,8 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
                     final String httpResponseContent = response.getContentString();
                     throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
                 } else {
-                    // get the CSRF token
-                    final Header csrfToken = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
-                    if (csrfToken != null) {
-                        addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, csrfToken.getValue());
-                    } else {
-                        getLogger().error("No CSRF token found when authenticating");
-                    }
+                    // Return the CSRF token
+                    return closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
                 }
             }
         } catch (final IOException e) {
