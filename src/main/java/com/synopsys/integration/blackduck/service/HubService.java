@@ -226,22 +226,27 @@ public class HubService {
     // handling plain requests
     // ------------------------------------------------
     public Response executeGetRequest(final String uri) throws IntegrationException {
-        return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
+        final Request request = RequestFactory.createCommonGetRequest(uri);
+        return executeRequest(request);
     }
 
     public Response executeGetRequest(final BlackDuckPath path) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
-        return restConnection.executeRequest(RequestFactory.createCommonGetRequest(uri));
+        final Request request = RequestFactory.createCommonGetRequest(uri);
+        return executeRequest(request);
     }
 
     public Response executeRequest(final BlackDuckPath path, final Request.Builder requestBuilder) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         requestBuilder.uri(uri);
-        return executeRequest(requestBuilder.build());
+        final Request request = requestBuilder.build();
+        return executeRequest(request);
     }
 
     public Response executeRequest(final Request request) throws IntegrationException {
-        return restConnection.executeRequest(request);
+        final Response response = restConnection.execute(request);
+        response.throwExceptionForError();
+        return response;
     }
 
     // ------------------------------------------------

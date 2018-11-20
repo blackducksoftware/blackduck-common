@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.exception.HubIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckResponsesTransformer {
@@ -51,7 +52,9 @@ public class BlackDuckResponsesTransformer {
         final List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
-        try (final Response initialResponse = restConnection.executeRequest(pagedRequest.createRequest())) {
+        Request request = pagedRequest.createRequest();
+        try (final Response initialResponse = restConnection.execute(request)) {
+            initialResponse.throwExceptionForError();
             final String initialJsonResponse = initialResponse.getContentString();
             BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, clazz);
             allResponses.addAll(blackDuckPageResponse.getItems());
@@ -64,7 +67,9 @@ public class BlackDuckResponsesTransformer {
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += pagedRequest.getLimit();
                 final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
-                try (final Response response = restConnection.executeRequest(offsetPagedRequest.createRequest())) {
+                request = offsetPagedRequest.createRequest();
+                try (final Response response = restConnection.execute(request)) {
+                    response.throwExceptionForError();
                     final String jsonResponse = response.getContentString();
                     blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
                     allResponses.addAll(blackDuckPageResponse.getItems());

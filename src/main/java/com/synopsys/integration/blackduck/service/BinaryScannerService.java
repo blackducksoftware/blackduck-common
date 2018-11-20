@@ -24,11 +24,12 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.FormBodyPart;
@@ -46,22 +47,24 @@ public class BinaryScannerService extends DataService {
         super(hubService, logger);
     }
 
-    public void scanBinary(final File binaryFile, final String projectName, final String projectVersion, final String codeLocatioName) throws IntegrationException, MalformedURLException, URISyntaxException {
+    public void scanBinary(final File binaryFile, final String projectName, final String projectVersion, final String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
         final RequestBuilder builder = hubService.getRestConnection().createRequestBuilder(HttpMethod.POST);
         final URL uploadUrl = new URL(hubService.getRestConnection().getBaseUrl(), "/api/uploads");
         builder.setUri(uploadUrl.toURI());
         builder.setEntity(createEntity(binaryFile, projectName, projectVersion, codeLocatioName));
 
-        final Response response = hubService.getRestConnection().executeRequest(builder.build());
-        logger.debug("Response: " + response.toString());
-        logger.debug("Response: " + response.getStatusMessage().toString());
-        logger.debug("Response: " + response.getStatusCode().toString());
-        logger.debug("Response: " + response.getContentString());
-        if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-            logger.info("Status code OK");
-        } else {
-            logger.error("Unknown status code: " + response.getStatusCode());
-            throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
+        final HttpUriRequest request = builder.build();
+        try (final Response response = hubService.getRestConnection().execute(request)) {
+            logger.debug("Response: " + response.toString());
+            logger.debug("Response: " + response.getStatusMessage().toString());
+            logger.debug("Response: " + response.getStatusCode().toString());
+            logger.debug("Response: " + response.getContentString());
+            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                logger.info("Status code OK");
+            } else {
+                logger.error("Unknown status code: " + response.getStatusCode());
+                throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
+            }
         }
     }
 

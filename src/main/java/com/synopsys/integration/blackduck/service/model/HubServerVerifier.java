@@ -49,7 +49,8 @@ public class HubServerVerifier {
 
         try {
             Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();
-            try (final Response response = restConnection.executeRequest(request)) {
+            try (final Response response = restConnection.execute(request)) {
+                response.throwExceptionForError();
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
                     // This could be a Hub server
@@ -67,7 +68,8 @@ public class HubServerVerifier {
             }
             final String downloadUri = downloadURL.toString();
             request = RequestFactory.createCommonGetRequest(downloadUri);
-            try (final Response response = restConnection.executeRequest(request)) {
+            try (final Response response = restConnection.execute(request)) {
+                response.throwExceptionForError();
             } catch (final IntegrationRestException e) {
                 throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (final IntegrationException e) {

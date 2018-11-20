@@ -119,7 +119,7 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             try {
                 closeableHttpResponse = closeableHttpClient.execute(request);
                 logResponseHeaders(closeableHttpResponse);
-                try (final Response response = new Response(closeableHttpClient, closeableHttpResponse)) {
+                try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
                     final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
                     final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
                     if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {

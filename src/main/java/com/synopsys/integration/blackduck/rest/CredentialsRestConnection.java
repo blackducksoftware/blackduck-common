@@ -80,9 +80,6 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         }
     }
 
-    /**
-     * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
-     */
     @Override
     public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {
         super.finalizeRequest(request);
@@ -128,7 +125,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             final CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(request);
             logResponseHeaders(closeableHttpResponse);
 
-            try (final Response response = new Response(closeableHttpClient, closeableHttpResponse)) {
+            try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
                 final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
                 final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
                 if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
