@@ -58,7 +58,7 @@ public class ProjectUpdateService extends DataService {
     public void updateProject(final String projectUrl, final ProjectRequest projectRequest) throws IntegrationException {
         final String json = hubService.convertToJson(projectRequest);
         final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUrl).build();
-        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
+        try (Response response = hubService.execute(projectUpdateRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -66,7 +66,7 @@ public class ProjectUpdateService extends DataService {
 
     public void deleteProject(final String projectUrl) throws IntegrationException {
         final Request deleteRequest = new Request.Builder(projectUrl).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(deleteRequest)) {
+        try (Response response = hubService.execute(deleteRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -81,7 +81,7 @@ public class ProjectUpdateService extends DataService {
     public void updateProjectVersion(final String projectVersionUrl, final ProjectVersionRequest versionRequest) throws IntegrationException {
         final String json = hubService.convertToJson(versionRequest);
         final Request projectVersionUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectVersionUrl).build();
-        try (Response response = hubService.executeRequest(projectVersionUpdateRequest)) {
+        try (Response response = hubService.execute(projectVersionUpdateRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -89,7 +89,7 @@ public class ProjectUpdateService extends DataService {
 
     public void deleteProjectVersion(final String projectVersionUrl) throws IntegrationException {
         final Request deleteRequest = new Request.Builder(projectVersionUrl).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(deleteRequest)) {
+        try (Response response = hubService.execute(deleteRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -157,7 +157,7 @@ public class ProjectUpdateService extends DataService {
     public void updateProjectAndVersion(final String projectUri, final String projectVersionUri, final ProjectRequest projectRequest) throws IntegrationException {
         final String json = hubService.convertToJson(projectRequest);
         final Request projectUpdateRequest = RequestFactory.createCommonPutRequestBuilder(json).uri(projectUri).build();
-        try (Response response = hubService.executeRequest(projectUpdateRequest)) {
+        try (Response response = hubService.execute(projectUpdateRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

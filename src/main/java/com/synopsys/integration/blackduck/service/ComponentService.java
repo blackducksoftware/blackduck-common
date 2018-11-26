@@ -121,7 +121,7 @@ public class ComponentService extends DataService {
         final String href = componentVersionView.getHref().orElse(null);
         try {
             final String remediatingURL = href + "/" + REMEDIATING_LINK;
-            try (final Response response = hubService.executeGetRequest(remediatingURL)) {
+            try (final Response response = hubService.get(remediatingURL)) {
                 final JsonElement jsonElement = hubService.getJsonParser().parse(response.getContentString());
                 return hubService.getGson().fromJson(jsonElement, RemediationOptionsView.class);
             } catch (final IOException ioException) {

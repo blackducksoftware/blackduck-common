@@ -25,6 +25,8 @@ package com.synopsys.integration.blackduck.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -92,6 +94,18 @@ public class BlackDuckJsonTransformer {
             logger.error(String.format("Could not parse the provided json responses with Gson:%s%s", System.lineSeparator(), json));
             throw new HubIntegrationException(e.getMessage(), e);
         }
+    }
+
+    public String mergeJson(final String toReceive, final String toMergeIn) {
+        final JsonObject toReceiveObj = gson.fromJson(toReceive, JsonObject.class);
+        final JsonObject toMergeInObj = gson.fromJson(toMergeIn, JsonObject.class);
+
+        final Set<Map.Entry<String, JsonElement>> fields = toMergeInObj.entrySet();
+        for (final Map.Entry<String, JsonElement> field : fields) {
+            toReceiveObj.add(field.getKey(), field.getValue());
+        }
+
+        return gson.toJson(toReceiveObj);
     }
 
 }

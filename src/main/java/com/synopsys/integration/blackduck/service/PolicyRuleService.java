@@ -86,7 +86,7 @@ public class PolicyRuleService {
     public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
         final String json = hubService.convertToJson(policyRuleView);
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(policyRuleView.getHref().orElse(null));
-        try (Response response = hubService.executeRequest(requestBuilder.build())) {
+        try (Response response = hubService.execute(requestBuilder.build())) {
 
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -95,7 +95,7 @@ public class PolicyRuleService {
 
     public void deletePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(policyRuleView.getHref().orElse(null));
-        try (Response response = hubService.executeRequest(requestBuilder.build())) {
+        try (Response response = hubService.execute(requestBuilder.build())) {
 
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

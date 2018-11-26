@@ -39,7 +39,7 @@ public class DryRunUploadService extends DataService {
     public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
         final String uri = hubService.getUri(new BlackDuckPath("/api/v1/scans"));
         final Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
             final String responseString = response.getContentString();
             final DryRunUploadResponse uploadResponse = hubService.getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.setJson(responseString);

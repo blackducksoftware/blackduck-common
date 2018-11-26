@@ -418,7 +418,7 @@ public class ReportService extends DataService {
     }
 
     private JsonElement getReportContentJson(final String reportContentUri) throws IntegrationException {
-        try (Response response = hubService.executeGetRequest(reportContentUri)) {
+        try (Response response = hubService.get(reportContentUri)) {
             final String jsonResponse = response.getContentString();
 
             final JsonObject json = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
@@ -433,7 +433,7 @@ public class ReportService extends DataService {
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
         final Request request = new Request.Builder(reportUri).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

@@ -55,7 +55,7 @@ public class UploadCallable implements Callable<UploadOutput> {
 
             final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
             final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
-            try (Response response = hubService.executeRequest(request)) {
+            try (Response response = hubService.execute(request)) {
                 final String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
             } catch (final IOException e) {

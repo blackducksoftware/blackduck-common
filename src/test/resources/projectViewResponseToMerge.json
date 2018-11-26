@@ -1,0 +1,43 @@
+{
+  "description": "a merged description",
+  "_meta": {
+    "allow": [
+      "monkey"
+    ],
+    "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf",
+    "links": [
+      {
+        "rel": "versions",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/versions"
+      },
+      {
+        "rel": "canonicalVersion",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/versions/d0cc46d5-e886-4363-beb3-d04123d1372a"
+      },
+      {
+        "rel": "assignable-users",
+        "href": "Mairzy doats and dozy doats and liddle lamzy divey"
+      },
+      {
+        "rel": "assignable-usergroups",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/assignable-usergroups"
+      },
+      {
+        "rel": "users",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/users"
+      },
+      {
+        "rel": "usergroups",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/usergroups"
+      },
+      {
+        "rel": "tags",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/tags"
+      },
+      {
+        "rel": "project-mappings",
+        "href": "https://int-hub02.dc1.lan/api/projects/e3c16059-f316-4dcc-9efe-0672cb0e6ddf/project-mappings"
+      }
+    ]
+  }
+}

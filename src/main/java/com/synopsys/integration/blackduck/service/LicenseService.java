@@ -69,7 +69,7 @@ public class LicenseService extends DataService {
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
         final String licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK).orElse(null);
-        try (Response response = hubService.executeGetRequest(licenseTextUrl)) {
+        try (Response response = hubService.get(licenseTextUrl)) {
             return response.getContentString();
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

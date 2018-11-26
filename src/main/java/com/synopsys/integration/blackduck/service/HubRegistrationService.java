@@ -37,7 +37,7 @@ public class HubRegistrationService extends DataService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        try (Response response = hubService.executeGetRequest(new BlackDuckPath("/api/v1/registrations"))) {
+        try (Response response = hubService.get(new BlackDuckPath("/api/v1/registrations"))) {
             final String jsonResponse = response.getContentString();
             final JsonObject jsonObject = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
             final String registrationId = jsonObject.get("registrationId").getAsString();

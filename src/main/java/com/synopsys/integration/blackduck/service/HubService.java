@@ -216,7 +216,7 @@ public class HubService {
     // ------------------------------------------------
     public void delete(final String url) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
-        try (final Response response = executeRequest(requestBuilder.build())) {
+        try (final Response response = execute(requestBuilder.build())) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -225,25 +225,25 @@ public class HubService {
     // ------------------------------------------------
     // handling plain requests
     // ------------------------------------------------
-    public Response executeGetRequest(final String uri) throws IntegrationException {
+    public Response get(final String uri) throws IntegrationException {
         final Request request = RequestFactory.createCommonGetRequest(uri);
-        return executeRequest(request);
+        return execute(request);
     }
 
-    public Response executeGetRequest(final BlackDuckPath path) throws IntegrationException {
+    public Response get(final BlackDuckPath path) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         final Request request = RequestFactory.createCommonGetRequest(uri);
-        return executeRequest(request);
+        return execute(request);
     }
 
-    public Response executeRequest(final BlackDuckPath path, final Request.Builder requestBuilder) throws IntegrationException {
+    public Response execute(final BlackDuckPath path, final Request.Builder requestBuilder) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         requestBuilder.uri(uri);
         final Request request = requestBuilder.build();
-        return executeRequest(request);
+        return execute(request);
     }
 
-    public Response executeRequest(final Request request) throws IntegrationException {
+    public Response execute(final Request request) throws IntegrationException {
         final Response response = restConnection.execute(request);
         response.throwExceptionForError();
         return response;
@@ -259,7 +259,7 @@ public class HubService {
     }
 
     public String executePostRequestAndRetrieveURL(final Request request) throws IntegrationException {
-        try (final Response response = executeRequest(request)) {
+        try (final Response response = execute(request)) {
             return response.getHeaderValue("location");
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

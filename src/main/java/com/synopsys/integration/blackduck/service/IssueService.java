@@ -48,7 +48,7 @@ public class IssueService extends DataService {
     public void updateIssue(final IssueView issueItem, final String uri) throws IntegrationException {
         final String json = hubService.convertToJson(issueItem);
         final Request request = new Request.Builder(uri).method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -61,7 +61,7 @@ public class IssueService extends DataService {
 
     public void deleteIssue(final String issueItemUri) throws IntegrationException {
         final Request request = new Request.Builder(issueItemUri).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

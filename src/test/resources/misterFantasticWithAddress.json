@@ -1,0 +1,12 @@
+{
+  "name": "Reed Richards",
+  "address": {
+    "first line": "The Baxter Building",
+    "second line": "42nd & Madison Ave.",
+    "third line": "Midtown",
+    "city": "New York City",
+    "state": "NY",
+    "zip": "10017"
+  },
+  "alias": "Mr. Fantastic"
+}

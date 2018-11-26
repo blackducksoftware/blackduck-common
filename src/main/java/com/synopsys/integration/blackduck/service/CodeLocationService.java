@@ -79,7 +79,7 @@ public class CodeLocationService extends DataService {
 
     public void updateCodeLocation(final String codeLocationViewUrl, final String codeLocationViewJson) throws IntegrationException {
         final Request request = new Request.Builder(codeLocationViewUrl).method(HttpMethod.PUT).bodyContent(new StringBodyContent(codeLocationViewJson)).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
@@ -98,7 +98,7 @@ public class CodeLocationService extends DataService {
 
     public void deleteCodeLocation(final String codeLocationViewUrl) throws IntegrationException {
         final Request deleteRequest = new Request.Builder(codeLocationViewUrl).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.executeRequest(deleteRequest)) {
+        try (Response response = hubService.execute(deleteRequest)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

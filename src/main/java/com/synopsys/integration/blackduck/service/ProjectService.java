@@ -424,7 +424,7 @@ public class ProjectService extends DataService {
 
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {
         final Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
-        try (Response response = hubService.executeRequest(request)) {
+        try (Response response = hubService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
