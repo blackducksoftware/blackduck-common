@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,7 +23,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,18 +35,15 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
-import com.synopsys.integration.blackduck.service.model.HubQuery;
+import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
 
 public class CodeLocationService extends DataService {
-    public CodeLocationService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+    public CodeLocationService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     public void unmapCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
@@ -57,58 +53,25 @@ public class CodeLocationService extends DataService {
     }
 
     public void unmapCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
-        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, "");
-        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
+        mapCodeLocation(codeLocationView, "");
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationView, final ProjectVersionView version) throws IntegrationException {
-        mapCodeLocation(codeLocationView, version.getHref().orElse(null));
+        if (version.getHref().isPresent()) {
+            mapCodeLocation(codeLocationView, version.getHref().get());
+        }
     }
 
     public void mapCodeLocation(final CodeLocationView codeLocationView, final String versionUrl) throws IntegrationException {
-        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
-        final CodeLocationView requestCodeLocationView = createRequestCodeLocationView(codeLocationView, versionUrl);
-        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(requestCodeLocationView));
-    }
-
-    public void updateCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
-        updateCodeLocation(codeLocationViewUrl, hubService.getGson().toJson(codeLocationView));
-    }
-
-    public void updateCodeLocation(final String codeLocationViewUrl, final String codeLocationViewJson) throws IntegrationException {
-        final Request request = new Request.Builder(codeLocationViewUrl).method(HttpMethod.PUT).bodyContent(new StringBodyContent(codeLocationViewJson)).build();
-        try (Response response = hubService.execute(request)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
-    public void deleteCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
-        for (final CodeLocationView codeLocationView : codeLocationViews) {
-            deleteCodeLocation(codeLocationView);
-        }
-    }
-
-    public void deleteCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
-        final String codeLocationViewUrl = codeLocationView.getHref().orElse(null);
-        deleteCodeLocation(codeLocationViewUrl);
-    }
-
-    public void deleteCodeLocation(final String codeLocationViewUrl) throws IntegrationException {
-        final Request deleteRequest = new Request.Builder(codeLocationViewUrl).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.execute(deleteRequest)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        codeLocationView.setMappedProjectVersion(versionUrl);
+        blackDuckService.put(codeLocationView);
     }
 
     public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", codeLocationName);
+            final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", codeLocationName);
             final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
-            final List<CodeLocationView> codeLocations = hubService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+            final List<CodeLocationView> codeLocations = blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.getName())) {
                     return codeLocation;
@@ -122,22 +85,12 @@ public class CodeLocationService extends DataService {
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
         final BlackDuckPath blackDuckPath = new BlackDuckPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
         final BlackDuckPathSingleResponse<CodeLocationView> codeLocationResponse = new BlackDuckPathSingleResponse<>(blackDuckPath, CodeLocationView.class);
-        return hubService.getResponse(codeLocationResponse);
-    }
-
-    private CodeLocationView createRequestCodeLocationView(final CodeLocationView codeLocationView, final String versionUrl) {
-        final CodeLocationView requestCodeLocationView = new CodeLocationView();
-        requestCodeLocationView.setCreatedAt(codeLocationView.getCreatedAt());
-        requestCodeLocationView.setMappedProjectVersion(versionUrl);
-        requestCodeLocationView.setName(codeLocationView.getName());
-        requestCodeLocationView.setUpdatedAt(codeLocationView.getUpdatedAt());
-        requestCodeLocationView.setUrl(codeLocationView.getUrl());
-        return requestCodeLocationView;
+        return blackDuckService.getResponse(codeLocationResponse);
     }
 
     public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final String uri = HubService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
-        return hubService.getResponse(uri, ScanSummaryView.class);
+        final String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
+        return blackDuckService.getResponse(uri, ScanSummaryView.class);
     }
 
 }

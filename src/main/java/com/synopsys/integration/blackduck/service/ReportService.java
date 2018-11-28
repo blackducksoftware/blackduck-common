@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -48,7 +48,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
 import com.synopsys.integration.blackduck.service.model.PolicyRule;
@@ -71,12 +71,12 @@ public class ReportService extends DataService {
     private final IntegrationEscapeUtil escapeUtil;
     private final long timeoutInMilliseconds;
 
-    public ReportService(final HubService hubService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
-        this(hubService, logger, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
+    public ReportService(final BlackDuckService blackDuckService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil) {
+        this(blackDuckService, logger, projectDataService, escapeUtil, DEFAULT_TIMEOUT);
     }
 
-    public ReportService(final HubService hubService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
-        super(hubService, logger);
+    public ReportService(final BlackDuckService blackDuckService, final IntLogger logger, final ProjectService projectDataService, final IntegrationEscapeUtil escapeUtil, final long timeoutInMilliseconds) {
+        super(blackDuckService, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
 
@@ -117,7 +117,7 @@ public class ReportService extends DataService {
         return createNoticesReportFile(outputDirectory, getNoticesReportData(project, version), project.getName(), version.getVersionName());
     }
 
-    private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws HubIntegrationException {
+    private File createNoticesReportFile(final File outputDirectory, final String noticesReportContent, final String projectName, final String projectVersionName) throws BlackDuckIntegrationException {
         if (noticesReportContent == null) {
             return null;
         }
@@ -133,7 +133,7 @@ public class ReportService extends DataService {
             logger.trace("Created Notices Report : " + noticesReportFile.getCanonicalPath());
             return noticesReportFile;
         } catch (final IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
@@ -161,7 +161,7 @@ public class ReportService extends DataService {
         reportData.setDistribution(version.getDistribution().toString());
         final List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        final List<VersionBomComponentView> bomEntries = hubService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        final List<VersionBomComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
         for (final VersionBomComponentView bomEntry : bomEntries) {
             final BomComponent component = createBomComponentFromBomComponentView(bomEntry);
@@ -176,7 +176,7 @@ public class ReportService extends DataService {
                 if (!policyFailure) {
                     // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
                     try {
-                        final PolicyStatusView bomPolicyStatus = hubService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
+                        final PolicyStatusView bomPolicyStatus = blackDuckService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                         policyStatus = bomPolicyStatus.getApprovalStatus().toString();
                     } catch (final IntegrationException e) {
                         policyFailure = true;
@@ -204,13 +204,13 @@ public class ReportService extends DataService {
         createReportFiles(outputDirectory, reportData);
     }
 
-    public void createReportFiles(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
+    public void createReportFiles(final File outputDirectory, final ReportData reportData) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Files in : " + outputDirectory.getCanonicalPath());
             final RiskReportWriter writer = new RiskReportWriter();
-            writer.createHtmlReportFiles(hubService.getGson(), outputDirectory, reportData);
+            writer.createHtmlReportFiles(blackDuckService.getGson(), outputDirectory, reportData);
         } catch (final RiskReportException | IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
@@ -227,7 +227,7 @@ public class ReportService extends DataService {
         return createReportPdfFile(outputDirectory, reportData);
     }
 
-    public File createReportPdfFile(final File outputDirectory, final ReportData reportData) throws HubIntegrationException {
+    public File createReportPdfFile(final File outputDirectory, final ReportData reportData) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
             final RiskReportPdfWriter writer = new RiskReportPdfWriter(logger);
@@ -235,7 +235,7 @@ public class ReportService extends DataService {
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
         } catch (final RiskReportException | IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
@@ -291,7 +291,7 @@ public class ReportService extends DataService {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
             final PolicySummaryStatusType status = bomEntry.getApprovalStatus();
             if (status == PolicySummaryStatusType.IN_VIOLATION) {
-                final List<PolicyRuleViewV2> rules = hubService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
+                final List<PolicyRuleViewV2> rules = blackDuckService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 final List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (final PolicyRuleViewV2 policyRuleView : rules) {
                     final PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
@@ -303,7 +303,7 @@ public class ReportService extends DataService {
     }
 
     private String getBaseUrl() {
-        return hubService.getHubBaseUrl().toString();
+        return blackDuckService.getHubBaseUrl().toString();
     }
 
     private String getReportProjectUrl(final String projectURL) {
@@ -351,7 +351,7 @@ public class ReportService extends DataService {
                 final String contentLink = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
 
                 if (contentLink == null) {
-                    throw new HubIntegrationException("Could not find content link for the report at : " + reportUrl);
+                    throw new BlackDuckIntegrationException("Could not find content link for the report at : " + reportUrl);
                 }
 
                 logger.debug("Getting the Notices Report content.");
@@ -381,13 +381,13 @@ public class ReportService extends DataService {
         jsonObject.addProperty("reportFormat", reportFormat.toString());
         jsonObject.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        final String json = hubService.convertToJson(jsonObject);
+        final String json = blackDuckService.convertToJson(jsonObject);
         final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(reportUri).build();
-        return hubService.executePostRequestAndRetrieveURL(request);
+        return blackDuckService.executePostRequestAndRetrieveURL(request);
     }
 
     /**
-     * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws HubIntegrationException after 30 minutes if the report has not been generated yet.
+     * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws BlackDuckIntegrationException after 30 minutes if the report has not been generated yet.
      */
     public ReportView isReportFinishedGenerating(final String reportUri) throws InterruptedException, IntegrationException {
         final long startTime = System.currentTimeMillis();
@@ -396,14 +396,14 @@ public class ReportService extends DataService {
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = hubService.getResponse(reportUri, ReportView.class);
+            reportInfo = blackDuckService.getResponse(reportUri, ReportView.class);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;
             }
             if (elapsedTime >= timeoutInMilliseconds) {
                 final String formattedTime = String.format("%d minutes", TimeUnit.MILLISECONDS.toMinutes(timeoutInMilliseconds));
-                throw new HubIntegrationException("The Report has not finished generating in : " + formattedTime);
+                throw new BlackDuckIntegrationException("The Report has not finished generating in : " + formattedTime);
             }
             // Retry every 5 seconds
             Thread.sleep(5000);
@@ -418,10 +418,10 @@ public class ReportService extends DataService {
     }
 
     private JsonElement getReportContentJson(final String reportContentUri) throws IntegrationException {
-        try (Response response = hubService.get(reportContentUri)) {
+        try (Response response = blackDuckService.get(reportContentUri)) {
             final String jsonResponse = response.getContentString();
 
-            final JsonObject json = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonObject json = blackDuckService.getGson().fromJson(jsonResponse, JsonObject.class);
             final JsonElement content = json.get("reportContent");
             final JsonArray reportConentArray = content.getAsJsonArray();
             final JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
@@ -433,7 +433,7 @@ public class ReportService extends DataService {
 
     public void deleteHubReport(final String reportUri) throws IntegrationException {
         final Request request = new Request.Builder(reportUri).method(HttpMethod.DELETE).build();
-        try (Response response = hubService.execute(request)) {
+        try (Response response = blackDuckService.execute(request)) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

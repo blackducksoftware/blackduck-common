@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -33,9 +33,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
-import com.synopsys.integration.blackduck.service.HubRegistrationService;
-import com.synopsys.integration.blackduck.service.HubService;
-import com.synopsys.integration.blackduck.service.HubServicesFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckRegistrationService;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
@@ -49,24 +49,24 @@ import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
-    private final HubService hubService;
+    private final BlackDuckService blackDuckService;
     private final PhoneHomeService phoneHomeService;
-    private final HubRegistrationService hubRegistrationService;
+    private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(final HubServicesFactory hubServicesFactory) {
-        return createAsynchronousPhoneHomeHelper(hubServicesFactory, null);
+    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(final BlackDuckServicesFactory blackDuckServicesFactory) {
+        return createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, null);
     }
 
-    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(final HubServicesFactory hubServicesFactory, final ExecutorService executorService) {
-        final IntLogger intLogger = hubServicesFactory.getLogger();
+    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(final BlackDuckServicesFactory blackDuckServicesFactory, final ExecutorService executorService) {
+        final IntLogger intLogger = blackDuckServicesFactory.getLogger();
         final PhoneHomeService intPhoneHomeService;
         if (executorService != null) {
-            intPhoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, hubServicesFactory.getRestConnection(), hubServicesFactory.getGson()), executorService);
+            intPhoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, blackDuckServicesFactory.getRestConnection(), blackDuckServicesFactory.getGson()), executorService);
         } else {
-            intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, hubServicesFactory.getRestConnection(), hubServicesFactory.getGson()));
+            intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, blackDuckServicesFactory.getRestConnection(), blackDuckServicesFactory.getGson()));
         }
-        return new BlackDuckPhoneHomeHelper(intLogger, hubServicesFactory.createHubService(), intPhoneHomeService, hubServicesFactory.createHubRegistrationService(), hubServicesFactory.getEnvironmentVariables());
+        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckServicesFactory.createBlackDuckService(), intPhoneHomeService, blackDuckServicesFactory.createBlackDuckRegistrationService(), blackDuckServicesFactory.getEnvironmentVariables());
     }
 
     public static PhoneHomeClient createPhoneHomeClient(final IntLogger intLogger, final RestConnection restConnection, final Gson gson) {
@@ -75,11 +75,12 @@ public class BlackDuckPhoneHomeHelper {
         return new PhoneHomeClient(googleAnalyticsTrackingId, intLogger, httpClientBuilder, gson);
     }
 
-    public BlackDuckPhoneHomeHelper(final IntLogger logger, final HubService hubService, final PhoneHomeService phoneHomeService, final HubRegistrationService hubRegistrationService, final IntEnvironmentVariables intEnvironmentVariables) {
+    public BlackDuckPhoneHomeHelper(final IntLogger logger, final BlackDuckService blackDuckService, final PhoneHomeService phoneHomeService, final BlackDuckRegistrationService blackDuckRegistrationService,
+            final IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
-        this.hubService = hubService;
+        this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;
-        this.hubRegistrationService = hubRegistrationService;
+        this.blackDuckRegistrationService = blackDuckRegistrationService;
         this.intEnvironmentVariables = intEnvironmentVariables;
     }
 
@@ -127,7 +128,7 @@ public class BlackDuckPhoneHomeHelper {
     private String getProductVersion() {
         final CurrentVersionView currentVersion;
         try {
-            currentVersion = hubService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+            currentVersion = blackDuckService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
             return currentVersion.getVersion();
         } catch (final IntegrationException e) {
         }
@@ -135,14 +136,14 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private String getHostName() {
-        return hubService.getHubBaseUrl().toString();
+        return blackDuckService.getHubBaseUrl().toString();
     }
 
     private String getRegistrationKey() {
         String registrationId = null;
         try {
             // We need to wrap this because this will most likely fail unless they are running as an admin
-            registrationId = hubRegistrationService.getRegistrationId();
+            registrationId = blackDuckRegistrationService.getRegistrationId();
         } catch (final IntegrationException e) {
         }
         // We must check if the reg id is blank because of an edge case in which the hub can authenticate (while the webserver is coming up) without registration

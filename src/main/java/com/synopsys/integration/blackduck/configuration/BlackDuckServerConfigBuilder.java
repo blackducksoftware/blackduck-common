@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -48,7 +48,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.util.BuilderStatus;
 import com.synopsys.integration.util.IntegrationBuilder;
 
-public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> {
+public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
     public static final String BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_";
     public static final String BLACKDUCK_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.";
 
@@ -57,7 +57,7 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
     private final Map<Property, String> values = new HashMap<>();
     private IntLogger logger;
 
-    public HubServerConfigBuilder() {
+    public BlackDuckServerConfigBuilder() {
         EnumSet.allOf(Property.class).forEach(property -> {
             values.put(property, null);
         });
@@ -65,7 +65,7 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
     }
 
     @Override
-    public HubServerConfig build() {
+    public BlackDuckServerConfig build() {
         try {
             return super.build();
         } catch (final Exception e) {
@@ -77,7 +77,7 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
     }
 
     @Override
-    public HubServerConfig buildWithoutValidation() {
+    public BlackDuckServerConfig buildWithoutValidation() {
         URL hubURL = null;
         try {
             String tempUrl = url();
@@ -92,10 +92,10 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
 
         final ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(apiToken())) {
-            return new HubServerConfig(hubURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
+            return new BlackDuckServerConfig(hubURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
         } else {
             final Credentials credentials = new Credentials(values.get(Property.USERNAME), values.get(Property.PASSWORD));
-            return new HubServerConfig(hubURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
+            return new BlackDuckServerConfig(hubURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
         }
     }
 
@@ -208,7 +208,7 @@ public class HubServerConfigBuilder extends IntegrationBuilder<HubServerConfig> 
         this.logger = logger;
     }
 
-    // setters for the values of HubServerConfigBuilder
+    // setters for the values of BlackDuckServerConfigBuilder
     public void setUrl(final String url) {
         values.put(Property.URL, url);
     }

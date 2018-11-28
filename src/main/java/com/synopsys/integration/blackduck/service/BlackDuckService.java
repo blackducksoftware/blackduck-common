@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -32,8 +32,8 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
@@ -42,7 +42,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
@@ -52,23 +52,24 @@ import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
-public class HubService {
+public class BlackDuckService {
     public static final BlackDuckPath BOMIMPORT_PATH = new BlackDuckPath("/api/bom-import");
     public static final BlackDuckPath SCANSUMMARIES_PATH = new BlackDuckPath("/api/scan-summaries");
+    public static final BlackDuckPath UPLOADS_PATH = new BlackDuckPath("/api/uploads");
 
     private final BlackDuckRestConnection restConnection;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final URL hubBaseUrl;
-    private final JsonParser jsonParser;
     private final Gson gson;
+    private final ObjectMapper objectMapper;
 
-    public HubService(final IntLogger logger, final BlackDuckRestConnection restConnection, final Gson gson, final JsonParser jsonParser) {
+    public BlackDuckService(final IntLogger logger, final BlackDuckRestConnection restConnection, final Gson gson, final ObjectMapper objectMapper) {
         this.restConnection = restConnection;
         hubBaseUrl = restConnection.getBaseUrl();
-        this.jsonParser = jsonParser;
         this.gson = gson;
-        final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, logger);
+        this.objectMapper = objectMapper;
+        final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(restConnection, blackDuckJsonTransformer);
         blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(restConnection, blackDuckJsonTransformer);
     }
@@ -79,10 +80,6 @@ public class HubService {
 
     public URL getHubBaseUrl() {
         return hubBaseUrl;
-    }
-
-    public JsonParser getJsonParser() {
-        return jsonParser;
     }
 
     public Gson getGson() {
@@ -207,18 +204,55 @@ public class HubService {
     // getting responses from a UriSingleResponse
     // ------------------------------------------------
     public <T extends BlackDuckResponse> T getResponse(final UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
-        final Request request = RequestFactory.createCommonGetRequest(uriSingleResponse.uri);
-        return blackDuckResponseTransformer.getResponse(request, uriSingleResponse.responseClass);
+        final Request request = RequestFactory.createCommonGetRequest(uriSingleResponse.getUri());
+        return blackDuckResponseTransformer.getResponse(request, uriSingleResponse.getResponseClass());
+    }
+
+    // ------------------------------------------------
+    // handling generic create
+    // ------------------------------------------------
+    public String create(final BlackDuckPath blackDuckPath, final Object object) throws IntegrationException {
+        final String uri = pieceTogetherUri(restConnection.getBaseUrl(), blackDuckPath.getPath());
+        return create(uri, object);
+    }
+
+    public String create(final String uri, final Object object) throws IntegrationException {
+        final String json = gson.toJson(object);
+        final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(uri).build();
+        return executePostRequestAndRetrieveURL(request);
     }
 
     // ------------------------------------------------
     // handling generic delete
     // ------------------------------------------------
+    public void delete(final BlackDuckView blackDuckView) throws IntegrationException {
+        if (blackDuckView.getHref().isPresent()) {
+            final String url = blackDuckView.getHref().get();
+            delete(url);
+        }
+    }
+
     public void delete(final String url) throws IntegrationException {
         final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(url);
         try (final Response response = execute(requestBuilder.build())) {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
+        }
+    }
+
+    // ------------------------------------------------
+    // handling generic put
+    // ------------------------------------------------
+    public void put(final BlackDuckView blackDuckView) throws IntegrationException {
+        if (blackDuckView.getHref().isPresent()) {
+            final String url = blackDuckView.getHref().get();
+            final String json = gson.toJson(blackDuckView);
+            // TODO add the 'missing' pieces back from blackDuckView that were lost
+            final Request request = RequestFactory.createCommonPutRequestBuilder(json).build();
+            try (final Response response = execute(request)) {
+            } catch (final IOException e) {
+                throw new IntegrationException(e.getMessage(), e);
+            }
         }
     }
 
@@ -266,12 +300,12 @@ public class HubService {
         }
     }
 
-    private String pieceTogetherUri(final URL baseURL, final String spec) throws HubIntegrationException {
+    private String pieceTogetherUri(final URL baseURL, final String spec) throws BlackDuckIntegrationException {
         final URL url;
         try {
             url = new URL(baseURL, spec);
         } catch (final MalformedURLException e) {
-            throw new HubIntegrationException(String.format("Could not construct the URL from %s and %s", baseURL.toString(), spec), e);
+            throw new BlackDuckIntegrationException(String.format("Could not construct the URL from %s and %s", baseURL.toString(), spec), e);
         }
         return url.toString();
     }

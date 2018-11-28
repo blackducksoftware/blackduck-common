@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -32,47 +32,47 @@ import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
-public class HubBucketService extends DataService {
+public class BlackDuckBucketService extends DataService {
     private final Optional<ExecutorService> executorService;
 
-    public HubBucketService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+    public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
         executorService = Optional.empty();
     }
 
-    public HubBucketService(final HubService hubService, final IntLogger logger, final ExecutorService executorService) {
-        super(hubService, logger);
+    public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger, final ExecutorService executorService) {
+        super(blackDuckService, logger);
         this.executorService = Optional.of(executorService);
     }
 
-    public HubBucket startTheBucket(final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
-        final HubBucket hubBucket = new HubBucket();
-        addToTheBucket(hubBucket, uriSingleResponses);
-        return hubBucket;
+    public BlackDuckBucket startTheBucket(final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
+        final BlackDuckBucket blackDuckBucket = new BlackDuckBucket();
+        addToTheBucket(blackDuckBucket, uriSingleResponses);
+        return blackDuckBucket;
     }
 
-    public <T extends BlackDuckResponse> void addToTheBucket(final HubBucket hubBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
+    public <T extends BlackDuckResponse> void addToTheBucket(final BlackDuckBucket blackDuckBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
         final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriSingleResponses.add(new UriSingleResponse<>(uri, responseClass));
-        addToTheBucket(hubBucket, uriSingleResponses);
+        addToTheBucket(blackDuckBucket, uriSingleResponses);
     }
 
-    public void addToTheBucket(final HubBucket hubBucket, final Map<String, Class<? extends BlackDuckResponse>> uriToResponseClass) throws IntegrationException {
+    public void addToTheBucket(final BlackDuckBucket blackDuckBucket, final Map<String, Class<? extends BlackDuckResponse>> uriToResponseClass) throws IntegrationException {
         final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriToResponseClass.forEach((key, value) -> {
             uriSingleResponses.add(new UriSingleResponse<>(key, value));
         });
-        addToTheBucket(hubBucket, uriSingleResponses);
+        addToTheBucket(blackDuckBucket, uriSingleResponses);
     }
 
-    public void addToTheBucket(final HubBucket hubBucket, final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
-        final List<HubBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
-            return new HubBucketFillTask(hubService, hubBucket, uriSingleResponse);
+    public void addToTheBucket(final BlackDuckBucket blackDuckBucket, final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
+        final List<BlackDuckBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
+            return new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, uriSingleResponse);
         }).collect(Collectors.toList());
         if (executorService.isPresent()) {
             // NOTE: it is up to the user of the bucket service to shutdown the executor

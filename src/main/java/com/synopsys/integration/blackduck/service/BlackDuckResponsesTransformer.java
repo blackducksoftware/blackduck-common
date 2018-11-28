@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
@@ -74,11 +74,11 @@ public class BlackDuckResponsesTransformer {
                     blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
                     allResponses.addAll(blackDuckPageResponse.getItems());
                 } catch (final IOException e) {
-                    throw new HubIntegrationException(e);
+                    throw new BlackDuckIntegrationException(e);
                 }
             }
         } catch (final IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
 
         return new BlackDuckPageResponse<>(totalCount, allResponses);

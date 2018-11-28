@@ -24,7 +24,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
     public void setup() throws Exception {
         final String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
         final ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME);
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         /**
          * we can get the project and version like this, and if they don't exist they will be created for us
@@ -41,7 +41,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
 
     @Test
     public void testAddingAComponent() throws Exception {
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         final ExternalId externalId = new ExternalId(Forge.MAVEN);
         externalId.group = "commons-fileupload";

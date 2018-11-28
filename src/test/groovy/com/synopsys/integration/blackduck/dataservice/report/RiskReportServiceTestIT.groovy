@@ -1,29 +1,7 @@
-/**
- * Hub Common
- *
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.*/
 package com.synopsys.integration.blackduck.dataservice.report
 
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.HubServicesFactory
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
@@ -56,8 +34,8 @@ class RiskReportServiceTestIT {
         projectRequestBuilder.setPhase(testPhase);
         projectRequestBuilder.setDistribution(testDistribution);
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         projectService.syncProjectAndVersion(projectRequestBuilder.build(), false);
     }
@@ -68,9 +46,9 @@ class RiskReportServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportService riskReportService = hubServicesFactory.createReportService(30000)
+        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
+        ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         File folder = folderForReport.toFile();
         Optional<File> pdfFile = riskReportService.createReportPdfFile(folder, testProjectName, testProjectVersionName)
         assertTrue(pdfFile.isPresent())
@@ -84,9 +62,9 @@ class RiskReportServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportService riskReportService = hubServicesFactory.createReportService(30000)
+        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
+        ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         File reportFolder = folderForReport.toFile()
         riskReportService.createReportFiles(reportFolder, testProjectName, testProjectVersionName)
 
@@ -108,9 +86,9 @@ class RiskReportServiceTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_PROJECT")
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
-        final HubServicesFactory hubServicesFactory = restConnectionTestHelper.createHubServicesFactory()
-        final IntLogger logger = hubServicesFactory.getRestConnection().logger
-        ReportService riskReportService = hubServicesFactory.createReportService(30000)
+        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
+        ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         Optional<File> noticeReportFile = riskReportService.createNoticesReportFile(folderForReport.toFile(), testProjectName, testProjectVersionName);
         assertTrue(noticeReportFile.isPresent())
         assertNotNull(noticeReportFile.get())

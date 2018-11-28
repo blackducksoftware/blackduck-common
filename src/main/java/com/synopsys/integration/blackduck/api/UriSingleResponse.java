@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -27,8 +27,8 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.LinkResponse;
 
 public class UriSingleResponse<T extends BlackDuckResponse> extends LinkResponse {
-    public String uri;
-    public Class<T> responseClass;
+    private final String uri;
+    private final Class<T> responseClass;
 
     public UriSingleResponse(final String uri, final Class<T> responseClass) {
         this.uri = uri;
@@ -38,6 +38,14 @@ public class UriSingleResponse<T extends BlackDuckResponse> extends LinkResponse
     @Override
     public String toString() {
         return uri;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public Class<T> getResponseClass() {
+        return responseClass;
     }
 
 }

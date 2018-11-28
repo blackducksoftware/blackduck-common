@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -32,8 +32,8 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -46,12 +46,12 @@ public class ScanBatchManager {
     private final ScanCommandRunner scanCommandRunner;
     private final File defaultInstallDirectory;
 
-    public static ScanBatchManager createDefaultScanManager(final IntLogger logger, final HubServerConfig hubServerConfig) {
+    public static ScanBatchManager createDefaultScanManager(final IntLogger logger, final BlackDuckServerConfig blackDuckServerConfig) {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, scanPathsUtility, operatingSystemType);
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, scanPathsUtility, operatingSystemType);
 
         return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
@@ -76,7 +76,7 @@ public class ScanBatchManager {
         this.defaultInstallDirectory = defaultInstallDirectory;
     }
 
-    public ScanBatchOutput executeScans(final ScanBatch scanBatch) throws HubIntegrationException {
+    public ScanBatchOutput executeScans(final ScanBatch scanBatch) throws BlackDuckIntegrationException {
         if (scannerZipInstaller != null) {
             // if an installer is specified, it will be used to install/update the scanner
             final File installDirectory = scanBatch.getSignatureScannerInstallDirectory();
@@ -88,7 +88,7 @@ public class ScanBatchManager {
                     if (scanPaths.isManagedByLibrary()) {
                         scannerZipInstaller.installOrUpdateScanner(installDirectory);
                     }
-                } catch (final HubIntegrationException e) {
+                } catch (final BlackDuckIntegrationException e) {
                     // a valid scanPaths could not be found so we will need to attempt an install
                     scannerZipInstaller.installOrUpdateScanner(installDirectory);
                 }

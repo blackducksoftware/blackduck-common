@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -25,34 +25,34 @@ package com.synopsys.integration.blackduck.service.model;
 
 import java.io.File;
 
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.certificate.CertificateHandler;
 
-public class HubCertificateHandler {
+public class BlackDuckCertificateHandler {
     private final CertificateHandler handler;
 
-    public HubCertificateHandler(final IntLogger logger) {
+    public BlackDuckCertificateHandler(final IntLogger logger) {
         handler = new CertificateHandler(logger);
     }
 
-    public HubCertificateHandler(final IntLogger logger, final File javaHomeOverride) {
+    public BlackDuckCertificateHandler(final IntLogger logger, final File javaHomeOverride) {
         handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
-    public void importHttpsCertificateForHubServer(final HubServerConfig hubServerConfig) throws IntegrationException {
-        if (hubServerConfig == null || hubServerConfig.getBlackDuckUrl() == null || !hubServerConfig.getBlackDuckUrl().getProtocol().startsWith("https")) {
+    public void importHttpsCertificateForHubServer(final BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
+        if (blackDuckServerConfig == null || blackDuckServerConfig.getBlackDuckUrl() == null || !blackDuckServerConfig.getBlackDuckUrl().getProtocol().startsWith("https")) {
             return;
         }
-        handler.setTimeout(hubServerConfig.getTimeout());
-        if (hubServerConfig.getProxyInfo() != null) {
-            handler.setProxyInfo(hubServerConfig.getProxyInfo());
+        handler.setTimeout(blackDuckServerConfig.getTimeout());
+        if (blackDuckServerConfig.getProxyInfo() != null) {
+            handler.setProxyInfo(blackDuckServerConfig.getProxyInfo());
         }
-        if (handler.isCertificateInTrustStore(hubServerConfig.getBlackDuckUrl())) {
+        if (handler.isCertificateInTrustStore(blackDuckServerConfig.getBlackDuckUrl())) {
             return;
         }
-        handler.retrieveAndImportHttpsCertificate(hubServerConfig.getBlackDuckUrl());
+        handler.retrieveAndImportHttpsCertificate(blackDuckServerConfig.getBlackDuckUrl());
     }
 
 }

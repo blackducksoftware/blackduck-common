@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -30,28 +30,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
-import com.synopsys.integration.blackduck.service.HubService;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.log.IntLogger;
 
 public class UploadRunner {
     private final IntLogger logger;
-    private final HubService hubService;
+    private final BlackDuckService blackDuckService;
     private final Optional<ExecutorService> optionalExecutorService;
 
-    public UploadRunner(final IntLogger logger, final HubService hubService) {
+    public UploadRunner(final IntLogger logger, final BlackDuckService blackDuckService) {
         this.logger = logger;
-        this.hubService = hubService;
+        this.blackDuckService = blackDuckService;
         optionalExecutorService = Optional.empty();
     }
 
-    public UploadRunner(final IntLogger logger, final HubService hubService, final ExecutorService executorService) {
+    public UploadRunner(final IntLogger logger, final BlackDuckService blackDuckService, final ExecutorService executorService) {
         this.logger = logger;
-        this.hubService = hubService;
+        this.blackDuckService = blackDuckService;
         optionalExecutorService = Optional.of(executorService);
     }
 
-    public UploadBatchOutput executeUploads(final UploadBatch uploadBatch) throws HubIntegrationException {
+    public UploadBatchOutput executeUploads(final UploadBatch uploadBatch) throws BlackDuckIntegrationException {
         logger.info("Starting the codelocation file uploads.");
         final UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch);
         logger.info("Completed the codelocation file uploads.");
@@ -59,7 +59,7 @@ public class UploadRunner {
         return uploadBatchOutput;
     }
 
-    private UploadBatchOutput uploadTargets(final UploadBatch uploadBatch) throws HubIntegrationException {
+    private UploadBatchOutput uploadTargets(final UploadBatch uploadBatch) throws BlackDuckIntegrationException {
         final List<UploadOutput> uploadOutputs = new ArrayList<>();
 
         try {
@@ -80,7 +80,7 @@ public class UploadRunner {
                 }
             }
         } catch (final Exception e) {
-            throw new HubIntegrationException(String.format("Encountered a problem uploading a file: %s", e.getMessage()), e);
+            throw new BlackDuckIntegrationException(String.format("Encountered a problem uploading a file: %s", e.getMessage()), e);
         }
 
         return new UploadBatchOutput(uploadOutputs);
@@ -89,7 +89,7 @@ public class UploadRunner {
     private List<UploadCallable> createCallables(final UploadBatch uploadBatch) {
         final List<UploadCallable> callables = uploadBatch.getUploadTargets()
                                                        .stream()
-                                                       .map(uploadTarget -> new UploadCallable(hubService, uploadTarget))
+                                                       .map(uploadTarget -> new UploadCallable(blackDuckService, uploadTarget))
                                                        .collect(Collectors.toList());
 
         return callables;

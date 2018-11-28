@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -26,6 +26,7 @@ package com.synopsys.integration.blackduck.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +42,8 @@ import com.synopsys.integration.blackduck.notification.CommonNotificationViewRes
 import com.synopsys.integration.blackduck.notification.NotificationDetailResult;
 import com.synopsys.integration.blackduck.notification.NotificationDetailResults;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
-import com.synopsys.integration.blackduck.service.bucket.HubBucket;
-import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
+import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucket;
+import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
 
@@ -85,25 +86,29 @@ public class CommonNotificationService {
             return new NotificationDetailResults(Collections.emptyList(), Optional.empty(), Optional.empty());
         }
 
-        List<NotificationDetailResult> sortedDetails = commonNotifications.stream().map(view -> {
-            return notificationContentDetailFactory.generateContentDetails(view);
-        }).collect(Collectors.toList());
+        List<NotificationDetailResult> sortedDetails =
+                commonNotifications
+                        .stream()
+                        .map(view -> notificationContentDetailFactory.generateContentDetails(view))
+                        .collect(Collectors.toList());
 
         if (oldestFirst) {
             // we don't want to use the default sorting from the hub
-            sortedDetails = sortedDetails.stream().sorted((result_1, result_2) -> {
-                return result_1.getCreatedAt().compareTo(result_2.getCreatedAt());
-            }).collect(Collectors.toList());
+            sortedDetails =
+                    sortedDetails
+                            .stream()
+                            .sorted(Comparator.comparing(NotificationDetailResult::getCreatedAt))
+                            .collect(Collectors.toList());
         }
 
         final DatePair datePair = getLatestCreatedAtString(commonNotifications);
         return new NotificationDetailResults(sortedDetails, datePair.date, datePair.dateString);
     }
 
-    public void populateHubBucket(final HubBucketService hubBucketService, final HubBucket hubBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
+    public void populateHubBucket(final BlackDuckBucketService blackDuckBucketService, final BlackDuckBucket blackDuckBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
         final List<UriSingleResponse<? extends BlackDuckResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(notificationDetailResults.getAllLinks());
-        hubBucketService.addToTheBucket(hubBucket, uriResponseList);
+        blackDuckBucketService.addToTheBucket(blackDuckBucket, uriResponseList);
     }
 
     private DatePair getLatestCreatedAtString(final List<CommonNotificationView> views) {

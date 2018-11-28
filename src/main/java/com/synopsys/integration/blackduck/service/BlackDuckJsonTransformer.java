@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,28 +23,34 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flipkart.zjsonpatch.JsonDiff;
+import com.flipkart.zjsonpatch.JsonPatch;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckJsonTransformer {
     private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final IntLogger logger;
 
-    public BlackDuckJsonTransformer(final Gson gson, final IntLogger logger) {
+    public BlackDuckJsonTransformer(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
         this.gson = gson;
+        this.objectMapper = objectMapper;
         this.logger = logger;
     }
 
@@ -53,17 +59,17 @@ public class BlackDuckJsonTransformer {
         return getResponseAs(json, clazz);
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws HubIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws BlackDuckIntegrationException {
         try {
             final JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
             return getResponseAs(jsonElement, clazz);
         } catch (final JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided json with Gson:%s%s", System.lineSeparator(), json));
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws HubIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws BlackDuckIntegrationException {
         final String json = gson.toJson(jsonElement);
         try {
             final T blackDuckResponse = gson.fromJson(jsonElement, clazz);
@@ -71,11 +77,12 @@ public class BlackDuckJsonTransformer {
             blackDuckResponse.setGson(gson);
             blackDuckResponse.setJsonElement(jsonElement);
             blackDuckResponse.setJson(json);
+            setPatch(blackDuckResponse);
 
             return blackDuckResponse;
         } catch (final JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided jsonElement with Gson:%s%s", System.lineSeparator(), json));
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
@@ -92,20 +99,36 @@ public class BlackDuckJsonTransformer {
             return new BlackDuckPageResponse<>(totalCount, itemList);
         } catch (final JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided json responses with Gson:%s%s", System.lineSeparator(), json));
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public String mergeJson(final String toReceive, final String toMergeIn) {
-        final JsonObject toReceiveObj = gson.fromJson(toReceive, JsonObject.class);
-        final JsonObject toMergeInObj = gson.fromJson(toMergeIn, JsonObject.class);
+    public String producePatchedJson(final BlackDuckResponse blackDuckResponse) {
+        final String lossyJson = gson.toJson(blackDuckResponse);
+        try {
+            final JsonNode source = objectMapper.readTree(lossyJson);
+            final JsonNode target = JsonPatch.apply(blackDuckResponse.getPatch(), source);
 
-        final Set<Map.Entry<String, JsonElement>> fields = toMergeInObj.entrySet();
-        for (final Map.Entry<String, JsonElement> field : fields) {
-            toReceiveObj.add(field.getKey(), field.getValue());
+            final StringWriter stringWriter = new StringWriter();
+            objectMapper.writeValue(stringWriter, target);
+
+            return stringWriter.toString();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        return gson.toJson(toReceiveObj);
+    private void setPatch(final BlackDuckResponse blackDuckResponse) {
+        final String lossyJson = gson.toJson(blackDuckResponse);
+
+        try {
+            final JsonNode source = objectMapper.readTree(lossyJson);
+            final JsonNode target = objectMapper.readTree(blackDuckResponse.getJson());
+            final JsonNode patch = JsonDiff.asJson(source, target);
+            blackDuckResponse.setPatch(patch);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

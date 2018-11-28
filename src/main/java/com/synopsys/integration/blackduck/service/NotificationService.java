@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -35,7 +35,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.Notification
 import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.service.model.HubFilter;
+import com.synopsys.integration.blackduck.service.model.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -43,14 +43,14 @@ import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.request.Request;
 
 public class NotificationService extends DataService {
-    public NotificationService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+    public NotificationService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     public List<NotificationView> getAllNotifications(final Date startDate, final Date endDate) throws IntegrationException {
         final List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
-        final List<NotificationView> allNotificationItems = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
+        final List<NotificationView> allNotificationItems = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
         return allNotificationItems;
     }
 
@@ -60,13 +60,13 @@ public class NotificationService extends DataService {
         final String userNotificationsUri = user.getFirstLink(UserView.NOTIFICATIONS_LINK).orElse(null);
         requestBuilder.uri(userNotificationsUri);
 
-        final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(requestBuilder, NotificationUserView.class, true);
+        final List<NotificationUserView> allUserNotificationItems = blackDuckService.getResponses(requestBuilder, NotificationUserView.class, true);
         return allUserNotificationItems;
     }
 
     public List<NotificationView> getFilteredNotifications(final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        final List<NotificationView> allNotificationItems = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
+        final List<NotificationView> allNotificationItems = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
         return allNotificationItems;
     }
 
@@ -75,7 +75,7 @@ public class NotificationService extends DataService {
         final String userNotificationsUri = user.getFirstLink(UserView.NOTIFICATIONS_LINK).orElse(null);
         requestBuilder.uri(userNotificationsUri);
 
-        final List<NotificationUserView> allUserNotificationItems = hubService.getResponses(requestBuilder, NotificationUserView.class, true);
+        final List<NotificationUserView> allUserNotificationItems = blackDuckService.getResponses(requestBuilder, NotificationUserView.class, true);
         return allUserNotificationItems;
     }
 
@@ -86,7 +86,7 @@ public class NotificationService extends DataService {
     public Date getLatestNotificationDate() throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
         RequestFactory.addHubFilter(requestBuilder, createFilterForAllKnownTypes());
-        final List<NotificationView> notifications = hubService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
+        final List<NotificationView> notifications = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
             return notifications.get(0).getCreatedAt();
         } else {
@@ -99,13 +99,13 @@ public class NotificationService extends DataService {
         return allKnownTypes;
     }
 
-    private HubFilter createFilterForAllKnownTypes() {
+    private BlackDuckRequestFilter createFilterForAllKnownTypes() {
         return createFilterForSpecificTypes(getAllKnownNotificationTypes());
     }
 
-    private HubFilter createFilterForSpecificTypes(final List<String> notificationTypesToInclude) {
-        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
-        return hubFilter;
+    private BlackDuckRequestFilter createFilterForSpecificTypes(final List<String> notificationTypesToInclude) {
+        final BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
+        return blackDuckRequestFilter;
     }
 
     private Request.Builder createNotificationRequestBuilder(final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) {
@@ -115,7 +115,7 @@ public class NotificationService extends DataService {
         final String endDateString = sdf.format(endDate);
 
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
-        final HubFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
+        final BlackDuckRequestFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
         RequestFactory.addHubFilter(requestBuilder, notificationTypeFilter);
         return requestBuilder;
     }

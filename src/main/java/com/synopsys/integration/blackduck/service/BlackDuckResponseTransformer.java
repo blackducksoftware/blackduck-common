@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -27,7 +27,7 @@ import java.io.IOException;
 
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
@@ -47,15 +47,15 @@ public class BlackDuckResponseTransformer {
             response.throwExceptionForError();
             return blackDuckJsonTransformer.getResponse(response, clazz);
         } catch (final IOException e) {
-            throw new HubIntegrationException(e.getMessage(), e);
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws HubIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws BlackDuckIntegrationException {
         return blackDuckJsonTransformer.getResponseAs(json, clazz);
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws HubIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws BlackDuckIntegrationException {
         return blackDuckJsonTransformer.getResponseAs(jsonElement, clazz);
     }
 

@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanBatchBuilder {
@@ -69,7 +69,7 @@ public class ScanBatchBuilder {
         assertValid();
 
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
-            blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
+                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
     public void assertValid() throws IllegalArgumentException {
@@ -128,8 +128,8 @@ public class ScanBatchBuilder {
         return StringUtils.join(errorMessages, ' ');
     }
 
-    public ScanBatchBuilder fromHubServerConfig(final HubServerConfig hubServerConfig) {
-        if (null == hubServerConfig) {
+    public ScanBatchBuilder fromHubServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
+        if (null == blackDuckServerConfig) {
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
             blackDuckUrl = null;
             blackDuckUsername = null;
@@ -137,15 +137,15 @@ public class ScanBatchBuilder {
             blackDuckApiToken = null;
             alwaysTrustServerCertificate = false;
         } else {
-            proxyInfo = hubServerConfig.getProxyInfo();
-            blackDuckUrl = hubServerConfig.getBlackDuckUrl();
-            if (hubServerConfig.usingApiToken()) {
-                blackDuckApiToken = hubServerConfig.getApiToken();
+            proxyInfo = blackDuckServerConfig.getProxyInfo();
+            blackDuckUrl = blackDuckServerConfig.getBlackDuckUrl();
+            if (blackDuckServerConfig.usingApiToken()) {
+                blackDuckApiToken = blackDuckServerConfig.getApiToken();
             } else {
-                blackDuckUsername = hubServerConfig.getCredentials().getUsername();
-                blackDuckPassword = hubServerConfig.getCredentials().getPassword();
+                blackDuckUsername = blackDuckServerConfig.getCredentials().getUsername();
+                blackDuckPassword = blackDuckServerConfig.getCredentials().getPassword();
             }
-            alwaysTrustServerCertificate = hubServerConfig.isAlwaysTrustServerCertificate();
+            alwaysTrustServerCertificate = blackDuckServerConfig.isAlwaysTrustServerCertificate();
         }
         return this;
     }

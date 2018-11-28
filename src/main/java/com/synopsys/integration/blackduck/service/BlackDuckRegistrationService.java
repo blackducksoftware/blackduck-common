@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -31,15 +31,15 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Response;
 
-public class HubRegistrationService extends DataService {
-    public HubRegistrationService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+public class BlackDuckRegistrationService extends DataService {
+    public BlackDuckRegistrationService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     public String getRegistrationId() throws IntegrationException {
-        try (Response response = hubService.get(new BlackDuckPath("/api/v1/registrations"))) {
+        try (Response response = blackDuckService.get(new BlackDuckPath("/api/v1/registrations"))) {
             final String jsonResponse = response.getContentString();
-            final JsonObject jsonObject = hubService.getJsonParser().parse(jsonResponse).getAsJsonObject();
+            final JsonObject jsonObject = blackDuckService.getGson().fromJson(jsonResponse, JsonObject.class);
             final String registrationId = jsonObject.get("registrationId").getAsString();
             return registrationId;
         } catch (final IOException e) {

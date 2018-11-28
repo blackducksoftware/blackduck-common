@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -28,18 +28,18 @@ import java.util.Optional;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.util.Stringable;
 
-public class HubBucketItem<T extends BlackDuckResponse> extends Stringable {
+public class BlackDuckBucketItem<T extends BlackDuckResponse> extends Stringable {
     private final String uri;
     private final Optional<T> blackDuckResponse;
     private final Optional<Exception> e;
 
-    public HubBucketItem(final String uri, final T blackDuckResponse) {
+    public BlackDuckBucketItem(final String uri, final T blackDuckResponse) {
         this.uri = uri;
         this.blackDuckResponse = Optional.of(blackDuckResponse);
         e = Optional.empty();
     }
 
-    public HubBucketItem(final String uri, final Exception e) {
+    public BlackDuckBucketItem(final String uri, final Exception e) {
         this.uri = uri;
         blackDuckResponse = Optional.empty();
         this.e = Optional.of(e);

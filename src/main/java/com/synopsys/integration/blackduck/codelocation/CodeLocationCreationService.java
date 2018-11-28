@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -39,11 +39,11 @@ import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
+import com.synopsys.integration.blackduck.exception.BlackDuckTimeoutExceededException;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
-import com.synopsys.integration.blackduck.exception.HubTimeoutExceededException;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.HubService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
@@ -53,8 +53,8 @@ public class CodeLocationCreationService extends DataService {
     private final CodeLocationService codeLocationService;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(final HubService hubService, final IntLogger logger, final CodeLocationService codeLocationService, final NotificationService notificationService) {
-        super(hubService, logger);
+    public CodeLocationCreationService(final BlackDuckService blackDuckService, final IntLogger logger, final CodeLocationService codeLocationService, final NotificationService notificationService) {
+        super(blackDuckService, logger);
         this.codeLocationService = codeLocationService;
         this.notificationService = notificationService;
     }
@@ -140,7 +140,7 @@ public class CodeLocationCreationService extends DataService {
         }
 
         if (!allCompleted) {
-            throw new HubTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
+            throw new BlackDuckTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
         } else {
             logger.info("All code locations have been added to the BOM.");
         }

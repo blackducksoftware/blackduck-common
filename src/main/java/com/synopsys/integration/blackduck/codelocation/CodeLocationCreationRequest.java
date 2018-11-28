@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -25,11 +25,11 @@ package com.synopsys.integration.blackduck.codelocation;
 
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public abstract class CodeLocationCreationRequest<T> {
     public abstract Set<String> getCodeLocationNames();
 
-    public abstract T executeRequest() throws HubIntegrationException;
+    public abstract T executeRequest() throws BlackDuckIntegrationException;
 
 }

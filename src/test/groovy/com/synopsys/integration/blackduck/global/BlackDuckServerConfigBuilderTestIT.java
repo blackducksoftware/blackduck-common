@@ -1,33 +1,6 @@
-/**
- * Hub Common
- *
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.synopsys.integration.blackduck.global;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URL;
 
@@ -35,13 +8,13 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 @Tag("integration")
-public class HubServerConfigBuilderTestIT {
+public class BlackDuckServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     private static final String VALID_TIMEOUT_STRING = "120";
@@ -50,10 +23,10 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxies() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         setBuilderDefaults(builder);
         setBuilderProxyDefaults(builder);
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
@@ -67,7 +40,7 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         setBuilderDefaults(builder);
         builder.setProxyPort(ProxyInfo.NO_PROXY_INFO.getPort());
         builder.setProxyHost(ProxyInfo.NO_PROXY_INFO.getHost());
@@ -75,7 +48,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setProxyNtlmWorkstation(ProxyInfo.NO_PROXY_INFO.getNtlmDomain());
         builder.setProxyUsername(ProxyInfo.NO_PROXY_INFO.getUsername());
         builder.setProxyPassword(ProxyInfo.NO_PROXY_INFO.getPassword());
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
 
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
@@ -88,27 +61,27 @@ public class HubServerConfigBuilderTestIT {
     @Test
     public void testValidBuildConnect() throws Exception {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
         builder.setUrl(hubServer);
         builder.setTimeout(120);
         builder.setPassword("blackduck");
         builder.setUsername("sysadmin");
         builder.setTrustCert(true);
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
         assertNotNull(config);
     }
 
     @Test
     public void testValidBuild() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setTrustCert(true);
         builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_INTEGER);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
         assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().getUsername());
@@ -117,14 +90,14 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildTimeoutString() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(120, config.getTimeout());
         assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().getUsername());
@@ -133,7 +106,7 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildWithProxy() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setUrl(hubServer);
@@ -142,7 +115,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
 
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
@@ -154,14 +127,14 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testUrlwithTrailingSlash() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setUrl(hubServer);
         builder.setTimeout(VALID_TIMEOUT_STRING);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        final HubServerConfig config = builder.build();
+        final BlackDuckServerConfig config = builder.build();
         assertFalse(config.getBlackDuckUrl().toString().endsWith("/"));
         assertEquals("https", config.getBlackDuckUrl().getProtocol());
         assertEquals(new URL(hubServer).getHost(), config.getBlackDuckUrl().getHost());
@@ -170,13 +143,13 @@ public class HubServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildWithProxyPortZero() throws Exception {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setUrl(hubServer);
         builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
         builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        HubServerConfig config = builder.build();
+        BlackDuckServerConfig config = builder.build();
         assertFalse(config.shouldUseProxyForHub());
 
         builder.setProxyPort(0);
@@ -196,7 +169,7 @@ public class HubServerConfigBuilderTestIT {
         }
     }
 
-    private void setBuilderDefaults(final HubServerConfigBuilder builder) throws Exception {
+    private void setBuilderDefaults(final BlackDuckServerConfigBuilder builder) throws Exception {
         final String hubServer = restConnectionTestHelper.getProperty("TEST_HTTPS_HUB_SERVER_URL");
         builder.setTrustCert(true);
         builder.setUrl(hubServer);
@@ -205,7 +178,7 @@ public class HubServerConfigBuilderTestIT {
         builder.setPassword("Pass");
     }
 
-    private void setBuilderProxyDefaults(final HubServerConfigBuilder builder) throws Exception {
+    private void setBuilderProxyDefaults(final BlackDuckServerConfigBuilder builder) throws Exception {
         builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
         builder.setProxyPort(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")));
     }

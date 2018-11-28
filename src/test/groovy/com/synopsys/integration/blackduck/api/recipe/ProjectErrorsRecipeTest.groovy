@@ -18,7 +18,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
 
     @AfterEach
     void cleanup() {
-        def projectService = hubServicesFactory.createProjectService()
+        def projectService = blackDuckServicesFactory.createProjectService()
         Optional<ProjectView> createdProject = projectService.getProjectByName(uniqueName)
         if (createdProject.isPresent()) {
             //we may or may not have created a project, so there may not be something to delete
@@ -31,7 +31,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
         /*
          * Let's try and find a project that doesn't exist, which should return Optional.empty()
          */
-        ProjectService projectService = hubServicesFactory.createProjectService()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
         Optional<ProjectView> projectView = projectService.getProjectByName(uniqueName)
         assertFalse(projectView.isPresent());
     }
@@ -42,7 +42,7 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          * First, create a project with a unique name
          */
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectService projectService = hubServicesFactory.createProjectService()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
         String projectUrl = projectService.createProject(projectRequest)
 
         /*

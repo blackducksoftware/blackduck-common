@@ -18,9 +18,9 @@ import org.mockito.Mockito;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.RestConnection;
@@ -47,16 +47,16 @@ public class ScannerZipInstallerTest {
         final File downloadTarget = new File(signatureScannerDownloadPath);
 
         final IntLogger logger = new BufferedIntLogger();
-        final HubServerConfigBuilder hubServerConfigBuilder = new HubServerConfigBuilder();
-        hubServerConfigBuilder.setUrl(blackDuckUrl);
-        hubServerConfigBuilder.setUsername(blackDuckUsername);
-        hubServerConfigBuilder.setPassword(blackDuckPassword);
-        hubServerConfigBuilder.setTimeout(120);
-        hubServerConfigBuilder.setTrustCert(true);
-        hubServerConfigBuilder.setLogger(logger);
+        final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
+        blackDuckServerConfigBuilder.setUsername(blackDuckUsername);
+        blackDuckServerConfigBuilder.setPassword(blackDuckPassword);
+        blackDuckServerConfigBuilder.setTimeout(120);
+        blackDuckServerConfigBuilder.setTrustCert(true);
+        blackDuckServerConfigBuilder.setLogger(logger);
 
-        final HubServerConfig hubServerConfig = hubServerConfigBuilder.build();
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, hubServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
+        final BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
+        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
@@ -93,7 +93,7 @@ public class ScannerZipInstallerTest {
             try {
                 final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
                 fail("Should have thrown");
-            } catch (final HubIntegrationException e) {
+            } catch (final BlackDuckIntegrationException e) {
             }
 
             scannerZipInstaller.installOrUpdateScanner(downloadTarget);

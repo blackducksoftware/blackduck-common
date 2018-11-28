@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -24,6 +24,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.component.VersionBomLicenseView;
@@ -38,17 +39,21 @@ import com.synopsys.integration.rest.request.Response;
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(final HubService hubService, final IntLogger logger, final ComponentService componentDataService) {
-        super(hubService, logger);
+    public LicenseService(final BlackDuckService blackDuckService, final IntLogger logger, final ComponentService componentDataService) {
+        super(blackDuckService, logger);
         this.componentDataService = componentDataService;
     }
 
-    public ComplexLicenseView getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
-        final ComponentSearchResultView componentSearchView = componentDataService.getExactComponentMatch(externalId);
-        final String componentVersionUrl = componentSearchView.getVersion();
-        final ComponentVersionView componentVersion = hubService.getResponse(componentVersionUrl, ComponentVersionView.class);
+    public Optional<ComplexLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
+        final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getExactComponentMatch(externalId);
+        if (!componentSearchView.isPresent()) {
+            return Optional.empty();
+        }
 
-        return componentVersion.getLicense();
+        final String componentVersionUrl = componentSearchView.get().getVersion();
+        final ComponentVersionView componentVersion = blackDuckService.getResponse(componentVersionUrl, ComponentVersionView.class);
+
+        return Optional.ofNullable(componentVersion.getLicense());
     }
 
     public LicenseView getLicenseView(final VersionBomLicenseView versionBomLicenseView) throws IntegrationException {
@@ -63,13 +68,13 @@ public class LicenseService extends DataService {
         if (licenseUrl == null) {
             return null;
         }
-        final LicenseView licenseView = hubService.getResponse(licenseUrl, LicenseView.class);
+        final LicenseView licenseView = blackDuckService.getResponse(licenseUrl, LicenseView.class);
         return licenseView;
     }
 
     public String getLicenseText(final LicenseView licenseView) throws IntegrationException {
         final String licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK).orElse(null);
-        try (Response response = hubService.get(licenseTextUrl)) {
+        try (Response response = blackDuckService.get(licenseTextUrl)) {
             return response.getContentString();
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);

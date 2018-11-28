@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -32,7 +32,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
     private final ScanBatchManager scanBatchManager;
@@ -53,7 +53,7 @@ public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCre
     }
 
     @Override
-    public ScanBatchOutput executeRequest() throws HubIntegrationException {
+    public ScanBatchOutput executeRequest() throws BlackDuckIntegrationException {
         return scanBatchManager.executeScans(scanBatch);
     }
 

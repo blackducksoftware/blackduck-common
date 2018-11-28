@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -21,31 +21,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.exception;
+package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.exception.IntegrationException;
-
-public class HubIntegrationException extends IntegrationException {
-    private static final long serialVersionUID = 1L;
-
-    public HubIntegrationException() {
-        super();
-    }
-
-    public HubIntegrationException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public HubIntegrationException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public HubIntegrationException(final String message) {
-        super(message);
-    }
-
-    public HubIntegrationException(final Throwable cause) {
-        super(cause);
-    }
-
+public class BlackDuckMediaTypes {
+    public final static String VULNERABILITY_REQUEST_SERVICE_V1 = "application/vnd.blackducksoftware.list-1+json";
 }

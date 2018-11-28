@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -41,10 +41,10 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
-public class HubServerVerifier {
-    public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo hubProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
+public class BlackDuckServerVerifier {
+    public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo blackDuckProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-        final ProxyInfo proxyInfo = hubProxyInfo != null ? hubProxyInfo : ProxyInfo.NO_PROXY_INFO;
+        final ProxyInfo proxyInfo = blackDuckProxyInfo != null ? blackDuckProxyInfo : ProxyInfo.NO_PROXY_INFO;
         final RestConnection restConnection = new RestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
 
         try {
@@ -64,16 +64,16 @@ public class HubServerVerifier {
             try {
                 downloadURL = new URL(blackDuckUrl, ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
             } catch (final MalformedURLException e) {
-                throw new HubIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
+                throw new BlackDuckIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
             }
             final String downloadUri = downloadURL.toString();
             request = RequestFactory.createCommonGetRequest(downloadUri);
             try (final Response response = restConnection.execute(request)) {
                 response.throwExceptionForError();
             } catch (final IntegrationRestException e) {
-                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+                throw new BlackDuckIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (final IntegrationException e) {
-                throw new HubIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
+                throw new BlackDuckIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }

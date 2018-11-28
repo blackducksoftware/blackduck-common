@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -29,30 +29,30 @@ import java.util.Optional;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.service.model.HubQuery;
+import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 
 public class ProjectGetService extends DataService {
-    public ProjectGetService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+    public ProjectGetService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
+        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", projectName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
 
-        final List<ProjectView> allProjectItems = hubService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
+        final List<ProjectView> allProjectItems = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
         return allProjectItems;
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("name", projectName);
+        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", projectName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
 
-        final List<ProjectView> projectItems = hubService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
+        final List<ProjectView> projectItems = blackDuckService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
         return projectItems;
     }
 
@@ -68,10 +68,10 @@ public class ProjectGetService extends DataService {
     }
 
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(final ProjectView projectView, final String projectVersionName) throws IntegrationException {
-        final Optional<HubQuery> hubQuery = HubQuery.createQuery("versionName", projectVersionName);
+        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
 
-        final List<ProjectVersionView> allProjectVersionMatchingItems = hubService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
+        final List<ProjectVersionView> allProjectVersionMatchingItems = blackDuckService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
         final Optional<ProjectVersionView> projectVersion = findMatchingProjectVersionView(allProjectVersionMatchingItems, projectVersionName);
 
         return projectVersion;

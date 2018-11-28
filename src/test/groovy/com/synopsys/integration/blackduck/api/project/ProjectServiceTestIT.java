@@ -1,32 +1,6 @@
-/**
- * Hub Common
- * <p>
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- * <p>
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.synopsys.integration.blackduck.api.project;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -49,8 +23,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckPageResponse;
-import com.synopsys.integration.blackduck.service.HubService;
-import com.synopsys.integration.blackduck.service.HubServicesFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -60,26 +34,29 @@ import com.synopsys.integration.rest.exception.IntegrationRestException;
 @Tag("integration")
 public class ProjectServiceTestIT {
     private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
-    private static HubServicesFactory hubServicesFactory;
+    private static BlackDuckServicesFactory blackDuckServicesFactory;
+    private static BlackDuckService blackDuckService;
+    private static ProjectService projectService;
     private static ProjectView project = null;
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
-        hubServicesFactory = restConnectionTestHelper.createHubServicesFactory();
+        blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+        blackDuckService = blackDuckServicesFactory.createBlackDuckService();
     }
 
     @AfterEach
     public void tearDownAfterTest() throws Exception {
         if (project != null) {
-            hubServicesFactory.createProjectService().deleteProject(project);
+            blackDuckServicesFactory.createProjectService().deleteProject(project);
             project = null;
         }
     }
 
     @Test
     public void testGettingAllProjects() throws IntegrationException {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final BlackDuckPageResponse<ProjectView> projectViews = hubService.getAllPageResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final BlackDuckPageResponse<ProjectView> projectViews = blackDuckService.getAllPageResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
         assertTrue(projectViews.getItems().size() > 0);
         assertEquals(projectViews.getTotalCount(), projectViews.getItems().size());
     }
@@ -94,10 +71,10 @@ public class ProjectServiceTestIT {
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(testProjectName);
-        final String projectUrl = hubServicesFactory.createProjectService().createProject(projectRequest);
+        final String projectUrl = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
         System.out.println("projectUrl: " + projectUrl);
 
-        project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+        project = blackDuckServicesFactory.createBlackDuckService().getResponse(projectUrl, ProjectView.class);
         final ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
         projectVersionRequest1.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest1.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
@@ -113,24 +90,24 @@ public class ProjectServiceTestIT {
         projectVersionRequest3.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest3.setVersionName(testProjectVersion3Name);
 
-        hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest1);
-        hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest2);
-        hubServicesFactory.createProjectService().createVersion(project, projectVersionRequest3);
+        blackDuckServicesFactory.createProjectService().createVersion(project, projectVersionRequest1);
+        blackDuckServicesFactory.createProjectService().createVersion(project, projectVersionRequest2);
+        blackDuckServicesFactory.createProjectService().createVersion(project, projectVersionRequest3);
 
-        final Optional<ProjectVersionView> projectVersion1 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion1Name);
+        final Optional<ProjectVersionView> projectVersion1 = blackDuckServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion1Name);
         assertEquals(testProjectVersion1Name, projectVersion1.get().getVersionName());
 
-        final Optional<ProjectVersionView> projectVersion2 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion2Name);
+        final Optional<ProjectVersionView> projectVersion2 = blackDuckServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion2Name);
         assertEquals(testProjectVersion2Name, projectVersion2.get().getVersionName());
 
-        final Optional<ProjectVersionView> projectVersion3 = hubServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion3Name);
+        final Optional<ProjectVersionView> projectVersion3 = blackDuckServicesFactory.createProjectService().getProjectVersion(project, testProjectVersion3Name);
         assertEquals(testProjectVersion3Name, projectVersion3.get().getVersionName());
 
-        hubServicesFactory.createProjectService().deleteProject(project);
+        blackDuckServicesFactory.createProjectService().deleteProject(project);
         project = null;
 
         try {
-            project = hubServicesFactory.createHubService().getResponse(projectUrl, ProjectView.class);
+            project = blackDuckServicesFactory.createBlackDuckService().getResponse(projectUrl, ProjectView.class);
             // TODO: Expects exception. integration-rest no longer throws an exception by default
             if (project != null) {
                 fail("This project should have been deleted");
@@ -142,8 +119,8 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateUpdateProject() throws IllegalArgumentException, IntegrationException {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName("InitialName");
@@ -151,7 +128,7 @@ public class ProjectServiceTestIT {
         projectRequest.setDescription("Initial Description");
         final String projectUrl = projectService.createProject(projectRequest);
 
-        project = hubService.getResponse(projectUrl, ProjectView.class);
+        project = blackDuckService.getResponse(projectUrl, ProjectView.class);
 
         assertEquals("InitialName", project.getName());
         assertTrue(2 == project.getProjectTier());
@@ -163,7 +140,7 @@ public class ProjectServiceTestIT {
 
         projectService.updateProject(projectUrl, projectRequest);
 
-        project = hubService.getResponse(projectUrl, ProjectView.class);
+        project = blackDuckService.getResponse(projectUrl, ProjectView.class);
 
         assertEquals("New Name", project.getName());
         assertTrue(4 == project.getProjectTier());
@@ -172,8 +149,8 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateUpdateProjectVersion() throws IllegalArgumentException, IntegrationException {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName("InitialName");
@@ -187,7 +164,7 @@ public class ProjectServiceTestIT {
 
         final String projectUrl = projectService.createProject(projectRequest);
 
-        project = hubService.getResponse(projectUrl, ProjectView.class);
+        project = blackDuckService.getResponse(projectUrl, ProjectView.class);
 
         final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion("InitialName", "Initial VersionName");
 
@@ -204,7 +181,7 @@ public class ProjectServiceTestIT {
         final String projectVersionUrl = projectVersionView.getHref().get();
         projectService.updateProjectVersion(projectVersionUrl, projectVersionRequest);
 
-        projectVersionView = hubService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
+        projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
@@ -213,8 +190,8 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateProjectWithTwoVersions() throws Exception {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         // first create a new project with a single version
         final String projectName = "createWithTwo" + Instant.now().toString();
@@ -229,7 +206,7 @@ public class ProjectServiceTestIT {
 
         final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
         project = projectVersionWrapper.get().getProjectView();
-        final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersionViews = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
         final ProjectVersionRequest projectVersionRequest = projectRequest.getVersionRequest();
@@ -237,14 +214,14 @@ public class ProjectServiceTestIT {
 
         projectService.createVersion(project, projectVersionRequest);
 
-        final List<ProjectVersionView> projectVersionViewsAfterUpdate = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersionViewsAfterUpdate = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViewsAfterUpdate.size());
     }
 
     @Test
     public void testUpdatingAProjectDoesNotAffectVersion() throws Exception {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         // first create a new project with a single version
         final String projectName = "toBeUpdated" + Instant.now().toString();
@@ -258,7 +235,7 @@ public class ProjectServiceTestIT {
 
         final String projectUrl = projectService.createProject(projectRequest);
 
-        project = hubService.getResponse(projectUrl, ProjectView.class);
+        project = blackDuckService.getResponse(projectUrl, ProjectView.class);
         final Optional<ProjectVersionView> projectVersionView = projectService.getProjectVersion(project, projectVersionName);
         assertEquals("first nickname", projectVersionView.get().getNickname());
 
@@ -270,15 +247,15 @@ public class ProjectServiceTestIT {
         projectService.updateProject(projectUrl, updateRequest);
 
         final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
-        final List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(projectVersionWrapper.get().getProjectView(), ProjectView.VERSIONS_LINK_RESPONSE);
+        final List<ProjectVersionView> projectVersionViews = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectView(), ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
         assertEquals("first nickname", projectVersionViews.get(0).getNickname());
     }
 
     @Test
     public void testCloning() throws Exception {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         // first create a new project with a single version
         final String projectName = "create" + Instant.now().toString();
@@ -301,7 +278,7 @@ public class ProjectServiceTestIT {
         final String projectUrl = project.getHref().get();
         final String projectVersionUrl = projectVersionView.getHref().get();
 
-        List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
         projectRequestBuilder.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
@@ -315,14 +292,14 @@ public class ProjectServiceTestIT {
         projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
         projectService.createVersion(project, projectVersionRequest);
 
-        projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        projectVersionViews = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViews.size());
     }
 
     @Test
     public void testSyncProjectVersionForExistingProjectWithNewVersion() throws Exception {
-        final HubService hubService = hubServicesFactory.createHubService();
-        final ProjectService projectService = hubServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
         // first create a new project with a single version
         final String projectName = "syncWithTwoVersions" + Instant.now().toString();
@@ -336,13 +313,13 @@ public class ProjectServiceTestIT {
         final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName);
         project = projectVersionWrapper.get().getProjectView();
 
-        List<ProjectVersionView> projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
         final ProjectRequest secondVersionRequest = new ProjectRequestBuilder(projectName, secondVersionName).build();
         projectService.syncProjectAndVersion(secondVersionRequest);
 
-        projectVersionViews = hubService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
+        projectVersionViews = blackDuckService.getAllResponses(project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViews.size());
     }
 

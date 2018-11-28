@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -42,79 +42,79 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.rest.RestConstants;
 
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionView> expressions = new ArrayList<>();
 
-    public void addProjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ProjectView projectView) throws HubIntegrationException {
+    public void addProjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ProjectView projectView) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref().orElse(null));
     }
 
-    public void addComponentVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentVersionView componentVersionView) throws HubIntegrationException {
+    public void addComponentVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentVersionView componentVersionView) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref().orElse(null));
     }
 
-    public void addComponentCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentView componentView) throws HubIntegrationException {
+    public void addComponentCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ComponentView componentView) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref().orElse(null));
     }
 
-    public void addLicenseCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final LicenseView licenseView) throws HubIntegrationException {
+    public void addLicenseCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final LicenseView licenseView) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref().orElse(null));
     }
 
-    public void addReviewStatusCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ReviewStatusType reviewType) throws HubIntegrationException {
+    public void addReviewStatusCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final ReviewStatusType reviewType) throws BlackDuckIntegrationException {
         addSingleObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.REVIEW_STATUS, reviewType);
     }
 
-    public void addComponentReleaseDateCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Date date) throws HubIntegrationException {
+    public void addComponentReleaseDateCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Date date) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.RELEASE_DATE, RestConstants.formatDate(date));
     }
 
-    public void addNewerVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws HubIntegrationException {
+    public void addNewerVersionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws BlackDuckIntegrationException {
         addSingleObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.NEWER_VERSIONS_COUNT, count);
     }
 
-    public void addHighSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws HubIntegrationException {
+    public void addHighSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws BlackDuckIntegrationException {
         addSingleObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.HIGH_SEVERITY_VULN_COUNT, count);
     }
 
-    public void addMediumSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws HubIntegrationException {
+    public void addMediumSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws BlackDuckIntegrationException {
         addSingleObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.MEDIUM_SEVERITY_VULN_COUNT, count);
     }
 
-    public void addLowSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws HubIntegrationException {
+    public void addLowSeverityVulnerabilityCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final Integer count) throws BlackDuckIntegrationException {
         addSingleObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.LOW_SEVERITY_VULN_COUNT, count);
     }
 
-    public void addProjectTierCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<Integer> tiers) throws HubIntegrationException {
+    public void addProjectTierCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<Integer> tiers) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_TIER, tiers);
     }
 
-    public void addPhaseCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<ProjectVersionPhaseType> projectVersionPhaseTypes) throws HubIntegrationException {
+    public void addPhaseCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<ProjectVersionPhaseType> projectVersionPhaseTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_PHASE, projectVersionPhaseTypes);
     }
 
-    public void addDistributionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<ProjectVersionDistributionType> projectVersionDistributionTypes) throws HubIntegrationException {
+    public void addDistributionCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<ProjectVersionDistributionType> projectVersionDistributionTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, projectVersionDistributionTypes);
     }
 
-    public void addComponentUsageCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<PolicyRuleComponentUsageValueSetType> componentUsageTypes) throws HubIntegrationException {
+    public void addComponentUsageCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<PolicyRuleComponentUsageValueSetType> componentUsageTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.COMPONENT_USAGE, componentUsageTypes);
     }
 
-    public void addLicenseFamilyCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<LicenseCodeSharingType> licenseCodeSharingTypes) throws HubIntegrationException {
+    public void addLicenseFamilyCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final List<LicenseCodeSharingType> licenseCodeSharingTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.LICENSE_FAMILY, licenseCodeSharingTypes);
     }
 
-    public void addSingleObjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final Object object) throws HubIntegrationException {
+    public void addSingleObjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final Object object) throws BlackDuckIntegrationException {
         final List<String> values = new ArrayList<>(1);
         values.add(object.toString());
         addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
     }
 
-    public void addMultiObjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<?> objectValues) throws HubIntegrationException {
+    public void addMultiObjectCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<?> objectValues) throws BlackDuckIntegrationException {
         final List<String> values = new ArrayList<>(objectValues.size());
         for (final Object object : objectValues) {
             values.add(object.toString());
@@ -122,13 +122,13 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
     }
 
-    public void addSingleCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final String value) throws HubIntegrationException {
+    public void addSingleCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final String value) throws BlackDuckIntegrationException {
         final List<String> values = new ArrayList<>(1);
         values.add(value);
         addMultiCondition(policyRuleConditionOperator, policyRuleConditionType, values);
     }
 
-    public void addMultiCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<String> values) throws HubIntegrationException {
+    public void addMultiCondition(final PolicyRuleConditionOperatorType policyRuleConditionOperator, final PolicyRuleConditionType policyRuleConditionType, final List<String> values) throws BlackDuckIntegrationException {
         final PolicyRuleExpressionParameter expressionParameter = new PolicyRuleExpressionParameter();
         expressionParameter.setValues(values);
         final PolicyRuleExpressionView expression = new PolicyRuleExpressionView();

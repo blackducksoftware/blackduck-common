@@ -1,31 +1,8 @@
-/**
- * Hub Common
- *
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.synopsys.integration.blackduck.rest;
 
 public enum TestingPropertyKey {
-    TEST_HUB_SERVER_URL,
-    TEST_HTTPS_HUB_SERVER_URL,
+    TEST_BLACK_DUCK_SERVER_URL,
+    TEST_HTTPS_BLACK_DUCK_SERVER_URL,
     TEST_HTTPS_IGNORE_HOST,
     TEST_USERNAME,
     TEST_PASSWORD,
@@ -36,7 +13,7 @@ public enum TestingPropertyKey {
     TEST_DISTRIBUTION,
     TEST_CREATE_PROJECT,
     TEST_CREATE_VERSION,
-    TEST_HUB_TIMEOUT,
+    TEST_BLACK_DUCK_TIMEOUT,
     TEST_REPORT_PROJECT,
     TEST_REPORT_VERSION,
     TEST_PROJECT_COMPONENT,
@@ -74,6 +51,6 @@ public enum TestingPropertyKey {
     TEST_VULNERABLE_COMPONENT_NAME,
     TEST_VULNERABLE_COMPONENT_MIN_VULNERABILITIES,
     TEST_VULNERABLE_COMPONENT_VULNERABILITY_NAME,
-    LOG_DETAILS_TO_CONSOLE;
+    LOG_DETAILS_TO_CONSOLE
 
 }

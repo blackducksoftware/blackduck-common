@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -72,9 +72,9 @@ public class ScanPathsUtility {
     /**
      * The directory can either be the directory that contains Black_Duck_Scan_Installation, or the directory that contains the bin, jre, lib (etc) directories.
      * @param directory
-     * @throws HubIntegrationException
+     * @throws BlackDuckIntegrationException
      */
-    public ScanPaths determineSignatureScannerPaths(final File directory) throws HubIntegrationException {
+    public ScanPaths determineSignatureScannerPaths(final File directory) throws BlackDuckIntegrationException {
         if (directory == null) {
             throw new IllegalArgumentException("null is not a valid directory");
         }
@@ -115,7 +115,7 @@ public class ScanPathsUtility {
         return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
-    public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws HubIntegrationException {
+    public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws BlackDuckIntegrationException {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeStringPrefix = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
 
@@ -123,7 +123,7 @@ public class ScanPathsUtility {
         return createRunOutputDirectory(generalOutputDirectory, timeStringPrefix, Integer.toString(uniqueThreadIdSuffix));
     }
 
-    public File createRunOutputDirectory(final File generalOutputDirectory, final String userProvidedPrefix, final String userProvidedUniqueSuffix) throws HubIntegrationException {
+    public File createRunOutputDirectory(final File generalOutputDirectory, final String userProvidedPrefix, final String userProvidedUniqueSuffix) throws BlackDuckIntegrationException {
         final String signatureScanOutputDirectoryName = "BlackDuckScanOutput";
         final File signatureScanOutputDirectory = new File(generalOutputDirectory, signatureScanOutputDirectoryName);
 
@@ -131,19 +131,19 @@ public class ScanPathsUtility {
 
         final File specificRunOutputDirectory = new File(signatureScanOutputDirectory, uniqueOutputDirectoryName);
         if (!specificRunOutputDirectory.exists() && !specificRunOutputDirectory.mkdirs()) {
-            throw new HubIntegrationException(String.format("Could not create the %s directory!", specificRunOutputDirectory.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format("Could not create the %s directory!", specificRunOutputDirectory.getAbsolutePath()));
         }
 
         final File bdIgnoreLogsFile = new File(generalOutputDirectory, ".bdignore");
         if (!bdIgnoreLogsFile.exists()) {
             try {
                 if (!bdIgnoreLogsFile.createNewFile()) {
-                    throw new HubIntegrationException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
+                    throw new BlackDuckIntegrationException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
                 }
                 final String exclusionPattern = "/" + signatureScanOutputDirectoryName + "/";
                 Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
             } catch (final IOException e) {
-                throw new HubIntegrationException(String.format("Unexpected error creating the .bdignore file in the %s directory: %s", bdIgnoreLogsFile.getAbsolutePath(), e.getMessage()));
+                throw new BlackDuckIntegrationException(String.format("Unexpected error creating the .bdignore file in the %s directory: %s", bdIgnoreLogsFile.getAbsolutePath(), e.getMessage()));
             }
         }
 
@@ -157,7 +157,7 @@ public class ScanPathsUtility {
         return standardOutFile;
     }
 
-    private String findPathToJavaExe(final File jreContentsDirectory) throws HubIntegrationException {
+    private String findPathToJavaExe(final File jreContentsDirectory) throws BlackDuckIntegrationException {
         File jreContents = jreContentsDirectory;
         final List<String> filenames = Arrays.asList(jreContents.list());
         if (filenames.contains("Contents")) {
@@ -171,36 +171,36 @@ public class ScanPathsUtility {
         }
 
         if (!javaExe.exists() || !javaExe.isFile()) {
-            throw new HubIntegrationException(String.format("The java executable does not exist at: %s", javaExe.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format("The java executable does not exist at: %s", javaExe.getAbsolutePath()));
         }
 
         return javaExe.getAbsolutePath();
     }
 
-    private String findPathToStandaloneJar(final File libDirectory) throws HubIntegrationException {
+    private String findPathToStandaloneJar(final File libDirectory) throws BlackDuckIntegrationException {
         final File standaloneJarFile = new File(libDirectory, STANDALONE_JAR_PATH);
 
         if (!standaloneJarFile.exists() || !standaloneJarFile.isFile()) {
-            throw new HubIntegrationException(String.format("The standalone jar does not exist at: %s", standaloneJarFile.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format("The standalone jar does not exist at: %s", standaloneJarFile.getAbsolutePath()));
         }
 
         return standaloneJarFile.getAbsolutePath();
     }
 
-    private String findPathToScanCliJar(final File libDirectory) throws HubIntegrationException {
+    private String findPathToScanCliJar(final File libDirectory) throws BlackDuckIntegrationException {
         final File scanCliJarFile = findFirstFilteredFile(libDirectory, SCAN_CLI_JAR_FILE_FILTER, "");
 
         if (!scanCliJarFile.exists() || !scanCliJarFile.isFile()) {
-            throw new HubIntegrationException(String.format("The scan.cli jar does not exist at: %s", scanCliJarFile.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format("The scan.cli jar does not exist at: %s", scanCliJarFile.getAbsolutePath()));
         }
 
         return scanCliJarFile.getAbsolutePath();
     }
 
-    private File findFirstFilteredFile(final File directory, final FileFilter fileFilter, final String notFoundMessageFormat) throws HubIntegrationException {
+    private File findFirstFilteredFile(final File directory, final FileFilter fileFilter, final String notFoundMessageFormat) throws BlackDuckIntegrationException {
         final File[] potentialItems = directory.listFiles(fileFilter);
         if (potentialItems == null || potentialItems.length < 1) {
-            throw new HubIntegrationException(String.format(notFoundMessageFormat, directory.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format(notFoundMessageFormat, directory.getAbsolutePath()));
         }
 
         return potentialItems[0];

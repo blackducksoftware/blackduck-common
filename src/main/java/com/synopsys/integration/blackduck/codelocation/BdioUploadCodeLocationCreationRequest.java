@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -30,7 +30,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
-import com.synopsys.integration.blackduck.exception.HubIntegrationException;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
     private final UploadRunner uploadRunner;
@@ -50,7 +50,7 @@ public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationR
     }
 
     @Override
-    public UploadBatchOutput executeRequest() throws HubIntegrationException {
+    public UploadBatchOutput executeRequest() throws BlackDuckIntegrationException {
         return uploadRunner.executeUploads(uploadBatch);
     }
 

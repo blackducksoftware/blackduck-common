@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -29,23 +29,23 @@ import java.util.concurrent.ExecutorService;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
-import com.synopsys.integration.blackduck.service.bucket.HubBucketService;
+import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 
-public class HubServicesFactory {
+public class BlackDuckServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
-    private final JsonParser jsonParser;
+    private final ObjectMapper objectMapper;
     private final BlackDuckRestConnection restConnection;
     private final IntLogger logger;
 
@@ -53,40 +53,40 @@ public class HubServicesFactory {
         return createDefaultGsonBuilder().create();
     }
 
-    public static GsonBuilder createDefaultGsonBuilder() {
-        return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
+    public static ObjectMapper createDefaultObjectMapper() {
+        return new ObjectMapper();
     }
 
-    public static JsonParser createDefaultJsonParser() {
-        return new JsonParser();
+    public static GsonBuilder createDefaultGsonBuilder() {
+        return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
     // NOTE
     //
     // The 'create' methods are alphabetical by return type - please keep this pattern consistent.
-    public HubServicesFactory(final Gson gson, final JsonParser jsonParser, final BlackDuckRestConnection restConnection, final IntLogger logger) {
+    public BlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final BlackDuckRestConnection restConnection, final IntLogger logger) {
         intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
-        this.jsonParser = jsonParser;
+        this.objectMapper = objectMapper;
         this.restConnection = restConnection;
         this.logger = logger;
     }
 
     public BinaryScannerService createBinaryScannerService() {
-        return new BinaryScannerService(createHubService(), logger);
+        return new BinaryScannerService(createBlackDuckService(), logger);
     }
 
     public CodeLocationCreationService createCodeLocationCreationService() {
-        final HubService hubService = createHubService();
+        final BlackDuckService blackDuckService = createBlackDuckService();
         final CodeLocationService codeLocationService = createCodeLocationService();
         final NotificationService notificationService = createNotificationService();
 
-        return new CodeLocationCreationService(hubService, logger, codeLocationService, notificationService);
+        return new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
     }
 
     public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(createHubService(), logger);
+        return new CodeLocationService(createBlackDuckService(), logger);
     }
 
     public CommonNotificationService createCommonNotificationService(final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
@@ -94,58 +94,53 @@ public class HubServicesFactory {
     }
 
     public ComponentService createComponentService() {
-        return new ComponentService(createHubService(), logger);
+        return new ComponentService(createBlackDuckService(), logger);
     }
 
-    public HubRegistrationService createHubRegistrationService() {
-        return new HubRegistrationService(createHubService(), logger);
+    public BlackDuckRegistrationService createBlackDuckRegistrationService() {
+        return new BlackDuckRegistrationService(createBlackDuckService(), logger);
     }
 
-    public HubService createHubService() {
-        return new HubService(logger, restConnection, gson, jsonParser);
+    public BlackDuckService createBlackDuckService() {
+        return new BlackDuckService(logger, restConnection, gson, objectMapper);
     }
 
-    public HubBucketService createHubBucketService() {
-        return new HubBucketService(createHubService(), logger);
+    public BlackDuckBucketService createBlackDuckBucketService() {
+        return new BlackDuckBucketService(createBlackDuckService(), logger);
     }
 
-    public HubBucketService createHubBucketService(final ExecutorService executorService) {
-        return new HubBucketService(createHubService(), logger, executorService);
+    public BlackDuckBucketService createBlackDuckBucketService(final ExecutorService executorService) {
+        return new BlackDuckBucketService(createBlackDuckService(), logger, executorService);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
     }
 
-    public IssueService createIssueService() {
-        return new IssueService(createHubService(), logger);
-    }
-
     public LicenseService createLicenseService() {
-        return new LicenseService(createHubService(), logger, createComponentService());
+        return new LicenseService(createBlackDuckService(), logger, createComponentService());
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(createHubService(), logger);
+        return new NotificationService(createBlackDuckService(), logger);
     }
 
     public PolicyRuleService createPolicyRuleService() {
-        return new PolicyRuleService(createHubService());
+        return new PolicyRuleService(createBlackDuckService());
     }
 
     public ProjectService createProjectService() {
-        final HubService hubService = createHubService();
-        final ProjectGetService projectGetService = new ProjectGetService(hubService, logger);
-        final ProjectUpdateService projectUpdateService = new ProjectUpdateService(hubService, logger, projectGetService);
-        return new ProjectService(hubService, logger, projectGetService, projectUpdateService, createComponentService());
+        final BlackDuckService blackDuckService = createBlackDuckService();
+        final ProjectGetService projectGetService = new ProjectGetService(blackDuckService, logger);
+        return new ProjectService(blackDuckService, logger, projectGetService, createComponentService());
     }
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(createHubService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+        return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public UserGroupService createUserGroupService() {
-        return new UserGroupService(createHubService(), logger);
+        return new UserGroupService(createBlackDuckService(), logger);
     }
     // NOTE
     //
@@ -167,12 +162,12 @@ public class HubServicesFactory {
         return logger;
     }
 
-    public JsonParser getJsonParser() {
-        return jsonParser;
-    }
-
     public Gson getGson() {
         return gson;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     public IntEnvironmentVariables getEnvironmentVariables() {

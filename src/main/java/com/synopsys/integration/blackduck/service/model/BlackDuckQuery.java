@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,6 +23,35 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-public class HubMediaTypes {
-    public final static String VULNERABILITY_REQUEST_SERVICE_V1 = "application/vnd.blackducksoftware.list-1+json";
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class BlackDuckQuery {
+    private final String q;
+
+    public static Optional<BlackDuckQuery> createQuery(final String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new BlackDuckQuery(parameter));
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<BlackDuckQuery> createQuery(final String prefix, final String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new BlackDuckQuery(prefix + ":" + parameter));
+        }
+
+        return Optional.empty();
+    }
+
+    private BlackDuckQuery(final String parameter) {
+        q = parameter;
+    }
+
+    public String getParameter() {
+        return q;
+    }
+
 }

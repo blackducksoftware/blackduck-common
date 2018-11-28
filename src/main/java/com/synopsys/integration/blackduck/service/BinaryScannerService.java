@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -43,18 +43,18 @@ import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Response;
 
 public class BinaryScannerService extends DataService {
-    public BinaryScannerService(final HubService hubService, final IntLogger logger) {
-        super(hubService, logger);
+    public BinaryScannerService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     public void scanBinary(final File binaryFile, final String projectName, final String projectVersion, final String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
-        final RequestBuilder builder = hubService.getRestConnection().createRequestBuilder(HttpMethod.POST);
-        final URL uploadUrl = new URL(hubService.getRestConnection().getBaseUrl(), "/api/uploads");
+        final RequestBuilder builder = blackDuckService.getRestConnection().createRequestBuilder(HttpMethod.POST);
+        final URL uploadUrl = new URL(blackDuckService.getRestConnection().getBaseUrl(), "/api/uploads");
         builder.setUri(uploadUrl.toURI());
         builder.setEntity(createEntity(binaryFile, projectName, projectVersion, codeLocatioName));
 
         final HttpUriRequest request = builder.build();
-        try (final Response response = hubService.getRestConnection().execute(request)) {
+        try (final Response response = blackDuckService.getRestConnection().execute(request)) {
             logger.debug("Response: " + response.toString());
             logger.debug("Response: " + response.getStatusMessage().toString());
             logger.debug("Response: " + response.getStatusCode().toString());

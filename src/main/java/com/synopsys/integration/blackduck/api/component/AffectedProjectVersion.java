@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -26,10 +26,50 @@ package com.synopsys.integration.blackduck.api.component;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 
 public class AffectedProjectVersion extends BlackDuckComponent {
-    public String projectName;
-    public String projectVersionName;
-    public String projectVersion;
-    public String componentIssueUrl;
-    public String bomComponent;
+    private String projectName;
+    private String projectVersionName;
+    private String projectVersion;
+    private String componentIssueUrl;
+    private String bomComponent;
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(final String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProjectVersionName() {
+        return projectVersionName;
+    }
+
+    public void setProjectVersionName(final String projectVersionName) {
+        this.projectVersionName = projectVersionName;
+    }
+
+    public String getProjectVersion() {
+        return projectVersion;
+    }
+
+    public void setProjectVersion(final String projectVersion) {
+        this.projectVersion = projectVersion;
+    }
+
+    public String getComponentIssueUrl() {
+        return componentIssueUrl;
+    }
+
+    public void setComponentIssueUrl(final String componentIssueUrl) {
+        this.componentIssueUrl = componentIssueUrl;
+    }
+
+    public String getBomComponent() {
+        return bomComponent;
+    }
+
+    public void setBomComponent(final String bomComponent) {
+        this.bomComponent = bomComponent;
+    }
 
 }

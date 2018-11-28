@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -55,10 +55,10 @@ public class PolicyRuleModel {
 
         for (final PolicyRuleExpressionView expression : getExpressionList()) {
             final PolicyRuleConditionType condition = PolicyRuleConditionType.valueOf(expression.getName());
-            if (condition == PolicyRuleConditionType.UNKNOWN_RULE_CONDTION) {
+            if (PolicyRuleConditionType.UNKNOWN_RULE_CONDTION == condition) {
                 continue;
             }
-            if (condition.policyRuleCategory == PolicyRuleCategoryType.COMPONENT) {
+            if (PolicyRuleCategoryType.COMPONENT == condition.getPolicyRuleCategory()) {
                 hasNonProjectLevelCondition = true;
             }
         }

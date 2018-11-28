@@ -1,6 +1,7 @@
 package com.synopsys.integration.blackduck.service.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -13,8 +14,8 @@ import com.synopsys.integration.rest.request.Request;
 public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() {
-        final HubFilter hubFilter = HubFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), hubFilter, 1, 0);
+        final BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), blackDuckRequestFilter, 1, 0);
         final Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

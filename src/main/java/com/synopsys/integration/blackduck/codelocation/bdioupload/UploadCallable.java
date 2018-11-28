@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -29,17 +29,17 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
-import com.synopsys.integration.blackduck.service.HubService;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class UploadCallable implements Callable<UploadOutput> {
-    private final HubService hubService;
+    private final BlackDuckService blackDuckService;
     private final UploadTarget uploadTarget;
 
-    public UploadCallable(final HubService hubService, final UploadTarget uploadTarget) {
-        this.hubService = hubService;
+    public UploadCallable(final BlackDuckService blackDuckService, final UploadTarget uploadTarget) {
+        this.blackDuckService = blackDuckService;
         this.uploadTarget = uploadTarget;
     }
 
@@ -53,9 +53,9 @@ public class UploadCallable implements Callable<UploadOutput> {
                 return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
             }
 
-            final String uri = hubService.getUri(HubService.BOMIMPORT_PATH);
+            final String uri = blackDuckService.getUri(BlackDuckService.BOMIMPORT_PATH);
             final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
-            try (Response response = hubService.execute(request)) {
+            try (Response response = blackDuckService.execute(request)) {
                 final String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
             } catch (final IOException e) {

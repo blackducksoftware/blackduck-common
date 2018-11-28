@@ -1,34 +1,12 @@
-/**
- * Hub Common
- *
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.*/
 package com.synopsys.integration.blackduck.api.codelocation
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.DryRunUploadResponse
 import com.synopsys.integration.blackduck.service.DryRunUploadService
-import com.synopsys.integration.blackduck.service.HubServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
@@ -60,7 +38,7 @@ class CodeLocationRequestServiceTestIT {
 
     @AfterEach
     public void testCleanup() {
-        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
+        BlackDuckServicesFactory services = restConnectionTestHelper.createBlackDuckServicesFactory(logger)
         Optional<ProjectView> project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         if (project.isPresent()) {
             services.createProjectService().deleteProject(project.get())
@@ -72,8 +50,8 @@ class CodeLocationRequestServiceTestIT {
         final String projectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
         final String versionName = restConnectionTestHelper.getProperty("TEST_CREATE_VERSION");
 
-        HubServicesFactory services = restConnectionTestHelper.createHubServicesFactory(logger)
-        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createHubService(), logger)
+        BlackDuckServicesFactory services = restConnectionTestHelper.createBlackDuckServicesFactory(logger)
+        DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createBlackDuckService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         assertNotNull(response)
 

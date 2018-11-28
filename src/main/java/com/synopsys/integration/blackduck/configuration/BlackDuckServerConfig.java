@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -36,7 +36,7 @@ import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.Stringable;
 
-public class HubServerConfig extends Stringable implements Serializable {
+public class BlackDuckServerConfig extends Stringable implements Serializable {
     private static final long serialVersionUID = -1581638027683631935L;
 
     private final URL blackDuckUrl;
@@ -46,7 +46,7 @@ public class HubServerConfig extends Stringable implements Serializable {
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    public BlackDuckServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
@@ -55,7 +55,7 @@ public class HubServerConfig extends Stringable implements Serializable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
-    public HubServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    public BlackDuckServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         credentials = null;

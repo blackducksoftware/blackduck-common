@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -41,12 +41,20 @@ public enum PolicyRuleConditionType {
     LOW_SEVERITY_VULN_COUNT(PolicyRuleCategoryType.COMPONENT, "Low Severity Vulnerability Count"),
     UNKNOWN_RULE_CONDTION(null, "Unknown Rule Condition");
 
-    public final PolicyRuleCategoryType policyRuleCategory;
-    public final String displayValue;
+    private final PolicyRuleCategoryType policyRuleCategory;
+    private final String displayValue;
 
-    private PolicyRuleConditionType(final PolicyRuleCategoryType policyRuleCategory, final String displayValue) {
+    PolicyRuleConditionType(final PolicyRuleCategoryType policyRuleCategory, final String displayValue) {
         this.policyRuleCategory = policyRuleCategory;
         this.displayValue = displayValue;
+    }
+
+    public PolicyRuleCategoryType getPolicyRuleCategory() {
+        return policyRuleCategory;
+    }
+
+    public String getDisplayValue() {
+        return displayValue;
     }
 
 }

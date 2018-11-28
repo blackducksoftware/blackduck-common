@@ -32,33 +32,33 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     void setup() {
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis()
         ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
-        ProjectService projectService = hubServicesFactory.createProjectService()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
 
         /**
          * we can get the project and version like this, and if they don't
          * exist they will be created for us*/
         projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
 
-        PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
-        policyRuleViewV2 = constructTestPolicy(hubServicesFactory.createComponentService())
+        PolicyRuleService policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
+        policyRuleViewV2 = constructTestPolicy(blackDuckServicesFactory.createComponentService())
 
         /**
          * to create a Policy Rule we can construct a PolicyRuleViewV2 and Post it to the Hub*/
         String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
-        policyRuleViewV2 = hubServicesFactory.createHubService().getResponse(policyRuleUrl, PolicyRuleViewV2.class)
+        policyRuleViewV2 = blackDuckServicesFactory.createBlackDuckService().getResponse(policyRuleUrl, PolicyRuleViewV2.class)
     }
 
     @AfterEach
     void cleanup() {
         deleteProject(projectVersionWrapper.getProjectView().name)
 
-        PolicyRuleService policyRuleService = hubServicesFactory.createPolicyRuleService()
+        PolicyRuleService policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
         policyRuleService.deletePolicyRule(policyRuleViewV2)
     }
 
     @Test
     void testCheckingThePolicyForAProjectVersion() {
-        ProjectService projectService = hubServicesFactory.createProjectService()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
 
         ExternalId externalId = constructExternalId()
 

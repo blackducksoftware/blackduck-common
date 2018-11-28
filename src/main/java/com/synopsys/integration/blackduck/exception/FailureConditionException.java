@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,7 +23,7 @@
  */
 package com.synopsys.integration.blackduck.exception;
 
-public class FailureConditionException extends HubIntegrationException {
+public class FailureConditionException extends BlackDuckIntegrationException {
     private static final long serialVersionUID = 1L;
 
     public FailureConditionException() {

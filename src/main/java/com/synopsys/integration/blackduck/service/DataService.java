@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -26,11 +26,11 @@ package com.synopsys.integration.blackduck.service;
 import com.synopsys.integration.log.IntLogger;
 
 public class DataService {
-    protected HubService hubService;
+    protected BlackDuckService blackDuckService;
     protected IntLogger logger;
 
-    public DataService(final HubService hubService, final IntLogger logger) {
-        this.hubService = hubService;
+    public DataService(final BlackDuckService blackDuckService, final IntLogger logger) {
+        this.blackDuckService = blackDuckService;
         this.logger = logger;
     }
 

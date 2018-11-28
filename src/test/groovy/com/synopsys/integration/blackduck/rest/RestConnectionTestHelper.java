@@ -1,26 +1,3 @@
-/**
- * Hub Common
- *
- * Copyright (C) 2017 Black Duck Software, Inc.
- * http://www.blackducksoftware.com/
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package com.synopsys.integration.blackduck.rest;
 
 import static org.junit.Assert.fail;
@@ -34,28 +11,28 @@ import java.util.logging.Logger;
 
 import org.apache.http.client.HttpClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import com.synopsys.integration.blackduck.configuration.HubServerConfig;
-import com.synopsys.integration.blackduck.configuration.HubServerConfigBuilder;
-import com.synopsys.integration.blackduck.service.HubServicesFactory;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 
 public class RestConnectionTestHelper {
-    private final String hubServerUrl;
+    private final String blackDuckServerUrl;
     private Properties testProperties;
 
     public RestConnectionTestHelper() {
         initProperties();
-        hubServerUrl = getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
+        blackDuckServerUrl = getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
     }
 
-    public RestConnectionTestHelper(final String hubServerUrlPropertyName) {
+    public RestConnectionTestHelper(final String blackDuckServerUrlPropertyName) {
         initProperties();
-        hubServerUrl = testProperties.getProperty(hubServerUrlPropertyName);
+        blackDuckServerUrl = testProperties.getProperty(blackDuckServerUrlPropertyName);
     }
 
     private void initProperties() {
@@ -94,19 +71,19 @@ public class RestConnectionTestHelper {
         return testProperties.getProperty(key);
     }
 
-    public HubServerConfig getHubServerConfig() {
-        final HubServerConfigBuilder builder = new HubServerConfigBuilder();
-        builder.setUrl(hubServerUrl);
+    public BlackDuckServerConfig getBlackDuckServerConfig() {
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        builder.setUrl(blackDuckServerUrl);
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
-        builder.setTimeout(getProperty(TestingPropertyKey.TEST_HUB_TIMEOUT));
+        builder.setTimeout(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
         builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder.build();
     }
 
-    public String getIntegrationHubServerUrl() {
-        return getProperty(TestingPropertyKey.TEST_HUB_SERVER_URL);
+    public String getIntegrationBlackDuckServerUrl() {
+        return getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
     }
 
     public String getTestUsername() {
@@ -125,22 +102,22 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
-    public HubServicesFactory createHubServicesFactory() throws IllegalArgumentException, IntegrationException {
-        return createHubServicesFactory(createIntLogger());
+    public BlackDuckServicesFactory createBlackDuckServicesFactory() throws IllegalArgumentException, IntegrationException {
+        return createBlackDuckServicesFactory(createIntLogger());
     }
 
-    public HubServicesFactory createHubServicesFactory(final IntLogger logger) throws IllegalArgumentException, IntegrationException {
-        final HubServerConfig hubServerConfig = getHubServerConfig();
-        return createHubServicesFactory(hubServerConfig, logger);
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(final IntLogger logger) throws IllegalArgumentException, IntegrationException {
+        final BlackDuckServerConfig blackDuckServerConfig = getBlackDuckServerConfig();
+        return createBlackDuckServicesFactory(blackDuckServerConfig, logger);
     }
 
-    public HubServicesFactory createHubServicesFactory(final HubServerConfig hubServerConfig, final IntLogger logger) throws IllegalArgumentException, IntegrationException {
-        final BlackDuckRestConnection restConnection = hubServerConfig.createCredentialsRestConnection(logger);
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(final BlackDuckServerConfig blackDuckServerConfig, final IntLogger logger) throws IllegalArgumentException, IntegrationException {
+        final BlackDuckRestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger);
+        final Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
 
-        final Gson gson = HubServicesFactory.createDefaultGson();
-        final JsonParser jsonParser = HubServicesFactory.createDefaultJsonParser();
-        final HubServicesFactory hubServicesFactory = new HubServicesFactory(gson, jsonParser, restConnection, logger);
-        return hubServicesFactory;
+        final BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, restConnection, logger);
+        return blackDuckServicesFactory;
     }
 
     public File getFile(final String classpathResource) {

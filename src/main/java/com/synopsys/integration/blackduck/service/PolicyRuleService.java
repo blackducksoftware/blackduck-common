@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -23,8 +23,8 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
@@ -32,24 +32,20 @@ import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpr
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.body.StringBodyContent;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
 
 public class PolicyRuleService {
-    private final HubService hubService;
+    private final BlackDuckService blackDuckService;
 
-    public PolicyRuleService(final HubService hubService) {
-        this.hubService = hubService;
+    public PolicyRuleService(final BlackDuckService blackDuckService) {
+        this.blackDuckService = blackDuckService;
     }
 
     public PolicyRuleViewV2 getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
-        final List<PolicyRuleViewV2> allPolicyRules = hubService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+        final List<PolicyRuleViewV2> allPolicyRules = blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
         for (final PolicyRuleViewV2 policyRule : allPolicyRules) {
             if (policyRuleName.equals(policyRule.getName())) {
                 return policyRule;
@@ -58,20 +54,17 @@ public class PolicyRuleService {
         throw new DoesNotExistException("This Policy Rule does not exist: " + policyRuleName);
     }
 
-    public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
-        final String json = hubService.convertToJson(policyRuleViewV2);
-        final Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(json);
-        return hubService.executePostRequestAndRetrieveURL(ApiDiscovery.POLICY_RULES_LINK, requestBuilder);
-    }
-
     /**
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
     public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName) throws IntegrationException {
-        final ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId);
+        final Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersion(externalId);
+        if (!componentVersionView.isPresent()) {
+            throw new BlackDuckIntegrationException(String.format("The external id (%s) provided could not be found, so no policy can be created for it.", externalId.createExternalId()));
+        }
 
         final PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
-        builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView);
+        builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView.get());
         final PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
 
         final PolicyRuleViewV2 policyRuleViewV2 = new PolicyRuleViewV2();
@@ -80,26 +73,7 @@ public class PolicyRuleService {
         policyRuleViewV2.setOverridable(true);
         policyRuleViewV2.setExpression(expressionSet);
 
-        return createPolicyRule(policyRuleViewV2);
-    }
-
-    public void updatePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
-        final String json = hubService.convertToJson(policyRuleView);
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(json)).uri(policyRuleView.getHref().orElse(null));
-        try (Response response = hubService.execute(requestBuilder.build())) {
-
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
-    public void deletePolicyRule(final PolicyRuleViewV2 policyRuleView) throws IntegrationException {
-        final Request.Builder requestBuilder = new Request.Builder().method(HttpMethod.DELETE).uri(policyRuleView.getHref().orElse(null));
-        try (Response response = hubService.execute(requestBuilder.build())) {
-
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        return blackDuckService.create(ApiDiscovery.POLICY_RULES_LINK, policyRuleViewV2);
     }
 
 }

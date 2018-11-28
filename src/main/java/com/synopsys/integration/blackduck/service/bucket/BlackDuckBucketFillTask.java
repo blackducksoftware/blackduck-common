@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -25,28 +25,28 @@ package com.synopsys.integration.blackduck.service.bucket;
 
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.service.HubService;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 
-public class HubBucketFillTask implements Runnable {
-    private final HubService hubService;
-    private final HubBucket hubBucket;
+public class BlackDuckBucketFillTask implements Runnable {
+    private final BlackDuckService blackDuckService;
+    private final BlackDuckBucket blackDuckBucket;
     private final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse;
 
-    public HubBucketFillTask(final HubService hubService, final HubBucket hubBucket, final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse) {
-        this.hubService = hubService;
-        this.hubBucket = hubBucket;
+    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse) {
+        this.blackDuckService = blackDuckService;
+        this.blackDuckBucket = blackDuckBucket;
         this.uriSingleResponse = uriSingleResponse;
     }
 
     @Override
     public void run() {
-        if (!hubBucket.contains(uriSingleResponse.uri)) {
+        if (!blackDuckBucket.contains(uriSingleResponse.getUri())) {
             try {
-                final BlackDuckResponse blackDuckResponse = hubService.getResponse(uriSingleResponse);
-                hubBucket.addValid(uriSingleResponse.uri, blackDuckResponse);
+                final BlackDuckResponse blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
+                blackDuckBucket.addValid(uriSingleResponse.getUri(), blackDuckResponse);
             } catch (final Exception e) {
                 // it is up to the consumer of the bucket to log or handle any/all Exceptions
-                hubBucket.addError(uriSingleResponse.uri, e);
+                blackDuckBucket.addError(uriSingleResponse.getUri(), e);
             }
         }
     }

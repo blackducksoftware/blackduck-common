@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -31,35 +31,35 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Some requests to the Hub can be filtered. There can be one more more filter keys each with one or more values.
+ * Some requests to Black Duck can be filtered. There can be one more more filter keys each with one or more values.
  *
  * If multiple filters values are combined for the same filter key, these values will be OR'ed together. If multiple filter values are combined for different filter keys, these values will be AND'ed together.
  */
-public class HubFilter {
+public class BlackDuckRequestFilter {
     private final Map<String, Set<String>> filterKeysToValues = new HashMap<>();
 
-    public static HubFilter createFilterWithMultipleValues(final String key, final List<String> values) {
-        final HubFilter hubFilter = new HubFilter();
-        hubFilter.addFilter(key, values);
-        return hubFilter;
+    public static BlackDuckRequestFilter createFilterWithMultipleValues(final String key, final List<String> values) {
+        final BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
+        blackDuckRequestFilter.addFilter(key, values);
+        return blackDuckRequestFilter;
     }
 
-    public static HubFilter createFilterWithSingleValue(final String key, final String value) {
-        final HubFilter hubFilter = new HubFilter();
-        hubFilter.addFilter(key, value);
-        return hubFilter;
+    public static BlackDuckRequestFilter createFilterWithSingleValue(final String key, final String value) {
+        final BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
+        blackDuckRequestFilter.addFilter(key, value);
+        return blackDuckRequestFilter;
     }
 
     public void addFilter(final String key, final String value) {
-        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<String>()).add(value);
+        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<>()).add(value);
     }
 
     public void addFilter(final String key, final List<String> values) {
-        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<String>()).addAll(values);
+        filterKeysToValues.computeIfAbsent(key, k -> new HashSet<>()).addAll(values);
     }
 
     /**
-     * This will return the filter key/value pairs as the Hub expects them: [key1:value1,key1:value2,key2:value3] etc
+     * This will return the filter key/value pairs as Black Duck expects them: [key1:value1,key1:value2,key2:value3] etc
      */
     public List<String> getFilterParameters() {
         final List<String> parameters = new ArrayList<>();

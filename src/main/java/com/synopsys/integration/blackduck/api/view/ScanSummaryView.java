@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -41,9 +41,25 @@ public class ScanSummaryView extends BlackDuckView {
         links.put(CODELOCATION_LINK, CodeLocationView.class);
     }
 
-    public ScanSummaryStatusType status;
-    public String statusMessage;
-    public Date createdAt;
-    public Date updatedAt;
+    private ScanSummaryStatusType status;
+    private String statusMessage;
+    private Date createdAt;
+    private Date updatedAt;
+
+    public ScanSummaryStatusType getStatus() {
+        return status;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 
 }

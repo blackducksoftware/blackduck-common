@@ -1,5 +1,5 @@
 /**
- * hub-common
+ * blackduck-common
  *
  * Copyright (C) 2018 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
@@ -151,27 +151,27 @@ public class NotificationContentDetail extends Stringable {
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (projectVersion.isPresent()) {
-            keyBuilder.append(projectVersion.get().uri.hashCode());
+            keyBuilder.append(projectVersion.get().getUri().hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (component.isPresent()) {
-            keyBuilder.append(component.get().uri.hashCode());
+            keyBuilder.append(component.get().getUri().hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (componentVersion.isPresent()) {
-            keyBuilder.append(componentVersion.get().uri.hashCode());
+            keyBuilder.append(componentVersion.get().getUri().hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
         if (policy.isPresent()) {
-            keyBuilder.append(policy.get().uri.hashCode());
+            keyBuilder.append(policy.get().getUri().hashCode());
             keyBuilder.append(CONTENT_KEY_SEPARATOR);
         }
 
         if (bomComponent.isPresent()) {
-            keyBuilder.append(bomComponent.get().uri.hashCode());
+            keyBuilder.append(bomComponent.get().getUri().hashCode());
         }
         keyBuilder.append(CONTENT_KEY_SEPARATOR);
 
