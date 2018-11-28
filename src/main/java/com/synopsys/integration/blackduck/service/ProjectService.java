@@ -284,7 +284,7 @@ public class ProjectService extends DataService {
     private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
         List<MatchedFileView> matchedFiles = new ArrayList<>(0);
         final List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
-        if (tempMatchedFiles != null && tempMatchedFiles.isEmpty()) {
+        if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
             matchedFiles = tempMatchedFiles;
         }
         return matchedFiles;
