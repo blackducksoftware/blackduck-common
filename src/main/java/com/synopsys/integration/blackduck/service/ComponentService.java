@@ -76,25 +76,25 @@ public class ComponentService extends DataService {
 
     public Optional<ComponentSearchResultView> getExactComponentMatch(final ExternalId externalId) throws IntegrationException {
         final List<ComponentSearchResultView> allComponents = getAllComponents(externalId);
-        final String hubOriginIdToMatch = externalId.createBlackDuckOriginId();
+        final String originIdToMatch = externalId.createBlackDuckOriginId();
         for (final ComponentSearchResultView componentItem : allComponents) {
-            if (null != hubOriginIdToMatch) {
-                if (hubOriginIdToMatch.equals(componentItem.getOriginId())) {
+            if (null != originIdToMatch) {
+                if (originIdToMatch.equals(componentItem.getOriginId())) {
                     return Optional.of(componentItem);
                 }
             }
         }
-        logger.error("Couldn't find an exact component that matches " + hubOriginIdToMatch);
+        logger.error("Couldn't find an exact component that matches " + originIdToMatch);
         return Optional.empty();
     }
 
     public List<ComponentSearchResultView> getAllComponents(final ExternalId externalId) throws IntegrationException {
         final String forge = externalId.forge.getName();
-        final String hubOriginId = externalId.createBlackDuckOriginId();
-        final String componentQuery = String.format("%s|%s", forge, hubOriginId);
-        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("id", componentQuery);
+        final String originId = externalId.createBlackDuckOriginId();
+        final String componentQuery = String.format("%s|%s", forge, originId);
+        final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
         final List<ComponentSearchResultView> allComponents = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allComponents;
     }

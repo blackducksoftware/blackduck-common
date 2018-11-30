@@ -93,7 +93,7 @@ public class CommonNotificationService {
                         .collect(Collectors.toList());
 
         if (oldestFirst) {
-            // we don't want to use the default sorting from the hub
+            // we don't want to use the default sorting from Black Duck
             sortedDetails =
                     sortedDetails
                             .stream()
@@ -105,7 +105,7 @@ public class CommonNotificationService {
         return new NotificationDetailResults(sortedDetails, datePair.date, datePair.dateString);
     }
 
-    public void populateHubBucket(final BlackDuckBucketService blackDuckBucketService, final BlackDuckBucket blackDuckBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
+    public void populateBlackDuckBucket(final BlackDuckBucketService blackDuckBucketService, final BlackDuckBucket blackDuckBucket, final NotificationDetailResults notificationDetailResults) throws IntegrationException {
         final List<UriSingleResponse<? extends BlackDuckResponse>> uriResponseList = new ArrayList<>();
         uriResponseList.addAll(notificationDetailResults.getAllLinks());
         blackDuckBucketService.addToTheBucket(blackDuckBucket, uriResponseList);

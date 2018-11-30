@@ -16,14 +16,9 @@ import org.junit.jupiter.api.Test;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.CodeLocationService;
-import com.synopsys.integration.blackduck.service.NotificationService;
-import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -40,7 +35,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
     @AfterEach
     public void cleanup() {
         if (projectVersionWrapper.isPresent()) {
-            deleteProject(projectVersionWrapper.get().getProjectView().getName());
+            deleteProject(projectVersionWrapper.get().getProjectView());
         }
         deleteCodeLocation(codeLocationName);
     }
@@ -52,19 +47,13 @@ public class BdioUploadRecipeTest extends BasicRecipe {
          * in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
          */
         final IntLogger logger = new BufferedIntLogger();
-        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-        final CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        final NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
-
         final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
         final UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
-        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
         projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, "27.0.0-SNAPSHOT");
         assertTrue(projectVersionWrapper.isPresent());
         final List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
@@ -80,31 +69,36 @@ public class BdioUploadRecipeTest extends BasicRecipe {
          * in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
          */
         final IntLogger logger = new BufferedIntLogger();
-        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-        final CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        final NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
 
         final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
         final UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocations(scanRequest);
 
         /**
          * now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
          */
-        final CodeLocationView codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        final int maxAttempts = 6;
+        int attempt = 0;
+        while (!optionalCodeLocationView.isPresent() && attempt < maxAttempts) {
+            // creating the code location can take a few seconds
+            attempt++;
+            Thread.sleep(5000);
+            optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        }
+        final CodeLocationView codeLocationView = optionalCodeLocationView.get();
         System.out.println(codeLocationView.getHref().get());
 
         /**
          * then we map the code location to a version
          */
-        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(uniqueProjectName, "27.0.0-SNAPSHOT");
-
-        projectVersionWrapper = Optional.of(projectService.syncProjectAndVersion(projectRequestBuilder.build(), false));
+        final String versionName = "27.0.0-SNAPSHOT";
+        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(uniqueProjectName, versionName);
+        projectService.createProject(projectRequestBuilder.build());
+        projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, versionName);
 
         final NotificationTaskRange notificationTaskRange = codeLocationCreationService.calculateCodeLocationRange();
 

@@ -1,0 +1,27 @@
+{
+  "name": "a fruit test",
+  "fruits": {
+    "possibleFruits": [
+      "APPLE",
+      "BANANA",
+      "PINEAPPLE"
+    ],
+    "nestedList": [
+      {
+        "apple": true,
+        "banana": false,
+        "pineapple": true
+      },
+      {
+        "apple": false,
+        "banana": false,
+        "pineapple": false
+      },
+      {
+        "apple": true,
+        "banana": true,
+        "pineapple": true
+      }
+    ]
+  }
+}

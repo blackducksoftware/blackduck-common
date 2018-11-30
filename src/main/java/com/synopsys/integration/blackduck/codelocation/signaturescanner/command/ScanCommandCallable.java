@@ -82,22 +82,22 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 }
                 processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
 
-                final Process hubCliProcess = processBuilder.start();
+                final Process blackDuckCliProcess = processBuilder.start();
 
                 // The cli logs go the error stream for some reason
-                final StreamRedirectThread redirectThread = new StreamRedirectThread(hubCliProcess.getErrorStream(), splitOutputStream);
+                final StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getErrorStream(), splitOutputStream);
                 redirectThread.start();
 
                 int returnCode = -1;
                 try {
-                    returnCode = hubCliProcess.waitFor();
+                    returnCode = blackDuckCliProcess.waitFor();
 
                     // the join method on the redirect thread will wait until the thread is dead
                     // the thread will die when it reaches the end of stream and the run method is finished
                     redirectThread.join();
                 } finally {
-                    if (hubCliProcess.isAlive()) {
-                        hubCliProcess.destroy();
+                    if (blackDuckCliProcess.isAlive()) {
+                        blackDuckCliProcess.destroy();
                     }
                     if (redirectThread.isAlive()) {
                         redirectThread.interrupt();
@@ -106,7 +106,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
 
                 splitOutputStream.flush();
 
-                logger.info(IOUtils.toString(hubCliProcess.getInputStream(), StandardCharsets.UTF_8));
+                logger.info(IOUtils.toString(blackDuckCliProcess.getInputStream(), StandardCharsets.UTF_8));
 
                 logger.info("Black Duck Signature Scanner return code: " + returnCode);
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
@@ -159,7 +159,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         maskIndex(cmdToOutput, passwordIndex);
         maskIndex(cmdToOutput, proxyPasswordIndex);
 
-        logger.info(String.format("Hub CLI command: %s", StringUtils.join(cmdToOutput, " ")));
+        logger.info(String.format("Black Duck CLI command: %s", StringUtils.join(cmdToOutput, " ")));
     }
 
     private void maskIndex(final List<String> cmd, final int indexToMask) {

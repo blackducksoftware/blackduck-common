@@ -1,6 +1,7 @@
 package com.synopsys.integration.blackduck.signaturescanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -13,14 +14,14 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanBatchBuilderTest {
     @Test
-    public void testValidHubScanConfig() throws Exception {
+    public void testValidBlackDuckScanConfig() throws Exception {
         final ScanBatchBuilder builder = new ScanBatchBuilder();
         builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
         assertTrue(builder.isValid());
     }
 
     @Test
-    public void testInvalidHubScanConfig() throws Exception {
+    public void testInvalidBlackDuckScanConfig() throws Exception {
         final ScanBatchBuilder builder = new ScanBatchBuilder();
 
         assertFalse(builder.isValid());

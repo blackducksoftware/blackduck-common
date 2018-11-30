@@ -52,37 +52,37 @@ public class RequestFactory {
         return createCommonGetRequestBuilder(uri, Optional.empty(), DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final Optional<BlackDuckQuery> hubQuery) {
-        return createCommonGetRequestBuilder(null, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
+    public static Request.Builder createCommonGetRequestBuilder(final Optional<BlackDuckQuery> blackDuckQuery) {
+        return createCommonGetRequestBuilder(null, blackDuckQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final int limit, final int offset) {
         return createCommonGetRequestBuilder(null, Optional.empty(), limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> hubQuery) {
-        return createCommonGetRequestBuilder(uri, hubQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> blackDuckQuery) {
+        return createCommonGetRequestBuilder(uri, blackDuckQuery, DEFAULT_LIMIT, DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(final String uri, final int limit, final int offset) {
         return createCommonGetRequestBuilder(uri, Optional.empty(), limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final Optional<BlackDuckQuery> hubQuery, final int limit, final int offset) {
-        return createCommonGetRequestBuilder(null, hubQuery, limit, offset);
+    public static Request.Builder createCommonGetRequestBuilder(final Optional<BlackDuckQuery> blackDuckQuery, final int limit, final int offset) {
+        return createCommonGetRequestBuilder(null, blackDuckQuery, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> hubQuery, final int limit, final int offset) {
-        return createCommonGetRequestBuilder(uri, hubQuery, null, limit, offset);
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> blackDuckQuery, final int limit, final int offset) {
+        return createCommonGetRequestBuilder(uri, blackDuckQuery, null, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> hubQuery, final BlackDuckRequestFilter blackDuckRequestFilter, final int limit, final int offset) {
+    public static Request.Builder createCommonGetRequestBuilder(final String uri, final Optional<BlackDuckQuery> blackDuckQuery, final BlackDuckRequestFilter blackDuckRequestFilter, final int limit, final int offset) {
         final Request.Builder requestBuilder = new Request.Builder();
         if (StringUtils.isNotBlank(uri)) {
             requestBuilder.uri(uri);
         }
-        addHubQuery(requestBuilder, hubQuery);
-        addHubFilter(requestBuilder, blackDuckRequestFilter);
+        addBlackDuckQuery(requestBuilder, blackDuckQuery);
+        addBlackDuckFilter(requestBuilder, blackDuckRequestFilter);
         addLimit(requestBuilder, limit);
         addOffset(requestBuilder, offset);
         return requestBuilder;
@@ -102,14 +102,14 @@ public class RequestFactory {
         return requestBuilder;
     }
 
-    public static Request.Builder addHubQuery(final Request.Builder requestBuilder, final Optional<BlackDuckQuery> hubQuery) {
-        if (hubQuery.isPresent()) {
-            requestBuilder.addQueryParameter(Q_PARAMETER, hubQuery.get().getParameter());
+    public static Request.Builder addBlackDuckQuery(final Request.Builder requestBuilder, final Optional<BlackDuckQuery> blackDuckQuery) {
+        if (blackDuckQuery.isPresent()) {
+            requestBuilder.addQueryParameter(Q_PARAMETER, blackDuckQuery.get().getParameter());
         }
         return requestBuilder;
     }
 
-    public static Request.Builder addHubFilter(final Request.Builder requestBuilder, final BlackDuckRequestFilter blackDuckRequestFilter) {
+    public static Request.Builder addBlackDuckFilter(final Request.Builder requestBuilder, final BlackDuckRequestFilter blackDuckRequestFilter) {
         if (blackDuckRequestFilter != null) {
             blackDuckRequestFilter.getFilterParameters().forEach(parameter -> {
                 requestBuilder.addQueryParameter(FILTER_PARAMETER, parameter);

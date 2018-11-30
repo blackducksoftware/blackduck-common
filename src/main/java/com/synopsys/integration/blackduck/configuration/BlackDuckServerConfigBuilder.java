@@ -78,24 +78,24 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     @Override
     public BlackDuckServerConfig buildWithoutValidation() {
-        URL hubURL = null;
+        URL blackDuckURL = null;
         try {
             String tempUrl = url();
             if (!tempUrl.endsWith("/")) {
-                hubURL = new URL(tempUrl);
+                blackDuckURL = new URL(tempUrl);
             } else {
                 tempUrl = tempUrl.substring(0, tempUrl.length() - 1);
-                hubURL = new URL(tempUrl);
+                blackDuckURL = new URL(tempUrl);
             }
         } catch (final MalformedURLException e) {
         }
 
         final ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(apiToken())) {
-            return new BlackDuckServerConfig(hubURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
+            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
         } else {
             final Credentials credentials = new Credentials(values.get(Property.USERNAME), values.get(Property.PASSWORD));
-            return new BlackDuckServerConfig(hubURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
+            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
         }
     }
 

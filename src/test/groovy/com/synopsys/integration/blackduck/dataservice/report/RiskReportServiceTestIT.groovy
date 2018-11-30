@@ -37,7 +37,7 @@ class RiskReportServiceTestIT {
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
         final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
-        projectService.syncProjectAndVersion(projectRequestBuilder.build(), false);
+        projectService.syncProjectAndVersion(projectRequestBuilder.build())
     }
 
     @Test

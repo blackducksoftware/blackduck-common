@@ -2,6 +2,8 @@ package com.synopsys.integration.blackduck.api;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,8 @@ public class LicenseDataServiceTestIT {
 
         final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
         final ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
-        final ComplexLicenseView complexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
+        final Optional<ComplexLicenseView> optionalComplexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
+        final ComplexLicenseView complexLicense = optionalComplexLicense.get();
 
         assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.getCodeSharing());
         assertTrue(StringUtils.isNotBlank(complexLicense.getLicense()));

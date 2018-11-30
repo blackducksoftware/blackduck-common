@@ -33,6 +33,11 @@ public class ProjectVersionWrapper {
     public ProjectVersionWrapper() {
     }
 
+    public ProjectVersionWrapper(final ProjectView projectView) {
+        this.projectView = projectView;
+        projectVersionView = null;
+    }
+
     public ProjectVersionWrapper(final ProjectView projectView, final ProjectVersionView projectVersionView) {
         this.projectView = projectView;
         this.projectVersionView = projectVersionView;

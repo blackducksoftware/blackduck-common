@@ -24,17 +24,21 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
@@ -67,6 +71,84 @@ public class ProjectService extends DataService {
         this.componentDataService = componentDataService;
     }
 
+    public ProjectVersionWrapper createProject(final ProjectRequest projectRequest) throws IntegrationException {
+        final String projectUrl = blackDuckService.create(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        final ProjectView projectView = blackDuckService.getResponse(projectUrl, ProjectView.class);
+        if (null == projectRequest.getVersionRequest()) {
+            return new ProjectVersionWrapper(projectView);
+        }
+
+        final Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectView, projectRequest.getVersionRequest().getVersionName());
+        return new ProjectVersionWrapper(projectView, projectVersionView.orElse(null));
+    }
+
+    public ProjectVersionView createProjectVersion(final ProjectView projectView, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
+            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
+        }
+        final String projectVersionUrl = blackDuckService.create(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
+        return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
+    }
+
+    public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest) throws IntegrationException {
+        return syncProjectAndVersion(projectRequest, false);
+    }
+
+    public ProjectVersionWrapper syncProjectAndVersion(final ProjectRequest projectRequest, final boolean performUpdate) throws IntegrationException {
+        final String projectName = projectRequest.getName();
+
+        final Optional<ProjectView> optionalProjectView = getProjectByName(projectName);
+        if (!optionalProjectView.isPresent()) {
+            // nothing exists, so create and return
+            return createProject(projectRequest);
+        }
+
+        // the project exists, so do updating and then deal with the version
+        ProjectView projectView = optionalProjectView.get();
+        if (performUpdate) {
+            populateViewFromRequest(projectView, projectRequest);
+            blackDuckService.put(projectView);
+            projectView = blackDuckService.getResponse(projectView.getHref().get(), ProjectView.class);
+        }
+        ProjectVersionView projectVersionView = null;
+
+        // dealing with the version
+        if (null != projectRequest.getVersionRequest() && StringUtils.isNotBlank(projectRequest.getVersionRequest().getVersionName())) {
+            final String projectVersionName = projectRequest.getVersionRequest().getVersionName();
+            final Optional<ProjectVersionView> optionalProjectVersionView = getProjectVersion(projectView, projectVersionName);
+            if (optionalProjectVersionView.isPresent()) {
+                // the version already exists, so do updating
+                projectVersionView = optionalProjectVersionView.get();
+                if (performUpdate) {
+                    populateViewFromRequest(projectVersionView, projectRequest.getVersionRequest());
+                    blackDuckService.put(projectVersionView);
+                    projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
+                }
+            } else {
+                // the version did not exist, so create it
+                projectVersionView = createProjectVersion(projectView, projectRequest.getVersionRequest());
+            }
+        }
+
+        return new ProjectVersionWrapper(projectView, projectVersionView);
+    }
+
+    public void populateViewFromRequest(final ProjectView projectView, final ProjectRequest projectRequest) {
+        try {
+            BeanUtils.copyProperties(projectView, projectRequest);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("Could not set properties on projectView: " + e.getMessage(), e);
+        }
+    }
+
+    public void populateViewFromRequest(final ProjectVersionView projectVersionView, final ProjectVersionRequest projectVersionRequest) {
+        try {
+            BeanUtils.copyProperties(projectVersionView, projectVersionView);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("Could not set properties on projectVersionView: " + e.getMessage(), e);
+        }
+    }
+
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
         return projectGetService.getAllProjectMatches(projectName);
     }
@@ -96,27 +178,9 @@ public class ProjectService extends DataService {
         return Optional.empty();
     }
 
-    public List<AssignedUserView> getAssignedUsersToProject(final String projectName) throws IntegrationException {
-        final Optional<ProjectView> project = getProjectByName(projectName);
-        if (project.isPresent()) {
-            return getAssignedUsersToProject(project.get());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     public List<AssignedUserView> getAssignedUsersToProject(final ProjectView project) throws IntegrationException {
         final List<AssignedUserView> assignedUsers = blackDuckService.getAllResponses(project, ProjectView.USERS_LINK_RESPONSE);
         return assignedUsers;
-    }
-
-    public List<UserView> getUsersForProject(final String projectName) throws IntegrationException {
-        final Optional<ProjectView> project = getProjectByName(projectName);
-        if (project.isPresent()) {
-            return getUsersForProject(project.get());
-        } else {
-            return Collections.emptyList();
-        }
     }
 
     public List<UserView> getUsersForProject(final ProjectView project) throws IntegrationException {
@@ -133,27 +197,9 @@ public class ProjectService extends DataService {
         return resolvedUserViews;
     }
 
-    public List<AssignedUserGroupView> getAssignedGroupsToProject(final String projectName) throws IntegrationException {
-        final Optional<ProjectView> project = getProjectByName(projectName);
-        if (project.isPresent()) {
-            return getAssignedGroupsToProject(project.get());
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     public List<AssignedUserGroupView> getAssignedGroupsToProject(final ProjectView project) throws IntegrationException {
         final List<AssignedUserGroupView> assignedGroups = blackDuckService.getAllResponses(project, ProjectView.USERGROUPS_LINK_RESPONSE);
         return assignedGroups;
-    }
-
-    public List<UserGroupView> getGroupsForProject(final String projectName) throws IntegrationException {
-        final Optional<ProjectView> project = getProjectByName(projectName);
-        if (project.isPresent()) {
-            return getGroupsForProject(project.get());
-        } else {
-            return Collections.emptyList();
-        }
     }
 
     public List<UserGroupView> getGroupsForProject(final ProjectView project) throws IntegrationException {
@@ -199,33 +245,9 @@ public class ProjectService extends DataService {
                        .collect(Collectors.toSet());
     }
 
-    public List<VersionBomComponentView> getComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> projectItem = getProjectByName(projectName);
-        if (projectItem.isPresent()) {
-            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectItem.get(), projectVersionName);
-            if (projectVersionView.isPresent()) {
-                return getComponentsForProjectVersion(projectVersionView.get());
-            }
-        }
-
-        return Collections.emptyList();
-    }
-
     public List<VersionBomComponentView> getComponentsForProjectVersion(final ProjectVersionView projectVersionView) throws IntegrationException {
         final List<VersionBomComponentView> versionBomComponentViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         return versionBomComponentViews;
-    }
-
-    public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> projectItem = getProjectByName(projectName);
-        if (projectItem.isPresent()) {
-            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectItem.get(), projectVersionName);
-            if (projectVersionView.isPresent()) {
-                return getVulnerableComponentsForProjectVersion(projectVersionView.get());
-            }
-        }
-
-        return Collections.emptyList();
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(final ProjectVersionView projectVersionView) throws IntegrationException {
@@ -251,27 +273,6 @@ public class ProjectService extends DataService {
         return componentVersionVulnerabilitiesList;
     }
 
-    public List<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectVersionWrapper> projectVersionWrapper = getProjectVersion(projectName, projectVersionName);
-        if (projectVersionWrapper.isPresent()) {
-            final ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
-            return getComponentVersionVulnerabilities(projectVersionView);
-        }
-        return Collections.emptyList();
-    }
-
-    public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> projectItem = getProjectByName(projectName);
-        if (projectItem.isPresent()) {
-            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectItem.get(), projectVersionName);
-            if (projectVersionView.isPresent()) {
-                return getComponentsWithMatchedFilesForProjectVersion(projectVersionView.get());
-            }
-        }
-
-        return Collections.emptyList();
-    }
-
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(final ProjectVersionView version) throws IntegrationException {
         final List<VersionBomComponentView> bomComponents = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         final List<VersionBomComponentModel> modelBomComponents = new ArrayList<>(bomComponents.size());
@@ -281,48 +282,8 @@ public class ProjectService extends DataService {
         return modelBomComponents;
     }
 
-    private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
-        List<MatchedFileView> matchedFiles = new ArrayList<>(0);
-        final List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
-        if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
-            matchedFiles = tempMatchedFiles;
-        }
-        return matchedFiles;
-    }
-
-    public Optional<VersionBomPolicyStatusView> getPolicyStatusForProjectAndVersion(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> projectItem = getProjectByName(projectName);
-        if (projectItem.isPresent()) {
-            final List<ProjectVersionView> projectVersions = blackDuckService.getAllResponses(projectItem.get(), ProjectView.VERSIONS_LINK_RESPONSE);
-            final ProjectVersionView projectVersionView = findMatchingVersion(projectVersions, projectVersionName);
-
-            return getPolicyStatusForVersion(projectVersionView);
-        }
-
-        return Optional.empty();
-    }
-
     public Optional<VersionBomPolicyStatusView> getPolicyStatusForVersion(final ProjectVersionView version) throws IntegrationException {
         return blackDuckService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
-    }
-
-    private ProjectVersionView findMatchingVersion(final List<ProjectVersionView> projectVersions, final String projectVersionName) throws BlackDuckIntegrationException {
-        for (final ProjectVersionView version : projectVersions) {
-            if (projectVersionName.equals(version.getVersionName())) {
-                return version;
-            }
-        }
-        return null;
-    }
-
-    public void addComponentToProjectVersion(final ExternalId componentExternalId, final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> projectItem = getProjectByName(projectName);
-        if (projectItem.isPresent()) {
-            final Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectItem.get(), projectVersionName);
-            if (projectVersionView.isPresent()) {
-                addComponentToProjectVersion(componentExternalId, projectVersionView.get());
-            }
-        }
     }
 
     public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
@@ -345,6 +306,15 @@ public class ProjectService extends DataService {
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+    }
+
+    private List<MatchedFileView> getMatchedFiles(final VersionBomComponentView component) throws IntegrationException {
+        List<MatchedFileView> matchedFiles = new ArrayList<>(0);
+        final List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
+        if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
+            matchedFiles = tempMatchedFiles;
+        }
+        return matchedFiles;
     }
 
 }

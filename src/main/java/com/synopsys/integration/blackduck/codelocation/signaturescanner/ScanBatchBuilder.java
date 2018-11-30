@@ -128,7 +128,7 @@ public class ScanBatchBuilder {
         return StringUtils.join(errorMessages, ' ');
     }
 
-    public ScanBatchBuilder fromHubServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
+    public ScanBatchBuilder fromBlackDuckServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
         if (null == blackDuckServerConfig) {
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
             blackDuckUrl = null;

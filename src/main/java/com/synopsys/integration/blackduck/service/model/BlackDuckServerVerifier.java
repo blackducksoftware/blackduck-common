@@ -42,7 +42,7 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckServerVerifier {
-    public void verifyIsHubServer(final URL blackDuckUrl, final ProxyInfo blackDuckProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
+    public void verifyIsBlackDuckServer(final URL blackDuckUrl, final ProxyInfo blackDuckProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
         final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
         final ProxyInfo proxyInfo = blackDuckProxyInfo != null ? blackDuckProxyInfo : ProxyInfo.NO_PROXY_INFO;
         final RestConnection restConnection = new RestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
@@ -53,7 +53,7 @@ public class BlackDuckServerVerifier {
                 response.throwExceptionForError();
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
-                    // This could be a Hub server
+                    // This could be a Black Duck server
                 } else {
                     throw e;
                 }
@@ -71,14 +71,14 @@ public class BlackDuckServerVerifier {
             try (final Response response = restConnection.execute(request)) {
                 response.throwExceptionForError();
             } catch (final IntegrationRestException e) {
-                throw new BlackDuckIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+                throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (final IntegrationException e) {
-                throw new BlackDuckIntegrationException("The Url does not appear to be a Hub server :" + downloadUri + ", because: " + e.getMessage(), e);
+                throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getMessage(), e);
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
         } catch (final URISyntaxException e) {
-            throw new IntegrationException("The Url does not appear to be a Hub server :" + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
+            throw new IntegrationException("The Url does not appear to be a Black Duck server :" + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
         }
     }
 

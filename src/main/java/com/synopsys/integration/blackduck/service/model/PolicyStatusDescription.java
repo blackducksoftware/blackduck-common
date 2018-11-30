@@ -77,7 +77,7 @@ public class PolicyStatusDescription {
 
     public String getPolicyStatusMessage() {
         if (policyStatusItem.getComponentVersionStatusCounts() == null || policyStatusItem.getComponentVersionStatusCounts().size() == 0) {
-            return "The Hub found no components.";
+            return "Black Duck found no components.";
         }
 
         final int inViolationCount = getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION);
@@ -85,7 +85,7 @@ public class PolicyStatusDescription {
         final int notInViolationCount = getCountOfStatus(PolicySummaryStatusType.NOT_IN_VIOLATION);
 
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("The Hub found: ");
+        stringBuilder.append("Black Duck found: ");
         stringBuilder.append(inViolationCount);
         stringBuilder.append(" components in violation");
         if (getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION) != 0) {

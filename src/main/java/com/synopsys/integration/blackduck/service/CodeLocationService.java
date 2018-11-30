@@ -34,7 +34,6 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
-import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -67,19 +66,24 @@ public class CodeLocationService extends DataService {
         blackDuckService.put(codeLocationView);
     }
 
-    public CodeLocationView getCodeLocationByName(final String codeLocationName) throws IntegrationException {
+    public Optional<CodeLocationView> getCodeLocationByName(final String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", codeLocationName);
-            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+            final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
+            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
             final List<CodeLocationView> codeLocations = blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
             for (final CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.getName())) {
-                    return codeLocation;
+                    return Optional.of(codeLocation);
                 }
             }
+            return codeLocations
+                           .stream()
+                           .filter(codeLocationView -> codeLocationName.equals(codeLocationView.getName()))
+                           .findFirst();
         }
 
-        throw new DoesNotExistException("This Code Location does not exist. Code Location: " + codeLocationName);
+        logger.error(String.format("The code location (%s) does not exist.", codeLocationName));
+        return Optional.empty();
     }
 
     public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {

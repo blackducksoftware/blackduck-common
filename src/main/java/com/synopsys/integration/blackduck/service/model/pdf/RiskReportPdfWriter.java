@@ -69,7 +69,7 @@ public class RiskReportPdfWriter {
         final PDDocument document = new PDDocument();
         document.getDocumentInformation().setAuthor("Black Duck Software");
         document.getDocumentInformation().setCreator("Integrations");
-        document.getDocumentInformation().setSubject("Hub Risk Report");
+        document.getDocumentInformation().setSubject("Black Duck Risk Report");
 
         try (PDFBoxManager pdfManager = new PDFBoxManager(pdfFile, document)) {
             this.pdfManager = pdfManager;
@@ -92,7 +92,7 @@ public class RiskReportPdfWriter {
 
     private PDRectangle writeHeader(final float pageWidth, final float startingHeight) throws IOException, URISyntaxException {
         final PDRectangle rectangle = pdfManager.drawRectangle(0, startingHeight - 100, pageWidth, 100, Color.BLACK);
-        pdfManager.drawImage(pageWidth - 220, rectangle.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Hub_BD_logo.png");
+        pdfManager.drawImage(pageWidth - 220, rectangle.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Black_Duck_BD_logo.png");
         pdfManager.writeText(5, rectangle.getLowerLeftY() + 40F, "Black Duck Risk Report", PDFBoxManager.DEFAULT_FONT_BOLD, 20, Color.WHITE);
         logger.trace("Finished writing the pdf header.");
         return rectangle;

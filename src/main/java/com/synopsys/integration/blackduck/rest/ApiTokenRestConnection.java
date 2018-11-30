@@ -50,7 +50,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
 
 /**
- * Connection to the Hub application which authenticates using the API token feature (added in Hub 4.4.0)
+ * Connection to the Black Duck application which authenticates using the API token feature
  */
 public class ApiTokenRestConnection extends BlackDuckRestConnection {
     private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -77,7 +77,7 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
     }
 
     /**
-     * Gets the cookie for the Authorized connection to the Hub server. Returns the response code from the connection.
+     * Gets the cookie for the Authorized connection to the Black Duck server. Returns the response code from the connection.
      */
     @Override
     public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {

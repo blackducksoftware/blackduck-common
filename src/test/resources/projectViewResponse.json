@@ -1,0 +1,56 @@
+{
+  "name": "??",
+  "description": "a made up description",
+  "projectLevelAdjustments": true,
+  "cloneCategories": [
+  ],
+  "createdAt": "2018-09-20T19:36:21.395Z",
+  "createdBy": "sysadmin",
+  "createdByUser": "https://int-hub02.dc1.lan/api/users/00000000-0000-0000-0001-000000000001",
+  "updatedAt": "2018-09-20T19:36:21.428Z",
+  "updatedBy": "sysadmin",
+  "updatedByUser": "https://int-hub02.dc1.lan/api/users/00000000-0000-0000-0001-000000000001",
+  "source": "CUSTOM",
+  "_meta": {
+    "allow": [
+      "DELETE",
+      "GET",
+      "PUT"
+    ],
+    "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f",
+    "links": [
+      {
+        "rel": "versions",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/versions"
+      },
+      {
+        "rel": "canonicalVersion",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/versions/e833c918-aeae-4b96-a037-f7ce31be4eb2"
+      },
+      {
+        "rel": "assignable-users",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/assignable-users"
+      },
+      {
+        "rel": "assignable-usergroups",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/assignable-usergroups"
+      },
+      {
+        "rel": "users",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/users"
+      },
+      {
+        "rel": "usergroups",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/usergroups"
+      },
+      {
+        "rel": "tags",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/tags"
+      },
+      {
+        "rel": "project-mappings",
+        "href": "https://int-hub02.dc1.lan/api/projects/d67634b6-084f-45a1-a4a2-7d2a4e74af6f/project-mappings"
+      }
+    ]
+  }
+}

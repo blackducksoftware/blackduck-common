@@ -85,7 +85,7 @@ public class NotificationService extends DataService {
      */
     public Date getLatestNotificationDate() throws IntegrationException {
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
-        RequestFactory.addHubFilter(requestBuilder, createFilterForAllKnownTypes());
+        RequestFactory.addBlackDuckFilter(requestBuilder, createFilterForAllKnownTypes());
         final List<NotificationView> notifications = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
         if (notifications.size() == 1) {
             return notifications.get(0).getCreatedAt();
@@ -116,7 +116,7 @@ public class NotificationService extends DataService {
 
         final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().addQueryParameter("startDate", startDateString).addQueryParameter("endDate", endDateString);
         final BlackDuckRequestFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
-        RequestFactory.addHubFilter(requestBuilder, notificationTypeFilter);
+        RequestFactory.addBlackDuckFilter(requestBuilder, notificationTypeFilter);
         return requestBuilder;
     }
 

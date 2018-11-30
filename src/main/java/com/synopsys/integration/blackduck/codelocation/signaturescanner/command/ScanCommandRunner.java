@@ -41,17 +41,14 @@ public class ScanCommandRunner {
     private final Optional<ExecutorService> optionalExecutorService;
 
     public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility) {
-        this.logger = logger;
-        this.intEnvironmentVariables = intEnvironmentVariables;
-        this.scanPathsUtility = scanPathsUtility;
-        optionalExecutorService = Optional.empty();
+        this(logger, intEnvironmentVariables, scanPathsUtility, null);
     }
 
     public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanPathsUtility = scanPathsUtility;
-        optionalExecutorService = Optional.of(executorService);
+        optionalExecutorService = Optional.ofNullable(executorService);
     }
 
     public List<ScanCommandOutput> executeScans(final List<ScanCommand> scanCommands, final boolean cleanupOutput) throws ScanFailedException {

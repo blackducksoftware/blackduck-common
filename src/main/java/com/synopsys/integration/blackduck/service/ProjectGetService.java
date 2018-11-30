@@ -41,16 +41,16 @@ public class ProjectGetService extends DataService {
     }
 
     public List<ProjectView> getAllProjectMatches(final String projectName) throws IntegrationException {
-        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", projectName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+        final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         final List<ProjectView> allProjectItems = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder);
         return allProjectItems;
     }
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
-        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("name", projectName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery, limit, RequestFactory.DEFAULT_OFFSET);
+        final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery, limit, RequestFactory.DEFAULT_OFFSET);
 
         final List<ProjectView> projectItems = blackDuckService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
         return projectItems;
@@ -68,8 +68,8 @@ public class ProjectGetService extends DataService {
     }
 
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(final ProjectView projectView, final String projectVersionName) throws IntegrationException {
-        final Optional<BlackDuckQuery> hubQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(hubQuery);
+        final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         final List<ProjectVersionView> allProjectVersionMatchingItems = blackDuckService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
         final Optional<ProjectVersionView> projectVersion = findMatchingProjectVersionView(allProjectVersionMatchingItems, projectVersionName);

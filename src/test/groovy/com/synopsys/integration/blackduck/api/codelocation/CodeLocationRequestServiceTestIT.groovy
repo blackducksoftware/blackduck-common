@@ -41,7 +41,7 @@ class CodeLocationRequestServiceTestIT {
         BlackDuckServicesFactory services = restConnectionTestHelper.createBlackDuckServicesFactory(logger)
         Optional<ProjectView> project = services.createProjectService().getProjectByName(restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT"))
         if (project.isPresent()) {
-            services.createProjectService().deleteProject(project.get())
+            services.createBlackDuckService().delete(project.get())
         }
     }
 
@@ -78,7 +78,7 @@ class CodeLocationRequestServiceTestIT {
         assertNotNull(codeLocationView)
         assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
-        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
+        services.createBlackDuckService().delete(codeLocationView)
         try {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             // TODO: Expects exception. integration-rest no longer throws an exception by default

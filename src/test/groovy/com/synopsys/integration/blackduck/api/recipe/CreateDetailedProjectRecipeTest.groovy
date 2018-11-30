@@ -7,6 +7,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.BlackDuckService
 import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -15,13 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals
 
 @Tag("integration")
 class CreateDetailedProjectRecipeTest extends BasicRecipe {
+    private ProjectView projectView
+
     @AfterEach
     void cleanup() {
-        def projectService = blackDuckServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(PROJECT_NAME)
-        if (createdProject.isPresent()) {
-            projectService.deleteProject(createdProject.get())
-        }
+        deleteProject(projectView)
     }
 
     @Test
@@ -29,9 +28,11 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
         /*
          * let's create the project/version in Black Duck
          */
-        ProjectRequest projectRequest = createProjectRequest(PROJECT_NAME, PROJECT_VERSION_NAME)
+        String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
+        ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
         ProjectService projectService = blackDuckServicesFactory.createProjectService()
-        String projectUrl = projectService.createProject(projectRequest)
+        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest)
+        String projectUrl = projectVersionWrapper.projectView.getHref().get()
 
         /*
          * using the url of the created project, we can now verify that the
@@ -39,10 +40,10 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          * wrapper to handle common GET requests and their response payloads
          */
         BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService()
-        ProjectView projectView = blackDuckService.getResponse(projectUrl, ProjectView.class)
+        projectView = blackDuckService.getResponse(projectUrl, ProjectView.class)
         ProjectVersionView projectVersionView = blackDuckService.getResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE).get()
 
-        assertEquals(PROJECT_NAME, projectView.name)
+        assertEquals(uniqueProjectName, projectView.name)
         assertEquals('A sample testing project to demonstrate blackduck-common capabilities.', projectView.description)
 
         assertEquals(PROJECT_VERSION_NAME, projectVersionView.versionName)

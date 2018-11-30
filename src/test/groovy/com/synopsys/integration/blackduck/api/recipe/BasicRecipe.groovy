@@ -7,11 +7,13 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
+import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
+import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
-import com.synopsys.integration.blackduck.service.CodeLocationService
-import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.*
+import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
@@ -23,18 +25,31 @@ class BasicRecipe {
     public static final String PROJECT_VERSION_NAME = '0.0.1-SNAPSHOT'
     public static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
 
-    public BlackDuckServicesFactory blackDuckServicesFactory
+    protected Gson gson
+    protected ObjectMapper objectMapper
 
-    protected Gson gson;
-    protected ObjectMapper objectMapper;
+    protected NotificationContentDetailFactory notificationContentDetailFactory
+
+    protected IntLogger logger
+    protected BlackDuckServicesFactory blackDuckServicesFactory
+    protected BlackDuckService blackDuckService
+    protected BlackDuckBucketService blackDuckBucketService
+    protected ProjectService projectService
+    protected CodeLocationService codeLocationService
+    protected NotificationService notificationService
+    protected CodeLocationCreationService codeLocationCreationService
+    protected PolicyRuleService policyRuleService
+    protected CommonNotificationService commonNotificationService
+
+    protected UploadRunner uploadRunner
 
     @BeforeEach
-    public void startRecipe() {
+    void startRecipe() {
         /*
          * the integration logger used to display log messages from our code
          * within a 3rd party integration environment
          */
-        IntLogger intLogger = new BufferedIntLogger()
+        logger = new BufferedIntLogger()
 
         /*
          * any usage of Black Duck API's has to begin with a url for the Black Duck
@@ -49,14 +64,27 @@ class BasicRecipe {
          * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
-        RestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(intLogger)
+        RestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger)
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, restConnection, intLogger)
+        notificationContentDetailFactory = new NotificationContentDetailFactory(gson)
+
+        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, restConnection, logger)
+        blackDuckService = blackDuckServicesFactory.createBlackDuckService()
+        blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
+        projectService = blackDuckServicesFactory.createProjectService()
+        codeLocationService = blackDuckServicesFactory.createCodeLocationService()
+        notificationService = blackDuckServicesFactory.createNotificationService()
+        codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()
+        policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
+
+        commonNotificationService = blackDuckServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
+
+        uploadRunner = new UploadRunner(logger, blackDuckService)
     }
 
-    public ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
+    ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
         /*
          * the ProjectRequestBuilder is a simple wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
@@ -73,17 +101,25 @@ class BasicRecipe {
         projectRequestBuilder.build()
     }
 
-    public void deleteProject(String projectName) {
-        ProjectService projectDataService = blackDuckServicesFactory.createProjectService()
-        Optional<ProjectView> project = projectDataService.getProjectByName(projectName)
-        if (project.isPresent()) {
-            projectDataService.deleteProject(project.get())
+    void deleteProject(String projectName) {
+        if (null != projectName) {
+            Optional<ProjectView> project = projectService.getProjectByName(projectName)
+            if (project.isPresent()) {
+                deleteProject(project.get())
+            }
         }
     }
 
-    public void deleteCodeLocation(String codeLocationName) {
-        CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService()
-        CodeLocationView codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName)
-        codeLocationService.deleteCodeLocation(codeLocationView)
+    void deleteProject(ProjectView projectView) {
+        if (null != projectView) {
+            blackDuckService.delete(projectView)
+        }
+    }
+
+    void deleteCodeLocation(String codeLocationName) {
+        Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName)
+        if (codeLocationView.isPresent()) {
+            blackDuckService.delete(codeLocationView.get())
+        }
     }
 }

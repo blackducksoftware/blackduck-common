@@ -10,13 +10,13 @@ import com.synopsys.integration.rest.credentials.Credentials;
 
 public class BlackDuckServerConfigBuilderTest {
     @Test
-    public void testValidateHubURLEmpty() {
+    public void testValidateBlackDuckURLEmpty() {
         final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         assertFalse(blackDuckServerConfigBuilder.isValid());
     }
 
     @Test
-    public void testValidateHubURLMalformed() {
+    public void testValidateBlackDuckURLMalformed() {
         final String blackDuckUrl = "TestString";
 
         final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
@@ -25,7 +25,7 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
-    public void testValidateHubURLMalformed2() {
+    public void testValidateBlackDuckURLMalformed2() {
         final String blackDuckUrl = "http:TestString";
 
         final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();

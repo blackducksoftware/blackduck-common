@@ -33,7 +33,6 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.exception.IntegrationException;
 
@@ -44,14 +43,18 @@ public class PolicyRuleService {
         this.blackDuckService = blackDuckService;
     }
 
-    public PolicyRuleViewV2 getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
+    public Optional<PolicyRuleViewV2> getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
         final List<PolicyRuleViewV2> allPolicyRules = blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
         for (final PolicyRuleViewV2 policyRule : allPolicyRules) {
             if (policyRuleName.equals(policyRule.getName())) {
-                return policyRule;
+                return Optional.of(policyRule);
             }
         }
-        throw new DoesNotExistException("This Policy Rule does not exist: " + policyRuleName);
+        return Optional.empty();
+    }
+
+    public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
+        return blackDuckService.create(ApiDiscovery.POLICY_RULES_LINK, policyRuleViewV2);
     }
 
     /**
@@ -73,7 +76,7 @@ public class PolicyRuleService {
         policyRuleViewV2.setOverridable(true);
         policyRuleViewV2.setExpression(expressionSet);
 
-        return blackDuckService.create(ApiDiscovery.POLICY_RULES_LINK, policyRuleViewV2);
+        return createPolicyRule(policyRuleViewV2);
     }
 
 }

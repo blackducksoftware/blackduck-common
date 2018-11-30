@@ -36,9 +36,9 @@ public class ScannerZipInstallerTest {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
 
         final String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
-        final String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_HUB_URL");
-        final String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_HUB_USERNAME");
-        final String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_HUB_PASSWORD");
+        final String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_URL");
+        final String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_USERNAME");
+        final String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_PASSWORD");
         assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
         assumeTrue(StringUtils.isNotBlank(blackDuckUrl));
         assumeTrue(StringUtils.isNotBlank(blackDuckUsername));

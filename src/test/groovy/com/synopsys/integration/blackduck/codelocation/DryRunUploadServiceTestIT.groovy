@@ -2,9 +2,8 @@ package com.synopsys.integration.blackduck.codelocation
 
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
-import com.synopsys.integration.blackduck.service.DryRunUploadResponse
-import com.synopsys.integration.blackduck.service.DryRunUploadService
+import com.synopsys.integration.blackduck.service.*
+import com.synopsys.integration.exception.IntegrationException
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
@@ -32,17 +31,31 @@ public class DryRunUploadServiceTestIT {
     @Test
     public void testDryRunUpload() {
         BlackDuckServicesFactory services = restConnectionTestHelper.createBlackDuckServicesFactory(logger)
+        BlackDuckService blackDuckService = services.createBlackDuckService()
+        CodeLocationService codeLocationService = services.createCodeLocationService()
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createBlackDuckService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         assertNotNull(response)
 
-        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
+        final int maxAttempts = 10;
+        int attempt = 0;
+        CodeLocationView codeLocationView = null
+        while (null == codeLocationView && attempt < maxAttempts) {
+            // creating the code location can take a few seconds
+            try {
+                codeLocationView = codeLocationService.getCodeLocationById(response.codeLocationId)
+            } catch (IntegrationException ignored) {
+                // ignored
+            }
+            attempt++;
+            Thread.sleep(5000);
+        }
         assertNotNull(codeLocationView)
 
         //cleanup
-        services.createCodeLocationService().deleteCodeLocation(codeLocationView)
+        blackDuckService.delete(codeLocationView)
         try {
-            services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
+            codeLocationService.getCodeLocationById(response.codeLocationId)
             fail('This should have thrown an exception')
         } catch (IntegrationRestException e) {
             assertEquals(404, e.getHttpStatusCode())

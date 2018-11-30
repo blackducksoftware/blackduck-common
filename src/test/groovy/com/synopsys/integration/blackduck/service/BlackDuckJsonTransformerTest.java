@@ -65,7 +65,7 @@ public class BlackDuckJsonTransformerTest {
 
         final BlackDuckPageResponse<ProjectView> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(json, ProjectView.class);
         assertEquals(10, blackDuckPageResponse.getItems().size());
-        assertEquals(72, blackDuckPageResponse.getTotalCount());
+        assertEquals(84, blackDuckPageResponse.getTotalCount());
 
         final JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
         final JsonArray items = jsonElement.getAsJsonObject().get("items").getAsJsonArray();
@@ -85,7 +85,6 @@ public class BlackDuckJsonTransformerTest {
         final String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
         final FruitTest fruitTest = blackDuckJsonTransformer.getResponseAs(json, FruitTest.class);
 
-        assertEquals(2, fruitTest.fruits.possibleFruits.size());
         assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.APPLE));
         assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.BANANA));
         assertTrue(fruitTest.fruits.nestedList.get(0).apple);

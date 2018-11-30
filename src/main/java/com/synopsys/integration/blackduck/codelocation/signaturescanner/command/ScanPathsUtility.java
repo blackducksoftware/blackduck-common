@@ -89,10 +89,10 @@ public class ScanPathsUtility {
 
         boolean managedByLibrary = false;
         File installDirectory = directory;
-        final File[] hubScanInstallationDirectories = directory.listFiles(file -> ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
-        if (hubScanInstallationDirectories.length == 1) {
+        final File[] blackDuckScanInstallationDirectories = directory.listFiles(file -> ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
+        if (blackDuckScanInstallationDirectories.length == 1) {
             logger.debug("The directory structure was likely created by the installer");
-            installDirectory = findFirstFilteredFile(hubScanInstallationDirectories[0], EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER, "No scan.cli directories could be found in %s.");
+            installDirectory = findFirstFilteredFile(blackDuckScanInstallationDirectories[0], EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER, "No scan.cli directories could be found in %s.");
             managedByLibrary = true;
         } else {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));

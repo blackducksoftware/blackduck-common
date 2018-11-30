@@ -60,8 +60,8 @@ public class ScanCommand {
     private final String versionName;
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-        final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-        final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
+            final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -94,13 +94,13 @@ public class ScanCommand {
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
         if (proxyInfo.shouldUseProxy()) {
-            final ProxyInfo hubProxyInfo = proxyInfo;
-            final String proxyHost = hubProxyInfo.getHost();
-            final int proxyPort = hubProxyInfo.getPort();
-            final String proxyUsername = hubProxyInfo.getUsername();
-            final String proxyPassword = hubProxyInfo.getPassword();
-            final String proxyNtlmDomain = hubProxyInfo.getNtlmDomain();
-            final String proxyNtlmWorkstation = hubProxyInfo.getNtlmWorkstation();
+            final ProxyInfo blackDuckProxyInfo = proxyInfo;
+            final String proxyHost = blackDuckProxyInfo.getHost();
+            final int proxyPort = blackDuckProxyInfo.getPort();
+            final String proxyUsername = blackDuckProxyInfo.getUsername();
+            final String proxyPassword = blackDuckProxyInfo.getPassword();
+            final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain();
+            final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation();
             cmd.add("-Dhttp.proxyHost=" + proxyHost);
             cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
@@ -135,17 +135,17 @@ public class ScanCommand {
             cmd.add(scheme);
             cmd.add("--host");
             cmd.add(host);
-            logger.debug("Using this Hub hostname : '" + host + "'");
+            logger.debug("Using the Black Duck hostname : '" + host + "'");
 
             if (StringUtils.isEmpty(apiToken)) {
                 cmd.add("--username");
                 cmd.add(username);
             }
 
-            final int hubPort = port;
-            if (hubPort > 0) {
+            final int blackDuckPort = port;
+            if (blackDuckPort > 0) {
                 cmd.add("--port");
-                cmd.add(Integer.toString(hubPort));
+                cmd.add(Integer.toString(blackDuckPort));
             } else {
                 logger.warn("Could not find a port to use for the Server.");
             }
@@ -172,7 +172,7 @@ public class ScanCommand {
             cmd.add(specificRunOutputDirectoryPath);
         }
 
-        // Only add the statusWriteDir option if the Hub supports the statusWriteDir option
+        // Only add the statusWriteDir option if Black Duck supports the statusWriteDir option
         // The scanStatusDirectoryPath is the same as the log directory path
         // The CLI will create a subdirectory for the status files
         cmd.add("--statusWriteDir");

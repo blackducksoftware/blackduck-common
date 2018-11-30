@@ -2,24 +2,20 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget
 import com.synopsys.integration.blackduck.notification.CommonNotificationView
 import com.synopsys.integration.blackduck.notification.NotificationDetailResult
 import com.synopsys.integration.blackduck.notification.NotificationDetailResults
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetail
-import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
-import com.synopsys.integration.blackduck.service.*
+import com.synopsys.integration.blackduck.service.CommonNotificationService
+import com.synopsys.integration.blackduck.service.NotificationService
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucket
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.exception.IntegrationException
-import com.synopsys.integration.log.BufferedIntLogger
-import com.synopsys.integration.log.IntLogger
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -35,19 +31,17 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
     private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
 
+    private ProjectVersionWrapper projectVersionWrapper
+
     @AfterEach
     void cleanup() {
-        def projectService = blackDuckServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(NOTIFICATION_PROJECT_NAME)
-        if (createdProject.isPresent()) {
-            projectService.deleteProject(createdProject.get())
-        }
+        deleteProject(projectVersionWrapper.projectView)
     }
 
     Date generateNotifications() {
         ProjectRequest projectRequest = createProjectRequest(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
-        ProjectService projectService = blackDuckServicesFactory.createProjectService()
-        String projectUrl = projectService.createProject(projectRequest)
+        projectVersionWrapper = projectService.createProject(projectRequest)
+
         ZonedDateTime startTime = ZonedDateTime.now()
         startTime = startTime.withZoneSameInstant(ZoneOffset.UTC)
         startTime = startTime.withSecond(0).withNano(0)
@@ -67,7 +61,7 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         int tryCount = 0;
         while (components.empty || tryCount < 30) {
             Thread.sleep(1000);
-            components = projectService.getComponentsForProjectVersion(NOTIFICATION_PROJECT_NAME, NOTIFICATION_PROJECT_VERSION_NAME)
+            components = projectService.getComponentsForProjectVersion(projectVersionWrapper.projectVersionView)
             tryCount++
         }
         if (!components.empty) {
@@ -77,29 +71,16 @@ class NotificationServiceRecipeTest extends BasicRecipe {
     }
 
     void uploadBdio(UploadTarget uploadTarget) throws IntegrationException, URISyntaxException, IOException {
-        final IntLogger logger = new BufferedIntLogger();
-        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-        final CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        final NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
-
-        final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
         final UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(uploadTarget);
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
         codeLocationCreationService.createCodeLocations(scanRequest);
     }
 
     @Test
     void fetchNotificationsSynchronous() {
-        final BlackDuckBucketService hubBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
-        final NotificationService notificationService = blackDuckServicesFactory.createNotificationService()
-
-        final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(gson, jsonParser);
-        final CommonNotificationService commonNotificationService = blackDuckServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
-
-        processNotifications(hubBucketService, notificationService, commonNotificationService)
+        processNotifications(blackDuckBucketService, notificationService, commonNotificationService)
     }
 
     @Test
@@ -107,17 +88,13 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), threadFactory);
 
-        final BlackDuckBucketService hubBucketService = blackDuckServicesFactory.createBlackDuckBucketService(executorService)
+        final BlackDuckBucketService blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService(executorService)
         final NotificationService notificationService = blackDuckServicesFactory.createNotificationService()
 
-        final NotificationContentDetailFactory notificationContentDetailFactory = new NotificationContentDetailFactory(gson, jsonParser);
-        final CommonNotificationService commonNotificationService = blackDuckServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
-
-        processNotifications(hubBucketService, notificationService, commonNotificationService)
+        processNotifications(blackDuckBucketService, notificationService, commonNotificationService)
     }
 
-    private void processNotifications(final BlackDuckBucketService hubBucketService, final NotificationService notificationService, CommonNotificationService commonNotificationService) {
-        cleanup()
+    private void processNotifications(final BlackDuckBucketService blackDuckBucketService, final NotificationService notificationService, CommonNotificationService commonNotificationService) {
         final Date startDate = generateNotifications()
         ZonedDateTime endTime = ZonedDateTime.now()
         endTime = endTime.withZoneSameInstant(ZoneOffset.UTC)
@@ -129,8 +106,8 @@ class NotificationServiceRecipeTest extends BasicRecipe {
         List<CommonNotificationView> commonNotificationViews = commonNotificationService.getCommonNotifications(notificationViews)
         final NotificationDetailResults notificationDetailResults = commonNotificationService.getNotificationDetailResults(commonNotificationViews)
 
-        final BlackDuckBucket hubBucket = new BlackDuckBucket();
-        commonNotificationService.populateHubBucket(hubBucketService, hubBucket, notificationDetailResults);
+        final BlackDuckBucket blackDuckBucket = new BlackDuckBucket();
+        commonNotificationService.populateBlackDuckBucket(blackDuckBucketService, blackDuckBucket, notificationDetailResults);
         final List<NotificationDetailResult> notificationResultList = notificationDetailResults.getResults()
 
         Date latestNotificationEndDate = notificationDetailResults.getLatestNotificationCreatedAtDate().get();

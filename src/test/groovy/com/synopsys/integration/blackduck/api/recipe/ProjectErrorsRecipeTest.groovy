@@ -2,7 +2,7 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
-import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.rest.exception.IntegrationRestException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
@@ -12,18 +12,14 @@ import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
 class ProjectErrorsRecipeTest extends BasicRecipe {
-    static final String PROJECT_NAME_NOT_FOUND = 'Project Name That Should Never Exist'
+    private static final String PROJECT_NAME_NOT_FOUND = 'Project Name That Should Never Exist'
 
     private final String uniqueName = PROJECT_NAME_NOT_FOUND + System.currentTimeMillis()
+    private ProjectView projectView
 
     @AfterEach
     void cleanup() {
-        def projectService = blackDuckServicesFactory.createProjectService()
-        Optional<ProjectView> createdProject = projectService.getProjectByName(uniqueName)
-        if (createdProject.isPresent()) {
-            //we may or may not have created a project, so there may not be something to delete
-            projectService.deleteProject(createdProject.get())
-        }
+        deleteProject(projectView)
     }
 
     @Test
@@ -31,9 +27,8 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
         /*
          * Let's try and find a project that doesn't exist, which should return Optional.empty()
          */
-        ProjectService projectService = blackDuckServicesFactory.createProjectService()
         Optional<ProjectView> projectView = projectService.getProjectByName(uniqueName)
-        assertFalse(projectView.isPresent());
+        assertFalse(projectView.isPresent())
     }
 
     @Test
@@ -42,15 +37,14 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
          * First, create a project with a unique name
          */
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectService projectService = blackDuckServicesFactory.createProjectService()
-        String projectUrl = projectService.createProject(projectRequest)
+        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest)
+        projectView = projectVersionWrapper.projectView;
 
         /*
          * Try to create a project with the same name, which should throw an Exception
          */
         try {
             projectService.createProject(projectRequest)
-            // TODO: Expects exception. integration-rest no longer throws an exception by default
             fail('Should have thrown an IntegrationRestException')
         } catch (Exception e) {
             assertTrue(e instanceof IntegrationRestException)

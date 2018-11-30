@@ -66,7 +66,8 @@ public class BlackDuckPhoneHomeHelper {
         } else {
             intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, createPhoneHomeClient(intLogger, blackDuckServicesFactory.getRestConnection(), blackDuckServicesFactory.getGson()));
         }
-        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckServicesFactory.createBlackDuckService(), intPhoneHomeService, blackDuckServicesFactory.createBlackDuckRegistrationService(), blackDuckServicesFactory.getEnvironmentVariables());
+        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckServicesFactory.createBlackDuckService(), intPhoneHomeService, blackDuckServicesFactory.createBlackDuckRegistrationService(),
+                blackDuckServicesFactory.getEnvironmentVariables());
     }
 
     public static PhoneHomeClient createPhoneHomeClient(final IntLogger intLogger, final RestConnection restConnection, final Gson gson) {
@@ -136,7 +137,7 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private String getHostName() {
-        return blackDuckService.getHubBaseUrl().toString();
+        return blackDuckService.getBlackDuckBaseURL().toString();
     }
 
     private String getRegistrationKey() {
@@ -146,7 +147,7 @@ public class BlackDuckPhoneHomeHelper {
             registrationId = blackDuckRegistrationService.getRegistrationId();
         } catch (final IntegrationException e) {
         }
-        // We must check if the reg id is blank because of an edge case in which the hub can authenticate (while the webserver is coming up) without registration
+        // We must check if the reg id is blank because of an edge case in which Black Duck can authenticate (while the webserver is coming up) without registration
         if (StringUtils.isBlank(registrationId)) {
             registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
         }

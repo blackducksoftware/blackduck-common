@@ -16,6 +16,7 @@ import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
@@ -32,7 +33,7 @@ public class ProjectAssignmentServiceTestIT {
     @AfterAll
     public static void tearDownAfterClass() throws Exception {
         if (project != null) {
-            blackDuckServicesFactory.createProjectService().deleteProject(project);
+            blackDuckServicesFactory.createBlackDuckService().delete(project);
         }
     }
 
@@ -43,13 +44,14 @@ public class ProjectAssignmentServiceTestIT {
 
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(testProjectName);
-        final String projectUrl = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
-        System.out.println("projectUrl: " + projectUrl);
+        final ProjectVersionWrapper projectVersionWrapper = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
+        project = projectVersionWrapper.getProjectView();
+        System.out.println("projectUrl: " + project.getHref().get());
 
-        project = blackDuckServicesFactory.createBlackDuckService().getResponse(projectUrl, ProjectView.class);
         final List<AssignedUserView> assignedUsers = blackDuckServicesFactory.createProjectService().getAssignedUsersToProject(project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).getName());
     }
+
 }

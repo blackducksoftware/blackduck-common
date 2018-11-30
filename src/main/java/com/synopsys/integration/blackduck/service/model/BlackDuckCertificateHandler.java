@@ -41,7 +41,7 @@ public class BlackDuckCertificateHandler {
         handler = new CertificateHandler(logger, javaHomeOverride);
     }
 
-    public void importHttpsCertificateForHubServer(final BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
+    public void importHttpsCertificateForBlackDuckServer(final BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
         if (blackDuckServerConfig == null || blackDuckServerConfig.getBlackDuckUrl() == null || !blackDuckServerConfig.getBlackDuckUrl().getProtocol().startsWith("https")) {
             return;
         }

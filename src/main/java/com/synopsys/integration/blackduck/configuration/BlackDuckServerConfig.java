@@ -64,7 +64,7 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
-    public boolean shouldUseProxyForHub() {
+    public boolean shouldUseProxyForBlackDuck() {
         return proxyInfo != null && proxyInfo.shouldUseProxy();
     }
 

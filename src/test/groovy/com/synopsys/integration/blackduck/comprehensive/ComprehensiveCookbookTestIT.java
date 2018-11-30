@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -21,7 +23,6 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
 import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
@@ -29,14 +30,16 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
+import com.synopsys.integration.blackduck.service.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ComponentService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 @Tag("integration")
@@ -51,41 +54,44 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
         final IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, blackDuckServicesFactory, testProjectName);
+        deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         // create the project
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(testProjectName);
-        final String projectUrl = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
-        final ProjectView projectItem = blackDuckServicesFactory.createBlackDuckService().getResponse(projectUrl, ProjectView.class);
-        final Optional<ProjectView> projectItemFromName = blackDuckServicesFactory.createProjectService().getProjectByName(testProjectName);
+        final ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);
+        final ProjectView projectItem = projectVersionWrapper.getProjectView();
+        final Optional<ProjectView> projectItemFromName = projectService.getProjectByName(testProjectName);
+
         // should return the same project
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        final int projectCountAfterCreate = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCountAfterCreate = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        final int projectVersionCount = blackDuckServicesFactory.createBlackDuckService().getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
+        final int projectVersionCount = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
 
         final ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest.setVersionName("RestConnectionTest");
-        final Optional<String> projectVersionUrl = blackDuckServicesFactory.createProjectService().createVersion(projectItem, projectVersionRequest);
-        final ProjectVersionView projectVersionItem = blackDuckServicesFactory.createBlackDuckService().getResponse(projectVersionUrl.get(), ProjectVersionView.class);
-        final Optional<ProjectVersionView> projectVersionItemFromName = blackDuckServicesFactory.createProjectService().getProjectVersion(projectItem, "RestConnectionTest");
+        final ProjectVersionView projectVersionItem = projectService.createProjectVersion(projectItem, projectVersionRequest);
+        final Optional<ProjectVersionView> projectVersionItemFromName = projectService.getProjectVersion(projectItem, "RestConnectionTest");
+
         // should return the same project version
         assertTrue(projectVersionItemFromName.isPresent());
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.get().toString());
 
-        assertTrue(blackDuckServicesFactory.createBlackDuckService().getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
+        assertTrue(blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
     }
 
     @Test
@@ -93,13 +99,15 @@ public class ComprehensiveCookbookTestIT {
         final String testProjectName = restConnectionTestHelper.getProperty("TEST_CREATE_PROJECT");
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
         final IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, blackDuckServicesFactory, testProjectName);
+        deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
 
         // get the count of all projects now
-        final int projectCount = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         final String versionName = "RestConnectionTest";
         final ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
@@ -113,51 +121,54 @@ public class ComprehensiveCookbookTestIT {
         final ProjectRequest projectRequest = projectBuilder.build();
 
         // create the project
-        final String projectUrl = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
-        final ProjectView projectItem = blackDuckServicesFactory.createBlackDuckService().getResponse(projectUrl, ProjectView.class);
-        final Optional<ProjectView> projectItemFromName = blackDuckServicesFactory.createProjectService().getProjectByName(testProjectName);
+        final ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);
+        final ProjectView projectItem = projectVersionWrapper.getProjectView();
+        final Optional<ProjectView> projectItemFromName = projectService.getProjectByName(testProjectName);
+
         // should return the same project
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        final int projectCountAfterCreate = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        final int projectCountAfterCreate = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        final Optional<ProjectVersionView> projectVersionItem = blackDuckServicesFactory.createProjectService().getProjectVersion(projectItem, versionName);
+        final Optional<ProjectVersionView> projectVersionItem = projectService.getProjectVersion(projectItem, versionName);
         assertTrue(projectVersionItem.isPresent());
         assertEquals(versionName, projectVersionItem.get().getVersionName());
+
+        // should return the same project version
+        assertEquals(projectVersionWrapper.getProjectVersionView().toString(), projectVersionItem.get().toString());
     }
 
     @Test
     public void testPolicyStatusFromBdioImport() throws Exception {
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
-        final IntLogger logger = blackDuckServicesFactory.getLogger();
         final ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        final ComponentService componentService = blackDuckServicesFactory.createComponentService();
+        final PolicyRuleService policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
+        final CodeLocationCreationService codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
+        final IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, blackDuckServicesFactory, "ek_mtglist");
+        deleteIfProjectExists(logger, projectService, blackDuckService, "ek_mtglist");
 
         // make sure there is a policy that will be in violation
         final ExternalId externalId = new ExternalIdFactory().createMavenExternalId("org.apache.poi", "poi", "3.9");
-        final ComponentService componentService = blackDuckServicesFactory.createComponentService();
-        final PolicyRuleService policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         final String policyNameToDeleteLater = "Test Rule for comprehensive policy status/bdio " + System.currentTimeMillis();
         final String policyRuleUrl = policyRuleService.createPolicyRuleForExternalId(componentService, externalId, policyNameToDeleteLater);
 
         // import the bdio
         final File file = restConnectionTestHelper.getFile("bdio/mtglist_bdio.jsonld");
-        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-
         final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
         final UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createWithMediaType("ek_mtglist Black Duck I/O Export", file, "application/ld+json"));
         final BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        final CodeLocationCreationService codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
         // make sure we have some code locations now
-        final List<CodeLocationView> codeLocationItems = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+        final List<CodeLocationView> codeLocationItems = blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
         assertTrue(codeLocationItems != null && codeLocationItems.size() > 0);
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             for (final CodeLocationView codeLocationItem : codeLocationItems) {
@@ -173,21 +184,22 @@ public class ComprehensiveCookbookTestIT {
         }
 
         // verify the policy
-        final Optional<VersionBomPolicyStatusView> policyStatusItem = projectService.getPolicyStatusForProjectAndVersion("ek_mtglist", "0.0.1");
+        final Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion("ek_mtglist", "0.0.1");
+        assertTrue(projectVersionWrapper.isPresent());
+        assertNotNull(projectVersionWrapper.get().getProjectVersionView());
+
+        final Optional<VersionBomPolicyStatusView> policyStatusItem = projectService.getPolicyStatusForVersion(projectVersionWrapper.get().getProjectVersionView());
         assertTrue(policyStatusItem.isPresent());
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
-        System.out.println(policyStatusItem);
+        System.out.println(policyStatusItem.get());
 
-        final PolicyRuleViewV2 checkPolicyRule = policyRuleService.getPolicyRuleViewByName(policyNameToDeleteLater);
-        assertNotNull(checkPolicyRule);
+        final Optional<PolicyRuleViewV2> checkPolicyRule = policyRuleService.getPolicyRuleViewByName(policyNameToDeleteLater);
+        assertTrue(checkPolicyRule.isPresent());
 
         blackDuckService.delete(policyRuleUrl);
 
-        try {
-            policyRuleService.getPolicyRuleViewByName(policyNameToDeleteLater);
-            fail("Should have deleted the policy rule");
-        } catch (final DoesNotExistException e) {
-        }
+        final Optional<PolicyRuleViewV2> deleted = policyRuleService.getPolicyRuleViewByName(policyNameToDeleteLater);
+        assertFalse(deleted.isPresent());
     }
 
     //    @Test
@@ -270,14 +282,30 @@ public class ComprehensiveCookbookTestIT {
     //    }
 
     @Test
-    public void testGettingAllProjectsAndVersions() throws Exception {
-        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+    public void testGettingAllProjects() throws IntegrationException {
+        assertGettingAll(ApiDiscovery.PROJECTS_LINK_RESPONSE, "project");
+    }
 
-        final List<ProjectView> allProjects = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
-        System.out.println(String.format("project count: %d", allProjects.size()));
+    @Test
+    public void testGettingAllCodeLocations() throws IntegrationException {
+        assertGettingAll(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, "code location");
+    }
+
+    @Test
+    public void testGettingAllUsers() throws IntegrationException {
+        assertGettingAll(ApiDiscovery.USERS_LINK_RESPONSE, "user");
+    }
+
+    @Test
+    public void testGettingAllProjectsAndVersions() throws Exception {
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
+            final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+            final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+
+            final List<ProjectView> allProjects = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+            System.out.println(String.format("project count: %d", allProjects.size()));
             for (final ProjectView projectItem : allProjects) {
-                final List<ProjectVersionView> allProjectVersions = blackDuckServicesFactory.createBlackDuckService().getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+                final List<ProjectVersionView> allProjectVersions = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
                 System.out.println(projectItem.toString());
                 System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (final ProjectVersionView projectVersionItem : allProjectVersions) {
@@ -287,39 +315,27 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    @Test
-    public void testGettingAllCodeLocations() throws Exception {
+    private <T extends BlackDuckResponse> void assertGettingAll(final BlackDuckPathMultipleResponses<T> pathResponses, final String labelForOutput) throws IntegrationException {
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
 
-        final List<CodeLocationView> allCodeLocations = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
-        System.out.println(String.format("code location count: %d", allCodeLocations.size()));
+        final BlackDuckPageResponse<T> pageResponse = blackDuckService.getPageResponses(pathResponses, true);
+        assertTrue(pageResponse.getTotalCount() > 0);
+        assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
+
         if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
-            for (final CodeLocationView codeLocationItem : allCodeLocations) {
-                System.out.println(codeLocationItem.toString());
+            System.out.println(String.format("%s count: %d", labelForOutput, pageResponse.getTotalCount()));
+            for (final BlackDuckResponse blackDuckResponse : pageResponse.getItems()) {
+                System.out.println(String.format("%s: %s", labelForOutput, blackDuckResponse.toString()));
             }
         }
     }
 
-    @Test
-    public void testGettingAllUsers() throws Exception {
-        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
-
-        final List<UserView> userItems = blackDuckServicesFactory.createBlackDuckService().getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
-        System.out.println(String.format("user count: %d", userItems.size()));
-        assertTrue(userItems != null && userItems.size() > 0);
-        if (Boolean.parseBoolean(restConnectionTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
-            for (final UserView userItem : userItems) {
-                System.out.println("user: " + userItem.toString());
-            }
-        }
-    }
-
-    private void deleteIfProjectExists(final IntLogger logger, final BlackDuckServicesFactory blackDuckServicesFactory, final String projectName) throws Exception {
+    private void deleteIfProjectExists(final IntLogger logger, final ProjectService projectService, final BlackDuckService blackDuckService, final String projectName) throws Exception {
         try {
-            final ProjectService projectService = blackDuckServicesFactory.createProjectService();
             final Optional<ProjectView> project = projectService.getProjectByName(projectName);
             if (project.isPresent()) {
-                projectService.deleteProject(project.get());
+                blackDuckService.delete(project.get());
             }
         } catch (final BlackDuckIntegrationException e) {
             logger.warn("Project didn't exist");

@@ -49,8 +49,8 @@ public class RiskReportResourceCopier extends JarResourceCopier {
     @Override
     public List<String> findRelativePathFileList() {
         final List<String> relativePathList = new LinkedList<>();
-        relativePathList.add("css/HubBomReport.css");
-        relativePathList.add("images/Hub_BD_logo.png");
+        relativePathList.add("css/BlackDuckBomReport.css");
+        relativePathList.add("images/Black_Duck_BD_logo.png");
         relativePathList.add(RISK_REPORT_HTML_FILE_NAME);
         relativePathList.addAll(findJavascriptFileList());
         return relativePathList;
@@ -59,8 +59,8 @@ public class RiskReportResourceCopier extends JarResourceCopier {
     private List<String> findJavascriptFileList() {
         final List<String> fileList = new LinkedList<>();
         final String parentDir = "js/";
-        fileList.add(parentDir + "HubBomReportFunctions.js");
-        fileList.add(parentDir + "HubRiskReport.js");
+        fileList.add(parentDir + "BlackDuckBomReportFunctions.js");
+        fileList.add(parentDir + "BlackDuckRiskReport.js");
         fileList.add(parentDir + "jquery-3.1.1.min.js");
         fileList.add(parentDir + "Sortable.js");
         return fileList;

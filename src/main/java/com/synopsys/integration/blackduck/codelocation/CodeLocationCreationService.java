@@ -40,7 +40,6 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.Notification
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 import com.synopsys.integration.blackduck.exception.BlackDuckTimeoutExceededException;
-import com.synopsys.integration.blackduck.exception.DoesNotExistException;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -100,11 +99,9 @@ public class CodeLocationCreationService extends DataService {
         while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
             final List<CodeLocationView> codeLocations = new ArrayList<>();
             for (final String codeLocationName : codeLocationNames) {
-                try {
-                    final CodeLocationView codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
-                    codeLocations.add(codeLocationView);
-                } catch (final DoesNotExistException ignoreBecauseItIsExpected) {
-                    // ignored - the code locations may not exist yet, hence the searching and timeout
+                final Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+                if (codeLocationView.isPresent()) {
+                    codeLocations.add(codeLocationView.get());
                 }
             }
 

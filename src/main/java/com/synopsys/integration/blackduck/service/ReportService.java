@@ -102,7 +102,7 @@ public class ReportService extends DataService {
 
     public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
-        return generateHubNoticesReport(version, ReportFormatType.TEXT);
+        return generateBlackDuckNoticesReport(version, ReportFormatType.TEXT);
     }
 
     public Optional<File> createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
@@ -123,7 +123,7 @@ public class ReportService extends DataService {
         }
         final String escapedProjectName = escapeUtil.escapeForUri(projectName);
         final String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
-        final File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Hub_Notices_Report.txt");
+        final File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Black_Duck_Notices_Report.txt");
         if (noticesReportFile.exists()) {
             noticesReportFile.delete();
         }
@@ -174,13 +174,13 @@ public class ReportService extends DataService {
                     componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
                 }
                 if (!policyFailure) {
-                    // FIXME if we could check if the Hub has the policy module we could remove a lot of the mess
+                    // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
                     try {
                         final PolicyStatusView bomPolicyStatus = blackDuckService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                         policyStatus = bomPolicyStatus.getApprovalStatus().toString();
                     } catch (final IntegrationException e) {
                         policyFailure = true;
-                        logger.debug("Could not get the component policy status, the Hub policy module is not enabled");
+                        logger.debug("Could not get the component policy status, the Black Duck policy module is not enabled");
                     }
                 }
             }
@@ -303,7 +303,7 @@ public class ReportService extends DataService {
     }
 
     private String getBaseUrl() {
-        return blackDuckService.getHubBaseUrl().toString();
+        return blackDuckService.getBlackDuckBaseURL().toString();
     }
 
     private String getReportProjectUrl(final String projectURL) {
@@ -339,11 +339,11 @@ public class ReportService extends DataService {
     /**
      * Assumes the BOM has already been updated
      */
-    public String generateHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
+    public String generateBlackDuckNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
         if (version.hasLink(ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
-                final String reportUrl = startGeneratingHubNoticesReport(version, reportFormat);
+                final String reportUrl = startGeneratingBlackDuckNoticesReport(version, reportFormat);
 
                 logger.debug("Waiting for the Notices Report to complete.");
                 final ReportView reportInfo = isReportFinishedGenerating(reportUrl);
@@ -358,23 +358,23 @@ public class ReportService extends DataService {
                 final String noticesReport = getNoticesReportContent(contentLink);
                 logger.debug("Finished retrieving the Notices Report.");
                 logger.debug("Cleaning up the Notices Report on the server.");
-                deleteHubReport(reportUrl);
+                deleteBlackDuckReport(reportUrl);
                 return noticesReport;
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == 402) {
                     // unlike the policy module, the licenseReports link is still present when the module is not enabled
-                    logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
+                    logger.warn("Can not create the notice report, the Black Duck notice module is not enabled.");
                 } else {
                     throw e;
                 }
             }
         } else {
-            logger.warn("Can not create the notice report, the Hub notice module is not enabled.");
+            logger.warn("Can not create the notice report, the Black Duck notice module is not enabled.");
         }
         return null;
     }
 
-    public String startGeneratingHubNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
+    public String startGeneratingBlackDuckNoticesReport(final ProjectVersionView version, final ReportFormatType reportFormat) throws IntegrationException {
         final String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
 
         final JsonObject jsonObject = new JsonObject();
@@ -431,7 +431,7 @@ public class ReportService extends DataService {
         }
     }
 
-    public void deleteHubReport(final String reportUri) throws IntegrationException {
+    public void deleteBlackDuckReport(final String reportUri) throws IntegrationException {
         final Request request = new Request.Builder(reportUri).method(HttpMethod.DELETE).build();
         try (Response response = blackDuckService.execute(request)) {
         } catch (final IOException e) {
