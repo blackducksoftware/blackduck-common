@@ -5,8 +5,8 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
-import com.synopsys.integration.log.IntLogger
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -47,7 +47,6 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
-        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         File folder = folderForReport.toFile();
         Optional<File> pdfFile = riskReportService.createReportPdfFile(folder, testProjectName, testProjectVersionName)
@@ -63,7 +62,6 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
-        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         File reportFolder = folderForReport.toFile()
         riskReportService.createReportFiles(reportFolder, testProjectName, testProjectVersionName)
@@ -87,12 +85,37 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
-        final IntLogger logger = blackDuckServicesFactory.getRestConnection().logger
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
         Optional<File> noticeReportFile = riskReportService.createNoticesReportFile(folderForReport.toFile(), testProjectName, testProjectVersionName);
         assertTrue(noticeReportFile.isPresent())
         assertNotNull(noticeReportFile.get())
         assertTrue(noticeReportFile.get().exists())
+    }
+
+    @Test
+    @Disabled
+    public void createReportFilesManually() {
+        // fill these values in with your particulars
+        final String projectName = 'detect'
+        final String projectVersionName = '3.6.0'
+        final String localPathForHtmlReport = '/Users/ekerwin/Documents/working/riskreport_html'
+        final String localPathForPdfReport = '/Users/ekerwin/Documents/working/riskreport_pdf'
+        final String localPathForNoticesReport = '/Users/ekerwin/Documents/working/notices'
+
+        final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
+
+        File htmlReportFolder = new File(localPathForHtmlReport)
+        File pdfReportFolder = new File(localPathForPdfReport)
+        File noticesReportFolder = new File(localPathForNoticesReport)
+
+        htmlReportFolder.mkdirs()
+        pdfReportFolder.mkdirs()
+        noticesReportFolder.mkdirs()
+
+        riskReportService.createReportFiles(htmlReportFolder, projectName, projectVersionName)
+        riskReportService.createReportPdfFile(pdfReportFolder, projectName, projectVersionName)
+        riskReportService.createNoticesReportFile(noticesReportFolder, projectName, projectVersionName);
     }
 
 }
