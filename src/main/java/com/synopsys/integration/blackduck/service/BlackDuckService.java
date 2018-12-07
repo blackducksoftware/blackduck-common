@@ -210,14 +210,14 @@ public class BlackDuckService {
     }
 
     // ------------------------------------------------
-    // handling generic create
+    // handling generic post
     // ------------------------------------------------
-    public String create(final BlackDuckPath blackDuckPath, final Object object) throws IntegrationException {
+    public String post(final BlackDuckPath blackDuckPath, final Object object) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), blackDuckPath.getPath());
-        return create(uri, object);
+        return post(uri, object);
     }
 
-    public String create(final String uri, final Object object) throws IntegrationException {
+    public String post(final String uri, final Object object) throws IntegrationException {
         final String json = gson.toJson(object);
         final Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(uri).build();
         return executePostRequestAndRetrieveURL(request);
@@ -258,7 +258,7 @@ public class BlackDuckService {
     }
 
     // ------------------------------------------------
-    // handling plain requests
+    // handling generic get
     // ------------------------------------------------
     public Response get(final String uri) throws IntegrationException {
         final Request request = RequestFactory.createCommonGetRequest(uri);
@@ -271,6 +271,9 @@ public class BlackDuckService {
         return execute(request);
     }
 
+    // ------------------------------------------------
+    // handling plain requests
+    // ------------------------------------------------
     public Response execute(final BlackDuckPath path, final Request.Builder requestBuilder) throws IntegrationException {
         final String uri = pieceTogetherUri(restConnection.getBaseUrl(), path.getPath());
         requestBuilder.uri(uri);

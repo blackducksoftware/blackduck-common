@@ -25,17 +25,12 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.util.List;
 
+import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 
-public class ScanBatchOutput {
-    private final List<ScanCommandOutput> scanCommandOutputs;
-
+public class ScanBatchOutput extends CodeLocationBatchOutput<ScanCommandOutput> {
     public ScanBatchOutput(final List<ScanCommandOutput> scanCommandOutputs) {
-        this.scanCommandOutputs = scanCommandOutputs;
-    }
-
-    public List<ScanCommandOutput> getScanCommandOutputs() {
-        return scanCommandOutputs;
+        super(scanCommandOutputs);
     }
 
 }

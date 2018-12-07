@@ -26,7 +26,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
     @Test
     void testCreatingAProject() {
         /*
-         * let's create the project/version in Black Duck
+         * let's post the project/version in Black Duck
          */
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
         ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)

@@ -48,7 +48,7 @@ public class RiskReportWriter {
                     }
                 }
             } catch (final URISyntaxException e) {
-                throw new RiskReportException("Couldn't create the report: " + e.getMessage(), e);
+                throw new RiskReportException("Couldn't post the report: " + e.getMessage(), e);
             }
             if (htmlFile == null) {
                 throw new RiskReportException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
@@ -59,7 +59,7 @@ public class RiskReportWriter {
             htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
             FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
         } catch (final IOException e) {
-            throw new RiskReportException("Couldn't create the report: " + e.getMessage(), e);
+            throw new RiskReportException("Couldn't post the report: " + e.getMessage(), e);
         }
     }
 

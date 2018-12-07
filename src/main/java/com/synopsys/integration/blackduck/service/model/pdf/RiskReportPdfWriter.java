@@ -84,7 +84,7 @@ public class RiskReportPdfWriter {
 
             return pdfFile;
         } catch (final IOException | URISyntaxException e) {
-            final String errorString = "Couldn't create the report: ";
+            final String errorString = "Couldn't post the report: ";
             logger.trace(errorString + e.getMessage(), e);
             throw new RiskReportException(errorString + e.getMessage(), e);
         }

@@ -28,7 +28,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
         final String versionName = PROJECT_VERSION_NAME;
 
         /**
-         * we can get the project and version like this, and if they don't exist we will create them
+         * we can get the project and version like this, and if they don't exist we will post them
          */
         final Optional<ProjectView> projectView = projectService.getProjectByName(uniqueProjectName);
         final ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, versionName);

@@ -167,14 +167,14 @@ public class ScanCommand {
 
         if (dryRun) {
             // The dryRunWriteDir is the same as the log directory path
-            // The CLI will create a subdirectory for the json files
+            // The CLI will post a subdirectory for the json files
             cmd.add("--dryRunWriteDir");
             cmd.add(specificRunOutputDirectoryPath);
         }
 
         // Only add the statusWriteDir option if Black Duck supports the statusWriteDir option
         // The scanStatusDirectoryPath is the same as the log directory path
-        // The CLI will create a subdirectory for the status files
+        // The CLI will post a subdirectory for the status files
         cmd.add("--statusWriteDir");
         cmd.add(specificRunOutputDirectoryPath);
 

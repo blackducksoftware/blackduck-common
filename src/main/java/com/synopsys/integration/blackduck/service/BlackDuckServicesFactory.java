@@ -63,7 +63,7 @@ public class BlackDuckServicesFactory {
 
     // NOTE
     //
-    // The 'create' methods are alphabetical by return type - please keep this pattern consistent.
+    // The 'post' methods are alphabetical by return type - please keep this pattern consistent.
     public BlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final BlackDuckRestConnection restConnection, final IntLogger logger) {
         intEnvironmentVariables = new IntEnvironmentVariables();
 
@@ -144,7 +144,7 @@ public class BlackDuckServicesFactory {
     }
     // NOTE
     //
-    // The 'create' methods are alphabetical by return type - please keep this pattern consistent.
+    // The 'post' methods are alphabetical by return type - please keep this pattern consistent.
 
     public void addEnvironmentVariable(final String key, final String value) {
         intEnvironmentVariables.put(key, value);

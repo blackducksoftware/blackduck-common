@@ -30,6 +30,8 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.jayway.jsonpath.JsonPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
@@ -67,7 +69,7 @@ public class NotificationService extends DataService {
     public List<NotificationView> getFilteredNotifications(final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) throws IntegrationException {
         final Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
         final List<NotificationView> allNotificationItems = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
-        return allNotificationItems;
+        return reallyFilterNotifications(allNotificationItems, notificationTypesToInclude);
     }
 
     public List<NotificationUserView> getFilteredUserNotifications(final UserView user, final Date startDate, final Date endDate, final List<String> notificationTypesToInclude) throws IntegrationException {
@@ -76,7 +78,8 @@ public class NotificationService extends DataService {
         requestBuilder.uri(userNotificationsUri);
 
         final List<NotificationUserView> allUserNotificationItems = blackDuckService.getResponses(requestBuilder, NotificationUserView.class, true);
-        return allUserNotificationItems;
+        // return
+        return reallyFilterNotifications(allUserNotificationItems, notificationTypesToInclude);
     }
 
     /**
@@ -118,6 +121,21 @@ public class NotificationService extends DataService {
         final BlackDuckRequestFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
         RequestFactory.addBlackDuckFilter(requestBuilder, notificationTypeFilter);
         return requestBuilder;
+    }
+
+    /*
+    FIXME
+    as of 2018.11.0, the notification filtering appears to be broken, so we must REALLY filter the notifications
+    when that is fixed, this can be removed
+    */
+    private <T extends BlackDuckView> List<T> reallyFilterNotifications(final List<T> notifications, final List<String> notificationTypesToInclude) {
+        return notifications
+                       .stream()
+                       .filter(notification -> {
+                           String notificationType = JsonPath.read(notification.getJson(), "$.type");
+                           return notificationTypesToInclude.contains(notificationType);
+                       })
+                       .collect(Collectors.toList());
     }
 
 }

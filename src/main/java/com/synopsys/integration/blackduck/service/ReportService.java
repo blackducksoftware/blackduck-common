@@ -363,13 +363,13 @@ public class ReportService extends DataService {
             } catch (final IntegrationRestException e) {
                 if (e.getHttpStatusCode() == 402) {
                     // unlike the policy module, the licenseReports link is still present when the module is not enabled
-                    logger.warn("Can not create the notice report, the Black Duck notice module is not enabled.");
+                    logger.warn("Can not post the notice report, the Black Duck notice module is not enabled.");
                 } else {
                     throw e;
                 }
             }
         } else {
-            logger.warn("Can not create the notice report, the Black Duck notice module is not enabled.");
+            logger.warn("Can not post the notice report, the Black Duck notice module is not enabled.");
         }
         return null;
     }

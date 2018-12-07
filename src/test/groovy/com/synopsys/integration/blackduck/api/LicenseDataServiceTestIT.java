@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseCodeSharingType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseOwnershipType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComplexLicenseType;
 import com.synopsys.integration.blackduck.api.generated.view.ComplexLicenseView;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -31,12 +30,18 @@ public class LicenseDataServiceTestIT {
         final Optional<ComplexLicenseView> optionalComplexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
         final ComplexLicenseView complexLicense = optionalComplexLicense.get();
 
-        assertEquals(LicenseCodeSharingType.PERMISSIVE, complexLicense.getCodeSharing());
-        assertTrue(StringUtils.isNotBlank(complexLicense.getLicense()));
-        assertEquals("Apache License 2.0", complexLicense.getName());
-        assertEquals(LicenseOwnershipType.OPEN_SOURCE, complexLicense.getOwnership());
-        assertNull(complexLicense.getType());
-        assertEquals(0, complexLicense.getLicenses().size());
+        assertEquals("Apache License 2.0", complexLicense.getLicenseDisplay());
+        assertEquals(ComplexLicenseType.DISJUNCTIVE, complexLicense.getType());
+        assertEquals(1, complexLicense.getLicenses().size());
+
+        final ComplexLicenseView embeddedLicense = complexLicense.getLicenses().get(0);
+        assertEquals("PERMISSIVE", embeddedLicense.getCodeSharing());
+        assertTrue(StringUtils.isNotBlank(embeddedLicense.getLicense()));
+        assertEquals("Apache License 2.0", embeddedLicense.getLicenseDisplay());
+        assertEquals("Apache License 2.0", embeddedLicense.getName());
+        assertEquals("OPEN_SOURCE", embeddedLicense.getOwnership());
+        assertNull(embeddedLicense.getType());
+        assertEquals(0, embeddedLicense.getLicenses().size());
 
         System.out.println(complexLicense);
     }

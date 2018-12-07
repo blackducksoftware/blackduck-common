@@ -107,12 +107,13 @@ public class CodeLocationCreationService extends DataService {
 
             if (codeLocations.size() == codeLocationNames.size()) {
                 logger.debug("All code locations have been found, now looking for notifications.");
-                final Set<String> codeLocationUrlsToFind = codeLocations
-                                                                   .stream()
-                                                                   .map(CodeLocationView::getHref)
-                                                                   .filter(Optional::isPresent)
-                                                                   .map(Optional::get)
-                                                                   .collect(Collectors.toSet());
+                final Set<String> codeLocationUrlsToFind =
+                        codeLocations
+                                .stream()
+                                .map(CodeLocationView::getHref)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .collect(Collectors.toSet());
                 final Set<String> codeLocationUrls = new HashSet<>();
                 final List<NotificationView> notifications = notificationService
                                                                      .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
@@ -139,6 +140,7 @@ public class CodeLocationCreationService extends DataService {
         if (!allCompleted) {
             throw new BlackDuckTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
         } else {
+            waitAnAdditionalMostlyArbitraryAmount();
             logger.info("All code locations have been added to the BOM.");
         }
     }
@@ -146,6 +148,16 @@ public class CodeLocationCreationService extends DataService {
     private Optional<String> getCodeLocationUrl(final NotificationView notificationView) {
         final String codeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
         return Optional.ofNullable(codeLocationUrl);
+    }
+
+    // FIXME this will need to be removed when the VERSION_BOM_CODE_LOCATION_BOM_COMPUTED is fixed
+    private void waitAnAdditionalMostlyArbitraryAmount() {
+        try {
+            // 5-10 seconds wasn't enough, 60 appears to be
+            Thread.sleep(60 * 1000);
+        } catch (final InterruptedException ignoreMe) {
+            // ignored
+        }
     }
 
 }

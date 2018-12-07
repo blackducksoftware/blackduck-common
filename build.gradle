@@ -15,7 +15,7 @@ apply plugin: 'com.blackducksoftware.integration.library'
 dependencies {
     implementation 'com.blackducksoftware.integration:integration-rest:0.4.0-SNAPSHOT'
     implementation 'com.blackducksoftware.integration:integration-reporting:0.1.6'
-    implementation 'com.blackducksoftware.integration:hub-common-api:5.0.0.3-SNAPSHOT'
+    implementation 'com.blackducksoftware.integration:blackduck-common-api:2018.11.0.0-SNAPSHOT'
     implementation 'com.blackducksoftware.integration:integration-bdio:16.2.1'
     implementation 'com.blackducksoftware.integration:phone-home-client:0.18.0'
     implementation 'com.flipkart.zjsonpatch:zjsonpatch:0.4.6'

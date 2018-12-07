@@ -63,16 +63,16 @@ import com.synopsys.integration.rest.request.Response;
 
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;
-    private final ComponentService componentDataService;
+    private final ComponentService componentService;
 
-    public ProjectService(final BlackDuckService blackDuckService, final IntLogger logger, final ProjectGetService projectGetService, final ComponentService componentDataService) {
+    public ProjectService(final BlackDuckService blackDuckService, final IntLogger logger, final ProjectGetService projectGetService, final ComponentService componentService) {
         super(blackDuckService, logger);
         this.projectGetService = projectGetService;
-        this.componentDataService = componentDataService;
+        this.componentService = componentService;
     }
 
     public ProjectVersionWrapper createProject(final ProjectRequest projectRequest) throws IntegrationException {
-        final String projectUrl = blackDuckService.create(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        final String projectUrl = blackDuckService.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
         final ProjectView projectView = blackDuckService.getResponse(projectUrl, ProjectView.class);
         if (null == projectRequest.getVersionRequest()) {
             return new ProjectVersionWrapper(projectView);
@@ -84,9 +84,9 @@ public class ProjectService extends DataService {
 
     public ProjectVersionView createProjectVersion(final ProjectView projectView, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
-            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
+            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to post a version.", ProjectView.VERSIONS_LINK));
         }
-        final String projectVersionUrl = blackDuckService.create(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
+        final String projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
         return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
     }
 
@@ -99,7 +99,7 @@ public class ProjectService extends DataService {
 
         final Optional<ProjectView> optionalProjectView = getProjectByName(projectName);
         if (!optionalProjectView.isPresent()) {
-            // nothing exists, so create and return
+            // nothing exists, so post and return
             return createProject(projectRequest);
         }
 
@@ -125,7 +125,7 @@ public class ProjectService extends DataService {
                     projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
                 }
             } else {
-                // the version did not exist, so create it
+                // the version did not exist, so post it
                 projectVersionView = createProjectVersion(projectView, projectRequest.getVersionRequest());
             }
         }
@@ -267,7 +267,7 @@ public class ProjectService extends DataService {
 
         final List<ComponentVersionVulnerabilities> componentVersionVulnerabilitiesList = new ArrayList<>();
         for (final ComponentVersionView componentVersionView : componentVersionViews) {
-            final ComponentVersionVulnerabilities componentVersionVulnerabilities = componentDataService.getComponentVersionVulnerabilities(componentVersionView);
+            final ComponentVersionVulnerabilities componentVersionVulnerabilities = componentService.getComponentVersionVulnerabilities(componentVersionView);
             componentVersionVulnerabilitiesList.add(componentVersionVulnerabilities);
         }
         return componentVersionVulnerabilitiesList;
@@ -286,11 +286,11 @@ public class ProjectService extends DataService {
         return blackDuckService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
-    public void addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
+    public Optional<String> addComponentToProjectVersion(final ExternalId componentExternalId, final ProjectVersionView projectVersionView) throws IntegrationException {
         final String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK).orElse(null);
-        final Optional<ComponentSearchResultView> componentSearchResultView = componentDataService.getExactComponentMatch(componentExternalId);
+        final Optional<ComponentSearchResultView> componentSearchResultView = componentService.getExactComponentMatch(componentExternalId);
+        String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
-            String componentVersionUrl = null;
             if (StringUtils.isNotBlank(componentSearchResultView.get().getVariant())) {
                 componentVersionUrl = componentSearchResultView.get().getVariant();
             } else {
@@ -298,6 +298,8 @@ public class ProjectService extends DataService {
             }
             addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
         }
+
+        return Optional.ofNullable(componentVersionUrl);
     }
 
     public void addComponentToProjectVersion(final String mediaType, final String projectVersionComponentsUri, final String componentVersionUrl) throws IntegrationException {

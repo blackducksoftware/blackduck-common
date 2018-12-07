@@ -90,7 +90,6 @@ public class BdioUploadRecipeTest extends BasicRecipe {
             optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
         }
         final CodeLocationView codeLocationView = optionalCodeLocationView.get();
-        System.out.println(codeLocationView.getHref().get());
 
         /**
          * then we map the code location to a version

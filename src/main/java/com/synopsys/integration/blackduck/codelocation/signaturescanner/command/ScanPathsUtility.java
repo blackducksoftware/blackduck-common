@@ -131,14 +131,14 @@ public class ScanPathsUtility {
 
         final File specificRunOutputDirectory = new File(signatureScanOutputDirectory, uniqueOutputDirectoryName);
         if (!specificRunOutputDirectory.exists() && !specificRunOutputDirectory.mkdirs()) {
-            throw new BlackDuckIntegrationException(String.format("Could not create the %s directory!", specificRunOutputDirectory.getAbsolutePath()));
+            throw new BlackDuckIntegrationException(String.format("Could not post the %s directory!", specificRunOutputDirectory.getAbsolutePath()));
         }
 
         final File bdIgnoreLogsFile = new File(generalOutputDirectory, ".bdignore");
         if (!bdIgnoreLogsFile.exists()) {
             try {
                 if (!bdIgnoreLogsFile.createNewFile()) {
-                    throw new BlackDuckIntegrationException(String.format("Could not create the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
+                    throw new BlackDuckIntegrationException(String.format("Could not post the %s file!", bdIgnoreLogsFile.getAbsolutePath()));
                 }
                 final String exclusionPattern = "/" + signatureScanOutputDirectoryName + "/";
                 Files.write(bdIgnoreLogsFile.toPath(), exclusionPattern.getBytes());
