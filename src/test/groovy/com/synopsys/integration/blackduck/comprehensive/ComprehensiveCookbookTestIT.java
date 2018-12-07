@@ -58,7 +58,6 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 @Tag("integration")
 public class ComprehensiveCookbookTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
-    private static final long TWENTY_MINUTES = FIVE_MINUTES * 4;
 
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
@@ -196,13 +195,16 @@ public class ComprehensiveCookbookTestIT {
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
         final File scanFile = restConnectionTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
+        final File parentDirectory = scanFile.getParentFile();
+        final File installDirectory = new File(parentDirectory, "scanner_install");
+        final File outputDirectory = new File(parentDirectory, "scanner_output");
 
         // perform the scan
         final ScanBatchManager scanBatchManager = ScanBatchManager.createDefaultScanManager(blackDuckServices.logger, blackDuckServices.blackDuckServerConfig);
         final ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
         scanBatchBuilder.fromBlackDuckServerConfig(blackDuckServices.blackDuckServerConfig);
-        scanBatchBuilder.installDirectory(new File("/Users/ekerwin/working/scanner_install"));
-        scanBatchBuilder.outputDirectory(new File("/Users/ekerwin/working/scanner_output"));
+        scanBatchBuilder.installDirectory(installDirectory);
+        scanBatchBuilder.outputDirectory(outputDirectory);
         scanBatchBuilder.projectAndVersionNames(projectName, projectVersionName);
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget(scanFile.getAbsolutePath(), codeLocationName));
         final ScanBatch scanBatch = scanBatchBuilder.build();
