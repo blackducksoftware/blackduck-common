@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;

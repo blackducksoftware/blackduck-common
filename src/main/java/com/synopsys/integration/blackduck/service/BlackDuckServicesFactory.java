@@ -33,6 +33,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
@@ -71,6 +75,16 @@ public class BlackDuckServicesFactory {
         this.objectMapper = objectMapper;
         this.restConnection = restConnection;
         this.logger = logger;
+    }
+
+    public BdioUploadService createBdioUploadService() {
+        final BlackDuckService blackDuckService = createBlackDuckService();
+        return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService), createCodeLocationCreationService());
+    }
+
+    public BdioUploadService createBdioUploadService(final ExecutorService executorService) {
+        final BlackDuckService blackDuckService = createBlackDuckService();
+        return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
     }
 
     public BinaryScannerService createBinaryScannerService() {
@@ -137,6 +151,10 @@ public class BlackDuckServicesFactory {
 
     public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
         return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+    }
+
+    public SignatureScannerService createSignatureScannerService(final ScanBatchManager scanBatchManager) {
+        return new SignatureScannerService(createBlackDuckService(), logger, scanBatchManager, createCodeLocationCreationService());
     }
 
     public UserGroupService createUserGroupService() {

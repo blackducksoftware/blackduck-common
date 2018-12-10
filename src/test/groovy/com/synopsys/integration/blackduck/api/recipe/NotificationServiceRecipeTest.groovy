@@ -3,7 +3,7 @@ package com.synopsys.integration.blackduck.api.recipe
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.NotificationView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView
-import com.synopsys.integration.blackduck.codelocation.BdioUploadCodeLocationCreationRequest
+import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCodeLocationCreationRequest
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget
 import com.synopsys.integration.blackduck.notification.CommonNotificationView

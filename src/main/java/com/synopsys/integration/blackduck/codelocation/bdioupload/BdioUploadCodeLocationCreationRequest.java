@@ -21,40 +21,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.codelocation;
+package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
-public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
-    private final ScanBatchManager scanBatchManager;
-    private final ScanBatch scanBatch;
+public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
+    private final UploadRunner uploadRunner;
+    private final UploadBatch uploadBatch;
 
-    public SignatureScannerCodeLocationCreationRequest(final ScanBatchManager scanBatchManager, final ScanBatch scanBatch) {
-        this.scanBatchManager = scanBatchManager;
-        this.scanBatch = scanBatch;
+    public BdioUploadCodeLocationCreationRequest(final UploadRunner uploadRunner, final UploadBatch uploadBatch) {
+        this.uploadRunner = uploadRunner;
+        this.uploadBatch = uploadBatch;
     }
 
     @Override
     public Set<String> getCodeLocationNames() {
-        return scanBatch.getScanTargets()
+        return uploadBatch.getUploadTargets()
                        .stream()
-                       .map(ScanTarget::getCodeLocationName)
-                       .filter(StringUtils::isBlank)
+                       .map(UploadTarget::getCodeLocationName)
                        .collect(Collectors.toSet());
     }
 
     @Override
-    public ScanBatchOutput executeRequest() throws BlackDuckIntegrationException {
-        return scanBatchManager.executeScans(scanBatch);
+    public UploadBatchOutput executeRequest() throws BlackDuckIntegrationException {
+        return uploadRunner.executeUploads(uploadBatch);
     }
 
 }
