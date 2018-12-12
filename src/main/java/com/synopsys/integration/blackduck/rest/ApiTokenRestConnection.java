@@ -91,6 +91,7 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             final String headerValue = "Bearer " + bearerToken.get();
             addCommonRequestHeader(AUTHORIZATION_HEADER, headerValue);
             request.addHeader(AUTHORIZATION_HEADER, headerValue);
+            authenticated = true;
         } else {
             getLogger().error("No Bearer token found when authenticating");
         }
