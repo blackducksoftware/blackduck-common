@@ -101,11 +101,11 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
         final String bearerToken;
 
         try (final Response response = attemptToAuthenticate()) {
-            final int statusCode = response.getActualResponse().getStatusLine().getStatusCode();
-            final String statusMessage = response.getActualResponse().getStatusLine().getReasonPhrase();
             if (response.isStatusCodeOkay()) {
                 bearerToken = readBearerToken(response.getActualResponse());
             } else {
+                final int statusCode = response.getActualResponse().getStatusLine().getStatusCode();
+                final String statusMessage = response.getActualResponse().getStatusLine().getReasonPhrase();
                 final String httpResponseContent = response.getContentString();
                 throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
             }

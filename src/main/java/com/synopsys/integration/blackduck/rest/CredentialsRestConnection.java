@@ -103,7 +103,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         Header header = null;
 
         try (final Response response = attemptToAuthenticate()) {
-            if (response.isStatusCodeError()) {
+            if (response.isStatusCodeOkay()) {
                 // Return the CSRF token
                 header = response.getActualResponse().getFirstHeader(RestConstants.X_CSRF_TOKEN);
             } else {
