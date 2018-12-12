@@ -1,3 +1,26 @@
+/**
+ * blackduck-common
+ *
+ * Copyright (C) 2018 Black Duck Software, Inc.
+ * http://www.blackducksoftware.com/
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.util.Set;
@@ -11,14 +34,18 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 public class SignatureScannerService extends DataService {
-    private final ScanBatchManager scanBatchManager;
+    private final ScanBatchRunner scanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
     public SignatureScannerService(final BlackDuckService blackDuckService, final IntLogger logger,
-            final ScanBatchManager scanBatchManager, final CodeLocationCreationService codeLocationCreationService) {
+            final ScanBatchRunner scanBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckService, logger);
-        this.scanBatchManager = scanBatchManager;
+        this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
+    }
+
+    public SignatureScannerCodeLocationCreationRequest createScanRequest(final ScanBatch scanBatch) {
+        return new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
     }
 
     public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(final SignatureScannerCodeLocationCreationRequest scanRequest) throws IntegrationException {
@@ -26,7 +53,7 @@ public class SignatureScannerService extends DataService {
     }
 
     public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(final ScanBatch scanBatch) throws IntegrationException {
-        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchManager, scanBatch);
+        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
 
         return performSignatureScan(scanRequest);
     }
@@ -36,7 +63,7 @@ public class SignatureScannerService extends DataService {
     }
 
     public ScanBatchOutput performSignatureScanAndWait(final ScanBatch scanBatch, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchManager, scanBatch);
+        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
 
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }

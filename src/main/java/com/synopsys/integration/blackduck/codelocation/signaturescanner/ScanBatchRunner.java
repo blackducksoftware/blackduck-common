@@ -38,7 +38,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
-public class ScanBatchManager {
+public class ScanBatchRunner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScannerZipInstaller scannerZipInstaller;
@@ -46,27 +46,27 @@ public class ScanBatchManager {
     private final ScanCommandRunner scanCommandRunner;
     private final File defaultInstallDirectory;
 
-    public static ScanBatchManager createDefaultScanManager(final IntLogger logger, final BlackDuckServerConfig blackDuckServerConfig) {
+    public static ScanBatchRunner createDefault(final IntLogger logger, final BlackDuckServerConfig blackDuckServerConfig) {
         final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
         final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, scanPathsUtility, operatingSystemType);
 
-        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
+        return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public static ScanBatchManager createScanManagerWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility,
+    public static ScanBatchRunner createWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility,
             final ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchManager(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
+        return new ScanBatchRunner(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
     }
 
-    public static ScanBatchManager createFullScanManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
+    public static ScanBatchRunner createComplete(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
             final ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchManager(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
+        return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public ScanBatchManager(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner,
+    public ScanBatchRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner,
             final File defaultInstallDirectory) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;

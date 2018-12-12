@@ -23,27 +23,19 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import java.util.Set;
-
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 
-public class CodeLocationCreationData<T> {
+public class CodeLocationCreationData<T extends CodeLocationBatchOutput> {
     private final NotificationTaskRange notificationTaskRange;
-    private final Set<String> successfulCodeLocationNames;
     private final T output;
 
-    public CodeLocationCreationData(final NotificationTaskRange notificationTaskRange, final Set<String> successfulCodeLocationNames, final T output) {
+    public CodeLocationCreationData(final NotificationTaskRange notificationTaskRange, final T output) {
         this.notificationTaskRange = notificationTaskRange;
-        this.successfulCodeLocationNames = successfulCodeLocationNames;
         this.output = output;
     }
 
     public NotificationTaskRange getNotificationTaskRange() {
         return notificationTaskRange;
-    }
-
-    public Set<String> getSuccessfulCodeLocationNames() {
-        return successfulCodeLocationNames;
     }
 
     public T getOutput() {

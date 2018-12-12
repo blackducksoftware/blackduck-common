@@ -33,11 +33,11 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
-    private final ScanBatchManager scanBatchManager;
+    private final ScanBatchRunner scanBatchRunner;
     private final ScanBatch scanBatch;
 
-    public SignatureScannerCodeLocationCreationRequest(final ScanBatchManager scanBatchManager, final ScanBatch scanBatch) {
-        this.scanBatchManager = scanBatchManager;
+    public SignatureScannerCodeLocationCreationRequest(final ScanBatchRunner scanBatchRunner, final ScanBatch scanBatch) {
+        this.scanBatchRunner = scanBatchRunner;
         this.scanBatch = scanBatch;
     }
 
@@ -52,7 +52,7 @@ public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCre
 
     @Override
     public ScanBatchOutput executeRequest() throws BlackDuckIntegrationException {
-        return scanBatchManager.executeScans(scanBatch);
+        return scanBatchRunner.executeScans(scanBatch);
     }
 
 }
