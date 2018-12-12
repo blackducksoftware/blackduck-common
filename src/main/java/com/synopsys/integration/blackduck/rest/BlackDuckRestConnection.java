@@ -26,12 +26,17 @@ package com.synopsys.integration.blackduck.rest;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
 
+import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
@@ -62,6 +67,17 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
             return new URL(baseUrl);
         } catch (final MalformedURLException e) {
             return null;
+        }
+    }
+
+    public boolean isAuthenticated() {
+        final Request request = RequestFactory.createCommonGetRequest(baseUrl);
+        try {
+            final HttpUriRequest httpUriRequest = request.createHttpUriRequest(Collections.emptyMap());
+            finalizeRequest(httpUriRequest);
+            return true;
+        } catch (final IntegrationException genericIntException) {
+            return false;
         }
     }
 }

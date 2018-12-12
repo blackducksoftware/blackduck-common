@@ -126,14 +126,14 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             logResponseHeaders(closeableHttpResponse);
 
             try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                    final String httpResponseContent = response.getContentString();
-                    throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                } else {
+                if (response.isStatusCodeOkay()) {
                     // Return the CSRF token
                     header = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
+                } else {
+                    final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
+                    final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
+                    final String httpResponseContent = response.getContentString();
+                    throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
                 }
             }
         } catch (final IOException e) {

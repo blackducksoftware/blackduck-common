@@ -44,7 +44,6 @@ import com.google.gson.JsonParser;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
@@ -120,13 +119,13 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
                 closeableHttpResponse = closeableHttpClient.execute(request);
                 logResponseHeaders(closeableHttpResponse);
                 try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                    final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                    final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                    if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
+                    if (response.isStatusCodeOkay()) {
+                        bearerToken = readBearerToken(closeableHttpResponse);
+                    } else {
+                        final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
+                        final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
                         final String httpResponseContent = response.getContentString();
                         throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                    } else {
-                        bearerToken = readBearerToken(closeableHttpResponse);
                     }
                 } catch (final IOException e) {
                     throw new IntegrationException(e.getMessage(), e);
