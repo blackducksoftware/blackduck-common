@@ -29,9 +29,11 @@ import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Response;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
@@ -64,4 +66,6 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
             return null;
         }
     }
+
+    public abstract Response attemptToAuthenticate() throws IntegrationException;
 }

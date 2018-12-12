@@ -101,6 +101,26 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
 
     private Optional<Header> requestCSRFTokenHeader() throws IntegrationException {
         Header header = null;
+
+        try (final Response response = attemptToAuthenticate()) {
+            if (response.isStatusCodeError()) {
+                // Return the CSRF token
+                header = response.getActualResponse().getFirstHeader(RestConstants.X_CSRF_TOKEN);
+            } else {
+                final int statusCode = response.getActualResponse().getStatusLine().getStatusCode();
+                final String statusMessage = response.getActualResponse().getStatusLine().getReasonPhrase();
+                final String httpResponseContent = response.getContentString();
+                throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
+            }
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+
+        return Optional.ofNullable(header);
+    }
+
+    @Override
+    public Response attemptToAuthenticate() throws IntegrationException {
         final URL securityUrl;
         try {
             securityUrl = new URL(getBaseUrl(), "j_spring_security_check");
@@ -125,21 +145,9 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             final CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(request);
             logResponseHeaders(closeableHttpResponse);
 
-            try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                    final String httpResponseContent = response.getContentString();
-                    throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                } else {
-                    // Return the CSRF token
-                    header = closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
-                }
-            }
+            return new Response(request, closeableHttpClient, closeableHttpResponse);
         } catch (final IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
-
-        return Optional.ofNullable(header);
     }
 }

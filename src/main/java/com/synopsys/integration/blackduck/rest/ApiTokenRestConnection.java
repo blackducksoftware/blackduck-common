@@ -44,7 +44,6 @@ import com.google.gson.JsonParser;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
@@ -99,7 +98,44 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
     }
 
     private Optional<String> retrieveBearerToken() throws IntegrationException {
-        String bearerToken = null;
+        final String bearerToken;
+
+        try (final Response response = attemptToAuthenticate()) {
+            final int statusCode = response.getActualResponse().getStatusLine().getStatusCode();
+            final String statusMessage = response.getActualResponse().getStatusLine().getReasonPhrase();
+            if (response.isStatusCodeOkay()) {
+                bearerToken = readBearerToken(response.getActualResponse());
+            } else {
+                final String httpResponseContent = response.getContentString();
+                throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
+            }
+        } catch (final IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+
+        return Optional.ofNullable(bearerToken);
+    }
+
+    private Map<String, String> getRequestHeaders() {
+        final Map<String, String> headers = new HashMap<>();
+        headers.put(AUTHORIZATION_HEADER, "token " + apiToken);
+
+        return headers;
+    }
+
+    private String readBearerToken(final CloseableHttpResponse response) throws IOException {
+        final JsonParser jsonParser = new JsonParser();
+        final String bodyToken;
+        try (final InputStream inputStream = response.getEntity().getContent()) {
+            bodyToken = IOUtils.toString(inputStream, Charsets.UTF_8);
+        }
+        final JsonObject bearerResponse = jsonParser.parse(bodyToken).getAsJsonObject();
+
+        return bearerResponse.get("bearerToken").getAsString();
+    }
+
+    @Override
+    public Response attemptToAuthenticate() throws IntegrationException {
         final URL authenticationUrl;
         try {
             authenticationUrl = new URL(getBaseUrl(), "api/tokens/authenticate");
@@ -119,40 +155,13 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             try {
                 closeableHttpResponse = closeableHttpClient.execute(request);
                 logResponseHeaders(closeableHttpResponse);
-                try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                    final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                    final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                    if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                        final String httpResponseContent = response.getContentString();
-                        throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                    } else {
-                        bearerToken = readBearerToken(closeableHttpResponse);
-                    }
-                } catch (final IOException e) {
-                    throw new IntegrationException(e.getMessage(), e);
-                }
+
+                return new Response(request, closeableHttpClient, closeableHttpResponse);
             } catch (final IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
+        } else {
+            throw new IntegrationException("Provided api token is blank");
         }
-        return Optional.ofNullable(bearerToken);
     }
-
-    private Map<String, String> getRequestHeaders() {
-        final Map<String, String> headers = new HashMap<>();
-        headers.put(AUTHORIZATION_HEADER, "token " + apiToken);
-
-        return headers;
-    }
-
-    private String readBearerToken(final CloseableHttpResponse response) throws IOException {
-        final JsonParser jsonParser = new JsonParser();
-        String bodyToken = "";
-        try (final InputStream inputStream = response.getEntity().getContent()) {
-            bodyToken = IOUtils.toString(inputStream, Charsets.UTF_8);
-        }
-        final JsonObject bearerResponse = jsonParser.parse(bodyToken).getAsJsonObject();
-        return bearerResponse.get("bearerToken").getAsString();
-    }
-
 }
