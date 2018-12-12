@@ -71,4 +71,5 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
     public boolean isAuthenticated() {
         return authenticated;
     }
+
 }
