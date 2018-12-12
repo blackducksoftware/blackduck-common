@@ -44,8 +44,6 @@ import com.google.gson.JsonParser;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
 
@@ -99,7 +97,6 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
     }
 
     private Optional<String> retrieveBearerToken() throws IntegrationException {
-        String bearerToken = null;
         final URL authenticationUrl;
         try {
             authenticationUrl = new URL(getBaseUrl(), "api/tokens/authenticate");
@@ -120,13 +117,9 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
                 closeableHttpResponse = closeableHttpClient.execute(request);
                 logResponseHeaders(closeableHttpResponse);
                 try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                    final int statusCode = closeableHttpResponse.getStatusLine().getStatusCode();
-                    final String statusMessage = closeableHttpResponse.getStatusLine().getReasonPhrase();
-                    if (statusCode < RestConstants.OK_200 || statusCode >= RestConstants.MULT_CHOICE_300) {
-                        final String httpResponseContent = response.getContentString();
-                        throw new IntegrationRestException(statusCode, statusMessage, httpResponseContent, String.format("Connection Error: %s %s", statusCode, statusMessage));
-                    } else {
-                        bearerToken = readBearerToken(closeableHttpResponse);
+                    if (response.isStatusCodeOkay()) {
+                        final String bearerToken = readBearerToken(closeableHttpResponse);
+                        return Optional.of(bearerToken);
                     }
                 } catch (final IOException e) {
                     throw new IntegrationException(e.getMessage(), e);
@@ -135,7 +128,7 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
                 throw new IntegrationException(e.getMessage(), e);
             }
         }
-        return Optional.ofNullable(bearerToken);
+        return Optional.empty();
     }
 
     private Map<String, String> getRequestHeaders() {

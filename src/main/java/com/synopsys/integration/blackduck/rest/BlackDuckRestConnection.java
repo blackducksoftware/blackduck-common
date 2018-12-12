@@ -39,6 +39,9 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
     private final String baseUrl;
 
+    // subclasses should set this once authentication is complete
+    protected boolean authenticated;
+
     public BlackDuckRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
         this.baseUrl = baseUrl;
@@ -63,5 +66,9 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
         } catch (final MalformedURLException e) {
             return null;
         }
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 }
