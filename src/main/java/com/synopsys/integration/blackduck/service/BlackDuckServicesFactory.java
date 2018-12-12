@@ -35,7 +35,7 @@ import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchManager;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
@@ -153,8 +153,8 @@ public class BlackDuckServicesFactory {
         return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
-    public SignatureScannerService createSignatureScannerService(final ScanBatchManager scanBatchManager) {
-        return new SignatureScannerService(createBlackDuckService(), logger, scanBatchManager, createCodeLocationCreationService());
+    public SignatureScannerService createSignatureScannerService(final ScanBatchRunner scanBatchRunner) {
+        return new SignatureScannerService(createBlackDuckService(), logger, scanBatchRunner, createCodeLocationCreationService());
     }
 
     public UserGroupService createUserGroupService() {

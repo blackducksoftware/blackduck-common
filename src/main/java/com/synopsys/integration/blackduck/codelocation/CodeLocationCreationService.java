@@ -62,18 +62,16 @@ public class CodeLocationCreationService extends DataService {
         final NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
         final T output = codeLocationCreationRequest.executeRequest();
 
-        final Set<String> successfulCodeLocationNames = output.getSuccessfulCodeLocationNames();
-        return new CodeLocationCreationData<>(notificationTaskRange, successfulCodeLocationNames, output);
+        return new CodeLocationCreationData<>(notificationTaskRange, output);
     }
 
     public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
         final CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
         final NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
-        final Set<String> successfulCodeLocationNames = codeLocationCreationData.getSuccessfulCodeLocationNames();
         final T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, successfulCodeLocationNames, timeoutInSeconds);
+        waitForCodeLocations(notificationTaskRange, output.getSuccessfulCodeLocationNames(), timeoutInSeconds);
 
         return output;
     }
@@ -107,13 +105,13 @@ public class CodeLocationCreationService extends DataService {
 
             if (codeLocations.size() == codeLocationNames.size()) {
                 logger.debug("All code locations have been found, now looking for notifications.");
-                final Set<String> codeLocationUrlsToFind =
-                        codeLocations
-                                .stream()
-                                .map(CodeLocationView::getHref)
-                                .filter(Optional::isPresent)
-                                .map(Optional::get)
-                                .collect(Collectors.toSet());
+                final Set<String> codeLocationUrlsToFind = codeLocations
+                                                                   .stream()
+                                                                   .map(CodeLocationView::getHref)
+                                                                   .filter(Optional::isPresent)
+                                                                   .map(Optional::get)
+                                                                   .collect(Collectors.toSet());
+
                 final Set<String> codeLocationUrls = new HashSet<>();
                 final List<NotificationView> notifications = notificationService
                                                                      .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),

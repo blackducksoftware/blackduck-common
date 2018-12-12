@@ -43,9 +43,8 @@ public class BdioUploadRecipeTest extends BasicRecipe {
     @Test
     public void testBdioUpload() throws IntegrationException, InterruptedException {
         final File file = restConnectionTestHelper.getFile("bdio/hub_common_bdio_with_project_section.jsonld");
-        /**
-         * in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
-         */
+
+        //in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
         final IntLogger logger = new BufferedIntLogger();
         final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
         final UploadBatch uploadBatch = new UploadBatch();
@@ -65,9 +64,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
     @Test
     public void testBdioUploadAndMapToVersion() throws InterruptedException, IntegrationException {
         final File file = restConnectionTestHelper.getFile("bdio/hub_common_bdio_without_project_section.jsonld");
-        /**
-         * in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
-         */
+        // in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
         final IntLogger logger = new BufferedIntLogger();
 
         final UploadRunner uploadRunner = new UploadRunner(logger, blackDuckService);
@@ -77,9 +74,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         codeLocationCreationService.createCodeLocations(scanRequest);
 
-        /**
-         * now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
-         */
+        // now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
         Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
         final int maxAttempts = 6;
         int attempt = 0;
@@ -91,9 +86,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         }
         final CodeLocationView codeLocationView = optionalCodeLocationView.get();
 
-        /**
-         * then we map the code location to a version
-         */
+        // then we map the code location to a version
         final String versionName = "27.0.0-SNAPSHOT";
         final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(uniqueProjectName, versionName);
         projectService.createProject(projectRequestBuilder.build());

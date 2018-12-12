@@ -1,10 +1,13 @@
 package com.synopsys.integration.blackduck.dataservice.report
 
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
 import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
@@ -47,12 +50,16 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
+        Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(testProjectName, testProjectVersionName)
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
+        ProjectView projectView = projectVersionWrapper.get().getProjectView()
+        ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView()
+
         File folder = folderForReport.toFile();
-        Optional<File> pdfFile = riskReportService.createReportPdfFile(folder, testProjectName, testProjectVersionName)
-        assertTrue(pdfFile.isPresent())
-        assertNotNull(pdfFile.get())
-        assertTrue(pdfFile.get().exists())
+        File pdfFile = riskReportService.createReportPdfFile(folder, projectView, projectVersionView)
+        assertNotNull(pdfFile)
+        assertTrue(pdfFile.exists())
     }
 
     @Test
@@ -62,9 +69,14 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
+        Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(testProjectName, testProjectVersionName)
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
+        ProjectView projectView = projectVersionWrapper.get().getProjectView()
+        ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView()
+
         File reportFolder = folderForReport.toFile()
-        riskReportService.createReportFiles(reportFolder, testProjectName, testProjectVersionName)
+        riskReportService.createReportFiles(reportFolder, projectView, projectVersionView)
 
         File[] reportFiles = reportFolder.listFiles();
         assertNotNull(reportFiles)
@@ -85,11 +97,15 @@ class RiskReportServiceTestIT {
         final String testProjectVersionName = restConnectionTestHelper.getProperty("TEST_VERSION")
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        ProjectService projectService = blackDuckServicesFactory.createProjectService()
+        Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(testProjectName, testProjectVersionName)
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
-        Optional<File> noticeReportFile = riskReportService.createNoticesReportFile(folderForReport.toFile(), testProjectName, testProjectVersionName);
-        assertTrue(noticeReportFile.isPresent())
-        assertNotNull(noticeReportFile.get())
-        assertTrue(noticeReportFile.get().exists())
+        ProjectView projectView = projectVersionWrapper.get().getProjectView()
+        ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView()
+
+        File noticeReportFile = riskReportService.createNoticesReportFile(folderForReport.toFile(), projectView, projectVersionView);
+        assertNotNull(noticeReportFile)
+        assertTrue(noticeReportFile.exists())
     }
 
     @Test
@@ -103,6 +119,10 @@ class RiskReportServiceTestIT {
         final String localPathForNoticesReport = '/Users/ekerwin/Documents/working/notices'
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
+        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(projectName, projectVersionName)
+        ProjectView projectView = projectVersionWrapper.get().getProjectView()
+        ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView()
         ReportService riskReportService = blackDuckServicesFactory.createReportService(30000)
 
         File htmlReportFolder = new File(localPathForHtmlReport)
@@ -113,9 +133,9 @@ class RiskReportServiceTestIT {
         pdfReportFolder.mkdirs()
         noticesReportFolder.mkdirs()
 
-        riskReportService.createReportFiles(htmlReportFolder, projectName, projectVersionName)
-        riskReportService.createReportPdfFile(pdfReportFolder, projectName, projectVersionName)
-        riskReportService.createNoticesReportFile(noticesReportFolder, projectName, projectVersionName);
+        riskReportService.createReportFiles(htmlReportFolder, projectView, projectVersionView)
+        riskReportService.createReportPdfFile(pdfReportFolder, projectView, projectVersionView)
+        riskReportService.createNoticesReportFile(noticesReportFolder, projectView, projectVersionView);
     }
 
 }

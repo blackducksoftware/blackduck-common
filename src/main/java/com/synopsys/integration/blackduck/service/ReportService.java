@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +57,6 @@ import com.synopsys.integration.blackduck.service.model.pdf.RiskReportPdfWriter;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportWriter;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
@@ -88,29 +86,9 @@ public class ReportService extends DataService {
         this.timeoutInMilliseconds = timeout;
     }
 
-    public Optional<String> getNoticesReportData(final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
-        final Optional<ProjectView> project = projectDataService.getProjectByName(projectName);
-        if (project.isPresent()) {
-            final Optional<ProjectVersionView> version = projectDataService.getProjectVersion(project.get(), projectVersionName);
-            if (version.isPresent()) {
-                return Optional.ofNullable(getNoticesReportData(project.get(), version.get()));
-            }
-        }
-
-        return Optional.empty();
-    }
-
     public String getNoticesReportData(final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
         return generateBlackDuckNoticesReport(version, ReportFormatType.TEXT);
-    }
-
-    public Optional<File> createNoticesReportFile(final File outputDirectory, final String projectName, final String projectVersionName) throws InterruptedException, IntegrationException {
-        final Optional<String> noticesReportData = getNoticesReportData(projectName, projectVersionName);
-        if (noticesReportData.isPresent()) {
-            return Optional.ofNullable(createNoticesReportFile(outputDirectory, noticesReportData.get(), projectName, projectVersionName));
-        }
-        return Optional.empty();
     }
 
     public File createNoticesReportFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -135,18 +113,6 @@ public class ReportService extends DataService {
         } catch (final IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
-    }
-
-    public Optional<ReportData> getRiskReportData(final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ProjectView> project = projectDataService.getProjectByName(projectName);
-        if (project.isPresent()) {
-            final Optional<ProjectVersionView> version = projectDataService.getProjectVersion(project.get(), projectVersionName);
-            if (version.isPresent()) {
-                return Optional.ofNullable(getRiskReportData(project.get(), version.get()));
-            }
-        }
-
-        return Optional.empty();
     }
 
     public ReportData getRiskReportData(final ProjectView project, final ProjectVersionView version) throws IntegrationException {
@@ -192,13 +158,6 @@ public class ReportService extends DataService {
         return reportData;
     }
 
-    public void createReportFiles(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ReportData> reportData = getRiskReportData(projectName, projectVersionName);
-        if (reportData.isPresent()) {
-            createReportFiles(outputDirectory, reportData.get());
-        }
-    }
-
     public void createReportFiles(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
         final ReportData reportData = getRiskReportData(project, version);
         createReportFiles(outputDirectory, reportData);
@@ -212,14 +171,6 @@ public class ReportService extends DataService {
         } catch (final RiskReportException | IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
-    }
-
-    public Optional<File> createReportPdfFile(final File outputDirectory, final String projectName, final String projectVersionName) throws IntegrationException {
-        final Optional<ReportData> reportData = getRiskReportData(projectName, projectVersionName);
-        if (reportData.isPresent()) {
-            return Optional.ofNullable(createReportPdfFile(outputDirectory, reportData.get()));
-        }
-        return Optional.empty();
     }
 
     public File createReportPdfFile(final File outputDirectory, final ProjectView project, final ProjectVersionView version) throws IntegrationException {
@@ -432,11 +383,7 @@ public class ReportService extends DataService {
     }
 
     public void deleteBlackDuckReport(final String reportUri) throws IntegrationException {
-        final Request request = new Request.Builder(reportUri).method(HttpMethod.DELETE).build();
-        try (Response response = blackDuckService.execute(request)) {
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        blackDuckService.delete(reportUri);
     }
 
 }
