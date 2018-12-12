@@ -13,7 +13,7 @@ version = '40.0.0-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    implementation 'com.blackducksoftware.integration:integration-rest:0.4.0'
+    implementation 'com.blackducksoftware.integration:integration-rest:0.4.1'
     implementation 'com.blackducksoftware.integration:integration-reporting:0.1.6'
     implementation 'com.blackducksoftware.integration:blackduck-common-api:2018.11.0.0'
     implementation 'com.blackducksoftware.integration:integration-bdio:16.3.0'
