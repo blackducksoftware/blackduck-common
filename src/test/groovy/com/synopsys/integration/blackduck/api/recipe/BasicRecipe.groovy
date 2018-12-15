@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
+import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
@@ -14,7 +15,6 @@ import com.synopsys.integration.blackduck.notification.content.detail.Notificati
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
-import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.rest.connection.RestConnection

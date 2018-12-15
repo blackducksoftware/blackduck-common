@@ -94,7 +94,12 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         if (StringUtils.isNotBlank(apiToken())) {
             return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert());
         } else {
-            final Credentials credentials = new Credentials(values.get(Property.USERNAME), values.get(Property.PASSWORD));
+            final String username = get(Property.USERNAME);
+            final String password = get(Property.PASSWORD);
+            final CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
+            credentialsBuilder.setUsernameAndPassword(username, password);
+            final Credentials credentials = credentialsBuilder.build();
+
             return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), credentials, proxyInfo, trustCert());
         }
     }
@@ -107,12 +112,22 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
 
         final int proxyPort = NumberUtils.toInt(values.get(Property.PROXY_PORT), 0);
-        final Credentials proxyCredentials = new Credentials(values.get(Property.PROXY_USERNAME), values.get(Property.PROXY_PASSWORD));
+        final String username = get(Property.PROXY_USERNAME);
+        final String password = get(Property.PROXY_PASSWORD);
+        final CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
+        credentialsBuilder.setUsernameAndPassword(username, password);
+        final Credentials proxyCredentials = credentialsBuilder.build();
         final String proxyNtlmDomain = values.get(Property.PROXY_NTLM_DOMAIN);
         final String proxyNtlmWorkstation = values.get(Property.PROXY_NTLM_WORKSTATION);
 
-        final ProxyInfo proxyInfo = new ProxyInfo(proxyHost, proxyPort, proxyCredentials, proxyNtlmDomain, proxyNtlmWorkstation);
-        return proxyInfo;
+        final ProxyInfoBuilder proxyInfoBuilder = ProxyInfo.newBuilder();
+        proxyInfoBuilder.setHost(proxyHost);
+        proxyInfoBuilder.setPort(proxyPort);
+        proxyInfoBuilder.setCredentials(proxyCredentials);
+        proxyInfoBuilder.setNtlmDomain(proxyNtlmDomain);
+        proxyInfoBuilder.setNtlmWorkstation(proxyNtlmWorkstation);
+
+        return proxyInfoBuilder.build();
     }
 
     public void setFromProperties(final Map<String, String> properties) {
@@ -208,14 +223,18 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         this.logger = logger;
     }
 
+    public String get(final Property property) {
+        return values.get(property);
+    }
+
     // setters for the values of BlackDuckServerConfigBuilder
     public void setUrl(final String url) {
         values.put(Property.URL, url);
     }
 
     public void setCredentials(final Credentials credentials) {
-        values.put(Property.USERNAME, credentials.getUsername());
-        values.put(Property.PASSWORD, credentials.getPassword());
+        values.put(Property.USERNAME, credentials.getUsername().orElse(null));
+        values.put(Property.PASSWORD, credentials.getPassword().orElse(null));
     }
 
     public void setUsername(final String username) {

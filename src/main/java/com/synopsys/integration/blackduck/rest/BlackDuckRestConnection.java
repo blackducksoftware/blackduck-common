@@ -23,24 +23,27 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.jayway.jsonpath.JsonPath;
+import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
+import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Response;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
 public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
     private final String baseUrl;
-
-    // subclasses should set this once authentication is complete
-    protected boolean authenticated;
 
     public BlackDuckRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
@@ -68,8 +71,17 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
         }
     }
 
-    public boolean isAuthenticated() {
-        return authenticated;
+    public abstract Response attemptAuthentication() throws IntegrationException, IOException;
+
+    public void throwExceptionForError(final Response response) throws BlackDuckApiException {
+        try {
+            response.throwExceptionForError();
+        } catch (final IntegrationRestException e) {
+            final String httpResponseContent = e.getHttpResponseContent();
+            final String errorMessage = JsonPath.read(httpResponseContent, "$.errorMessage");
+            final String errorCode = JsonPath.read(httpResponseContent, "$.errorCode");
+            throw new BlackDuckApiException(e, errorMessage, errorCode);
+        }
     }
 
 }

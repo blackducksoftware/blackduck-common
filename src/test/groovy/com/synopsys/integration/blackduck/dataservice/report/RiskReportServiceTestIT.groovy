@@ -1,12 +1,12 @@
 package com.synopsys.integration.blackduck.dataservice.report
 
+import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
-import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled

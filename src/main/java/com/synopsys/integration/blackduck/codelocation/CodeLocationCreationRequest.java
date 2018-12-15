@@ -23,13 +23,9 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import java.util.Set;
-
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
-public abstract class CodeLocationCreationRequest<T> {
-    public abstract Set<String> getCodeLocationNames();
-
+public abstract class CodeLocationCreationRequest<T extends CodeLocationBatchOutput> {
     public abstract T executeRequest() throws BlackDuckIntegrationException;
 
 }

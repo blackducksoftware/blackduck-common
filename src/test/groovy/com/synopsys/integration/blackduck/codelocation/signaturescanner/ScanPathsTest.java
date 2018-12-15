@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
 import static org.hamcrest.CoreMatchers.is;

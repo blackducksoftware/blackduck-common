@@ -80,7 +80,7 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
     }
 
     @Override
-    public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {
+    public void finalizeRequest(final HttpUriRequest request) {
         super.finalizeRequest(request);
 
         if (request.containsHeader(RestConstants.X_CSRF_TOKEN)) {
@@ -93,13 +93,25 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
             final String headerValue = csrfToken.get().getValue();
             addCommonRequestHeader(RestConstants.X_CSRF_TOKEN, headerValue);
             request.addHeader(RestConstants.X_CSRF_TOKEN, headerValue);
-            authenticated = true;
         } else {
             getLogger().error("No CSRF token found when authenticating");
         }
     }
 
-    private Optional<Header> requestCSRFTokenHeader() throws IntegrationException {
+    private Optional<Header> requestCSRFTokenHeader() {
+        try (final Response response = attemptAuthentication()) {
+            if (response.isStatusCodeOkay()) {
+                // Return the CSRF token
+                return Optional.of(response.getActualResponse().getFirstHeader(RestConstants.X_CSRF_TOKEN));
+            }
+        } catch (IntegrationException | IOException e) {
+            logger.error("Authentication was not successful", e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public final Response attemptAuthentication() throws IntegrationException, IOException {
         final URL securityUrl;
         try {
             securityUrl = new URL(getBaseUrl(), "j_spring_security_check");
@@ -108,8 +120,8 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         }
 
         final List<NameValuePair> bodyValues = new ArrayList<>();
-        bodyValues.add(new BasicNameValuePair("j_username", credentials.getUsername()));
-        bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword()));
+        bodyValues.add(new BasicNameValuePair("j_username", credentials.getUsername().orElse(null)));
+        bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword().orElse(null)));
         final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, Charsets.UTF_8);
 
         final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST);
@@ -119,22 +131,11 @@ public class CredentialsRestConnection extends BlackDuckRestConnection {
         final HttpUriRequest request = requestBuilder.build();
         logRequestHeaders(request);
 
-        try {
-            final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
-            final CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(request);
-            logResponseHeaders(closeableHttpResponse);
+        final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
+        final CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(request);
+        logResponseHeaders(closeableHttpResponse);
 
-            try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                if (response.isStatusCodeOkay()) {
-                    // Return the CSRF token
-                    return Optional.of(closeableHttpResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN));
-                }
-            }
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-
-        return Optional.empty();
+        return new Response(request, closeableHttpClient, closeableHttpResponse);
     }
 
 }

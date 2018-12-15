@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.service;
+package com.synopsys.integration.blackduck.codelocation;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 

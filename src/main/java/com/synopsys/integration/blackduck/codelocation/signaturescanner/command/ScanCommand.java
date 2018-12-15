@@ -95,12 +95,12 @@ public class ScanCommand {
         scannerPaths.addJavaAndOnePathArguments(cmd);
         if (proxyInfo.shouldUseProxy()) {
             final ProxyInfo blackDuckProxyInfo = proxyInfo;
-            final String proxyHost = blackDuckProxyInfo.getHost();
+            final String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
             final int proxyPort = blackDuckProxyInfo.getPort();
-            final String proxyUsername = blackDuckProxyInfo.getUsername();
-            final String proxyPassword = blackDuckProxyInfo.getPassword();
-            final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain();
-            final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation();
+            final String proxyUsername = blackDuckProxyInfo.getUsername().orElse(null);
+            final String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
+            final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
+            final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
             cmd.add("-Dhttp.proxyHost=" + proxyHost);
             cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
             if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {

@@ -23,8 +23,8 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
-import java.io.Serializable;
 import java.net.URL;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,12 +32,17 @@ import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.util.Buildable;
 import com.synopsys.integration.util.Stringable;
 
-public class BlackDuckServerConfig extends Stringable implements Serializable {
-    private static final long serialVersionUID = -1581638027683631935L;
+public class BlackDuckServerConfig extends Stringable implements Buildable {
+    public static BlackDuckServerConfigBuilder newBuilder() {
+        return new BlackDuckServerConfigBuilder();
+    }
 
     private final URL blackDuckUrl;
     private final int timeoutSeconds;
@@ -46,7 +51,7 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
 
-    public BlackDuckServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    BlackDuckServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.credentials = credentials;
@@ -55,7 +60,7 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
     }
 
-    public BlackDuckServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    BlackDuckServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
         blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         credentials = null;
@@ -72,8 +77,8 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
         if (getBlackDuckUrl() != null) {
             logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());
         }
-        if (getCredentials() != null && StringUtils.isNotBlank(getCredentials().getUsername())) {
-            logger.alwaysLog("--> Black Duck User: " + getCredentials().getUsername());
+        if (getCredentials().isPresent() && getCredentials().get().getUsername().isPresent()) {
+            logger.alwaysLog("--> Black Duck User: " + getCredentials().get().getUsername().get());
         }
         if (StringUtils.isNotBlank(apiToken)) {
             logger.alwaysLog("--> Black Duck API Token Used");
@@ -81,17 +86,36 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
         if (alwaysTrustServerCertificate) {
             logger.alwaysLog("--> Trust Black Duck certificate: " + isAlwaysTrustServerCertificate());
         }
-        if (proxyInfo != null) {
-            if (StringUtils.isNotBlank(proxyInfo.getHost())) {
+        if (proxyInfo != null && proxyInfo.shouldUseProxy()) {
+            if (StringUtils.isNotBlank(proxyInfo.getHost().orElse(null))) {
                 logger.alwaysLog("--> Proxy Host: " + proxyInfo.getHost());
             }
             if (proxyInfo.getPort() > 0) {
                 logger.alwaysLog("--> Proxy Port: " + proxyInfo.getPort());
             }
-            if (StringUtils.isNotBlank(proxyInfo.getUsername())) {
+            if (StringUtils.isNotBlank(proxyInfo.getUsername().orElse(null))) {
                 logger.alwaysLog("--> Proxy Username: " + proxyInfo.getUsername());
             }
         }
+    }
+
+    public boolean canConnect() {
+        return canConnect(new SilentIntLogger());
+    }
+
+    public boolean canConnect(final IntLogger logger) {
+        try {
+            final BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
+            try (Response response = blackDuckRestConnection.attemptAuthentication()) {
+                // if you get a good response, you know that a connection can be made
+                if (response.isStatusCodeOkay()) {
+                    return true;
+                }
+            }
+        } catch (final Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
     }
 
     public BlackDuckRestConnection createRestConnection(final IntLogger logger) {
@@ -103,11 +127,11 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
     }
 
     public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) {
-        return new CredentialsRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getCredentials());
+        return new CredentialsRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getCredentials().orElse(null));
     }
 
     public ApiTokenRestConnection createApiTokenRestConnection(final IntLogger logger) {
-        return new ApiTokenRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getApiToken());
+        return new ApiTokenRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getApiToken().orElse(null));
     }
 
     public boolean usingApiToken() {
@@ -118,12 +142,12 @@ public class BlackDuckServerConfig extends Stringable implements Serializable {
         return blackDuckUrl;
     }
 
-    public Credentials getCredentials() {
-        return credentials;
+    public Optional<Credentials> getCredentials() {
+        return Optional.ofNullable(credentials);
     }
 
-    public String getApiToken() {
-        return apiToken;
+    public Optional<String> getApiToken() {
+        return Optional.ofNullable(apiToken);
     }
 
     public ProxyInfo getProxyInfo() {

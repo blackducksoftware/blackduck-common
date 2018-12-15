@@ -140,10 +140,10 @@ public class ScanBatchBuilder {
             proxyInfo = blackDuckServerConfig.getProxyInfo();
             blackDuckUrl = blackDuckServerConfig.getBlackDuckUrl();
             if (blackDuckServerConfig.usingApiToken()) {
-                blackDuckApiToken = blackDuckServerConfig.getApiToken();
-            } else {
-                blackDuckUsername = blackDuckServerConfig.getCredentials().getUsername();
-                blackDuckPassword = blackDuckServerConfig.getCredentials().getPassword();
+                blackDuckApiToken = blackDuckServerConfig.getApiToken().orElse(null);
+            } else if (blackDuckServerConfig.getCredentials().isPresent()) {
+                blackDuckUsername = blackDuckServerConfig.getCredentials().get().getUsername().orElse(null);
+                blackDuckPassword = blackDuckServerConfig.getCredentials().get().getPassword().orElse(null);
             }
             alwaysTrustServerCertificate = blackDuckServerConfig.isAlwaysTrustServerCertificate();
         }

@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,7 +8,6 @@ import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 

@@ -78,7 +78,7 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
      * Gets the cookie for the Authorized connection to the Black Duck server. Returns the response code from the connection.
      */
     @Override
-    public void finalizeRequest(final HttpUriRequest request) throws IntegrationException {
+    public void finalizeRequest(final HttpUriRequest request) {
         super.finalizeRequest(request);
 
         if (request.containsHeader(AUTHORIZATION_HEADER)) {
@@ -91,13 +91,13 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             final String headerValue = "Bearer " + bearerToken.get();
             addCommonRequestHeader(AUTHORIZATION_HEADER, headerValue);
             request.addHeader(AUTHORIZATION_HEADER, headerValue);
-            authenticated = true;
         } else {
             getLogger().error("No Bearer token found when authenticating");
         }
     }
 
-    private Optional<String> retrieveBearerToken() throws IntegrationException {
+    @Override
+    public final Response attemptAuthentication() throws IntegrationException, IOException {
         final URL authenticationUrl;
         try {
             authenticationUrl = new URL(getBaseUrl(), "api/tokens/authenticate");
@@ -105,29 +105,27 @@ public class ApiTokenRestConnection extends BlackDuckRestConnection {
             throw new IntegrationException("Error constructing the authentication URL: " + e.getMessage(), e);
         }
 
-        if (StringUtils.isNotBlank(apiToken)) {
-            final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST, getRequestHeaders());
-            requestBuilder.setCharset(Charsets.UTF_8);
-            requestBuilder.setUri(authenticationUrl.toString());
-            final HttpUriRequest request = requestBuilder.build();
-            logRequestHeaders(request);
+        final RequestBuilder requestBuilder = createRequestBuilder(HttpMethod.POST, getRequestHeaders());
+        requestBuilder.setCharset(Charsets.UTF_8);
+        requestBuilder.setUri(authenticationUrl.toString());
+        final HttpUriRequest request = requestBuilder.build();
+        logRequestHeaders(request);
 
-            final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
-            final CloseableHttpResponse closeableHttpResponse;
-            try {
-                closeableHttpResponse = closeableHttpClient.execute(request);
-                logResponseHeaders(closeableHttpResponse);
-                try (final Response response = new Response(request, closeableHttpClient, closeableHttpResponse)) {
-                    if (response.isStatusCodeOkay()) {
-                        final String bearerToken = readBearerToken(closeableHttpResponse);
-                        return Optional.of(bearerToken);
-                    }
-                } catch (final IOException e) {
-                    throw new IntegrationException(e.getMessage(), e);
-                }
-            } catch (final IOException e) {
-                throw new IntegrationException(e.getMessage(), e);
+        final CloseableHttpClient closeableHttpClient = getClientBuilder().build();
+        final CloseableHttpResponse closeableHttpResponse;
+        closeableHttpResponse = closeableHttpClient.execute(request);
+        logResponseHeaders(closeableHttpResponse);
+        return new Response(request, closeableHttpClient, closeableHttpResponse);
+    }
+
+    private Optional<String> retrieveBearerToken() {
+        try (final Response response = attemptAuthentication()) {
+            if (response.isStatusCodeOkay()) {
+                final String bearerToken = readBearerToken(response.getActualResponse());
+                return Optional.of(bearerToken);
             }
+        } catch (final IntegrationException | IOException e) {
+            logger.error("Could not retrieve the bearer token", e);
         }
         return Optional.empty();
     }

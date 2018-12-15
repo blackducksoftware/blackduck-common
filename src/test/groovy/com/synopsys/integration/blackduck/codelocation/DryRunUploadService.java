@@ -1,8 +1,10 @@
-package com.synopsys.integration.blackduck.service;
+package com.synopsys.integration.blackduck.codelocation;
 
 import java.io.File;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;

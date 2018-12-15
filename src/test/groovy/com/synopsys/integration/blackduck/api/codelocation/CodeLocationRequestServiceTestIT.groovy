@@ -1,14 +1,14 @@
 package com.synopsys.integration.blackduck.api.codelocation
 
+import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
+import com.synopsys.integration.blackduck.codelocation.DryRunUploadResponse
+import com.synopsys.integration.blackduck.codelocation.DryRunUploadService
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
-import com.synopsys.integration.blackduck.service.DryRunUploadResponse
-import com.synopsys.integration.blackduck.service.DryRunUploadService
 import com.synopsys.integration.blackduck.service.ProjectService
-import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel

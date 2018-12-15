@@ -3,40 +3,33 @@ package com.synopsys.integration.blackduck.comprehensive;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
@@ -57,8 +50,6 @@ import com.synopsys.integration.blackduck.service.ComponentService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.ProjectService;
-import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
-import com.synopsys.integration.blackduck.service.model.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -184,44 +175,7 @@ public class ComprehensiveCookbookTestIT {
         uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
         final BdioUploadCodeLocationCreationRequest codeLocationCreationRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
-        //blackDuckServices.codeLocationCreationService.createCodeLocationsAndWait(codeLocationCreationRequest, 15 * 60);
-        final CodeLocationCreationData<UploadBatchOutput> creationData = blackDuckServices.codeLocationCreationService.createCodeLocations(codeLocationCreationRequest);
-
-        // verify the code location exists
-        String codeLocationUrl = null;
-        while (true) {
-            final Optional<CodeLocationView> foundCodeLocation = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-            if (foundCodeLocation.isPresent()) {
-                System.out.println("Found the code location!");
-                codeLocationUrl = foundCodeLocation.get().getHref().get();
-                break;
-            }
-            System.out.println("Still waiting for the code location to be created...");
-            Thread.sleep((5 * 1000));
-        }
-
-        final NotificationTaskRange notificationTaskRange = creationData.getNotificationTaskRange();
-        final Date start = notificationTaskRange.getStartDate();
-        final Date end = notificationTaskRange.getEndDate();
-
-        // wait for the notification for the found code location
-        boolean keepWaiting = true;
-        while (keepWaiting) {
-            final List<NotificationView> notifications = blackDuckServices.notificationService.getFilteredNotifications(start, end, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
-            for (final NotificationView notificationView : notifications) {
-                final String notificationCodeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
-                if (StringUtils.isNotBlank(notificationCodeLocationUrl) && codeLocationUrl.equals(notificationCodeLocationUrl)) {
-                    System.out.println("Found the right notification!");
-                    System.out.println(notificationView);
-                    keepWaiting = false;
-                }
-            }
-
-            if (keepWaiting) {
-                System.out.println("Still waiting for the notification...");
-                Thread.sleep((5 * 1000));
-            }
-        }
+        blackDuckServices.codeLocationCreationService.createCodeLocationsAndWait(codeLocationCreationRequest, 15 * 60);
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
     }

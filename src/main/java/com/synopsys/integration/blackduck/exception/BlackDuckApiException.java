@@ -21,31 +21,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.codelocation;
+package com.synopsys.integration.blackduck.exception;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.exception.IntegrationRestException;
 
-import org.apache.commons.lang3.StringUtils;
+public class BlackDuckApiException extends IntegrationException {
+    private final IntegrationRestException cause;
+    private final String blackDuckErrorMessage;
+    private final String blackDuckErrorCode;
 
-public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
-    private final List<T> outputs;
-
-    public CodeLocationBatchOutput(final List<T> outputs) {
-        this.outputs = outputs;
-    }
-
-    public List<T> getOutputs() {
-        return outputs;
-    }
-
-    public Set<String> getSuccessfulCodeLocationNames() {
-        return getOutputs().stream()
-                       .filter(output -> Result.SUCCESS == output.getResult())
-                       .map(CodeLocationOutput::getCodeLocationName)
-                       .filter(StringUtils::isBlank)
-                       .collect(Collectors.toSet());
+    public BlackDuckApiException(final IntegrationRestException cause, final String blackDuckErrorMessage, final String blackDuckErrorCode) {
+        this.cause = cause;
+        this.blackDuckErrorMessage = blackDuckErrorMessage;
+        this.blackDuckErrorCode = blackDuckErrorCode;
     }
 
 }

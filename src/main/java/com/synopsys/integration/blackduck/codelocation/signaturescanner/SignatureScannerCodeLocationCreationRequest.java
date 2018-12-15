@@ -23,13 +23,7 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCreationRequest<ScanBatchOutput> {
@@ -39,15 +33,6 @@ public class SignatureScannerCodeLocationCreationRequest extends CodeLocationCre
     public SignatureScannerCodeLocationCreationRequest(final ScanBatchRunner scanBatchRunner, final ScanBatch scanBatch) {
         this.scanBatchRunner = scanBatchRunner;
         this.scanBatch = scanBatch;
-    }
-
-    @Override
-    public Set<String> getCodeLocationNames() {
-        return scanBatch.getScanTargets()
-                       .stream()
-                       .map(ScanTarget::getCodeLocationName)
-                       .filter(StringUtils::isBlank)
-                       .collect(Collectors.toSet());
     }
 
     @Override

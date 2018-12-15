@@ -23,9 +23,6 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
@@ -36,14 +33,6 @@ public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationR
     public BdioUploadCodeLocationCreationRequest(final UploadRunner uploadRunner, final UploadBatch uploadBatch) {
         this.uploadRunner = uploadRunner;
         this.uploadBatch = uploadBatch;
-    }
-
-    @Override
-    public Set<String> getCodeLocationNames() {
-        return uploadBatch.getUploadTargets()
-                       .stream()
-                       .map(UploadTarget::getCodeLocationName)
-                       .collect(Collectors.toSet());
     }
 
     @Override
