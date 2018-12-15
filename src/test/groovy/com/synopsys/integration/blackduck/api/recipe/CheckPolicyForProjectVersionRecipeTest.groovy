@@ -38,7 +38,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         policyRuleViewV2 = constructTestPolicy(blackDuckServicesFactory.createComponentService())
 
         /*
-         * To post a Policy Rule we can construct a PolicyRuleViewV2 and post it to Black Duck.
+         * To create a Policy Rule we can construct a PolicyRuleViewV2 and create it to Black Duck.
          */
         String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
         policyRuleViewV2 = blackDuckService.getResponse(policyRuleUrl, PolicyRuleViewV2.class)

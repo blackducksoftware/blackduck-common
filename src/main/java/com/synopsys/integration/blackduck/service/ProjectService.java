@@ -84,7 +84,7 @@ public class ProjectService extends DataService {
 
     public ProjectVersionView createProjectVersion(final ProjectView projectView, final ProjectVersionRequest projectVersionRequest) throws IntegrationException {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
-            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to post a version.", ProjectView.VERSIONS_LINK));
+            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
         }
         final String projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
         return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
@@ -99,7 +99,7 @@ public class ProjectService extends DataService {
 
         final Optional<ProjectView> optionalProjectView = getProjectByName(projectName);
         if (!optionalProjectView.isPresent()) {
-            // nothing exists, so post and return
+            // nothing exists, so create and return
             return createProject(projectRequest);
         }
 
@@ -125,7 +125,7 @@ public class ProjectService extends DataService {
                     projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
                 }
             } else {
-                // the version did not exist, so post it
+                // the version did not exist, so create it
                 projectVersionView = createProjectVersion(projectView, projectRequest.getVersionRequest());
             }
         }

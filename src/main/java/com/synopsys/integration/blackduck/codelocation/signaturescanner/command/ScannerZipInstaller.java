@@ -98,7 +98,7 @@ public class ScannerZipInstaller {
         try {
             versionFile = retrieveVersionFile(scannerExpansionDirectory);
         } catch (final IOException e) {
-            throw new BlackDuckIntegrationException("Trying to install the scanner but could not post the version file: " + e.getMessage());
+            throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage());
         }
 
         final String downloadUrl = getDownloadUrl();

@@ -34,14 +34,14 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
     @Test
     void testTryingToCreateAProjectThatAlreadyExists() {
         /*
-         * First, post a project with a unique name
+         * First, create a project with a unique name
          */
         ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
         ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest)
         projectView = projectVersionWrapper.projectView;
 
         /*
-         * Try to post a project with the same name, which should throw an Exception
+         * Try to create a project with the same name, which should throw an Exception
          */
         try {
             projectService.createProject(projectRequest)

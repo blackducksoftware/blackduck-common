@@ -84,7 +84,7 @@ public class RiskReportPdfWriter {
 
             return pdfFile;
         } catch (final IOException | URISyntaxException e) {
-            final String errorString = "Couldn't post the report: ";
+            final String errorString = "Couldn't create the report: ";
             logger.trace(errorString + e.getMessage(), e);
             throw new RiskReportException(errorString + e.getMessage(), e);
         }
@@ -122,7 +122,7 @@ public class RiskReportPdfWriter {
                 reportData.getTotalComponents());
         final PDRectangle rectangle = writeSummaryTable(center + 180, height, "Operational Risk", reportData.getOperationalRiskHighCount(), reportData.getOperationalRiskMediumCount(), reportData.getOperationalRiskLowCount(),
                 reportData.getOperationalRiskNoneCount(), reportData.getTotalComponents());
-        logger.trace("Finished writing the sumary tables.");
+        logger.trace("Finished writing the summary tables.");
         return rectangle;
     }
 

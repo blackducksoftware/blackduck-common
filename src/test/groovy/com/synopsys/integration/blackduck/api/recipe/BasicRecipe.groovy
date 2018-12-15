@@ -61,7 +61,7 @@ class BasicRecipe {
         BlackDuckServerConfig blackDuckServerConfig = restConnectionTestHelper.getBlackDuckServerConfig()
 
         /*
-         * next, we need to post the pieces needed for the
+         * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
         RestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger)
@@ -88,7 +88,7 @@ class BasicRecipe {
         /*
          * the ProjectRequestBuilder is a simple wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
-         * post both a project in Black Duck and a version for that created
+         * create both a project in Black Duck and a version for that created
          * project - a project must have at least one version
          */
         ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()

@@ -77,7 +77,7 @@ public class ComprehensiveCookbookTestIT {
         // get the count of all projects now
         final int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
-        // post the project
+        // create the project
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(testProjectName);
         final ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);
@@ -133,7 +133,7 @@ public class ComprehensiveCookbookTestIT {
 
         final ProjectRequest projectRequest = projectBuilder.build();
 
-        // post the project
+        // create the project
         final ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);
         final ProjectView projectItem = projectVersionWrapper.getProjectView();
         final Optional<ProjectView> projectItemFromName = projectService.getProjectByName(testProjectName);

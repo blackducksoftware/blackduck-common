@@ -166,7 +166,7 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateProjectWithTwoVersions() throws Exception {
-        // first post a new project with a single version
+        // first create a new project with a single version
         final String projectName = "createWithTwo" + Instant.now().toString();
         final String projectVersionName = "1.0.0";
 
@@ -193,8 +193,8 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCloning() throws Exception {
-        // first post a new project with a single version
-        final String projectName = "post" + Instant.now().toString();
+        // first create a new project with a single version
+        final String projectName = "create" + Instant.now().toString();
         final String projectVersionName = "1.0.0";
 
         final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
@@ -233,7 +233,7 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreatingProjectWithoutVersion() throws Exception {
-        final String projectName = "post" + Instant.now().toString();
+        final String projectName = "create" + Instant.now().toString();
         final ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(projectName);
 

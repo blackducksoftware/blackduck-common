@@ -37,7 +37,6 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
@@ -64,10 +63,6 @@ public class BlackDuckServicesFactory {
 
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
-    }
-
-    public BlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final BlackDuckServerConfig blackDuckServerConfig, final IntLogger logger) {
-        this(gson, objectMapper, blackDuckServerConfig.createRestConnection(logger), logger);
     }
 
     public BlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final BlackDuckRestConnection restConnection, final IntLogger logger) {

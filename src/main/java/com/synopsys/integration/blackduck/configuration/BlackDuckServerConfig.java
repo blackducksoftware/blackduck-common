@@ -28,9 +28,12 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
@@ -116,6 +119,17 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
             System.out.println(e.getMessage());
         }
         return false;
+    }
+
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
+        BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
+        return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
+    }
+
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(final IntLogger logger) {
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        return createBlackDuckServicesFactory(gson, objectMapper, logger);
     }
 
     public BlackDuckRestConnection createRestConnection(final IntLogger logger) {

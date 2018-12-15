@@ -58,7 +58,7 @@ public class PolicyRuleService {
     }
 
     /**
-     * This will post a policy rule that will be violated by the existence of a matching external id in the project's BOM.
+     * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
     public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName) throws IntegrationException {
         final Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersion(externalId);
