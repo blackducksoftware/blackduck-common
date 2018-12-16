@@ -54,7 +54,7 @@ public class BlackDuckResponsesTransformer {
         int currentOffset = pagedRequest.getOffset();
         Request request = pagedRequest.createRequest();
         try (final Response initialResponse = restConnection.execute(request)) {
-            initialResponse.throwExceptionForError();
+            restConnection.throwExceptionForError(initialResponse);
             final String initialJsonResponse = initialResponse.getContentString();
             BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, clazz);
             allResponses.addAll(blackDuckPageResponse.getItems());
@@ -69,7 +69,7 @@ public class BlackDuckResponsesTransformer {
                 final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
                 request = offsetPagedRequest.createRequest();
                 try (final Response response = restConnection.execute(request)) {
-                    response.throwExceptionForError();
+                    restConnection.throwExceptionForError(response);
                     final String jsonResponse = response.getContentString();
                     blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
                     allResponses.addAll(blackDuckPageResponse.getItems());

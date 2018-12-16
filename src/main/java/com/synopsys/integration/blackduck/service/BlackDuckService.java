@@ -287,7 +287,7 @@ public class BlackDuckService {
 
     public Response execute(final Request request) throws IntegrationException {
         final Response response = restConnection.execute(request);
-        response.throwExceptionForError();
+        restConnection.throwExceptionForError(response);
         return response;
     }
 

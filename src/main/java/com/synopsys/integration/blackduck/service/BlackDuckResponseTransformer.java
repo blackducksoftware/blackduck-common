@@ -44,7 +44,7 @@ public class BlackDuckResponseTransformer {
 
     public <T extends BlackDuckResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {
         try (final Response response = restConnection.execute(request)) {
-            response.throwExceptionForError();
+            restConnection.throwExceptionForError(response);
             return blackDuckJsonTransformer.getResponse(response, clazz);
         } catch (final IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);

@@ -122,13 +122,13 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
-        BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
+        final BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
         return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(final IntLogger logger) {
-        Gson gson = BlackDuckServicesFactory.createDefaultGson();
-        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        final Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         return createBlackDuckServicesFactory(gson, objectMapper, logger);
     }
 

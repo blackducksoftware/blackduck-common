@@ -130,7 +130,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return proxyInfoBuilder.build();
     }
 
-    public void setFromProperties(final Map<String, String> properties) {
+    public BlackDuckServerConfigBuilder setFromProperties(final Map<String, String> properties) {
         for (final Property configProperty : Property.values()) {
             if (configProperty.isWithin(properties.keySet())) {
                 final String value = configProperty.getValueFrom(properties);
@@ -143,15 +143,16 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
                 }
             }
         }
+        return this;
     }
 
-    public void setFromProperties(final Properties properties) {
+    public BlackDuckServerConfigBuilder setFromProperties(final Properties properties) {
         final Map<String, String> propertiesMap = new HashMap<>();
         for (final String propertyName : properties.stringPropertyNames()) {
             propertiesMap.put(propertyName, properties.getProperty(propertyName));
         }
 
-        setFromProperties(propertiesMap);
+        return setFromProperties(propertiesMap);
     }
 
     @Override
@@ -219,8 +220,9 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return logger;
     }
 
-    public void setLogger(final IntLogger logger) {
+    public BlackDuckServerConfigBuilder setLogger(final IntLogger logger) {
         this.logger = logger;
+        return this;
     }
 
     public String get(final Property property) {
@@ -228,69 +230,85 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     }
 
     // setters for the values of BlackDuckServerConfigBuilder
-    public void setUrl(final String url) {
+    public BlackDuckServerConfigBuilder setUrl(final String url) {
         values.put(Property.URL, url);
+        return this;
     }
 
-    public void setCredentials(final Credentials credentials) {
+    public BlackDuckServerConfigBuilder setCredentials(final Credentials credentials) {
         values.put(Property.USERNAME, credentials.getUsername().orElse(null));
         values.put(Property.PASSWORD, credentials.getPassword().orElse(null));
+        return this;
     }
 
-    public void setUsername(final String username) {
+    public BlackDuckServerConfigBuilder setUsername(final String username) {
         values.put(Property.USERNAME, username);
+        return this;
     }
 
-    public void setPassword(final String password) {
+    public BlackDuckServerConfigBuilder setPassword(final String password) {
         values.put(Property.PASSWORD, password);
+        return this;
     }
 
-    public void setApiToken(final String apiToken) {
+    public BlackDuckServerConfigBuilder setApiToken(final String apiToken) {
         values.put(Property.API_TOKEN, apiToken);
+        return this;
     }
 
-    public void setTimeout(final String timeout) {
+    public BlackDuckServerConfigBuilder setTimeout(final String timeout) {
         values.put(Property.TIMEOUT, timeout);
+        return this;
     }
 
-    public void setTimeout(final int timeout) {
+    public BlackDuckServerConfigBuilder setTimeout(final int timeout) {
         setTimeout(String.valueOf(timeout));
+        return this;
     }
 
-    public void setProxyHost(final String proxyHost) {
+    public BlackDuckServerConfigBuilder setProxyHost(final String proxyHost) {
         values.put(Property.PROXY_HOST, proxyHost);
+        return this;
     }
 
-    public void setProxyPort(final String proxyPort) {
+    public BlackDuckServerConfigBuilder setProxyPort(final String proxyPort) {
         values.put(Property.PROXY_PORT, proxyPort);
+        return this;
     }
 
-    public void setProxyPort(final int proxyPort) {
+    public BlackDuckServerConfigBuilder setProxyPort(final int proxyPort) {
         setProxyPort(String.valueOf(proxyPort));
+        return this;
     }
 
-    public void setProxyUsername(final String proxyUsername) {
+    public BlackDuckServerConfigBuilder setProxyUsername(final String proxyUsername) {
         values.put(Property.PROXY_USERNAME, proxyUsername);
+        return this;
     }
 
-    public void setProxyPassword(final String proxyPassword) {
+    public BlackDuckServerConfigBuilder setProxyPassword(final String proxyPassword) {
         values.put(Property.PROXY_PASSWORD, proxyPassword);
+        return this;
     }
 
-    public void setProxyNtlmDomain(final String proxyNtlmDomain) {
+    public BlackDuckServerConfigBuilder setProxyNtlmDomain(final String proxyNtlmDomain) {
         values.put(Property.PROXY_NTLM_DOMAIN, proxyNtlmDomain);
+        return this;
     }
 
-    public void setProxyNtlmWorkstation(final String proxyNtlmWorkstation) {
+    public BlackDuckServerConfigBuilder setProxyNtlmWorkstation(final String proxyNtlmWorkstation) {
         values.put(Property.PROXY_NTLM_WORKSTATION, proxyNtlmWorkstation);
+        return this;
     }
 
-    public void setTrustCert(final String trustCert) {
+    public BlackDuckServerConfigBuilder setTrustCert(final String trustCert) {
         values.put(Property.TRUST_CERT, trustCert);
+        return this;
     }
 
-    public void setTrustCert(final boolean trustCert) {
+    public BlackDuckServerConfigBuilder setTrustCert(final boolean trustCert) {
         setTrustCert(String.valueOf(trustCert));
+        return this;
     }
 
     public enum Property {
