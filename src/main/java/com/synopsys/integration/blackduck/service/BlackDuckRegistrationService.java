@@ -23,13 +23,12 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.io.IOException;
-
-import com.google.gson.JsonObject;
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.RegistrationView;
+import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckRegistrationService extends DataService {
     public BlackDuckRegistrationService(final BlackDuckService blackDuckService, final IntLogger logger) {
@@ -37,14 +36,11 @@ public class BlackDuckRegistrationService extends DataService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        try (Response response = blackDuckService.get(new BlackDuckPath("/api/v1/registrations"))) {
-            final String jsonResponse = response.getContentString();
-            final JsonObject jsonObject = blackDuckService.getGson().fromJson(jsonResponse, JsonObject.class);
-            final String registrationId = jsonObject.get("registrationId").getAsString();
-            return registrationId;
-        } catch (final IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder();
+        requestBuilder.addAdditionalHeader("Accept", "application/vnd.blackducksoftware.status-4+json");
+
+        final RegistrationView registrationView = blackDuckService.getResponse(ApiDiscovery.REGISTRATION_LINK_RESPONSE, requestBuilder);
+        return registrationView.getRegistrationId();
     }
 
 }

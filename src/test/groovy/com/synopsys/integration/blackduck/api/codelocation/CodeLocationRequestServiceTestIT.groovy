@@ -6,6 +6,7 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.codelocation.DryRunUploadResponse
 import com.synopsys.integration.blackduck.codelocation.DryRunUploadService
+import com.synopsys.integration.blackduck.exception.BlackDuckApiException
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
@@ -13,7 +14,6 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
-import com.synopsys.integration.rest.exception.IntegrationRestException
 import org.apache.commons.lang3.StringUtils
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -83,8 +83,8 @@ class CodeLocationRequestServiceTestIT {
             services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
             // TODO: Expects exception. integration-rest no longer throws an exception by default
             fail('This should have thrown an exception')
-        } catch (IntegrationRestException e) {
-            assertEquals(404, e.getHttpStatusCode())
+        } catch (BlackDuckApiException e) {
+            assertEquals(404, e.getOriginalIntegrationRestException().getHttpStatusCode())
         }
     }
 

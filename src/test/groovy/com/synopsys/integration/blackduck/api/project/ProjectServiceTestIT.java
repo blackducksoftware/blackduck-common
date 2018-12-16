@@ -21,13 +21,14 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.synopsys.integration.rest.RestConstants;
 
 @Tag("integration")
 public class ProjectServiceTestIT {
@@ -102,7 +103,8 @@ public class ProjectServiceTestIT {
             blackDuckService.getResponse(projectUrl, ProjectView.class);
             fail("This project should have been deleted");
         } catch (final Exception e) {
-            assertTrue(e instanceof IntegrationRestException);
+            assertTrue(e instanceof BlackDuckApiException);
+            assertTrue(RestConstants.NOT_FOUND_404 == ((BlackDuckApiException) e).getOriginalIntegrationRestException().getHttpStatusCode());
         }
     }
 

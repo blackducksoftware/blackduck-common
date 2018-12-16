@@ -15,7 +15,7 @@ public class BlackDuckRegistrationRequestServiceTestIT {
     private final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
 
     @Test
-    public void testGettingAllProjects() throws Exception {
+    public void testGettingRegistrationId() throws Exception {
         final BlackDuckServicesFactory blackDuckDataServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
         final BlackDuckRegistrationService blackDuckRegistrationRequestService = blackDuckDataServicesFactory.createBlackDuckRegistrationService();
         final String registrationId = blackDuckRegistrationRequestService.getRegistrationId();

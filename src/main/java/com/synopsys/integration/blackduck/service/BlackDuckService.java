@@ -140,6 +140,12 @@ public class BlackDuckService {
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
     }
 
+    public <T extends BlackDuckResponse> T getResponse(final BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, final Request.Builder requestBuilder) throws IntegrationException {
+        final String uri = pieceTogetherUri(blackDuckBaseURL, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
+        requestBuilder.uri(uri);
+        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
+    }
+
     public <T extends BlackDuckResponse> T getResponse(final BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
         final String uri = pieceTogetherUri(blackDuckBaseURL, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
         final Request request = RequestFactory.createCommonGetRequest(uri);

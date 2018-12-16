@@ -27,14 +27,26 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 
 public class BlackDuckApiException extends IntegrationException {
-    private final IntegrationRestException cause;
+    private final IntegrationRestException originalIntegrationRestException;
     private final String blackDuckErrorMessage;
     private final String blackDuckErrorCode;
 
-    public BlackDuckApiException(final IntegrationRestException cause, final String blackDuckErrorMessage, final String blackDuckErrorCode) {
-        this.cause = cause;
+    public BlackDuckApiException(final IntegrationRestException originalIntegrationRestException, final String blackDuckErrorMessage, final String blackDuckErrorCode) {
+        this.originalIntegrationRestException = originalIntegrationRestException;
         this.blackDuckErrorMessage = blackDuckErrorMessage;
         this.blackDuckErrorCode = blackDuckErrorCode;
+    }
+
+    public IntegrationRestException getOriginalIntegrationRestException() {
+        return originalIntegrationRestException;
+    }
+
+    public String getBlackDuckErrorMessage() {
+        return blackDuckErrorMessage;
+    }
+
+    public String getBlackDuckErrorCode() {
+        return blackDuckErrorCode;
     }
 
 }

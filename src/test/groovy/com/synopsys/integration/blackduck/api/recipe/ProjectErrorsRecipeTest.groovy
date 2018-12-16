@@ -2,8 +2,8 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
+import com.synopsys.integration.blackduck.exception.BlackDuckApiException
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
-import com.synopsys.integration.rest.exception.IntegrationRestException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -47,9 +47,9 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
             projectService.createProject(projectRequest)
             fail('Should have thrown an IntegrationRestException')
         } catch (Exception e) {
-            assertTrue(e instanceof IntegrationRestException)
+            assertTrue(e instanceof BlackDuckApiException)
             //since the project already existed, a 412 Precondition Failed http error response should occur
-            assertEquals(412, ((IntegrationRestException) e).httpStatusCode)
+            assertEquals(412, ((BlackDuckApiException) e).getOriginalIntegrationRestException().getHttpStatusCode())
         }
     }
 
