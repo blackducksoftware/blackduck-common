@@ -79,10 +79,14 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
         } catch (final IntegrationRestException e) {
             final String httpResponseContent = e.getHttpResponseContent();
             if (StringUtils.isNotBlank(httpResponseContent)) {
-                final String errorMessage = JsonPath.read(httpResponseContent, "$.errorMessage");
-                final String errorCode = JsonPath.read(httpResponseContent, "$.errorCode");
-                if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
-                    throw new BlackDuckApiException(e, errorMessage, errorCode);
+                try {
+                    final String errorMessage = JsonPath.read(httpResponseContent, "$.errorMessage");
+                    final String errorCode = JsonPath.read(httpResponseContent, "$.errorCode");
+                    if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
+                        throw new BlackDuckApiException(e, errorMessage, errorCode);
+                    }
+                } catch (final Exception ignored) {
+                    //ignored
                 }
             }
             throw e;
