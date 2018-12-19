@@ -1,13 +1,15 @@
 package com.synopsys.integration.blackduck.codelocation
 
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
+import com.synopsys.integration.blackduck.exception.BlackDuckApiException
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
-import com.synopsys.integration.blackduck.service.*
+import com.synopsys.integration.blackduck.service.BlackDuckService
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
+import com.synopsys.integration.blackduck.service.CodeLocationService
 import com.synopsys.integration.exception.IntegrationException
 import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
-import com.synopsys.integration.rest.exception.IntegrationRestException
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -57,8 +59,8 @@ public class DryRunUploadServiceTestIT {
         try {
             codeLocationService.getCodeLocationById(response.codeLocationId)
             fail('This should have thrown an exception')
-        } catch (IntegrationRestException e) {
-            assertEquals(404, e.getHttpStatusCode())
+        } catch (BlackDuckApiException e) {
+            assertEquals(404, e.getOriginalIntegrationRestException().httpStatusCode)
         }
     }
 
