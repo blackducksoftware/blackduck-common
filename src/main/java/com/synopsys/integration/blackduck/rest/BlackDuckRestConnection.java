@@ -85,6 +85,12 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
                     if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
                         throw new BlackDuckApiException(e, errorMessage, errorCode);
                     }
+                } catch (final BlackDuckApiException transformedException) {
+                    // Not all IntegrationRestExceptions are from Black Duck - if we were able to
+                    // transform the IntegrationRestException, we want to throw the resulting
+                    // BlackDuckApiException, otherwise, we want to ignore any potential
+                    // transformation and just throw the original IntegrationRestException
+                    throw transformedException;
                 } catch (final Exception ignored) {
                     //ignored
                 }
