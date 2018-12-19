@@ -56,6 +56,21 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
+    public void testNullUrlInvalid() {
+        final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        blackDuckServerConfigBuilder.setUrl(null);
+        blackDuckServerConfigBuilder.setUsername("fakeUser");
+        blackDuckServerConfigBuilder.setPassword("fakePassword");
+        assertFalse(blackDuckServerConfigBuilder.isValid());
+        try {
+            blackDuckServerConfigBuilder.build();
+            fail("Should have thrown an exception");
+        } catch (final Exception e) {
+            assertTrue(e instanceof IllegalArgumentException);
+        }
+    }
+
+    @Test
     public void testValidateBlackDuckURLMalformed() {
         final String blackDuckUrl = "TestString";
 

@@ -26,6 +26,7 @@ package com.synopsys.integration.blackduck.configuration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -157,7 +158,18 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     @Override
     protected void validate(final BuilderStatus builderStatus) {
-        if (StringUtils.isBlank(values.get(Property.API_TOKEN))) {
+        if (StringUtils.isBlank(url())) {
+            builderStatus.addErrorMessage("The Black Duck url must be specified.");
+        } else {
+            try {
+                final URL blackDuckURL = new URL(url());
+                blackDuckURL.toURI();
+            } catch (final MalformedURLException | URISyntaxException e) {
+                builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", url()));
+            }
+        }
+
+        if (StringUtils.isBlank(apiToken())) {
             final CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
             credentialsBuilder.setUsername(values.get(Property.USERNAME));
             credentialsBuilder.setPassword(values.get(Property.PASSWORD));
