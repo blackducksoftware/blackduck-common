@@ -9,14 +9,18 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
+import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
+import com.synopsys.integration.log.SilentIntLogger;
 
 @Tag("integration")
 public class BlackDuckServerConfigBuilderTestIT {
     private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
-
-    private static final String VALID_TIMEOUT_STRING = "120";
-
-    private static final int VALID_TIMEOUT_INTEGER = 120;
+    private static final String URL = restConnectionTestHelper.getIntegrationBlackDuckServerUrl();
+    private static final String USERNAME = restConnectionTestHelper.getTestUsername();
+    private static final String PASSWORD = restConnectionTestHelper.getTestPassword();
+    private static final String PROXY_PASSTHROUGH_HOST = restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_PROXY_HOST_PASSTHROUGH);
+    private static final int PROXY_PASSTHROUGH_PORT = NumberUtils.toInt(restConnectionTestHelper.getProperty(TestingPropertyKey.TEST_PROXY_PORT_PASSTHROUGH));
+    private static final int TIMEOUT = 120;
 
     @Test
     public void testValidConfigWithProxies() throws Exception {
@@ -25,12 +29,12 @@ public class BlackDuckServerConfigBuilderTestIT {
         setBuilderProxyDefaults(builder);
         final BlackDuckServerConfig config = builder.build();
 
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
+        final String blackDuckServer = URL;
         assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals("User", config.getCredentials().get().getUsername().get());
         assertEquals("Pass", config.getCredentials().get().getPassword().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost().get());
-        assertEquals(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")), config.getProxyInfo().getPort());
+        assertEquals(PROXY_PASSTHROUGH_HOST, config.getProxyInfo().getHost().get());
+        assertEquals(PROXY_PASSTHROUGH_PORT, config.getProxyInfo().getPort());
 
         assertTrue(config.getProxyInfo().shouldUseProxy());
     }
@@ -47,8 +51,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         builder.setProxyPassword(null);
         final BlackDuckServerConfig config = builder.build();
 
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals("User", config.getCredentials().get().getUsername().get());
         assertEquals("Pass", config.getCredentials().get().getPassword().get());
 
@@ -56,96 +59,107 @@ public class BlackDuckServerConfigBuilderTestIT {
     }
 
     @Test
-    public void testValidBuildConnect() throws Exception {
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
+    public void testValidCanConnect() {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        builder.setTrustCert(true);
-        builder.setUrl(blackDuckServer);
-        builder.setTimeout(120);
-        builder.setPassword("blackduck");
-        builder.setUsername("sysadmin");
-        builder.setTrustCert(true);
-        final BlackDuckServerConfig config = builder.build();
-        assertNotNull(config);
+        setValidDefaults(builder);
+        final BlackDuckServerConfig blackDuckServerConfig = builder.build();
+        assertTrue(blackDuckServerConfig.canConnect());
+        final ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
+        assertTrue(connectionResult.isSuccess());
+        assertFalse(connectionResult.getErrorMessage().isPresent());
+    }
+
+    @Test
+    public void testInvalidUrlCanNotConnect() {
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        setValidDefaults(builder);
+        builder.setUrl("https://www.google.com");
+        final BlackDuckServerConfig blackDuckServerConfig = builder.build();
+        assertFalse(blackDuckServerConfig.canConnect());
+        final ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
+        assertFalse(connectionResult.isSuccess());
+        assertEquals("The connection was not successful for an unknown reason.", connectionResult.getErrorMessage().get());
+    }
+
+    @Test
+    public void testInvalidPasswordCanNotConnect() {
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        setValidDefaults(builder);
+        builder.setPassword("not a real password");
+        final BlackDuckServerConfig blackDuckServerConfig = builder.build();
+        assertFalse(blackDuckServerConfig.canConnect());
+        final ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
+        assertFalse(connectionResult.isSuccess());
+        assertEquals("Invalid username or password", connectionResult.getErrorMessage().get());
+    }
+
+    @Test
+    public void testInvalidApiTokenCanNotConnect() {
+        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        setValidDefaults(builder);
+        builder.setUsername(null);
+        builder.setPassword(null);
+        builder.setApiToken("not a real token");
+        final BlackDuckServerConfig blackDuckServerConfig = builder.build();
+        assertFalse(blackDuckServerConfig.canConnect());
+        final ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
+        assertFalse(connectionResult.isSuccess());
+        assertEquals("The connection was not successful for an unknown reason.", connectionResult.getErrorMessage().get());
     }
 
     @Test
     public void testValidBuild() throws Exception {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        builder.setTrustCert(true);
-        builder.setUrl(blackDuckServer);
-        builder.setTimeout(VALID_TIMEOUT_INTEGER);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
+        setValidDefaults(builder);
         final BlackDuckServerConfig config = builder.build();
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
-        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().get().getUsername().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().get().getPassword().get());
+        assertEquals(new URL(URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(TIMEOUT, config.getTimeout());
+        assertEquals(USERNAME, config.getCredentials().get().getUsername().get());
+        assertEquals(PASSWORD, config.getCredentials().get().getPassword().get());
     }
 
     @Test
     public void testValidBuildTimeoutString() throws Exception {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        builder.setTrustCert(true);
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        builder.setUrl(blackDuckServer);
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
+        setValidDefaults(builder);
         final BlackDuckServerConfig config = builder.build();
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(120, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().get().getUsername().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().get().getPassword().get());
+        assertEquals(USERNAME, config.getCredentials().get().getUsername().get());
+        assertEquals(PASSWORD, config.getCredentials().get().getPassword().get());
     }
 
     @Test
     public void testValidBuildWithProxy() throws Exception {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        builder.setTrustCert(true);
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        builder.setUrl(blackDuckServer);
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
-        builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
-        builder.setProxyPort(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"));
+        setValidDefaults(builder);
+        builder.setProxyHost(PROXY_PASSTHROUGH_HOST);
+        builder.setProxyPort(PROXY_PASSTHROUGH_PORT);
         final BlackDuckServerConfig config = builder.build();
 
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
-        assertEquals(VALID_TIMEOUT_INTEGER, config.getTimeout());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_USERNAME"), config.getCredentials().get().getUsername().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PASSWORD"), config.getCredentials().get().getPassword().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"), config.getProxyInfo().getHost().get());
-        assertEquals(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH"), String.valueOf(config.getProxyInfo().getPort()));
+        assertEquals(new URL(URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(TIMEOUT, config.getTimeout());
+        assertEquals(USERNAME, config.getCredentials().get().getUsername().get());
+        assertEquals(PASSWORD, config.getCredentials().get().getPassword().get());
+        assertEquals(PROXY_PASSTHROUGH_HOST, config.getProxyInfo().getHost().get());
+        assertEquals(PROXY_PASSTHROUGH_PORT, config.getProxyInfo().getPort());
     }
 
     @Test
     public void testUrlwithTrailingSlash() throws Exception {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        builder.setTrustCert(true);
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        builder.setUrl(blackDuckServer);
-        builder.setTimeout(VALID_TIMEOUT_STRING);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
+        setValidDefaults(builder);
         final BlackDuckServerConfig config = builder.build();
         assertFalse(config.getBlackDuckUrl().toString().endsWith("/"));
         assertEquals("https", config.getBlackDuckUrl().getProtocol());
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL).getHost(), config.getBlackDuckUrl().getHost());
         assertEquals(-1, config.getBlackDuckUrl().getPort());
     }
 
     @Test
-    public void testValidBuildWithProxyPortZero() throws Exception {
+    public void testValidBuildWithProxyPortZero() {
         final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        builder.setTrustCert(true);
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
-        builder.setUrl(blackDuckServer);
-        builder.setPassword(restConnectionTestHelper.getProperty("TEST_PASSWORD"));
-        builder.setUsername(restConnectionTestHelper.getProperty("TEST_USERNAME"));
+        setValidDefaults(builder);
         BlackDuckServerConfig config = builder.build();
         assertFalse(config.shouldUseProxyForBlackDuck());
 
@@ -159,25 +173,30 @@ public class BlackDuckServerConfigBuilderTestIT {
 
         builder.setProxyPort(1);
         try {
-            config = builder.build();
+            builder.build();
             fail("Should have thrown an IllegalStateException with invalid proxy state");
         } catch (final IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("proxy"));
         }
     }
 
-    private void setBuilderDefaults(final BlackDuckServerConfigBuilder builder) throws Exception {
-        final String blackDuckServer = restConnectionTestHelper.getProperty("TEST_HTTPS_BLACK_DUCK_SERVER_URL");
+    private void setValidDefaults(final BlackDuckServerConfigBuilder builder) {
+        builder.setUrl(URL);
+        builder.setUsername(USERNAME);
+        builder.setPassword(PASSWORD);
         builder.setTrustCert(true);
-        builder.setUrl(blackDuckServer);
+    }
+
+    private void setBuilderDefaults(final BlackDuckServerConfigBuilder builder) {
+        setValidDefaults(builder);
         builder.setTimeout("100");
         builder.setUsername("User");
         builder.setPassword("Pass");
     }
 
-    private void setBuilderProxyDefaults(final BlackDuckServerConfigBuilder builder) throws Exception {
-        builder.setProxyHost(restConnectionTestHelper.getProperty("TEST_PROXY_HOST_PASSTHROUGH"));
-        builder.setProxyPort(NumberUtils.toInt(restConnectionTestHelper.getProperty("TEST_PROXY_PORT_PASSTHROUGH")));
+    private void setBuilderProxyDefaults(final BlackDuckServerConfigBuilder builder) {
+        builder.setProxyHost(PROXY_PASSTHROUGH_HOST);
+        builder.setProxyPort(PROXY_PASSTHROUGH_PORT);
     }
 
 }

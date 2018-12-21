@@ -1,0 +1,55 @@
+{
+  "overallStatus": "IN_VIOLATION",
+  "updatedAt": "2018-12-19T19:39:10.679Z",
+  "componentVersionStatusCounts": [
+    {
+      "name": "NOT_IN_VIOLATION",
+      "value": 52
+    },
+    {
+      "name": "IN_VIOLATION",
+      "value": 2
+    },
+    {
+      "name": "IN_VIOLATION_OVERRIDDEN",
+      "value": 0
+    }
+  ],
+  "componentVersionPolicyViolationDetails": {
+    "name": "IN_VIOLATION",
+    "severityLevels": [
+      {
+        "name": "BLOCKER",
+        "value": 0
+      },
+      {
+        "name": "CRITICAL",
+        "value": 0
+      },
+      {
+        "name": "MAJOR",
+        "value": 0
+      },
+      {
+        "name": "MINOR",
+        "value": 0
+      },
+      {
+        "name": "TRIVIAL",
+        "value": 0
+      },
+      {
+        "name": "UNSPECIFIED",
+        "value": 4
+      }
+    ]
+  },
+  "_meta": {
+    "allow": [
+      "GET"
+    ],
+    "href": "https:\/\/int-hub04.dc1.lan\/api\/projects\/298575e5-e702-422e-8e12-62adc8a9e787\/versions\/c6ef5c78-1dc6-4997-8fab-5e8854422b88\/policy-status",
+    "links": [
+    ]
+  }
+}

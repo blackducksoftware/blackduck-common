@@ -27,10 +27,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
+import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -78,25 +80,32 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
             response.throwExceptionForError();
         } catch (final IntegrationRestException e) {
             final String httpResponseContent = e.getHttpResponseContent();
-            if (StringUtils.isNotBlank(httpResponseContent)) {
-                try {
-                    final String errorMessage = JsonPath.read(httpResponseContent, "$.errorMessage");
-                    final String errorCode = JsonPath.read(httpResponseContent, "$.errorCode");
-                    if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
-                        throw new BlackDuckApiException(e, errorMessage, errorCode);
-                    }
-                } catch (final BlackDuckApiException transformedException) {
-                    // Not all IntegrationRestExceptions are from Black Duck - if we were able to
-                    // transform the IntegrationRestException, we want to throw the resulting
-                    // BlackDuckApiException, otherwise, we want to ignore any potential
-                    // transformation and just throw the original IntegrationRestException
-                    throw transformedException;
-                } catch (final Exception ignored) {
-                    //ignored
-                }
+            final Optional<ErrorResponse> optionalErrorResponse = extractErrorResponse(httpResponseContent);
+            // Not all IntegrationRestExceptions are from Black Duck - if we were able to
+            // transform the IntegrationRestException, we want to throw the resulting
+            // BlackDuckApiException, otherwise, we want to ignore any potential
+            // transformation and just throw the original IntegrationRestException
+            if (optionalErrorResponse.isPresent()) {
+                throw new BlackDuckApiException(e, optionalErrorResponse.get().getErrorMessage(), optionalErrorResponse.get().getErrorCode());
+            } else {
+                throw e;
             }
-            throw e;
         }
+    }
+
+    public Optional<ErrorResponse> extractErrorResponse(final String responseContent) {
+        if (StringUtils.isNotBlank(responseContent)) {
+            try {
+                final String errorMessage = JsonPath.read(responseContent, "$.errorMessage");
+                final String errorCode = JsonPath.read(responseContent, "$.errorCode");
+                if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
+                    return Optional.of(new ErrorResponse(errorMessage, errorCode));
+                }
+            } catch (final Exception ignored) {
+                //ignored
+            }
+        }
+        return Optional.empty();
     }
 
 }

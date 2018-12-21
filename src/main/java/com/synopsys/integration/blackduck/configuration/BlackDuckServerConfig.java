@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
 import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
 import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
@@ -107,18 +108,37 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public boolean canConnect(final IntLogger logger) {
+        final ConnectionResult connectionResult = attemptConnection(logger);
+        return connectionResult.isSuccess();
+    }
+
+    public ConnectionResult attemptConnection(final IntLogger logger) {
+        String errorMessage = null;
         try {
             final BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
             try (Response response = blackDuckRestConnection.attemptAuthentication()) {
-                // if you get a good response, you know that a connection can be made
-                if (response.isStatusCodeOkay()) {
-                    return true;
+                // if you get an error response, you know that a connection could not be made
+                if (response.isStatusCodeError()) {
+                    final String httpResponseContent = response.getContentString();
+                    final Optional<ErrorResponse> errorResponse = blackDuckRestConnection.extractErrorResponse(httpResponseContent);
+                    if (errorResponse.isPresent()) {
+                        errorMessage = errorResponse.get().getErrorMessage();
+                    } else {
+                        errorMessage = "The connection was not successful for an unknown reason.";
+                    }
                 }
             }
         } catch (final Exception e) {
-            System.out.println(e.getMessage());
+            errorMessage = e.getMessage();
         }
-        return false;
+
+        if (null != errorMessage) {
+            logger.error(errorMessage);
+            return ConnectionResult.FAILURE(errorMessage);
+        }
+
+        logger.info("A successful connection was made.");
+        return ConnectionResult.SUCCESS();
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
