@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -38,7 +38,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
-import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -50,11 +50,11 @@ public class BlackDuckServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final ObjectMapper objectMapper;
-    private final BlackDuckRestConnection restConnection;
+    private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
 
     public static Gson createDefaultGson() {
-        return createDefaultGsonBuilder().create();
+        return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
     }
 
     public static ObjectMapper createDefaultObjectMapper() {
@@ -65,22 +65,22 @@ public class BlackDuckServicesFactory {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
-    public BlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final BlackDuckRestConnection restConnection, final IntLogger logger) {
+    public BlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
         intEnvironmentVariables = new IntEnvironmentVariables();
 
         this.gson = gson;
         this.objectMapper = objectMapper;
-        this.restConnection = restConnection;
+        this.blackDuckHttpClient = blackDuckHttpClient;
         this.logger = logger;
     }
 
     public BdioUploadService createBdioUploadService() {
-        final BlackDuckService blackDuckService = createBlackDuckService();
+        BlackDuckService blackDuckService = createBlackDuckService();
         return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService), createCodeLocationCreationService());
     }
 
-    public BdioUploadService createBdioUploadService(final ExecutorService executorService) {
-        final BlackDuckService blackDuckService = createBlackDuckService();
+    public BdioUploadService createBdioUploadService(ExecutorService executorService) {
+        BlackDuckService blackDuckService = createBlackDuckService();
         return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
     }
 
@@ -89,9 +89,9 @@ public class BlackDuckServicesFactory {
     }
 
     public CodeLocationCreationService createCodeLocationCreationService() {
-        final BlackDuckService blackDuckService = createBlackDuckService();
-        final CodeLocationService codeLocationService = createCodeLocationService();
-        final NotificationService notificationService = createNotificationService();
+        BlackDuckService blackDuckService = createBlackDuckService();
+        CodeLocationService codeLocationService = createCodeLocationService();
+        NotificationService notificationService = createNotificationService();
 
         return new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
     }
@@ -100,7 +100,7 @@ public class BlackDuckServicesFactory {
         return new CodeLocationService(createBlackDuckService(), logger);
     }
 
-    public CommonNotificationService createCommonNotificationService(final NotificationContentDetailFactory notificationContentDetailFactory, final boolean oldestFirst) {
+    public CommonNotificationService createCommonNotificationService(NotificationContentDetailFactory notificationContentDetailFactory, boolean oldestFirst) {
         return new CommonNotificationService(notificationContentDetailFactory, oldestFirst);
     }
 
@@ -113,14 +113,14 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckService createBlackDuckService() {
-        return new BlackDuckService(logger, restConnection, gson, objectMapper);
+        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
     }
 
     public BlackDuckBucketService createBlackDuckBucketService() {
         return new BlackDuckBucketService(createBlackDuckService(), logger);
     }
 
-    public BlackDuckBucketService createBlackDuckBucketService(final ExecutorService executorService) {
+    public BlackDuckBucketService createBlackDuckBucketService(ExecutorService executorService) {
         return new BlackDuckBucketService(createBlackDuckService(), logger, executorService);
     }
 
@@ -141,16 +141,16 @@ public class BlackDuckServicesFactory {
     }
 
     public ProjectService createProjectService() {
-        final BlackDuckService blackDuckService = createBlackDuckService();
-        final ProjectGetService projectGetService = new ProjectGetService(blackDuckService, logger);
+        BlackDuckService blackDuckService = createBlackDuckService();
+        ProjectGetService projectGetService = new ProjectGetService(blackDuckService, logger);
         return new ProjectService(blackDuckService, logger, projectGetService, createComponentService());
     }
 
-    public ReportService createReportService(final long timeoutInMilliseconds) throws IntegrationException {
+    public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {
         return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
-    public SignatureScannerService createSignatureScannerService(final ScanBatchRunner scanBatchRunner) {
+    public SignatureScannerService createSignatureScannerService(ScanBatchRunner scanBatchRunner) {
         return new SignatureScannerService(createBlackDuckService(), logger, scanBatchRunner, createCodeLocationCreationService());
     }
 
@@ -158,16 +158,16 @@ public class BlackDuckServicesFactory {
         return new UserGroupService(createBlackDuckService(), logger);
     }
 
-    public void addEnvironmentVariable(final String key, final String value) {
+    public void addEnvironmentVariable(String key, String value) {
         intEnvironmentVariables.put(key, value);
     }
 
-    public void addEnvironmentVariables(final Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
         intEnvironmentVariables.putAll(environmentVariables);
     }
 
-    public BlackDuckRestConnection getRestConnection() {
-        return restConnection;
+    public BlackDuckHttpClient getBlackDuckHttpClient() {
+        return blackDuckHttpClient;
     }
 
     public IntLogger getLogger() {

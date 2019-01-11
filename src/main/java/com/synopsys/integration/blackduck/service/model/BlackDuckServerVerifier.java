@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -35,49 +35,49 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckServerVerifier {
-    public void verifyIsBlackDuckServer(final URL blackDuckUrl, final ProxyInfo blackDuckProxyInfo, final boolean alwaysTrustServerCertificate, final int timeoutSeconds) throws IntegrationException {
-        final IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-        final ProxyInfo proxyInfo = blackDuckProxyInfo != null ? blackDuckProxyInfo : ProxyInfo.NO_PROXY_INFO;
-        final RestConnection restConnection = new RestConnection(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
+    public void verifyIsBlackDuckServer(URL blackDuckUrl, ProxyInfo blackDuckProxyInfo, boolean alwaysTrustServerCertificate, int timeoutSeconds) throws IntegrationException {
+        IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
+        ProxyInfo proxyInfo = blackDuckProxyInfo != null ? blackDuckProxyInfo : ProxyInfo.NO_PROXY_INFO;
+        IntHttpClient intHttpClient = new IntHttpClient(logger, timeoutSeconds, alwaysTrustServerCertificate, proxyInfo);
 
         try {
             Request request = new Request.Builder(blackDuckUrl.toURI().toString()).build();
-            try (final Response response = restConnection.execute(request)) {
+            try (Response response = intHttpClient.execute(request)) {
                 response.throwExceptionForError();
-            } catch (final IntegrationRestException e) {
+            } catch (IntegrationRestException e) {
                 if (e.getHttpStatusCode() == RestConstants.UNAUTHORIZED_401 || e.getHttpStatusCode() == RestConstants.FORBIDDEN_403) {
                     // This could be a Black Duck server
                 } else {
                     throw e;
                 }
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-            final URL downloadURL;
+            URL downloadURL;
             try {
                 downloadURL = new URL(blackDuckUrl, ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
-            } catch (final MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 throw new BlackDuckIntegrationException("Error constructing the download URL : " + e.getMessage(), e);
             }
-            final String downloadUri = downloadURL.toString();
+            String downloadUri = downloadURL.toString();
             request = RequestFactory.createCommonGetRequest(downloadUri);
-            try (final Response response = restConnection.execute(request)) {
+            try (Response response = intHttpClient.execute(request)) {
                 response.throwExceptionForError();
-            } catch (final IntegrationRestException e) {
+            } catch (IntegrationRestException e) {
                 throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
-            } catch (final IntegrationException e) {
+            } catch (IntegrationException e) {
                 throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getMessage(), e);
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
-        } catch (final URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new IntegrationException("The Url does not appear to be a Black Duck server :" + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
         }
     }

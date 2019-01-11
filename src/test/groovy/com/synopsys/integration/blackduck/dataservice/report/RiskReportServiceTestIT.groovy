@@ -3,7 +3,7 @@ package com.synopsys.integration.blackduck.dataservice.report
 import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
-import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 
 @Tag("integration")
 class RiskReportServiceTestIT {
-    private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
+    private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper()
 
     @BeforeAll
     public static void createProjectFirst() {

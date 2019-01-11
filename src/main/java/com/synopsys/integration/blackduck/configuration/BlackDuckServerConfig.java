@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -31,15 +31,16 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.component.ErrorResponse;
-import com.synopsys.integration.blackduck.rest.ApiTokenRestConnection;
-import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
-import com.synopsys.integration.blackduck.rest.CredentialsRestConnection;
+import com.synopsys.integration.blackduck.rest.ApiTokenBlackDuckHttpClient;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.rest.CredentialsBlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.Buildable;
 import com.synopsys.integration.util.Stringable;
 
@@ -54,30 +55,37 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     private final String apiToken;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
+    private final Gson gson;
+    private final ObjectMapper objectMapper;
+    private final AuthenticationSupport authenticationSupport;
 
-    BlackDuckServerConfig(final URL url, final int timeoutSeconds, final Credentials credentials, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
-        blackDuckUrl = url;
-        this.timeoutSeconds = timeoutSeconds;
-        this.credentials = credentials;
-        apiToken = null;
-        this.proxyInfo = proxyInfo;
-        this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+    BlackDuckServerConfig(
+            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, credentials, null);
     }
 
-    BlackDuckServerConfig(final URL url, final int timeoutSeconds, final String apiToken, final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate) {
+    BlackDuckServerConfig(URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, apiToken);
+    }
+
+    private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, Credentials credentials,
+            String apiToken) {
+        this.credentials = credentials;
+        this.apiToken = apiToken;
         blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
-        credentials = null;
-        this.apiToken = apiToken;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+        this.gson = gson;
+        this.objectMapper = objectMapper;
+        this.authenticationSupport = authenticationSupport;
     }
 
     public boolean shouldUseProxyForBlackDuck() {
         return proxyInfo != null && proxyInfo.shouldUseProxy();
     }
 
-    public void print(final IntLogger logger) {
+    public void print(IntLogger logger) {
         if (getBlackDuckUrl() != null) {
             logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());
         }
@@ -107,20 +115,20 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return canConnect(new SilentIntLogger());
     }
 
-    public boolean canConnect(final IntLogger logger) {
-        final ConnectionResult connectionResult = attemptConnection(logger);
+    public boolean canConnect(IntLogger logger) {
+        ConnectionResult connectionResult = attemptConnection(logger);
         return connectionResult.isSuccess();
     }
 
-    public ConnectionResult attemptConnection(final IntLogger logger) {
+    public ConnectionResult attemptConnection(IntLogger logger) {
         String errorMessage = null;
         try {
-            final BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
-            try (Response response = blackDuckRestConnection.attemptAuthentication()) {
+            BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
+            try (Response response = blackDuckHttpClient.attemptAuthentication()) {
                 // if you get an error response, you know that a connection could not be made
                 if (response.isStatusCodeError()) {
-                    final String httpResponseContent = response.getContentString();
-                    final Optional<ErrorResponse> errorResponse = blackDuckRestConnection.extractErrorResponse(httpResponseContent);
+                    String httpResponseContent = response.getContentString();
+                    Optional<ErrorResponse> errorResponse = blackDuckHttpClient.extractErrorResponse(httpResponseContent);
                     if (errorResponse.isPresent()) {
                         errorMessage = errorResponse.get().getErrorMessage();
                     } else {
@@ -128,7 +136,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
                     }
                 }
             }
-        } catch (final Exception e) {
+        } catch (Exception e) {
             errorMessage = e.getMessage();
         }
 
@@ -141,31 +149,31 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return ConnectionResult.SUCCESS();
     }
 
-    public BlackDuckServicesFactory createBlackDuckServicesFactory(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
-        final BlackDuckRestConnection blackDuckRestConnection = createRestConnection(logger);
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
+        BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
         return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
     }
 
-    public BlackDuckServicesFactory createBlackDuckServicesFactory(final IntLogger logger) {
-        final Gson gson = BlackDuckServicesFactory.createDefaultGson();
-        final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         return createBlackDuckServicesFactory(gson, objectMapper, logger);
     }
 
-    public BlackDuckRestConnection createRestConnection(final IntLogger logger) {
+    public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {
         if (usingApiToken()) {
-            return createApiTokenRestConnection(logger);
+            return createApiTokenBlackDuckHttpClient(logger);
         } else {
-            return createCredentialsRestConnection(logger);
+            return createCredentialsBlackDuckHttpClient(logger);
         }
     }
 
-    public CredentialsRestConnection createCredentialsRestConnection(final IntLogger logger) {
-        return new CredentialsRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getCredentials().orElse(null));
+    public CredentialsBlackDuckHttpClient createCredentialsBlackDuckHttpClient(IntLogger logger) {
+        return new CredentialsBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), authenticationSupport, getCredentials().orElse(null));
     }
 
-    public ApiTokenRestConnection createApiTokenRestConnection(final IntLogger logger) {
-        return new ApiTokenRestConnection(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), getApiToken().orElse(null));
+    public ApiTokenBlackDuckHttpClient createApiTokenBlackDuckHttpClient(IntLogger logger) {
+        return new ApiTokenBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl().toString(), gson, authenticationSupport, getApiToken().orElse(null));
     }
 
     public boolean usingApiToken() {

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper;
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -22,33 +22,33 @@ import com.synopsys.integration.exception.IntegrationException;
 @Tag("integration")
 public class ProjectAssignmentServiceTestIT {
     private static BlackDuckServicesFactory blackDuckServicesFactory;
-    private final static RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
+    private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
     private static ProjectView project = null;
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
-        blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
+        ProjectAssignmentServiceTestIT.blackDuckServicesFactory = ProjectAssignmentServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
     }
 
     @AfterAll
     public static void tearDownAfterClass() throws Exception {
-        if (project != null) {
-            blackDuckServicesFactory.createBlackDuckService().delete(project);
+        if (ProjectAssignmentServiceTestIT.project != null) {
+            ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createBlackDuckService().delete(ProjectAssignmentServiceTestIT.project);
         }
     }
 
     @Test
     public void testGetAssignedUsersFromProjectView() throws IllegalArgumentException, IntegrationException {
-        final Long timestamp = (new Date()).getTime();
-        final String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
+        Long timestamp = (new Date()).getTime();
+        String testProjectName = "hub-common-it-ProjectAssignmentServiceTest-" + timestamp;
 
-        final ProjectRequest projectRequest = new ProjectRequest();
+        ProjectRequest projectRequest = new ProjectRequest();
         projectRequest.setName(testProjectName);
-        final ProjectVersionWrapper projectVersionWrapper = blackDuckServicesFactory.createProjectService().createProject(projectRequest);
-        project = projectVersionWrapper.getProjectView();
-        System.out.println("projectUrl: " + project.getHref().get());
+        ProjectVersionWrapper projectVersionWrapper = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectService().createProject(projectRequest);
+        ProjectAssignmentServiceTestIT.project = projectVersionWrapper.getProjectView();
+        System.out.println("projectUrl: " + ProjectAssignmentServiceTestIT.project.getHref().get());
 
-        final List<AssignedUserView> assignedUsers = blackDuckServicesFactory.createProjectService().getAssignedUsersToProject(project);
+        List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).getName());
