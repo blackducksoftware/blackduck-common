@@ -95,6 +95,16 @@ public class BlackDuckHttpClientTestIT {
         assertFalse(invalidPasswordConfig.canConnect());
     }
 
+    @Test
+    public void testProvidedApiToken() {
+        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        builder.setUrl("https://int-hub02.dc1.lan");
+        builder.setApiToken("YTM4NTViNWQtNDBkZi00YWY4LWExZmUtOGJlNjU2MWE3MTlkOjdiYzkxOTc2LTlhZWUtNDIzYy04ZTVmLTE1MjBiMWYwNDRkNg==");
+        builder.setTrustCert(true);
+        BlackDuckServerConfig blackDuckServerConfig = builder.build();
+        assertTrue(blackDuckServerConfig.canConnect());
+    }
+
     // WARNING!!!!
     // ******************************
     // These API token methods are NOT(!!!) intended for production use! They are used here to enable automated testing

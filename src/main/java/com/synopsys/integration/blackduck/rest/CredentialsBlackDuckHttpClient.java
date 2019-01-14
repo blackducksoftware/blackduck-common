@@ -85,7 +85,6 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
         try (Response response = attemptAuthentication()) {
             if (response.isStatusCodeOkay()) {
                 Header csrfHeader = response.getActualResponse().getFirstHeader(RestConstants.X_CSRF_TOKEN);
-                //FIXME this shouldn't be optional anymore
                 Optional<String> csrfToken = Optional.of(csrfHeader.getValue());
                 authenticationSupport.resolveToken(logger, this, request, RestConstants.X_CSRF_TOKEN, csrfToken, "No CSRF token found when authenticating");
             }

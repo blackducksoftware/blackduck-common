@@ -88,7 +88,7 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
         Map<String, String> headers = new HashMap<>();
         headers.put(ApiTokenBlackDuckHttpClient.AUTHORIZATION_HEADER, "token " + apiToken);
 
-        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/token/authenticate", headers);
+        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
     }
 
 }
