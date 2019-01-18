@@ -23,7 +23,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.connection.RestConnection;
+import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
@@ -33,21 +33,21 @@ import com.synopsys.integration.util.OperatingSystemType;
 public class ScannerZipInstallerTest {
     @Test
     public void testActualDownload() throws Exception {
-        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
 
-        final String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
-        final String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_URL");
-        final String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_USERNAME");
-        final String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_PASSWORD");
+        String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
+        String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_URL");
+        String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_USERNAME");
+        String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_PASSWORD");
         assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
         assumeTrue(StringUtils.isNotBlank(blackDuckUrl));
         assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
         assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
 
-        final File downloadTarget = new File(signatureScannerDownloadPath);
+        File downloadTarget = new File(signatureScannerDownloadPath);
 
-        final IntLogger logger = new BufferedIntLogger();
-        final BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        IntLogger logger = new BufferedIntLogger();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
         blackDuckServerConfigBuilder.setUsername(blackDuckUsername);
         blackDuckServerConfigBuilder.setPassword(blackDuckPassword);
@@ -55,13 +55,13 @@ public class ScannerZipInstallerTest {
         blackDuckServerConfigBuilder.setTrustCert(true);
         blackDuckServerConfigBuilder.setLogger(logger);
 
-        final BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
+        BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
+        ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
-        final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
+        ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
@@ -73,32 +73,32 @@ public class ScannerZipInstallerTest {
 
     @Test
     public void testInitialDownload() throws Exception {
-        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
 
-        final InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
-        final Response mockResponse = Mockito.mock(Response.class);
+        InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
+        Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
 
-        final RestConnection mockRestConnection = Mockito.mock(RestConnection.class);
-        Mockito.when(mockRestConnection.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+        IntHttpClient mockIntHttpClient = Mockito.mock(IntHttpClient.class);
+        Mockito.when(mockIntHttpClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
 
-        final IntLogger logger = new BufferedIntLogger();
-        final Path tempDirectory = Files.createTempDirectory(null);
-        final File downloadTarget = tempDirectory.toFile();
+        IntLogger logger = new BufferedIntLogger();
+        Path tempDirectory = Files.createTempDirectory(null);
+        File downloadTarget = tempDirectory.toFile();
         try {
-            final CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
-            final ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockRestConnection, cleanupZipExpander, scanPathsUtility, "http://www.google.com", OperatingSystemType.MAC);
+            CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+            ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
+            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockIntHttpClient, cleanupZipExpander, scanPathsUtility, "http://www.google.com", OperatingSystemType.MAC);
 
             try {
-                final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
                 fail("Should have thrown");
-            } catch (final BlackDuckIntegrationException e) {
+            } catch (BlackDuckIntegrationException e) {
             }
 
             scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
-            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
             assertTrue(scanPaths.isManagedByLibrary());
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));

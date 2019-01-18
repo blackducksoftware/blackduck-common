@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -43,18 +43,19 @@ import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Response;
 
 public class BinaryScannerService extends DataService {
-    public BinaryScannerService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public BinaryScannerService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public void scanBinary(final File binaryFile, final String projectName, final String projectVersion, final String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
-        final RequestBuilder builder = blackDuckService.getRestConnection().createRequestBuilder(HttpMethod.POST);
-        final URL uploadUrl = new URL(blackDuckService.getRestConnection().getBaseUrl(), "/api/uploads");
+    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
+        RequestBuilder builder = blackDuckService.getBlackDuckHttpClient().createRequestBuilder(HttpMethod.POST);
+        URL baseURL = new URL(blackDuckService.getBlackDuckHttpClient().getBaseUrl());
+        URL uploadUrl = new URL(baseURL, "/api/uploads");
         builder.setUri(uploadUrl.toURI());
         builder.setEntity(createEntity(binaryFile, projectName, projectVersion, codeLocatioName));
 
-        final HttpUriRequest request = builder.build();
-        try (final Response response = blackDuckService.getRestConnection().execute(request)) {
+        HttpUriRequest request = builder.build();
+        try (Response response = blackDuckService.getBlackDuckHttpClient().execute(request)) {
             logger.debug("Response: " + response.toString());
             logger.debug("Response: " + response.getStatusMessage().toString());
             logger.debug("Response: " + response.getStatusCode().toString());
@@ -68,8 +69,8 @@ public class BinaryScannerService extends DataService {
         }
     }
 
-    private HttpEntity createEntity(final File file, final String projectName, final String projectVersion, final String codeLocatioName) {
-        final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+    private HttpEntity createEntity(File file, String projectName, String projectVersion, String codeLocatioName) {
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         addPart(builder, "projectName", projectName);
         addPart(builder, "version", projectVersion);
         addPart(builder, "codeLocationName", codeLocatioName);
@@ -78,9 +79,9 @@ public class BinaryScannerService extends DataService {
         return builder.build();
     }
 
-    private void addPart(final MultipartEntityBuilder builder, final String name, final String value) {
-        final StringBody body = new StringBody(value, ContentType.DEFAULT_TEXT);
-        final FormBodyPart part = FormBodyPartBuilder.create(name, body).build();
+    private void addPart(MultipartEntityBuilder builder, String name, String value) {
+        StringBody body = new StringBody(value, ContentType.DEFAULT_TEXT);
+        FormBodyPart part = FormBodyPartBuilder.create(name, body).build();
         // part.getHeader().removeFields("Content-Type");
         builder.addPart(part);
     }

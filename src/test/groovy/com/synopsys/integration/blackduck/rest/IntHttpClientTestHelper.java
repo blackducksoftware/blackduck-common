@@ -21,16 +21,16 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 
-public class RestConnectionTestHelper {
+public class IntHttpClientTestHelper {
     private final String blackDuckServerUrl;
     private Properties testProperties;
 
-    public RestConnectionTestHelper() {
+    public IntHttpClientTestHelper() {
         initProperties();
         blackDuckServerUrl = getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
     }
 
-    public RestConnectionTestHelper(final String blackDuckServerUrlPropertyName) {
+    public IntHttpClientTestHelper(String blackDuckServerUrlPropertyName) {
         initProperties();
         blackDuckServerUrl = testProperties.getProperty(blackDuckServerUrlPropertyName);
     }
@@ -38,41 +38,41 @@ public class RestConnectionTestHelper {
     private void initProperties() {
         Logger.getLogger(HttpClient.class.getName()).setLevel(Level.FINE);
         testProperties = new Properties();
-        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        try (final InputStream is = classLoader.getResourceAsStream("test.properties")) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        try (InputStream is = classLoader.getResourceAsStream("test.properties")) {
             testProperties.load(is);
-        } catch (final Exception e) {
+        } catch (Exception e) {
             System.err.println("reading test.properties failed!");
         }
 
         if (testProperties.isEmpty()) {
             try {
                 loadOverrideProperties(TestingPropertyKey.values());
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 System.err.println("reading properties from the environment failed");
             }
         }
     }
 
-    private void loadOverrideProperties(final TestingPropertyKey[] keys) {
-        for (final TestingPropertyKey key : keys) {
-            final String prop = System.getenv(key.toString());
+    private void loadOverrideProperties(TestingPropertyKey[] keys) {
+        for (TestingPropertyKey key : keys) {
+            String prop = System.getenv(key.toString());
             if (prop != null && !prop.isEmpty()) {
                 testProperties.setProperty(key.toString(), prop);
             }
         }
     }
 
-    public String getProperty(final TestingPropertyKey key) {
+    public String getProperty(TestingPropertyKey key) {
         return getProperty(key.toString());
     }
 
-    public String getProperty(final String key) {
+    public String getProperty(String key) {
         return testProperties.getProperty(key);
     }
 
     public BlackDuckServerConfig getBlackDuckServerConfig() {
-        final BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl(blackDuckServerUrl);
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
@@ -98,7 +98,7 @@ public class RestConnectionTestHelper {
         return new PrintStreamIntLogger(System.out, LogLevel.TRACE);
     }
 
-    public IntLogger createIntLogger(final LogLevel logLevel) {
+    public IntLogger createIntLogger(LogLevel logLevel) {
         return new PrintStreamIntLogger(System.out, logLevel);
     }
 
@@ -106,26 +106,26 @@ public class RestConnectionTestHelper {
         return createBlackDuckServicesFactory(createIntLogger());
     }
 
-    public BlackDuckServicesFactory createBlackDuckServicesFactory(final IntLogger logger) throws IllegalArgumentException, IntegrationException {
-        final BlackDuckServerConfig blackDuckServerConfig = getBlackDuckServerConfig();
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) throws IllegalArgumentException, IntegrationException {
+        BlackDuckServerConfig blackDuckServerConfig = getBlackDuckServerConfig();
         return createBlackDuckServicesFactory(blackDuckServerConfig, logger);
     }
 
-    public BlackDuckServicesFactory createBlackDuckServicesFactory(final BlackDuckServerConfig blackDuckServerConfig, final IntLogger logger) throws IllegalArgumentException, IntegrationException {
-        final BlackDuckRestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger);
-        final Gson gson = BlackDuckServicesFactory.createDefaultGson();
-        final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(BlackDuckServerConfig blackDuckServerConfig, IntLogger logger) throws IllegalArgumentException, IntegrationException {
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
 
-        final BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, restConnection, logger);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger);
         return blackDuckServicesFactory;
     }
 
-    public File getFile(final String classpathResource) {
+    public File getFile(String classpathResource) {
         try {
-            final URL url = Thread.currentThread().getContextClassLoader().getResource(classpathResource);
-            final File file = new File(url.toURI().getPath());
+            URL url = Thread.currentThread().getContextClassLoader().getResource(classpathResource);
+            File file = new File(url.toURI().getPath());
             return file;
-        } catch (final Exception e) {
+        } catch (Exception e) {
             fail("Could not get file: " + e.getMessage());
             return null;
         }

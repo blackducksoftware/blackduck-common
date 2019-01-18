@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,7 +23,6 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,9 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.connection.ReconnectingRestConnection;
+import com.synopsys.integration.rest.client.AuthenticatingIntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
@@ -44,10 +42,10 @@ import com.synopsys.integration.rest.request.Response;
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
-public abstract class BlackDuckRestConnection extends ReconnectingRestConnection {
+public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final String baseUrl;
 
-    public BlackDuckRestConnection(final IntLogger logger, final int timeout, final boolean alwaysTrustServerCertificate, final ProxyInfo proxyInfo, final String baseUrl) {
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, String baseUrl) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
         this.baseUrl = baseUrl;
 
@@ -55,32 +53,22 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
             throw new IllegalArgumentException("No base url was provided.");
         } else {
             try {
-                final URL url = new URL(baseUrl);
+                URL url = new URL(baseUrl);
                 url.toURI();
-            } catch (final MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 throw new IllegalArgumentException("The provided base url is not a valid java.net.URL.", e);
-            } catch (final URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
             }
         }
     }
 
-    public URL getBaseUrl() {
-        try {
-            return new URL(baseUrl);
-        } catch (final MalformedURLException e) {
-            return null;
-        }
-    }
-
-    public abstract Response attemptAuthentication() throws IntegrationException, IOException;
-
-    public void throwExceptionForError(final Response response) throws IntegrationRestException, BlackDuckApiException {
+    public void throwExceptionForError(Response response) throws IntegrationRestException, BlackDuckApiException {
         try {
             response.throwExceptionForError();
-        } catch (final IntegrationRestException e) {
-            final String httpResponseContent = e.getHttpResponseContent();
-            final Optional<ErrorResponse> optionalErrorResponse = extractErrorResponse(httpResponseContent);
+        } catch (IntegrationRestException e) {
+            String httpResponseContent = e.getHttpResponseContent();
+            Optional<ErrorResponse> optionalErrorResponse = extractErrorResponse(httpResponseContent);
             // Not all IntegrationRestExceptions are from Black Duck - if we were able to
             // transform the IntegrationRestException, we want to throw the resulting
             // BlackDuckApiException, otherwise, we want to ignore any potential
@@ -93,19 +81,23 @@ public abstract class BlackDuckRestConnection extends ReconnectingRestConnection
         }
     }
 
-    public Optional<ErrorResponse> extractErrorResponse(final String responseContent) {
+    public Optional<ErrorResponse> extractErrorResponse(String responseContent) {
         if (StringUtils.isNotBlank(responseContent)) {
             try {
-                final String errorMessage = JsonPath.read(responseContent, "$.errorMessage");
-                final String errorCode = JsonPath.read(responseContent, "$.errorCode");
+                String errorMessage = JsonPath.read(responseContent, "$.errorMessage");
+                String errorCode = JsonPath.read(responseContent, "$.errorCode");
                 if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
                     return Optional.of(new ErrorResponse(errorMessage, errorCode));
                 }
-            } catch (final Exception ignored) {
+            } catch (Exception ignored) {
                 //ignored
             }
         }
         return Optional.empty();
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
 }

@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -29,33 +29,33 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckResponsesTransformer {
-    private final BlackDuckRestConnection restConnection;
+    private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
 
-    public BlackDuckResponsesTransformer(final BlackDuckRestConnection restConnection, final BlackDuckJsonTransformer blackDuckJsonTransformer) {
-        this.restConnection = restConnection;
+    public BlackDuckResponsesTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
+        this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(final PagedRequest pagedRequest, final Class<T> clazz) throws IntegrationException {
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
         return getResponses(pagedRequest, clazz, true);
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(final PagedRequest pagedRequest, final Class<T> clazz, final boolean getAll) throws IntegrationException {
-        final List<T> allResponses = new LinkedList<>();
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
+        List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
         Request request = pagedRequest.createRequest();
-        try (final Response initialResponse = restConnection.execute(request)) {
-            restConnection.throwExceptionForError(initialResponse);
-            final String initialJsonResponse = initialResponse.getContentString();
+        try (Response initialResponse = blackDuckHttpClient.execute(request)) {
+            blackDuckHttpClient.throwExceptionForError(initialResponse);
+            String initialJsonResponse = initialResponse.getContentString();
             BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, clazz);
             allResponses.addAll(blackDuckPageResponse.getItems());
 
@@ -66,18 +66,18 @@ public class BlackDuckResponsesTransformer {
 
             while (allResponses.size() < totalCount && currentOffset < totalCount) {
                 currentOffset += pagedRequest.getLimit();
-                final PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
+                PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
                 request = offsetPagedRequest.createRequest();
-                try (final Response response = restConnection.execute(request)) {
-                    restConnection.throwExceptionForError(response);
-                    final String jsonResponse = response.getContentString();
+                try (Response response = blackDuckHttpClient.execute(request)) {
+                    blackDuckHttpClient.throwExceptionForError(response);
+                    String jsonResponse = response.getContentString();
                     blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
                     allResponses.addAll(blackDuckPageResponse.getItems());
-                } catch (final IOException e) {
+                } catch (IOException e) {
                     throw new BlackDuckIntegrationException(e);
                 }
             }
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
 

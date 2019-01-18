@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
     private final List<T> outputs;
 
-    public CodeLocationBatchOutput(final List<T> outputs) {
+    public CodeLocationBatchOutput(List<T> outputs) {
         this.outputs = outputs;
     }
 
@@ -44,7 +44,7 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
         return getOutputs().stream()
                        .filter(output -> Result.SUCCESS == output.getResult())
                        .map(CodeLocationOutput::getCodeLocationName)
-                       .filter(StringUtils::isBlank)
+                       .filter(StringUtils::isNotBlank)
                        .collect(Collectors.toSet());
     }
 

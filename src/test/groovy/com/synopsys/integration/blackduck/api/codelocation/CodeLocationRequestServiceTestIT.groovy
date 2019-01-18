@@ -7,7 +7,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.codelocation.DryRunUploadResponse
 import com.synopsys.integration.blackduck.codelocation.DryRunUploadService
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException
-import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
 class CodeLocationRequestServiceTestIT {
-    private static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper();
+    private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper();
 
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO)
 

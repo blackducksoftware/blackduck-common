@@ -12,18 +12,18 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationServi
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
 import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
-import com.synopsys.integration.blackduck.rest.RestConnectionTestHelper
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
-import com.synopsys.integration.rest.connection.RestConnection
 import org.junit.jupiter.api.BeforeEach
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
     public static final String PROJECT_VERSION_NAME = '0.0.1-SNAPSHOT'
-    public static final RestConnectionTestHelper restConnectionTestHelper = new RestConnectionTestHelper()
+    public static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper()
 
     protected Gson gson
     protected ObjectMapper objectMapper
@@ -64,13 +64,13 @@ class BasicRecipe {
          * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
-        RestConnection restConnection = blackDuckServerConfig.createCredentialsRestConnection(logger)
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger)
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
 
         notificationContentDetailFactory = new NotificationContentDetailFactory(gson)
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, restConnection, logger)
+        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger)
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
@@ -122,4 +122,5 @@ class BasicRecipe {
             blackDuckService.delete(codeLocationView.get())
         }
     }
+
 }

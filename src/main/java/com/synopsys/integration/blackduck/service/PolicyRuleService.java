@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -31,7 +31,7 @@ import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOpe
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.exception.IntegrationException;
@@ -39,13 +39,13 @@ import com.synopsys.integration.exception.IntegrationException;
 public class PolicyRuleService {
     private final BlackDuckService blackDuckService;
 
-    public PolicyRuleService(final BlackDuckService blackDuckService) {
+    public PolicyRuleService(BlackDuckService blackDuckService) {
         this.blackDuckService = blackDuckService;
     }
 
-    public Optional<PolicyRuleViewV2> getPolicyRuleViewByName(final String policyRuleName) throws IntegrationException {
-        final List<PolicyRuleViewV2> allPolicyRules = blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
-        for (final PolicyRuleViewV2 policyRule : allPolicyRules) {
+    public Optional<PolicyRuleView> getPolicyRuleViewByName(String policyRuleName) throws IntegrationException {
+        List<PolicyRuleView> allPolicyRules = blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+        for (PolicyRuleView policyRule : allPolicyRules) {
             if (policyRuleName.equals(policyRule.getName())) {
                 return Optional.of(policyRule);
             }
@@ -53,30 +53,30 @@ public class PolicyRuleService {
         return Optional.empty();
     }
 
-    public String createPolicyRule(final PolicyRuleViewV2 policyRuleViewV2) throws IntegrationException {
-        return blackDuckService.post(ApiDiscovery.POLICY_RULES_LINK, policyRuleViewV2);
+    public String createPolicyRule(PolicyRuleView policyRuleView) throws IntegrationException {
+        return blackDuckService.post(ApiDiscovery.POLICY_RULES_LINK, policyRuleView);
     }
 
     /**
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
-    public String createPolicyRuleForExternalId(final ComponentService componentService, final ExternalId externalId, final String policyName) throws IntegrationException {
-        final Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersion(externalId);
+    public String createPolicyRuleForExternalId(ComponentService componentService, ExternalId externalId, String policyName) throws IntegrationException {
+        Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersion(externalId);
         if (!componentVersionView.isPresent()) {
             throw new BlackDuckIntegrationException(String.format("The external id (%s) provided could not be found, so no policy can be created for it.", externalId.createExternalId()));
         }
 
-        final PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
+        PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView.get());
-        final PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
+        PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
 
-        final PolicyRuleViewV2 policyRuleViewV2 = new PolicyRuleViewV2();
-        policyRuleViewV2.setName(policyName);
-        policyRuleViewV2.setEnabled(true);
-        policyRuleViewV2.setOverridable(true);
-        policyRuleViewV2.setExpression(expressionSet);
+        PolicyRuleView policyRuleView = new PolicyRuleView();
+        policyRuleView.setName(policyName);
+        policyRuleView.setEnabled(true);
+        policyRuleView.setOverridable(true);
+        policyRuleView.setExpression(expressionSet);
 
-        return createPolicyRule(policyRuleViewV2);
+        return createPolicyRule(policyRuleView);
     }
 
 }

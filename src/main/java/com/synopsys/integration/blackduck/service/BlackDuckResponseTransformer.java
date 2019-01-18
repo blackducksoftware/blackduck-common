@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (C) 2018 Black Duck Software, Inc.
+ * Copyright (C) 2019 Black Duck Software, Inc.
  * http://www.blackducksoftware.com/
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,34 +28,34 @@ import java.io.IOException;
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackDuckRestConnection;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BlackDuckResponseTransformer {
-    private final BlackDuckRestConnection restConnection;
+    private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
 
-    public BlackDuckResponseTransformer(final BlackDuckRestConnection restConnection, final BlackDuckJsonTransformer blackDuckJsonTransformer) {
-        this.restConnection = restConnection;
+    public BlackDuckResponseTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
+        this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> T getResponse(final Request request, final Class<T> clazz) throws IntegrationException {
-        try (final Response response = restConnection.execute(request)) {
-            restConnection.throwExceptionForError(response);
+    public <T extends BlackDuckResponse> T getResponse(Request request, Class<T> clazz) throws IntegrationException {
+        try (Response response = blackDuckHttpClient.execute(request)) {
+            blackDuckHttpClient.throwExceptionForError(response);
             return blackDuckJsonTransformer.getResponse(response, clazz);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws BlackDuckIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(String json, Class<T> clazz) throws BlackDuckIntegrationException {
         return blackDuckJsonTransformer.getResponseAs(json, clazz);
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws BlackDuckIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(JsonElement jsonElement, Class<T> clazz) throws BlackDuckIntegrationException {
         return blackDuckJsonTransformer.getResponseAs(jsonElement, clazz);
     }
 
