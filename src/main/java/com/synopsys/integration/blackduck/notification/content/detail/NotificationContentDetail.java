@@ -32,7 +32,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.util.Stringable;
@@ -52,7 +52,7 @@ public class NotificationContentDetail extends Stringable {
     private final Optional<UriSingleResponse<ComponentVersionView>> componentVersion;
 
     private final Optional<String> policyName;
-    private final Optional<UriSingleResponse<PolicyRuleViewV2>> policy;
+    private final Optional<UriSingleResponse<PolicyRuleView>> policy;
 
     private final Optional<String> componentVersionOriginName;
     private final Optional<UriSingleResponse<IssueView>> componentIssue;
@@ -69,20 +69,20 @@ public class NotificationContentDetail extends Stringable {
 
     // @formatter:off
     public static NotificationContentDetail createDetail(
-            final String notificationGroup
-            ,final Optional<String> projectName
-            ,final Optional<String> projectVersionName
-            ,final Optional<String> projectVersionUri
-            ,final Optional<String> componentName
-            ,final Optional<String> componentUri
-            ,final Optional<String> componentVersionName
-            ,final Optional<String> componentVersionUri
-            ,final Optional<String> policyName
-            ,final Optional<String> policyUri
-            ,final Optional<String> componentVersionOriginName
-            ,final Optional<String> componentIssueUri
-            ,final Optional<String> componentVersionOriginId
-            ,final Optional<String> bomComponent
+            String notificationGroup
+            , Optional<String> projectName
+            , Optional<String> projectVersionName
+            , Optional<String> projectVersionUri
+            , Optional<String> componentName
+            , Optional<String> componentUri
+            , Optional<String> componentVersionName
+            , Optional<String> componentVersionUri
+            , Optional<String> policyName
+            , Optional<String> policyUri
+            , Optional<String> componentVersionOriginName
+            , Optional<String> componentIssueUri
+            , Optional<String> componentVersionOriginId
+            , Optional<String> bomComponent
             ) {
         return new NotificationContentDetail(
                 notificationGroup
@@ -105,20 +105,20 @@ public class NotificationContentDetail extends Stringable {
 
     // @formatter:off
     private NotificationContentDetail(
-            final String notificationGroup
-            ,final Optional<String> projectName
-            ,final Optional<String> projectVersionName
-            ,final Optional<String> projectVersion
-            ,final Optional<String> componentName
-            ,final Optional<String> component
-            ,final Optional<String> componentVersionName
-            ,final Optional<String> componentVersion
-            ,final Optional<String> policyName
-            ,final Optional<String> policy
-            ,final Optional<String> componentVersionOriginName
-            ,final Optional<String> componentIssue
-            ,final Optional<String> componentVersionOriginId
-            ,final Optional<String> bomComponent
+            String notificationGroup
+            , Optional<String> projectName
+            , Optional<String> projectVersionName
+            , Optional<String> projectVersion
+            , Optional<String> componentName
+            , Optional<String> component
+            , Optional<String> componentVersionName
+            , Optional<String> componentVersion
+            , Optional<String> policyName
+            , Optional<String> policy
+            , Optional<String> componentVersionOriginName
+            , Optional<String> componentIssue
+            , Optional<String> componentVersionOriginId
+            , Optional<String> bomComponent
             ) {
         this.notificationGroup = notificationGroup;
         this.projectName = projectName;
@@ -129,7 +129,7 @@ public class NotificationContentDetail extends Stringable {
         this.componentVersionName = componentVersionName;
         this.componentVersion = createUriSingleResponse(componentVersion, ComponentVersionView.class);
         this.policyName = policyName;
-        this.policy = createUriSingleResponse(policy, PolicyRuleViewV2.class);
+        this.policy = createUriSingleResponse(policy, PolicyRuleView.class);
         this.componentVersionOriginName = componentVersionOriginName;
         this.componentIssue = createUriSingleResponse(componentIssue, IssueView.class);
         this.componentVersionOriginId = componentVersionOriginId;
@@ -138,7 +138,7 @@ public class NotificationContentDetail extends Stringable {
     }
     // @formatter:on
 
-    private <T extends BlackDuckResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(final Optional<String> uri, final Class<T> responseClass) {
+    private <T extends BlackDuckResponse> Optional<UriSingleResponse<T>> createUriSingleResponse(Optional<String> uri, Class<T> responseClass) {
         if (uri.isPresent()) {
             return Optional.of(new UriSingleResponse<>(uri.get(), responseClass));
         }
@@ -146,36 +146,36 @@ public class NotificationContentDetail extends Stringable {
     }
 
     private String createContentDetailKey() {
-        final StringBuilder keyBuilder = new StringBuilder();
+        StringBuilder keyBuilder = new StringBuilder();
         keyBuilder.append(notificationGroup);
-        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
 
         if (projectVersion.isPresent()) {
             keyBuilder.append(projectVersion.get().getUri().hashCode());
         }
-        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
 
         if (component.isPresent()) {
             keyBuilder.append(component.get().getUri().hashCode());
         }
-        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
 
         if (componentVersion.isPresent()) {
             keyBuilder.append(componentVersion.get().getUri().hashCode());
         }
-        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
 
         if (policy.isPresent()) {
             keyBuilder.append(policy.get().getUri().hashCode());
-            keyBuilder.append(CONTENT_KEY_SEPARATOR);
+            keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
         }
 
         if (bomComponent.isPresent()) {
             keyBuilder.append(bomComponent.get().getUri().hashCode());
         }
-        keyBuilder.append(CONTENT_KEY_SEPARATOR);
+        keyBuilder.append(NotificationContentDetail.CONTENT_KEY_SEPARATOR);
 
-        final String key = keyBuilder.toString();
+        String key = keyBuilder.toString();
         return key;
     }
 
@@ -192,15 +192,15 @@ public class NotificationContentDetail extends Stringable {
     }
 
     public boolean isVulnerability() {
-        return CONTENT_KEY_GROUP_VULNERABILITY.equals(notificationGroup);
+        return NotificationContentDetail.CONTENT_KEY_GROUP_VULNERABILITY.equals(notificationGroup);
     }
 
     public boolean isBomEdit() {
-        return CONTENT_KEY_GROUP_BOM_EDIT.equals(notificationGroup);
+        return NotificationContentDetail.CONTENT_KEY_GROUP_BOM_EDIT.equals(notificationGroup);
     }
 
     public List<UriSingleResponse<? extends BlackDuckResponse>> getPresentLinks() {
-        final List<UriSingleResponse<? extends BlackDuckResponse>> presentLinks = new ArrayList<>();
+        List<UriSingleResponse<? extends BlackDuckResponse>> presentLinks = new ArrayList<>();
         if (projectVersion.isPresent()) {
             presentLinks.add(projectVersion.get());
         }
@@ -256,7 +256,7 @@ public class NotificationContentDetail extends Stringable {
         return policyName;
     }
 
-    public Optional<UriSingleResponse<PolicyRuleViewV2>> getPolicy() {
+    public Optional<UriSingleResponse<PolicyRuleView>> getPolicy() {
         return policy;
     }
 

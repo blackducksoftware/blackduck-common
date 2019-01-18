@@ -7,7 +7,7 @@ import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpr
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleViewV2
+import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals
 @Tag("integration")
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
-    PolicyRuleViewV2 policyRuleViewV2
+    PolicyRuleView policyRuleView
 
     @BeforeEach
     void setup() {
@@ -35,19 +35,19 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          */
         projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
 
-        policyRuleViewV2 = constructTestPolicy(blackDuckServicesFactory.createComponentService())
+        policyRuleView = constructTestPolicy(blackDuckServicesFactory.createComponentService())
 
         /*
-         * To create a Policy Rule we can construct a PolicyRuleViewV2 and create it to Black Duck.
+         * To create a Policy Rule we can construct a PolicyRuleView and create it to Black Duck.
          */
-        String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleViewV2)
-        policyRuleViewV2 = blackDuckService.getResponse(policyRuleUrl, PolicyRuleViewV2.class)
+        String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleView)
+        policyRuleView = blackDuckService.getResponse(policyRuleUrl, PolicyRuleView.class)
     }
 
     @AfterEach
     void cleanup() {
         deleteProject(projectVersionWrapper.getProjectView())
-        blackDuckService.delete(policyRuleViewV2)
+        blackDuckService.delete(policyRuleView)
     }
 
     @Test
@@ -63,22 +63,22 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
-    private PolicyRuleViewV2 constructTestPolicy(ComponentService componentService) {
+    private PolicyRuleView constructTestPolicy(ComponentService componentService) {
         ExternalId externalId = constructExternalId()
         ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId).get()
 
         /**
-         * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleViewV2*/
+         * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleView*/
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder()
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView)
         PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView()
 
-        PolicyRuleViewV2 policyRuleViewV2 = new PolicyRuleViewV2()
-        policyRuleViewV2.name = 'Test Rule' + System.currentTimeMillis()
-        policyRuleViewV2.enabled = true
-        policyRuleViewV2.overridable = true
-        policyRuleViewV2.expression = expressionSet
-        policyRuleViewV2
+        PolicyRuleView policyRuleView = new PolicyRuleView()
+        policyRuleView.name = 'Test Rule' + System.currentTimeMillis()
+        policyRuleView.enabled = true
+        policyRuleView.overridable = true
+        policyRuleView.expression = expressionSet
+        policyRuleView
     }
 
     private ExternalId constructExternalId() {

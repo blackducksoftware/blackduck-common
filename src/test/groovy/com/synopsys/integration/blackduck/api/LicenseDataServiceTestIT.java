@@ -35,7 +35,6 @@ public class LicenseDataServiceTestIT {
         assertEquals(1, complexLicense.getLicenses().size());
 
         ComplexLicenseView embeddedLicense = complexLicense.getLicenses().get(0);
-        assertEquals("PERMISSIVE", embeddedLicense.getCodeSharing());
         assertTrue(StringUtils.isNotBlank(embeddedLicense.getLicense()));
         assertEquals("Apache License 2.0", embeddedLicense.getLicenseDisplay());
         assertEquals("Apache License 2.0", embeddedLicense.getName());

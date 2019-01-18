@@ -23,10 +23,8 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.Header;
@@ -34,6 +32,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -81,15 +80,16 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     }
 
     @Override
-    public void authenticateRequest(HttpUriRequest request) throws IntegrationException {
-        try (Response response = attemptAuthentication()) {
-            if (response.isStatusCodeOkay()) {
-                Header csrfHeader = response.getActualResponse().getFirstHeader(RestConstants.X_CSRF_TOKEN);
-                Optional<String> csrfToken = Optional.of(csrfHeader.getValue());
-                authenticationSupport.resolveToken(logger, this, request, RestConstants.X_CSRF_TOKEN, csrfToken, "No CSRF token found when authenticating");
+    protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
+        if (response.isStatusCodeOkay()) {
+            CloseableHttpResponse actualResponse = response.getActualResponse();
+            Header csrfHeader = actualResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
+            String csrfHeaderValue = csrfHeader.getValue();
+            if (null != csrfHeaderValue) {
+                authenticationSupport.addAuthenticationHeader(this, request, RestConstants.X_CSRF_TOKEN, csrfHeaderValue);
+            } else {
+                logger.error("No CSRF token found when authenticating.");
             }
-        } catch (IOException e) {
-            throw new IntegrationException("The request could not be authenticated with the provided credentials: " + e.getMessage(), e);
         }
     }
 

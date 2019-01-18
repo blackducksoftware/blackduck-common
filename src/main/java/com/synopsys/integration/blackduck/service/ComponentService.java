@@ -35,7 +35,7 @@ import com.synopsys.integration.blackduck.api.generated.response.RemediationOpti
 import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityV2View;
+import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
 import com.synopsys.integration.blackduck.service.model.BlackDuckMediaTypes;
 import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
@@ -46,38 +46,38 @@ import com.synopsys.integration.rest.request.Request;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
-    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(REMEDIATING_LINK, RemediationOptionsView.class);
+    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
-    public ComponentService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public ComponentService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public Optional<ComponentVersionView> getComponentVersion(final ExternalId externalId) throws IntegrationException {
-        for (final ComponentVersionView componentVersion : getAllComponentVersions(externalId)) {
+    public Optional<ComponentVersionView> getComponentVersion(ExternalId externalId) throws IntegrationException {
+        for (ComponentVersionView componentVersion : getAllComponentVersions(externalId)) {
             if (componentVersion.getVersionName().equals(externalId.version)) {
                 return Optional.of(componentVersion);
             }
         }
-        final String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createBlackDuckOriginId();
+        String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createBlackDuckOriginId();
         logger.error(errMsg);
         return Optional.empty();
     }
 
-    public List<ComponentVersionView> getAllComponentVersions(final ExternalId externalId) throws IntegrationException {
-        final Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
+    public List<ComponentVersionView> getAllComponentVersions(ExternalId externalId) throws IntegrationException {
+        Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
         if (!componentSearchView.isPresent()) {
             return Collections.emptyList();
         }
-        final ComponentView componentView = blackDuckService.getResponse(componentSearchView.get().getComponent(), ComponentView.class);
+        ComponentView componentView = blackDuckService.getResponse(componentSearchView.get().getComponent(), ComponentView.class);
 
-        final List<ComponentVersionView> componentVersionViews = blackDuckService.getAllResponses(componentView, ComponentView.VERSIONS_LINK_RESPONSE);
+        List<ComponentVersionView> componentVersionViews = blackDuckService.getAllResponses(componentView, ComponentView.VERSIONS_LINK_RESPONSE);
         return componentVersionViews;
     }
 
-    public Optional<ComponentSearchResultView> getExactComponentMatch(final ExternalId externalId) throws IntegrationException {
-        final List<ComponentSearchResultView> allComponents = getAllComponents(externalId);
-        final String originIdToMatch = externalId.createBlackDuckOriginId();
-        for (final ComponentSearchResultView componentItem : allComponents) {
+    public Optional<ComponentSearchResultView> getExactComponentMatch(ExternalId externalId) throws IntegrationException {
+        List<ComponentSearchResultView> allComponents = getAllComponents(externalId);
+        String originIdToMatch = externalId.createBlackDuckOriginId();
+        for (ComponentSearchResultView componentItem : allComponents) {
             if (null != originIdToMatch) {
                 if (originIdToMatch.equals(componentItem.getOriginId())) {
                     return Optional.of(componentItem);
@@ -88,34 +88,34 @@ public class ComponentService extends DataService {
         return Optional.empty();
     }
 
-    public List<ComponentSearchResultView> getAllComponents(final ExternalId externalId) throws IntegrationException {
-        final String forge = externalId.forge.getName();
-        final String originId = externalId.createBlackDuckOriginId();
-        final String componentQuery = String.format("%s|%s", forge, originId);
-        final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
+    public List<ComponentSearchResultView> getAllComponents(ExternalId externalId) throws IntegrationException {
+        String forge = externalId.forge.getName();
+        String originId = externalId.createBlackDuckOriginId();
+        String componentQuery = String.format("%s|%s", forge, originId);
+        Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
-        final List<ComponentSearchResultView> allComponents = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        List<ComponentSearchResultView> allComponents = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allComponents;
     }
 
-    public List<VulnerabilityV2View> getVulnerabilitiesFromComponentVersion(final ExternalId externalId) throws IntegrationException {
-        final Optional<ComponentVersionVulnerabilities> componentVersionVulnerabilities = getComponentVersionVulnerabilities(externalId);
+    public List<VulnerabilityView> getVulnerabilitiesFromComponentVersion(ExternalId externalId) throws IntegrationException {
+        Optional<ComponentVersionVulnerabilities> componentVersionVulnerabilities = getComponentVersionVulnerabilities(externalId);
         if (!componentVersionVulnerabilities.isPresent()) {
             return Collections.emptyList();
         }
         return componentVersionVulnerabilities.get().getVulnerabilities();
     }
 
-    public Optional<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(final ExternalId externalId) throws IntegrationException {
-        final Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
+    public Optional<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(ExternalId externalId) throws IntegrationException {
+        Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
         }
 
-        final String componentVersionURL = componentSearchView.get().getVersion();
+        String componentVersionURL = componentSearchView.get().getVersion();
         if (null != componentVersionURL) {
-            final ComponentVersionView componentVersion = blackDuckService.getResponse(componentVersionURL, ComponentVersionView.class);
+            ComponentVersionView componentVersion = blackDuckService.getResponse(componentVersionURL, ComponentVersionView.class);
             return Optional.ofNullable(getComponentVersionVulnerabilities(componentVersion));
         }
 
@@ -123,20 +123,20 @@ public class ComponentService extends DataService {
         return Optional.empty();
     }
 
-    public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(final ComponentVersionView componentVersion) throws IntegrationException {
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().mimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-        final List<VulnerabilityV2View> vulnerabilityList = blackDuckService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
+    public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder().mimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
+        List<VulnerabilityView> vulnerabilityList = blackDuckService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
-    public Optional<RemediationOptionsView> getRemediationInformation(final ComponentVersionView componentVersionView) throws IntegrationException {
+    public Optional<RemediationOptionsView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
         if (!componentVersionView.getHref().isPresent()) {
             return Optional.empty();
         }
 
-        final String remediatingUrl = componentVersionView.getHref().get() + "/" + REMEDIATING_LINK;
-        final UriSingleResponse<RemediationOptionsView> uriSingleResponse = new UriSingleResponse<>(remediatingUrl, RemediationOptionsView.class);
+        String remediatingUrl = componentVersionView.getHref().get() + "/" + ComponentService.REMEDIATING_LINK;
+        UriSingleResponse<RemediationOptionsView> uriSingleResponse = new UriSingleResponse<>(remediatingUrl, RemediationOptionsView.class);
         return Optional.ofNullable(blackDuckService.getResponse(uriSingleResponse));
     }
 

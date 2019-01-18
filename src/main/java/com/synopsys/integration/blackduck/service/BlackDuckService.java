@@ -220,6 +220,14 @@ public class BlackDuckService {
     }
 
     // ------------------------------------------------
+    // handling post with a response
+    // ------------------------------------------------
+    public <T extends BlackDuckResponse> T post(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, Object object) throws IntegrationException {
+        String responseUri = post(blackDuckPathSingleResponse.getBlackDuckPath(), object);
+        return getResponse(responseUri, blackDuckPathSingleResponse.getResponseClass());
+    }
+
+    // ------------------------------------------------
     // handling generic post
     // ------------------------------------------------
     public String post(BlackDuckPath blackDuckPath, Object object) throws IntegrationException {

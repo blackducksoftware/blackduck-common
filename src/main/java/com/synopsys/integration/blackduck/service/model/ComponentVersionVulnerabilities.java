@@ -26,13 +26,13 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.List;
 
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityV2View;
+import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
 
 public class ComponentVersionVulnerabilities {
     private final ComponentVersionView componentVersionView;
-    private final List<VulnerabilityV2View> vulnerabilities;
+    private final List<VulnerabilityView> vulnerabilities;
 
-    public ComponentVersionVulnerabilities(final ComponentVersionView componentVersionView, final List<VulnerabilityV2View> vulnerabilities) {
+    public ComponentVersionVulnerabilities(ComponentVersionView componentVersionView, List<VulnerabilityView> vulnerabilities) {
         this.componentVersionView = componentVersionView;
         this.vulnerabilities = vulnerabilities;
     }
@@ -41,7 +41,7 @@ public class ComponentVersionVulnerabilities {
         return componentVersionView;
     }
 
-    public List<VulnerabilityV2View> getVulnerabilities() {
+    public List<VulnerabilityView> getVulnerabilities() {
         return vulnerabilities;
     }
 

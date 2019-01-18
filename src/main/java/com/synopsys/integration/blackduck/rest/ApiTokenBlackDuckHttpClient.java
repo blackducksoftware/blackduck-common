@@ -23,10 +23,8 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -42,8 +40,6 @@ import com.synopsys.integration.rest.support.AuthenticationSupport;
  * Connection to the Black Duck application which authenticates using the API token feature
  */
 public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-
     private final Gson gson;
     private final AuthenticationSupport authenticationSupport;
     private final String apiToken;
@@ -63,30 +59,23 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     public void handleErrorResponse(HttpUriRequest request, Response response) {
         super.handleErrorResponse(request, response);
 
-        authenticationSupport.handleErrorResponse(this, request, response, ApiTokenBlackDuckHttpClient.AUTHORIZATION_HEADER);
+        authenticationSupport.handleTokenErrorResponse(this, request, response);
     }
 
     @Override
     public boolean isAlreadyAuthenticated(HttpUriRequest request) {
-        return request.containsHeader(ApiTokenBlackDuckHttpClient.AUTHORIZATION_HEADER);
+        return authenticationSupport.isTokenAlreadyAuthenticated(request);
     }
 
     @Override
-    public void authenticateRequest(HttpUriRequest request) throws IntegrationException {
-        try (Response response = attemptAuthentication()) {
-            if (response.isStatusCodeOkay()) {
-                Optional<String> bearerToken = authenticationSupport.retrieveBearerToken(logger, gson, this, "bearerToken");
-                authenticationSupport.resolveBearerToken(logger, this, request, ApiTokenBlackDuckHttpClient.AUTHORIZATION_HEADER, bearerToken);
-            }
-        } catch (IOException e) {
-            throw new IntegrationException("The request could not be authenticated with the provided api token: " + e.getMessage(), e);
-        }
+    protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
+        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, gson, this, "bearerToken");
     }
 
     @Override
     public final Response attemptAuthentication() throws IntegrationException {
         Map<String, String> headers = new HashMap<>();
-        headers.put(ApiTokenBlackDuckHttpClient.AUTHORIZATION_HEADER, "token " + apiToken);
+        headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
 
         return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
     }

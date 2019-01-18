@@ -52,52 +52,52 @@ public class CodeLocationCreationService extends DataService {
     private final CodeLocationService codeLocationService;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(final BlackDuckService blackDuckService, final IntLogger logger, final CodeLocationService codeLocationService, final NotificationService notificationService) {
+    public CodeLocationCreationService(BlackDuckService blackDuckService, IntLogger logger, CodeLocationService codeLocationService, NotificationService notificationService) {
         super(blackDuckService, logger);
         this.codeLocationService = codeLocationService;
         this.notificationService = notificationService;
     }
 
-    public <T extends CodeLocationBatchOutput> CodeLocationCreationData<T> createCodeLocations(final CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
-        final NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
-        final T output = codeLocationCreationRequest.executeRequest();
+    public <T extends CodeLocationBatchOutput> CodeLocationCreationData<T> createCodeLocations(CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
+        NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
+        T output = codeLocationCreationRequest.executeRequest();
 
         return new CodeLocationCreationData<>(notificationTaskRange, output);
     }
 
-    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(final CodeLocationCreationRequest<T> codeLocationCreationRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        final CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
+    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
-        final NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
-        final T output = codeLocationCreationData.getOutput();
+        NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
+        T output = codeLocationCreationData.getOutput();
 
         waitForCodeLocations(notificationTaskRange, output.getSuccessfulCodeLocationNames(), timeoutInSeconds);
 
         return output;
     }
 
-    public void waitForCodeLocations(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public void waitForCodeLocations(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         assertCodeLocationsAddedToBom(notificationTaskRange, codeLocationNames, timeoutInSeconds);
     }
 
     public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {
-        final long startTime = System.currentTimeMillis();
-        final LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
-        final LocalDateTime threeDaysLater = localStartTime.plusDays(3);
+        long startTime = System.currentTimeMillis();
+        LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
+        LocalDateTime threeDaysLater = localStartTime.plusDays(3);
 
-        final Date startDate = notificationService.getLatestNotificationDate();
-        final Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
+        Date startDate = notificationService.getLatestNotificationDate();
+        Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 
         return new NotificationTaskRange(startTime, startDate, endDate);
     }
 
-    private void assertCodeLocationsAddedToBom(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    private void assertCodeLocationsAddedToBom(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         boolean allCompleted = false;
         int attemptCount = 1;
         while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
-            final List<CodeLocationView> codeLocations = new ArrayList<>();
-            for (final String codeLocationName : codeLocationNames) {
-                final Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+            List<CodeLocationView> codeLocations = new ArrayList<>();
+            for (String codeLocationName : codeLocationNames) {
+                Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
                 if (codeLocationView.isPresent()) {
                     codeLocations.add(codeLocationView.get());
                 }
@@ -105,21 +105,21 @@ public class CodeLocationCreationService extends DataService {
 
             if (codeLocations.size() == codeLocationNames.size()) {
                 logger.debug("All code locations have been found, now looking for notifications.");
-                final Set<String> codeLocationUrlsToFind = codeLocations
-                                                                   .stream()
-                                                                   .map(CodeLocationView::getHref)
-                                                                   .filter(Optional::isPresent)
-                                                                   .map(Optional::get)
-                                                                   .collect(Collectors.toSet());
+                Set<String> codeLocationUrlsToFind = codeLocations
+                                                             .stream()
+                                                             .map(CodeLocationView::getHref)
+                                                             .filter(Optional::isPresent)
+                                                             .map(Optional::get)
+                                                             .collect(Collectors.toSet());
 
-                final Set<String> codeLocationUrls = new HashSet<>();
-                final List<NotificationView> notifications = notificationService
-                                                                     .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                                                                             Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+                Set<String> codeLocationUrls = new HashSet<>();
+                List<NotificationView> notifications = notificationService
+                                                               .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                                                                       Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
                 logger.debug(String.format("There were %d notifications found.", notifications.size()));
 
-                for (final NotificationView notificationView : notifications) {
-                    final Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
+                for (NotificationView notificationView : notifications) {
+                    Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
                     if (codeLocationUrl.isPresent()) {
                         codeLocationUrls.add(codeLocationUrl.get());
                     }
@@ -138,24 +138,13 @@ public class CodeLocationCreationService extends DataService {
         if (!allCompleted) {
             throw new BlackDuckTimeoutExceededException(String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
         } else {
-            waitAnAdditionalMostlyArbitraryAmount();
             logger.info("All code locations have been added to the BOM.");
         }
     }
 
-    private Optional<String> getCodeLocationUrl(final NotificationView notificationView) {
-        final String codeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
+    private Optional<String> getCodeLocationUrl(NotificationView notificationView) {
+        String codeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
         return Optional.ofNullable(codeLocationUrl);
-    }
-
-    // FIXME this will need to be removed when the VERSION_BOM_CODE_LOCATION_BOM_COMPUTED is fixed
-    private void waitAnAdditionalMostlyArbitraryAmount() {
-        try {
-            // 5-10 seconds wasn't enough, 60 appears to be
-            Thread.sleep(60 * 1000);
-        } catch (final InterruptedException ignoreMe) {
-            // ignored
-        }
     }
 
 }
