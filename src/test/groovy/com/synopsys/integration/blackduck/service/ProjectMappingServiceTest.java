@@ -3,7 +3,6 @@ package com.synopsys.integration.blackduck.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +31,8 @@ class ProjectMappingServiceTest {
         final String testProjectName = intHttpClientTestHelper.getProperty("TEST_PROJECT");
         final String testProjectVersion = intHttpClientTestHelper.getProperty("TEST_VERSION");
 
-        final Optional<ProjectView> existingProjectView = projectService.getProjectByName(testProjectName);
-        if (existingProjectView.isPresent()) {
-            final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-            blackDuckService.delete(existingProjectView.get());
-        }
-
         final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(testProjectName, testProjectVersion);
-        final ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequestBuilder.build());
+        final ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectRequestBuilder.build());
         projectView = projectVersionWrapper.getProjectView();
     }
 
