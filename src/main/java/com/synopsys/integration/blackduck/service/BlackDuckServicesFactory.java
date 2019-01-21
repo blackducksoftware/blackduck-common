@@ -159,8 +159,7 @@ public class BlackDuckServicesFactory {
     }
 
     public ProjectMappingService createProjectMappingService() {
-        final BlackDuckService blackDuckService = createBlackDuckService();
-        return new ProjectMappingService(blackDuckService);
+        return new ProjectMappingService(createBlackDuckService(), logger);
     }
 
     public void addEnvironmentVariable(String key, String value) {

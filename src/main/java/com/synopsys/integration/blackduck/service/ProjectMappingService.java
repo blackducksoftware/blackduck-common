@@ -6,12 +6,11 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 
-public class ProjectMappingService {
-    private final BlackDuckService blackDuckService;
-
-    public ProjectMappingService(BlackDuckService blackDuckService) {
-        this.blackDuckService = blackDuckService;
+public class ProjectMappingService extends DataService {
+    public ProjectMappingService(BlackDuckService blackDuckService, IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     /**
@@ -41,4 +40,5 @@ public class ProjectMappingService {
     public List<ProjectMappingView> getProjectMappings(ProjectView projectView) throws IntegrationException {
         return blackDuckService.getResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE, true);
     }
+
 }
