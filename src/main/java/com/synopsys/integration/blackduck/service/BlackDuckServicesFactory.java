@@ -158,6 +158,11 @@ public class BlackDuckServicesFactory {
         return new UserGroupService(createBlackDuckService(), logger);
     }
 
+    public ProjectMappingService createProjectMappingService() {
+        final BlackDuckService blackDuckService = createBlackDuckService();
+        return new ProjectMappingService(blackDuckService);
+    }
+
     public void addEnvironmentVariable(String key, String value) {
         intEnvironmentVariables.put(key, value);
     }
