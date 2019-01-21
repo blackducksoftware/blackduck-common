@@ -34,8 +34,6 @@ public class ProjectMappingService {
                 projectMappingView.setApplicationId(applicationId);
                 blackDuckService.post(projectMappingsLink.get(), projectMappingView);
             }
-        } else {
-            throw new IntegrationException("project-mappings link not found in projectView");
         }
     }
 
