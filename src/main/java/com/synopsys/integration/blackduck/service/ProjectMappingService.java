@@ -1,43 +1,44 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 
-public class ProjectMappingService {
-    private final BlackDuckService blackDuckService;
-
-    public ProjectMappingService(final BlackDuckService blackDuckService) {
-        this.blackDuckService = blackDuckService;
+public class ProjectMappingService extends DataService {
+    public ProjectMappingService(BlackDuckService blackDuckService, IntLogger logger) {
+        super(blackDuckService, logger);
     }
 
     /**
      * Sets the applicationId for a project
      * @throws IntegrationException
      */
-    // TODO: Currently there exists only one project-mapping which is the project's Application ID. Eventually there will be namespaces that we will need to filter. This method would need to take in a namespace as well.
-    public void populateApplicationId(final ProjectView projectView, final String applicationId) throws IntegrationException {
-        final Optional<String> projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK);
-
-        if (projectMappingsLink.isPresent()) {
-            final Optional<ProjectMappingView> existingProjectMappingView = getProjectMappings(projectView).stream()
-                                                                                .findFirst();
-            if (existingProjectMappingView.isPresent()) {
-                final ProjectMappingView projectMappingView = existingProjectMappingView.get();
-                projectMappingView.setApplicationId(applicationId);
-                blackDuckService.put(projectMappingView);
-            } else {
-                final ProjectMappingView projectMappingView = new ProjectMappingView();
-                projectMappingView.setApplicationId(applicationId);
-                blackDuckService.post(projectMappingsLink.get(), projectMappingView);
+    public void populateApplicationId(ProjectView projectView, String applicationId) throws IntegrationException {
+        List<ProjectMappingView> projectMappings = blackDuckService.getAllResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE);
+        boolean canCreate = projectMappings.isEmpty();
+        if (canCreate) {
+            if (!projectView.hasLink(ProjectView.PROJECT_MAPPINGS_LINK)) {
+                throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a project mapping.", ProjectView.PROJECT_MAPPINGS_LINK));
             }
+            String projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK).get();
+            ProjectMappingView projectMappingView = new ProjectMappingView();
+            projectMappingView.setApplicationId(applicationId);
+            blackDuckService.post(projectMappingsLink, projectMappingView);
+        } else {
+            // Currently there exists only one project-mapping which is the project's Application ID.
+            // Eventually, this method would need to take in a namespace on which we will need to filter.
+            ProjectMappingView projectMappingView = projectMappings.get(0);
+            projectMappingView.setApplicationId(applicationId);
+            blackDuckService.put(projectMappingView);
         }
     }
 
-    public List<ProjectMappingView> getProjectMappings(final ProjectView projectView) throws IntegrationException {
+    public List<ProjectMappingView> getProjectMappings(ProjectView projectView) throws IntegrationException {
         return blackDuckService.getResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE, true);
     }
+
 }

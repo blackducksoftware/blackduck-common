@@ -132,7 +132,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
                     if (errorResponse.isPresent()) {
                         errorMessage = errorResponse.get().getErrorMessage();
                     } else {
-                        errorMessage = "The connection was not successful for an unknown reason.";
+                        errorMessage = "The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.";
                     }
                 }
             }
