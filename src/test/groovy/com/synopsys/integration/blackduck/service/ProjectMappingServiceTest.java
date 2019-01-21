@@ -50,12 +50,12 @@ class ProjectMappingServiceTest {
     }
 
     @Test
-    void setApplicationId() throws IntegrationException {
+    void populateApplicationId() throws IntegrationException {
         List<ProjectMappingView> projectMappings = projectMappingService.getProjectMappings(projectView);
         assertEquals(0, projectMappings.size());
 
         // Testing Creation
-        projectMappingService.setApplicationId(projectView, "testApplicationId1");
+        projectMappingService.populateApplicationId(projectView, "testApplicationId1");
         projectMappings = projectMappingService.getProjectMappings(projectView);
         assertEquals(1, projectMappings.size());
 
@@ -64,7 +64,7 @@ class ProjectMappingServiceTest {
         assertEquals("testApplicationId1", applicationId);
 
         // Testing Updating
-        projectMappingService.setApplicationId(projectView, "testApplicationId2");
+        projectMappingService.populateApplicationId(projectView, "testApplicationId2");
         projectMappings = projectMappingService.getProjectMappings(projectView);
         assertEquals(1, projectMappings.size());
 

@@ -19,7 +19,7 @@ public class ProjectMappingService {
      * @throws IntegrationException
      */
     // TODO: Currently there exists only one project-mapping which is the project's Application ID. Eventually there will be namespaces that we will need to filter. This method would need to take in a namespace as well.
-    public void setApplicationId(final ProjectView projectView, final String applicationId) throws IntegrationException {
+    public void populateApplicationId(final ProjectView projectView, final String applicationId) throws IntegrationException {
         final Optional<String> projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK);
 
         if (projectMappingsLink.isPresent()) {
