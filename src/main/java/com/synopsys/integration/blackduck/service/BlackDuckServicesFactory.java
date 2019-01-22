@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
@@ -92,8 +93,9 @@ public class BlackDuckServicesFactory {
         BlackDuckService blackDuckService = createBlackDuckService();
         CodeLocationService codeLocationService = createCodeLocationService();
         NotificationService notificationService = createNotificationService();
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, codeLocationService, notificationService);
 
-        return new CodeLocationCreationService(blackDuckService, logger, codeLocationService, notificationService);
+        return new CodeLocationCreationService(blackDuckService, logger, codeLocationWaiter, notificationService);
     }
 
     public CodeLocationService createCodeLocationService() {
