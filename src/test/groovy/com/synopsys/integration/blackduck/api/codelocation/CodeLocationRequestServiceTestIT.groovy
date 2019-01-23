@@ -55,7 +55,12 @@ class CodeLocationRequestServiceTestIT {
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         assertNotNull(response)
 
-        CodeLocationView codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
+        CodeLocationView codeLocationView = null;
+        long startTime = System.currentTimeMillis();
+        long duration = System.currentTimeMillis() - startTime;
+        while (!codeLocationView && duration < 1000 * 60 * 5) {
+            codeLocationView = services.createCodeLocationService().getCodeLocationById(response.codeLocationId)
+        }
         assertNotNull(codeLocationView)
         assertTrue(StringUtils.isBlank(codeLocationView.mappedProjectVersion))
 
