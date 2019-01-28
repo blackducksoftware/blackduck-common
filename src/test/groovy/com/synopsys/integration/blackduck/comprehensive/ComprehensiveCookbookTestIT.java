@@ -28,15 +28,15 @@ import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponent
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.Result;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCodeLocationCreationRequest;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerCodeLocationCreationRequest;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
@@ -170,12 +170,13 @@ public class ComprehensiveCookbookTestIT {
 
         // import the bdio
         File file = intHttpClientTestHelper.getFile("bdio/mtglist_bdio.jsonld");
-        UploadRunner uploadRunner = new UploadRunner(blackDuckServices.logger, blackDuckServices.blackDuckService);
-        UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
-        BdioUploadCodeLocationCreationRequest codeLocationCreationRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(codeLocationName, file));
 
-        blackDuckServices.codeLocationCreationService.createCodeLocationsAndWait(codeLocationCreationRequest, 15 * 60);
+        BdioUploadService bdioUploadService = blackDuckServices.blackDuckServicesFactory.createBdioUploadService();
+        UploadBatchOutput uploadBatchOutput = bdioUploadService.uploadBdioAndWait(uploadBatch, 15 * 60);
+        for (UploadOutput uploadOutput : uploadBatchOutput) {
+            assertEquals(Result.SUCCESS, uploadOutput.getResult());
+        }
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
     }
@@ -201,7 +202,6 @@ public class ComprehensiveCookbookTestIT {
         File outputDirectory = new File(parentDirectory, "scanner_output");
 
         // perform the scan
-        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(blackDuckServices.logger, blackDuckServices.blackDuckServerConfig);
         ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
         scanBatchBuilder.fromBlackDuckServerConfig(blackDuckServices.blackDuckServerConfig);
         scanBatchBuilder.installDirectory(installDirectory);
@@ -209,11 +209,12 @@ public class ComprehensiveCookbookTestIT {
         scanBatchBuilder.projectAndVersionNames(projectName, projectVersionName);
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget(scanFile.getAbsolutePath(), codeLocationName));
         ScanBatch scanBatch = scanBatchBuilder.build();
-        SignatureScannerCodeLocationCreationRequest codeLocationCreationRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
 
-        ScanBatchOutput scanBatchOutput = blackDuckServices.codeLocationCreationService.createCodeLocationsAndWait(codeLocationCreationRequest, 15 * 60);
-        for (ScanCommandOutput scanCommandOutput : scanBatchOutput.getOutputs()) {
-            assertTrue(scanCommandOutput.getResult() == Result.SUCCESS);
+        SignatureScannerService signatureScannerService = blackDuckServices.blackDuckServicesFactory.createSignatureScannerService();
+        ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
+
+        for (ScanCommandOutput scanCommandOutput : scanBatchOutput) {
+            assertEquals(Result.SUCCESS, scanCommandOutput.getResult());
             assertNotNull(scanCommandOutput.getDryRunFile());
         }
 

@@ -24,10 +24,19 @@
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class UploadBatch {
     private final List<UploadTarget> uploadTargets = new ArrayList<>();
+
+    public UploadBatch() {
+
+    }
+
+    public UploadBatch(UploadTarget... uploadTargets) {
+        this.uploadTargets.addAll(Arrays.asList(uploadTargets));
+    }
 
     public void addUploadTarget(final UploadTarget uploadTarget) {
         uploadTargets.add(uploadTarget);

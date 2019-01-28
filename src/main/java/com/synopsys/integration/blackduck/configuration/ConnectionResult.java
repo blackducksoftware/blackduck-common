@@ -26,17 +26,19 @@ package com.synopsys.integration.blackduck.configuration;
 import java.util.Optional;
 
 public class ConnectionResult {
+    private final int httpStatusCode;
     private final String errorMessage;
 
-    public static final ConnectionResult SUCCESS() {
-        return new ConnectionResult(null);
+    public static final ConnectionResult SUCCESS(int httpStatusCode) {
+        return new ConnectionResult(httpStatusCode, null);
     }
 
-    public static final ConnectionResult FAILURE(final String errorMessage) {
-        return new ConnectionResult(errorMessage);
+    public static final ConnectionResult FAILURE(int httpStatusCode, String errorMessage) {
+        return new ConnectionResult(httpStatusCode, errorMessage);
     }
 
-    private ConnectionResult(final String errorMessage) {
+    private ConnectionResult(int httpStatusCode, String errorMessage) {
+        this.httpStatusCode = httpStatusCode;
         this.errorMessage = errorMessage;
     }
 
@@ -46,6 +48,10 @@ public class ConnectionResult {
 
     public boolean isFailure() {
         return getErrorMessage().isPresent();
+    }
+
+    public int getHttpStatusCode() {
+        return httpStatusCode;
     }
 
     public Optional<String> getErrorMessage() {
