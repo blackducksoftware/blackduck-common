@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.configuration;
 
 import java.net.URL;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,17 +59,30 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     private final Gson gson;
     private final ObjectMapper objectMapper;
     private final AuthenticationSupport authenticationSupport;
+    private final ExecutorService executorService;
+
+    BlackDuckServerConfig(
+            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport,
+            ExecutorService executorService) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, executorService, credentials, null);
+    }
 
     BlackDuckServerConfig(
             URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, credentials, null);
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, credentials, null);
+    }
+
+    BlackDuckServerConfig(URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport,
+            ExecutorService executorService) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, executorService, null, apiToken);
     }
 
     BlackDuckServerConfig(URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, apiToken);
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, null, apiToken);
     }
 
-    private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, Credentials credentials,
+    private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, ExecutorService executorService,
+            Credentials credentials,
             String apiToken) {
         this.credentials = credentials;
         this.apiToken = apiToken;
@@ -79,6 +93,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.authenticationSupport = authenticationSupport;
+        this.executorService = executorService;
     }
 
     public boolean shouldUseProxyForBlackDuck() {
@@ -122,10 +137,13 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
     public ConnectionResult attemptConnection(IntLogger logger) {
         String errorMessage = null;
+        int httpStatusCode = 0;
+
         try {
             BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
             try (Response response = blackDuckHttpClient.attemptAuthentication()) {
                 // if you get an error response, you know that a connection could not be made
+                httpStatusCode = response.getStatusCode();
                 if (response.isStatusCodeError()) {
                     String httpResponseContent = response.getContentString();
                     Optional<ErrorResponse> errorResponse = blackDuckHttpClient.extractErrorResponse(httpResponseContent);
@@ -142,22 +160,29 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
         if (null != errorMessage) {
             logger.error(errorMessage);
-            return ConnectionResult.FAILURE(errorMessage);
+            return ConnectionResult.FAILURE(httpStatusCode, errorMessage);
         }
 
         logger.info("A successful connection was made.");
-        return ConnectionResult.SUCCESS();
+        return ConnectionResult.SUCCESS(httpStatusCode);
     }
 
+    /**
+     * @deprecated The gson and objectMapper instances don't need to be passed in - they should be set in the builder.
+     */
+    @Deprecated
     public BlackDuckServicesFactory createBlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
         BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
         return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
-        Gson gson = BlackDuckServicesFactory.createDefaultGson();
-        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-        return createBlackDuckServicesFactory(gson, objectMapper, logger);
+        BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
+        if (null == executorService) {
+            return new BlackDuckServicesFactory(gson, objectMapper, executorService, blackDuckRestConnection, logger);
+        } else {
+            return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
+        }
     }
 
     public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {

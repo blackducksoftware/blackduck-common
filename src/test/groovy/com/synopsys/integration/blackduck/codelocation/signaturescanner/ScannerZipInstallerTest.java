@@ -21,6 +21,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.client.IntHttpClient;
@@ -56,11 +57,15 @@ public class ScannerZipInstallerTest {
         blackDuckServerConfigBuilder.setLogger(logger);
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
-        ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
+
+        OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
+        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
+        CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckUrl, operatingSystemType);
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
-        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
         ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));

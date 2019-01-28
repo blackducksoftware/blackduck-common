@@ -27,6 +27,7 @@ import java.util.Set;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -38,7 +39,7 @@ public class SignatureScannerService extends DataService {
     private final CodeLocationCreationService codeLocationCreationService;
 
     public SignatureScannerService(final BlackDuckService blackDuckService, final IntLogger logger,
-            final ScanBatchRunner scanBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
+        final ScanBatchRunner scanBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckService, logger);
         this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
@@ -68,8 +69,8 @@ public class SignatureScannerService extends DataService {
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public void waitForSignatureScan(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
+    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
     }
 
 }

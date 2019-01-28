@@ -23,17 +23,19 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
-    private final List<T> outputs;
+public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
+    private final List<T> outputs = new ArrayList<>();
 
     public CodeLocationBatchOutput(List<T> outputs) {
-        this.outputs = outputs;
+        this.outputs.addAll(outputs);
     }
 
     public List<T> getOutputs() {
@@ -46,6 +48,11 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> {
                        .map(CodeLocationOutput::getCodeLocationName)
                        .filter(StringUtils::isNotBlank)
                        .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return outputs.iterator();
     }
 
 }
