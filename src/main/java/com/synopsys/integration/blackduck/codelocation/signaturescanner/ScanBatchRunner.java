@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
@@ -34,7 +35,9 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
@@ -46,28 +49,52 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final File defaultInstallDirectory;
 
-    public static ScanBatchRunner createDefault(final IntLogger logger, final BlackDuckServerConfig blackDuckServerConfig) {
-        final IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
-        final OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
-        final ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
-        final ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
-        final ScannerZipInstaller scannerZipInstaller = ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, scanPathsUtility, operatingSystemType);
+    /**
+     * @deprecated Please use the createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables) method instead.
+     */
+    @Deprecated
+    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig) {
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
+        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables);
+    }
+
+    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables) {
+        OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
+        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
+        ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
+
+        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
+    }
+
+    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService) {
+        OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
+        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
+        ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility, executorService);
+
+        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
+    }
+
+    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, OperatingSystemType operatingSystemType,
+            ScanCommandRunner scanCommandRunner) {
+        CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
 
         return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public static ScanBatchRunner createWithNoInstaller(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility,
-            final ScanCommandRunner scanCommandRunner) {
+    public static ScanBatchRunner createWithNoInstaller(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, File defaultInstallDirectory, ScanPathsUtility scanPathsUtility,
+            ScanCommandRunner scanCommandRunner) {
         return new ScanBatchRunner(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
     }
 
-    public static ScanBatchRunner createComplete(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility,
-            final ScanCommandRunner scanCommandRunner) {
+    public static ScanBatchRunner createComplete(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility,
+            ScanCommandRunner scanCommandRunner) {
         return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public ScanBatchRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScannerZipInstaller scannerZipInstaller, final ScanPathsUtility scanPathsUtility, final ScanCommandRunner scanCommandRunner,
-            final File defaultInstallDirectory) {
+    public ScanBatchRunner(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner,
+            File defaultInstallDirectory) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scannerZipInstaller = scannerZipInstaller;
@@ -76,27 +103,27 @@ public class ScanBatchRunner {
         this.defaultInstallDirectory = defaultInstallDirectory;
     }
 
-    public ScanBatchOutput executeScans(final ScanBatch scanBatch) throws BlackDuckIntegrationException {
+    public ScanBatchOutput executeScans(ScanBatch scanBatch) throws BlackDuckIntegrationException {
         if (scannerZipInstaller != null) {
             // if an installer is specified, it will be used to install/update the scanner
-            final File installDirectory = scanBatch.getSignatureScannerInstallDirectory();
+            File installDirectory = scanBatch.getSignatureScannerInstallDirectory();
             if (!installDirectory.exists()) {
                 scannerZipInstaller.installOrUpdateScanner(installDirectory);
             } else {
                 try {
-                    final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+                    ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
                     if (scanPaths.isManagedByLibrary()) {
                         scannerZipInstaller.installOrUpdateScanner(installDirectory);
                     }
-                } catch (final BlackDuckIntegrationException e) {
+                } catch (BlackDuckIntegrationException e) {
                     // a valid scanPaths could not be found so we will need to attempt an install
                     scannerZipInstaller.installOrUpdateScanner(installDirectory);
                 }
             }
         }
 
-        final List<ScanCommand> scanCommands = scanBatch.createScanCommands(defaultInstallDirectory, scanPathsUtility, intEnvironmentVariables);
-        final List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanBatch.isCleanupOutput());
+        List<ScanCommand> scanCommands = scanBatch.createScanCommands(defaultInstallDirectory, scanPathsUtility, intEnvironmentVariables);
+        List<ScanCommandOutput> scanCommandOutputs = scanCommandRunner.executeScans(scanCommands, scanBatch.isCleanupOutput());
         return new ScanBatchOutput(scanCommandOutputs);
     }
 

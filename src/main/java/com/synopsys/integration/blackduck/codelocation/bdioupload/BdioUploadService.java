@@ -37,41 +37,51 @@ public class BdioUploadService extends DataService {
     private final UploadRunner uploadRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public BdioUploadService(final BlackDuckService blackDuckService, final IntLogger logger, final UploadRunner uploadRunner, final CodeLocationCreationService codeLocationCreationService) {
+    public BdioUploadService(BlackDuckService blackDuckService, IntLogger logger, UploadRunner uploadRunner, CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckService, logger);
         this.uploadRunner = uploadRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
-    public BdioUploadCodeLocationCreationRequest createUploadRequest(final UploadBatch uploadBatch) {
+    public BdioUploadCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch) {
         return new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
     }
 
-    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(final BdioUploadCodeLocationCreationRequest uploadRequest) throws IntegrationException {
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(BdioUploadCodeLocationCreationRequest uploadRequest) throws IntegrationException {
         return codeLocationCreationService.createCodeLocations(uploadRequest);
     }
 
-    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(final UploadTarget uploadTarget) throws IntegrationException {
-        final UploadBatch uploadBatch = new UploadBatch();
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch) throws IntegrationException {
+        BdioUploadCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch);
+        return uploadBdio(uploadRequest);
+    }
+
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadTarget uploadTarget) throws IntegrationException {
+        UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(uploadTarget);
-        final BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
         return uploadBdio(uploadRequest);
     }
 
-    public UploadBatchOutput uploadBdioAndWait(final BdioUploadCodeLocationCreationRequest uploadRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public UploadBatchOutput uploadBdioAndWait(BdioUploadCodeLocationCreationRequest uploadRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return codeLocationCreationService.createCodeLocationsAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public UploadBatchOutput uploadBdioAndWait(final UploadTarget uploadTarget, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        final UploadBatch uploadBatch = new UploadBatch();
+    public UploadBatchOutput uploadBdioAndWait(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        BdioUploadCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch);
+        return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
+    }
+
+    public UploadBatchOutput uploadBdioAndWait(UploadTarget uploadTarget, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(uploadTarget);
-        final BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
 
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBdioUpload(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public void waitForBdioUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
     }
 

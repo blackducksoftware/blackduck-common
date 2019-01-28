@@ -31,8 +31,10 @@ import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -65,6 +67,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
+    private ExecutorService executorService = null;
 
     public BlackDuckServerConfigBuilder() {
         EnumSet.allOf(Property.class).forEach(property -> {
@@ -241,6 +244,15 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         if (null != logger) {
             this.logger = logger;
         }
+        return this;
+    }
+
+    public Optional<ExecutorService> getExecutorService() {
+        return Optional.ofNullable(executorService);
+    }
+
+    public BlackDuckServerConfigBuilder setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
         return this;
     }
 
