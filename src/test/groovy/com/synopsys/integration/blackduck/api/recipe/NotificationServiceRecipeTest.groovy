@@ -17,6 +17,7 @@ import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import com.synopsys.integration.exception.IntegrationException
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 
@@ -27,6 +28,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
 @Tag("integration")
+@Disabled
 class NotificationServiceRecipeTest extends BasicRecipe {
     private static final String NOTIFICATION_PROJECT_NAME = "hub-notification-data-test"
     private static final String NOTIFICATION_PROJECT_VERSION_NAME = "1.0.0"
