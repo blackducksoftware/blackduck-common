@@ -38,7 +38,7 @@ public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
     private final UploadTarget uploadTarget;
 
-    public UploadCallable(final BlackDuckService blackDuckService, final UploadTarget uploadTarget) {
+    public UploadCallable(BlackDuckService blackDuckService, UploadTarget uploadTarget) {
         this.blackDuckService = blackDuckService;
         this.uploadTarget = uploadTarget;
     }
@@ -46,23 +46,23 @@ public class UploadCallable implements Callable<UploadOutput> {
     @Override
     public UploadOutput call() {
         try {
-            final String jsonPayload;
+            String jsonPayload;
             try {
                 jsonPayload = FileUtils.readFileToString(uploadTarget.getUploadFile(), StandardCharsets.UTF_8);
-            } catch (final IOException e) {
-                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
+            } catch (IOException e) {
+                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to initially read file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
             }
 
-            final String uri = blackDuckService.getUri(BlackDuckService.BOMIMPORT_PATH);
-            final Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
+            String uri = blackDuckService.getUri(BlackDuckService.BOMIMPORT_PATH);
+            Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
-                final String responseString = response.getContentString();
+                String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), e.getMessage(), e);
             }
-        } catch (final Exception e) {
-            return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "An unknown error occurred trying to upload a file.", e);
+        } catch (Exception e) {
+            return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
         }
     }
 
