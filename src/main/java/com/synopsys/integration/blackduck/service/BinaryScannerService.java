@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class BinaryScannerService extends DataService {
         super(blackDuckService, logger);
     }
 
-    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException, URISyntaxException {
+    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException {
         Map<String, String> textParts = new HashMap<>();
         textParts.put("projectName", projectName);
         textParts.put("version", projectVersion);
@@ -59,7 +58,7 @@ public class BinaryScannerService extends DataService {
                 logger.info("Status code OK");
             } else {
                 logger.error("Unknown status code: " + response.getStatusCode());
-                throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
+                throw new IntegrationException("Unknown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
             }
         }
     }
