@@ -23,11 +23,9 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import java.util.Iterator;
-
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 
-public class CodeLocationCreationData<T extends CodeLocationBatchOutput> implements Iterable<T> {
+public class CodeLocationCreationData<T extends CodeLocationBatchOutput> {
     private final NotificationTaskRange notificationTaskRange;
     private final T output;
 
@@ -42,11 +40,6 @@ public class CodeLocationCreationData<T extends CodeLocationBatchOutput> impleme
 
     public T getOutput() {
         return output;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return output.iterator();
     }
 
 }
