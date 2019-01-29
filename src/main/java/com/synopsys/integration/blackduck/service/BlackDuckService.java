@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathSingleResponse;
@@ -230,13 +231,13 @@ public class BlackDuckService {
     // ------------------------------------------------
     // handling generic post
     // ------------------------------------------------
-    public String post(BlackDuckPath blackDuckPath, Object object) throws IntegrationException {
+    public String post(BlackDuckPath blackDuckPath, BlackDuckComponent blackDuckComponent) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckHttpClient.getBaseUrl(), blackDuckPath.getPath());
-        return post(uri, object);
+        return post(uri, blackDuckComponent);
     }
 
-    public String post(String uri, Object object) throws IntegrationException {
-        String json = gson.toJson(object);
+    public String post(String uri, BlackDuckComponent blackDuckComponent) throws IntegrationException {
+        String json = gson.toJson(blackDuckComponent);
         Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(uri).build();
         return executePostRequestAndRetrieveURL(request);
     }

@@ -26,20 +26,13 @@ package com.synopsys.integration.blackduck.service;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.StringBody;
-
+import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class BinaryScannerService extends DataService {
@@ -47,15 +40,17 @@ public class BinaryScannerService extends DataService {
         super(blackDuckService, logger);
     }
 
-    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
-        RequestBuilder builder = blackDuckService.getBlackDuckHttpClient().createRequestBuilder(HttpMethod.POST);
-        URL baseURL = new URL(blackDuckService.getBlackDuckHttpClient().getBaseUrl());
-        URL uploadUrl = new URL(baseURL, "/api/uploads");
-        builder.setUri(uploadUrl.toURI());
-        builder.setEntity(createEntity(binaryFile, projectName, projectVersion, codeLocatioName));
+    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException, URISyntaxException {
+        Map<String, String> textParts = new HashMap<>();
+        textParts.put("projectName", projectName);
+        textParts.put("version", projectVersion);
+        textParts.put("codeLocationName", codeLocationName);
 
-        HttpUriRequest request = builder.build();
-        try (Response response = blackDuckService.getBlackDuckHttpClient().execute(request)) {
+        Map<String, File> binaryParts = new HashMap<>();
+        binaryParts.put("fileupload", binaryFile);
+
+        Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(binaryParts, textParts);
+        try (Response response = blackDuckService.execute(BlackDuckService.UPLOADS_PATH, requestBuilder)) {
             logger.debug("Response: " + response.toString());
             logger.debug("Response: " + response.getStatusMessage().toString());
             logger.debug("Response: " + response.getStatusCode().toString());
@@ -67,23 +62,6 @@ public class BinaryScannerService extends DataService {
                 throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
             }
         }
-    }
-
-    private HttpEntity createEntity(File file, String projectName, String projectVersion, String codeLocatioName) {
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        addPart(builder, "projectName", projectName);
-        addPart(builder, "version", projectVersion);
-        addPart(builder, "codeLocationName", codeLocatioName);
-        builder.addBinaryBody("fileupload", file);
-
-        return builder.build();
-    }
-
-    private void addPart(MultipartEntityBuilder builder, String name, String value) {
-        StringBody body = new StringBody(value, ContentType.DEFAULT_TEXT);
-        FormBodyPart part = FormBodyPartBuilder.create(name, body).build();
-        // part.getHeader().removeFields("Content-Type");
-        builder.addPart(part);
     }
 
 }
