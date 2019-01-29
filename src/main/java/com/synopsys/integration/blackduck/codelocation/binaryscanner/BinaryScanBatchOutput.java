@@ -1,7 +1,12 @@
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
-import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
+import java.util.List;
 
-public class BinaryScanBatchOutput extends CodeLocationBatchOutput<UploadOutput> {
+import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
+
+public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOutput> {
+    public BinaryScanBatchOutput(List<BinaryScanOutput> outputs) {
+        super(outputs);
+    }
+
 }
