@@ -13,9 +13,8 @@ version = '41.2.0-SNAPSHOT'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    api 'com.blackducksoftware.integration:integration-rest:0.8.0'
+    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.2'
     api 'com.blackducksoftware.integration:integration-reporting:0.2.0'
-    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.1'
     api 'com.blackducksoftware.integration:integration-bdio:16.4.0'
     api 'com.blackducksoftware.integration:phone-home-client:0.20.0'
 

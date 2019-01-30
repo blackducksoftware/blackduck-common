@@ -29,6 +29,8 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.NotificationService;
@@ -73,7 +75,8 @@ public class CodeLocationCreationService extends DataService {
         LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
         LocalDateTime threeDaysLater = localStartTime.plusDays(3);
 
-        Date startDate = notificationService.getLatestNotificationDate();
+        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
         Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 
         return new NotificationTaskRange(startTime, startDate, endDate);

@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -96,10 +97,11 @@ public class BlackDuckHttpClientTestIT {
     }
 
     @Test
+    @Disabled
     public void testProvidedApiToken() {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl("https://int-hub02.dc1.lan");
-        builder.setApiToken("YTM4NTViNWQtNDBkZi00YWY4LWExZmUtOGJlNjU2MWE3MTlkOjdiYzkxOTc2LTlhZWUtNDIzYy04ZTVmLTE1MjBiMWYwNDRkNg==");
+        builder.setApiToken("MTYzZjkxMjAtMDBmMi00NTk4LWJmNjEtZmYzYWIyMmEwNWE2OjJkYjQwZDJiLTAzYWQtNGZiOC05ZTJjLTY3MWQyZTcwNWIzOQ==");
         builder.setTrustCert(true);
         BlackDuckServerConfig blackDuckServerConfig = builder.build();
         assertTrue(blackDuckServerConfig.canConnect());
