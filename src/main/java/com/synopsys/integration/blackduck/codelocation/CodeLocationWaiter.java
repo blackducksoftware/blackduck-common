@@ -34,7 +34,8 @@ import java.util.Set;
 import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -56,7 +57,7 @@ public class CodeLocationWaiter {
         this.notificationService = notificationService;
     }
 
-    public CodeLocationWaitResult checkCodeLocationsAddedToBom(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         boolean allCompleted = false;
         int attemptCount = 1;
         while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
@@ -72,12 +73,12 @@ public class CodeLocationWaiter {
 
             if (codeLocationNamesToViews.size() > 0) {
                 logger.debug("At least one code location has been found, now looking for notifications.");
-                List<NotificationView> notifications = notificationService
-                                                               .getFilteredNotifications(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                                                                       Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+                List<NotificationUserView> notifications = notificationService
+                                                                   .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                                                                           Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
                 logger.debug(String.format("There were %d notifications found.", notifications.size()));
 
-                for (NotificationView notificationView : notifications) {
+                for (NotificationUserView notificationView : notifications) {
                     Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
                     if (codeLocationUrl.isPresent() && codeLocationUrlsToNames.containsKey(codeLocationUrl.get())) {
                         foundCodeLocationNames.add(codeLocationUrlsToNames.get(codeLocationUrl.get()));
@@ -102,7 +103,7 @@ public class CodeLocationWaiter {
         }
     }
 
-    private Optional<String> getCodeLocationUrl(NotificationView notificationView) {
+    private Optional<String> getCodeLocationUrl(NotificationUserView notificationView) {
         String codeLocationUrl = JsonPath.read(notificationView.getJson(), "$.content.codeLocation");
         return Optional.ofNullable(codeLocationUrl);
     }

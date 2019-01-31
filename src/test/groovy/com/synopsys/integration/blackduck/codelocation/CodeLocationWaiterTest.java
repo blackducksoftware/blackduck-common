@@ -20,7 +20,8 @@ import org.mockito.stubbing.Answer;
 
 import com.synopsys.integration.blackduck.api.generated.component.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.NotificationView;
+import com.synopsys.integration.blackduck.api.generated.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -36,15 +37,15 @@ public class CodeLocationWaiterTest {
         Mockito.when(mockCodeLocationService.getCodeLocationByName("two")).thenReturn(Optional.of(createTestView("two")));
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
-        NotificationView first = createTestNotification("one");
-        NotificationView second = createTestNotification("two");
-        Mockito.when(mockNotificationService.getFilteredNotifications(Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first, second));
+        NotificationUserView first = createTestNotification("one");
+        NotificationUserView second = createTestNotification("two");
+        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first, second));
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(notificationTaskRange, codeLocationNames, 2);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -58,11 +59,11 @@ public class CodeLocationWaiterTest {
         Mockito.when(mockCodeLocationService.getCodeLocationByName("one")).thenReturn(Optional.of(createTestView("one")));
         Mockito.when(mockCodeLocationService.getCodeLocationByName("two")).thenReturn(Optional.of(createTestView("two")));
 
-        NotificationView first = createTestNotification("one");
-        NotificationView second = createTestNotification("two");
+        NotificationUserView first = createTestNotification("one");
+        NotificationUserView second = createTestNotification("two");
 
-        List<NotificationView> initialResponse = Arrays.asList(first);
-        List<NotificationView> eventualResponse = Arrays.asList(first, second);
+        List<NotificationUserView> initialResponse = Arrays.asList(first);
+        List<NotificationUserView> eventualResponse = Arrays.asList(first, second);
 
         Answer eventuallyFindBoth = new Answer() {
             final long startTime = System.currentTimeMillis();
@@ -80,13 +81,13 @@ public class CodeLocationWaiterTest {
         };
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
-        Mockito.when(mockNotificationService.getFilteredNotifications(Mockito.any(), Mockito.any(), Mockito.anyList())).thenAnswer(eventuallyFindBoth);
+        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenAnswer(eventuallyFindBoth);
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(notificationTaskRange, codeLocationNames, 7);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 7);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -101,14 +102,14 @@ public class CodeLocationWaiterTest {
         Mockito.when(mockCodeLocationService.getCodeLocationByName("two")).thenReturn(Optional.empty());
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
-        NotificationView first = createTestNotification("one");
-        Mockito.when(mockNotificationService.getFilteredNotifications(Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first));
+        NotificationUserView first = createTestNotification("one");
+        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first));
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(notificationTaskRange, codeLocationNames, 2);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2);
         assertTrue(CodeLocationWaitResult.Status.PARTIAL == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getErrorMessage().isPresent());
@@ -136,8 +137,8 @@ public class CodeLocationWaiterTest {
         return codeLocationView;
     }
 
-    private NotificationView createTestNotification(String name) {
-        NotificationView notificationView = new NotificationView();
+    private NotificationUserView createTestNotification(String name) {
+        NotificationUserView notificationView = new NotificationUserView();
         notificationView.setJson("{\"content\": {\"codeLocation\": \"" + hrefFromName(name) + "\"}}");
         return notificationView;
     }
