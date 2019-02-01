@@ -178,7 +178,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
         BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
-        if (null == executorService) {
+        if (null != executorService) {
             return new BlackDuckServicesFactory(gson, objectMapper, executorService, blackDuckRestConnection, logger);
         } else {
             return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
