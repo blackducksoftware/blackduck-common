@@ -33,7 +33,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.view.ScanSummaryView;
+import com.synopsys.integration.blackduck.api.manual.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -41,37 +41,37 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 
 public class CodeLocationService extends DataService {
-    public CodeLocationService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public CodeLocationService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public void unmapCodeLocations(final List<CodeLocationView> codeLocationViews) throws IntegrationException {
-        for (final CodeLocationView codeLocationView : codeLocationViews) {
+    public void unmapCodeLocations(List<CodeLocationView> codeLocationViews) throws IntegrationException {
+        for (CodeLocationView codeLocationView : codeLocationViews) {
             unmapCodeLocation(codeLocationView);
         }
     }
 
-    public void unmapCodeLocation(final CodeLocationView codeLocationView) throws IntegrationException {
+    public void unmapCodeLocation(CodeLocationView codeLocationView) throws IntegrationException {
         mapCodeLocation(codeLocationView, "");
     }
 
-    public void mapCodeLocation(final CodeLocationView codeLocationView, final ProjectVersionView version) throws IntegrationException {
+    public void mapCodeLocation(CodeLocationView codeLocationView, ProjectVersionView version) throws IntegrationException {
         if (version.getHref().isPresent()) {
             mapCodeLocation(codeLocationView, version.getHref().get());
         }
     }
 
-    public void mapCodeLocation(final CodeLocationView codeLocationView, final String versionUrl) throws IntegrationException {
+    public void mapCodeLocation(CodeLocationView codeLocationView, String versionUrl) throws IntegrationException {
         codeLocationView.setMappedProjectVersion(versionUrl);
         blackDuckService.put(codeLocationView);
     }
 
-    public Optional<CodeLocationView> getCodeLocationByName(final String codeLocationName) throws IntegrationException {
+    public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         if (StringUtils.isNotBlank(codeLocationName)) {
-            final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
-            final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
-            final List<CodeLocationView> codeLocations = blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
-            for (final CodeLocationView codeLocation : codeLocations) {
+            Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
+            Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+            List<CodeLocationView> codeLocations = blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder);
+            for (CodeLocationView codeLocation : codeLocations) {
                 if (codeLocationName.equals(codeLocation.getName())) {
                     return Optional.of(codeLocation);
                 }
@@ -86,14 +86,14 @@ public class CodeLocationService extends DataService {
         return Optional.empty();
     }
 
-    public CodeLocationView getCodeLocationById(final String codeLocationId) throws IntegrationException {
-        final BlackDuckPath blackDuckPath = new BlackDuckPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
-        final BlackDuckPathSingleResponse<CodeLocationView> codeLocationResponse = new BlackDuckPathSingleResponse<>(blackDuckPath, CodeLocationView.class);
+    public CodeLocationView getCodeLocationById(String codeLocationId) throws IntegrationException {
+        BlackDuckPath blackDuckPath = new BlackDuckPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
+        BlackDuckPathSingleResponse<CodeLocationView> codeLocationResponse = new BlackDuckPathSingleResponse<>(blackDuckPath, CodeLocationView.class);
         return blackDuckService.getResponse(codeLocationResponse);
     }
 
-    public ScanSummaryView getScanSummaryViewById(final String scanSummaryId) throws IntegrationException {
-        final String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
+    public ScanSummaryView getScanSummaryViewById(String scanSummaryId) throws IntegrationException {
+        String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         return blackDuckService.getResponse(uri, ScanSummaryView.class);
     }
 

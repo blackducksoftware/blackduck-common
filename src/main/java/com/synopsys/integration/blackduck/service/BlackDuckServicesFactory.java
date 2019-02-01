@@ -38,7 +38,6 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -144,10 +143,6 @@ public class BlackDuckServicesFactory {
 
     public CodeLocationService createCodeLocationService() {
         return new CodeLocationService(createBlackDuckService(), logger);
-    }
-
-    public CommonNotificationService createCommonNotificationService(NotificationContentDetailFactory notificationContentDetailFactory, boolean oldestFirst) {
-        return new CommonNotificationService(notificationContentDetailFactory, oldestFirst);
     }
 
     public ComponentService createComponentService() {
