@@ -29,10 +29,12 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import com.jayway.jsonpath.JsonPath;
 import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.client.AuthenticatingIntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
@@ -63,21 +65,20 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         }
     }
 
-    public void throwExceptionForError(Response response) throws IntegrationRestException, BlackDuckApiException {
+    @Override
+    public Response execute(HttpUriRequest request) throws IntegrationException {
+        try {
+            return super.execute(request);
+        } catch (IntegrationRestException e) {
+            throw transformException(e);
+        }
+    }
+
+    public void throwExceptionForError(Response response) throws IntegrationException {
         try {
             response.throwExceptionForError();
         } catch (IntegrationRestException e) {
-            String httpResponseContent = e.getHttpResponseContent();
-            Optional<ErrorResponse> optionalErrorResponse = extractErrorResponse(httpResponseContent);
-            // Not all IntegrationRestExceptions are from Black Duck - if we were able to
-            // transform the IntegrationRestException, we want to throw the resulting
-            // BlackDuckApiException, otherwise, we want to ignore any potential
-            // transformation and just throw the original IntegrationRestException
-            if (optionalErrorResponse.isPresent()) {
-                throw new BlackDuckApiException(e, optionalErrorResponse.get().getErrorMessage(), optionalErrorResponse.get().getErrorCode());
-            } else {
-                throw e;
-            }
+            throw transformException(e);
         }
     }
 
@@ -98,6 +99,22 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    private IntegrationException transformException(IntegrationRestException e) {
+        String httpResponseContent = e.getHttpResponseContent();
+        Optional<ErrorResponse> optionalErrorResponse = extractErrorResponse(httpResponseContent);
+        // Not all IntegrationRestExceptions are from Black Duck - if we were able to
+        // transform the IntegrationRestException, we want to return the resulting
+        // BlackDuckApiException, otherwise, we want to ignore any potential
+        // transformation and just return the original IntegrationRestException
+        if (optionalErrorResponse.isPresent()) {
+            ErrorResponse errorResponse = optionalErrorResponse.get();
+            String apiExceptionErrorMessage = String.format("[Black Duck Error Message]: %s [Integration Error Message]: %s", errorResponse.getErrorMessage(), e.getMessage());
+            return new BlackDuckApiException(e, apiExceptionErrorMessage, errorResponse.getErrorCode());
+        } else {
+            return e;
+        }
     }
 
 }
