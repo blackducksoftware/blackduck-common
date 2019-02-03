@@ -36,7 +36,7 @@ public class IntHttpClientTestHelper {
     }
 
     private void initProperties() {
-        Logger.getLogger(HttpClient.class.getName()).setLevel(Level.FINE);
+        Logger.getLogger(HttpClient.class.getName()).setLevel(Level.INFO);
         testProperties = new Properties();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classLoader.getResourceAsStream("test.properties")) {
@@ -95,7 +95,7 @@ public class IntHttpClientTestHelper {
     }
 
     public IntLogger createIntLogger() {
-        return new PrintStreamIntLogger(System.out, LogLevel.TRACE);
+        return new PrintStreamIntLogger(System.out, LogLevel.INFO);
     }
 
     public IntLogger createIntLogger(LogLevel logLevel) {

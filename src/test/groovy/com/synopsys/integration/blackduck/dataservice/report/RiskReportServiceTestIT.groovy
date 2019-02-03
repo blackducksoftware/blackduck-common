@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.dataservice.report
 
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class RiskReportServiceTestIT {
     private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper()
 

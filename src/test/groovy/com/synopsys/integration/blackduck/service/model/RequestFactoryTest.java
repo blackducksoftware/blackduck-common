@@ -8,21 +8,24 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.rest.request.Request;
 
+@ExtendWith(TimingExtension.class)
 public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() {
-        final BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), blackDuckRequestFilter, 1, 0);
-        final Request request = requestBuilder.build();
+        BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), blackDuckRequestFilter, 1, 0);
+        Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));
         assertTrue(request.getQueryParameters().containsKey("limit"));
         assertTrue(request.getQueryParameters().containsKey("offset"));
 
-        final Set<String> filterParameters = request.getQueryParameters().get("filter");
+        Set<String> filterParameters = request.getQueryParameters().get("filter");
         assertEquals(2, filterParameters.size());
         assertTrue(filterParameters.contains("KEY1:value1"));
         assertTrue(filterParameters.contains("KEY1:value2"));

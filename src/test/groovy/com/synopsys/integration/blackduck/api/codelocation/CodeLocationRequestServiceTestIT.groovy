@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.api.codelocation
 
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
@@ -19,10 +20,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class CodeLocationRequestServiceTestIT {
     private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper();
 

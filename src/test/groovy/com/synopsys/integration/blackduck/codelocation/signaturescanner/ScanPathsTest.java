@@ -17,7 +17,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
@@ -25,6 +27,7 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
+@ExtendWith(TimingExtension.class)
 public class ScanPathsTest {
     // Example ...BlackDuckScanOutput\2018-09-16_15-38-37-050_1
     private static final String DATE_AND_THREAD_SPECIFIC_NAME = ".*\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}-\\d{3}_\\S+";
@@ -43,14 +46,14 @@ public class ScanPathsTest {
 
     @BeforeEach
     public void createFileSetups() throws Exception {
-        final Path tempDirectoryPath = Files.createTempDirectory("scan_setups");
+        Path tempDirectoryPath = Files.createTempDirectory("scan_setups");
         tempDirectory = tempDirectoryPath.toFile();
 
         createMacSetup(tempDirectory);
         createWindowsSetup(tempDirectory);
         createLinuxSetup(tempDirectory);
 
-        final Path bdsJavaHomeDirectoryPath = Files.createTempDirectory("bds_java_home");
+        Path bdsJavaHomeDirectoryPath = Files.createTempDirectory("bds_java_home");
         bdsJavaHomeDirectory = bdsJavaHomeDirectoryPath.toFile();
 
         createWindowsJvm(bdsJavaHomeDirectory);
@@ -66,9 +69,9 @@ public class ScanPathsTest {
 
     @Test
     public void testSignatureScannerPathsInstalledByUs() throws Exception {
-        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
 
         assertScanPathsOk(macScanPaths, true);
         assertScanPathsOk(windowsScanPaths, true);
@@ -77,9 +80,9 @@ public class ScanPathsTest {
 
     @Test
     public void testSignatureScannerPathsInstalledByThem() throws Exception {
-        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(new File(macSetup, getScannerPath()));
-        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(new File(windowsSetup, getScannerPath()));
-        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(new File(linuxSetup, getScannerPath()));
+        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(new File(macSetup, getScannerPath()));
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(new File(windowsSetup, getScannerPath()));
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(new File(linuxSetup, getScannerPath()));
 
         assertScanPathsOk(macScanPaths, false);
         assertScanPathsOk(windowsScanPaths, false);
@@ -88,22 +91,22 @@ public class ScanPathsTest {
 
     @Test
     public void testCreateSpecificRunOutputDirectory() throws Exception {
-        final File macSpecificRunOutputDirectory = macScanPathsUtility.createSpecificRunOutputDirectory(new File(macSetup, getScannerPath()));
-        final File windowsSpecificRunOutputDirectory = windowsScanPathsUtility.createSpecificRunOutputDirectory(new File(windowsSetup, getScannerPath()));
-        final File linuxSpecificRunOutputDirectory = linuxScanPathsUtility.createSpecificRunOutputDirectory(new File(linuxSetup, getScannerPath()));
+        File macSpecificRunOutputDirectory = macScanPathsUtility.createSpecificRunOutputDirectory(new File(macSetup, getScannerPath()));
+        File windowsSpecificRunOutputDirectory = windowsScanPathsUtility.createSpecificRunOutputDirectory(new File(windowsSetup, getScannerPath()));
+        File linuxSpecificRunOutputDirectory = linuxScanPathsUtility.createSpecificRunOutputDirectory(new File(linuxSetup, getScannerPath()));
 
-        assertTrue(macSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
-        assertTrue(windowsSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
-        assertTrue(linuxSpecificRunOutputDirectory.getAbsolutePath().matches(DATE_AND_THREAD_SPECIFIC_NAME));
+        assertTrue(macSpecificRunOutputDirectory.getAbsolutePath().matches(ScanPathsTest.DATE_AND_THREAD_SPECIFIC_NAME));
+        assertTrue(windowsSpecificRunOutputDirectory.getAbsolutePath().matches(ScanPathsTest.DATE_AND_THREAD_SPECIFIC_NAME));
+        assertTrue(linuxSpecificRunOutputDirectory.getAbsolutePath().matches(ScanPathsTest.DATE_AND_THREAD_SPECIFIC_NAME));
     }
 
     @Test
     public void testJavaExecutablePathWithPackagedJre() throws Exception {
         intEnvironmentVariables.put(BDS_JAVA_HOME, null);
 
-        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
 
         assertThat(macScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "mac_setup" + File.separator + getScannerPath()));
         assertThat(windowsScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "windows_setup" + File.separator + getScannerPath()));
@@ -114,16 +117,16 @@ public class ScanPathsTest {
     public void testJavaExecutablePathWithBdsJavaHome() throws Exception {
         intEnvironmentVariables.put(BDS_JAVA_HOME, bdsJavaHomeDirectory.getAbsolutePath());
 
-        final ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        final ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        final ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
 
         assertThat(macScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java"));
         assertThat(windowsScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java.exe"));
         assertThat(linuxScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java"));
     }
 
-    private void assertScanPathsOk(final ScanPaths scanPaths, final boolean managedByLibrary) {
+    private void assertScanPathsOk(ScanPaths scanPaths, boolean managedByLibrary) {
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
@@ -134,77 +137,77 @@ public class ScanPathsTest {
         return ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY + File.separator + "scanner";
     }
 
-    private void createMacSetup(final File tempDirectory) throws IOException {
+    private void createMacSetup(File tempDirectory) throws IOException {
         macSetup = new File(tempDirectory, "mac_setup");
         createBasicSetup(macSetup);
 
-        final File icon = new File(macSetup, getScannerPath() + File.separator + "icon");
+        File icon = new File(macSetup, getScannerPath() + File.separator + "icon");
         icon.mkdirs();
 
-        final File jre = new File(macSetup, getScannerPath() + File.separator + "jre");
-        final File javaBin = new File(jre, "Contents" + File.separator + "Home" + File.separator + "bin");
+        File jre = new File(macSetup, getScannerPath() + File.separator + "jre");
+        File javaBin = new File(jre, "Contents" + File.separator + "Home" + File.separator + "bin");
         javaBin.mkdirs();
 
-        final File javaExe = new File(javaBin, "java");
+        File javaExe = new File(javaBin, "java");
         javaExe.createNewFile();
     }
 
-    private void createWindowsSetup(final File tempDirectory) throws IOException {
+    private void createWindowsSetup(File tempDirectory) throws IOException {
         windowsSetup = new File(tempDirectory, "windows_setup");
         createBasicSetup(windowsSetup);
 
-        final File jre = new File(windowsSetup, getScannerPath() + File.separator + "jre");
-        final File javaBin = new File(jre, "bin");
+        File jre = new File(windowsSetup, getScannerPath() + File.separator + "jre");
+        File javaBin = new File(jre, "bin");
         javaBin.mkdirs();
 
-        final File javaExe = new File(javaBin, "java.exe");
+        File javaExe = new File(javaBin, "java.exe");
         javaExe.createNewFile();
     }
 
-    private void createLinuxSetup(final File tempDirectory) throws IOException {
+    private void createLinuxSetup(File tempDirectory) throws IOException {
         linuxSetup = new File(tempDirectory, "linux_setup");
         createBasicSetup(linuxSetup);
 
-        final File jre = new File(linuxSetup, getScannerPath() + File.separator + "jre");
-        final File javaBin = new File(jre, "bin");
+        File jre = new File(linuxSetup, getScannerPath() + File.separator + "jre");
+        File javaBin = new File(jre, "bin");
         javaBin.mkdirs();
 
-        final File javaExe = new File(javaBin, "java");
+        File javaExe = new File(javaBin, "java");
         javaExe.createNewFile();
     }
 
-    private void createBasicSetup(final File installDirectory) throws IOException {
-        final File scanDirectory = new File(installDirectory, getScannerPath());
+    private void createBasicSetup(File installDirectory) throws IOException {
+        File scanDirectory = new File(installDirectory, getScannerPath());
         scanDirectory.mkdirs();
 
-        final File bin = new File(scanDirectory, "bin");
+        File bin = new File(scanDirectory, "bin");
         bin.mkdirs();
-        final File jre = new File(scanDirectory, "jre");
+        File jre = new File(scanDirectory, "jre");
         jre.mkdirs();
-        final File lib = new File(scanDirectory, "lib");
-        final File cache = new File(lib, "cache");
+        File lib = new File(scanDirectory, "lib");
+        File cache = new File(lib, "cache");
         cache.mkdirs();
 
-        final File standaloneJar = new File(lib, "scan.cli-x.y.z-standalone.jar");
+        File standaloneJar = new File(lib, "scan.cli-x.y.z-standalone.jar");
         standaloneJar.createNewFile();
 
-        final File implStandaloneJar = new File(cache, "scan.cli.impl-standalone.jar");
+        File implStandaloneJar = new File(cache, "scan.cli.impl-standalone.jar");
         implStandaloneJar.createNewFile();
     }
 
-    private void createWindowsJvm(final File tempDirectory) throws IOException {
-        final File javaBin = new File(tempDirectory, "bin");
+    private void createWindowsJvm(File tempDirectory) throws IOException {
+        File javaBin = new File(tempDirectory, "bin");
         javaBin.mkdirs();
 
-        final File javaExe = new File(javaBin, "java.exe");
+        File javaExe = new File(javaBin, "java.exe");
         javaExe.createNewFile();
     }
 
-    private void createOtherJvm(final File tempDirectory) throws IOException {
-        final File javaBin = new File(tempDirectory, "bin");
+    private void createOtherJvm(File tempDirectory) throws IOException {
+        File javaBin = new File(tempDirectory, "bin");
         javaBin.mkdirs();
 
-        final File javaExe = new File(javaBin, "java");
+        File javaExe = new File(javaBin, "java");
         javaExe.createNewFile();
     }
 

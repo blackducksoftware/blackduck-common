@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
@@ -11,10 +12,12 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class CreateDetailedProjectRecipeTest extends BasicRecipe {
     private ProjectView projectView
 

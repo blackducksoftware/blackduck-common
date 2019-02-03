@@ -12,7 +12,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -29,6 +31,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class BdioUploadRecipeTest extends BasicRecipe {
     private final String codeLocationName = "hub_common_27_0_0_SNAPSHOT_upload_recipe";
     private final String uniqueProjectName = "hub-common_with_project_in_bdio";

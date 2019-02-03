@@ -8,7 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -17,6 +19,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class ProjectMappingServiceTest {
     private ProjectMappingService projectMappingService;
     private ProjectView projectView;
@@ -24,21 +27,21 @@ class ProjectMappingServiceTest {
 
     @BeforeEach
     void setUp() throws IntegrationException {
-        final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
         blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         projectMappingService = blackDuckServicesFactory.createProjectMappingService();
-        final ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        final String testProjectName = intHttpClientTestHelper.getProperty("TEST_PROJECT");
-        final String testProjectVersion = intHttpClientTestHelper.getProperty("TEST_VERSION");
+        ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        String testProjectName = intHttpClientTestHelper.getProperty("TEST_PROJECT");
+        String testProjectVersion = intHttpClientTestHelper.getProperty("TEST_VERSION");
 
-        final ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(testProjectName, testProjectVersion);
-        final ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectRequestBuilder.build());
+        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(testProjectName, testProjectVersion);
+        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectRequestBuilder.build());
         projectView = projectVersionWrapper.getProjectView();
     }
 
     @AfterEach
     void tearDown() throws IntegrationException {
-        final BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
         blackDuckService.delete(projectView);
     }
 
@@ -68,7 +71,7 @@ class ProjectMappingServiceTest {
 
     @Test
     void getProjectMappings() throws IntegrationException {
-        final List<ProjectMappingView> projectMappings = projectMappingService.getProjectMappings(projectView);
+        List<ProjectMappingView> projectMappings = projectMappingService.getProjectMappings(projectView);
         assertEquals(0, projectMappings.size());
     }
 }

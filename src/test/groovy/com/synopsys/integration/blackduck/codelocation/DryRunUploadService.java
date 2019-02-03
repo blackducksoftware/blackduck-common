@@ -11,16 +11,16 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 public class DryRunUploadService extends DataService {
-    public DryRunUploadService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public DryRunUploadService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public DryRunUploadResponse uploadDryRunFile(final File dryRunFile) throws Exception {
-        final String uri = blackDuckService.getUri(new BlackDuckPath("/api/v1/scans"));
-        final Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
+    public DryRunUploadResponse uploadDryRunFile(File dryRunFile) throws Exception {
+        String uri = blackDuckService.getUri(new BlackDuckPath("/api/v1/scans"));
+        Request request = RequestFactory.createCommonPostRequestBuilder(dryRunFile).uri(uri).build();
         try (Response response = blackDuckService.execute(request)) {
-            final String responseString = response.getContentString();
-            final DryRunUploadResponse uploadResponse = blackDuckService.getGson().fromJson(responseString, DryRunUploadResponse.class);
+            String responseString = response.getContentString();
+            DryRunUploadResponse uploadResponse = blackDuckService.getGson().fromJson(responseString, DryRunUploadResponse.class);
             uploadResponse.setJson(responseString);
             return uploadResponse;
         }

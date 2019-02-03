@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.api.recipe
 
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException
@@ -7,10 +8,12 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class ProjectErrorsRecipeTest extends BasicRecipe {
     private static final String PROJECT_NAME_NOT_FOUND = 'Project Name That Should Never Exist'
 

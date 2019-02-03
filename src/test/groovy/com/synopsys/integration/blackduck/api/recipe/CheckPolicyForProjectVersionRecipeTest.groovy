@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.bdio.model.Forge
 import com.synopsys.integration.bdio.model.externalid.ExternalId
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
@@ -16,10 +17,12 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
     PolicyRuleView policyRuleView
