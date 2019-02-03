@@ -12,6 +12,7 @@ import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
+@Disabled
 public class DryRunUploadServiceTestIT {
     private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper();
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
