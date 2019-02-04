@@ -12,7 +12,6 @@ import com.synopsys.integration.log.IntLogger
 import com.synopsys.integration.log.LogLevel
 import com.synopsys.integration.log.PrintStreamIntLogger
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-@Disabled
 public class DryRunUploadServiceTestIT {
     private static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper();
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
@@ -44,17 +42,23 @@ public class DryRunUploadServiceTestIT {
         DryRunUploadService dryRunUploadRequestService = new DryRunUploadService(services.createBlackDuckService(), logger)
         DryRunUploadResponse response = dryRunUploadRequestService.uploadDryRunFile(dryRunFile)
         assertNotNull(response)
+        logger.info("upload response: ${response}");
 
+        int attemptCount = 0;
         long start = System.currentTimeMillis();
+        long duration = System.currentTimeMillis() - start;
         CodeLocationView codeLocationView = null
-        while (null == codeLocationView && System.currentTimeMillis() - start <= FIVE_MINUTES) {
+        while (null == codeLocationView && duration <= FIVE_MINUTES) {
             // creating the code location can take a few seconds
             try {
                 codeLocationView = codeLocationService.getCodeLocationById(response.codeLocationId)
+                logger.info("Found ${codeLocationView} on attempt ${attemptCount}");
             } catch (IntegrationException ignored) {
                 // ignored
             }
             Thread.sleep(5000);
+            attemptCount++;
+            duration = System.currentTimeMillis() - start;
         }
         assertNotNull(codeLocationView)
 
