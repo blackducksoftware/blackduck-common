@@ -110,7 +110,7 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         // transformation and just return the original IntegrationRestException
         if (optionalErrorResponse.isPresent()) {
             ErrorResponse errorResponse = optionalErrorResponse.get();
-            String apiExceptionErrorMessage = String.format("[Black Duck Error Message]: %s [Integration Error Message]: %s", errorResponse.getErrorMessage(), e.getMessage());
+            String apiExceptionErrorMessage = String.format("%s [HTTP Error]: %s", errorResponse.getErrorMessage(), e.getMessage());
             return new BlackDuckApiException(e, apiExceptionErrorMessage, errorResponse.getErrorCode());
         } else {
             return e;
