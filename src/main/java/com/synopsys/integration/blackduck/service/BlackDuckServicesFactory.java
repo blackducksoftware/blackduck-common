@@ -192,6 +192,10 @@ public class BlackDuckServicesFactory {
         return new ProjectMappingService(createBlackDuckService(), logger);
     }
 
+    public TagService createTagService() {
+        return new TagService(createBlackDuckService(), logger);
+    }
+
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
     }
