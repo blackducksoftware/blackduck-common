@@ -69,7 +69,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertTrue(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertTrue(connectionResult.isSuccess());
-        assertFalse(connectionResult.getErrorMessage().isPresent());
+        assertFalse(connectionResult.getFailureMessage().isPresent());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getErrorMessage().get());
+        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getFailureMessage().get());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals("Invalid username or password", connectionResult.getErrorMessage().get());
+        assertEquals("Invalid username or password", connectionResult.getFailureMessage().get());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getErrorMessage().get());
+        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getFailureMessage().get());
     }
 
     @Test

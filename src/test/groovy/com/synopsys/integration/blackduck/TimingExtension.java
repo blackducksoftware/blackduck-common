@@ -1,31 +1,38 @@
 package com.synopsys.integration.blackduck;
 
 import java.lang.reflect.Method;
-import java.util.logging.Logger;
+import java.util.Date;
 
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
-    private static final Logger logger = Logger.getLogger(TimingExtension.class.getName());
+import com.synopsys.integration.rest.RestConstants;
 
+public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
     private static final String START_TIME = "start time";
 
     @Override
     public void beforeTestExecution(ExtensionContext context) throws Exception {
-        getStore(context).put(TimingExtension.START_TIME, System.currentTimeMillis());
+        long currentTime = System.currentTimeMillis();
+        getStore(context).put(TimingExtension.START_TIME, currentTime);
+        Class<?> testClass = context.getRequiredTestClass();
         Method testMethod = context.getRequiredTestMethod();
-        TimingExtension.logger.info(() -> String.format("Method [%s] starting...", testMethod.getName()));
+        String currentTimeString = RestConstants.formatDate(new Date(currentTime));
+
+        System.out.println(String.format("%s - %s:%s starting...", currentTimeString, testClass.getName(), testMethod.getName()));
     }
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
+        long currentTime = System.currentTimeMillis();
+        Class<?> testClass = context.getRequiredTestClass();
         Method testMethod = context.getRequiredTestMethod();
+        String currentTimeString = RestConstants.formatDate(new Date(currentTime));
         long startTime = getStore(context).remove(TimingExtension.START_TIME, long.class);
-        long duration = System.currentTimeMillis() - startTime;
+        long duration = currentTime - startTime;
 
-        TimingExtension.logger.info(() -> String.format("Method [%s] took %s ms.", testMethod.getName(), duration));
+        System.out.println(String.format("%s - %s:%s took %s ms.", currentTimeString, testClass.getName(), testMethod.getName(), duration));
     }
 
     private ExtensionContext.Store getStore(ExtensionContext context) {

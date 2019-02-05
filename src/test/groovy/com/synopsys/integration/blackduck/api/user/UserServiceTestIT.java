@@ -13,14 +13,13 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class UserServiceTestIT {
-    private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper(TestingPropertyKey.TEST_HTTPS_BLACK_DUCK_SERVER_URL.toString());
+    private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
     @Test
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {

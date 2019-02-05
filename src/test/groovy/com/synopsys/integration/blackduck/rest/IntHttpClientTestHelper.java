@@ -22,30 +22,28 @@ import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 
 public class IntHttpClientTestHelper {
+    private static Properties testProperties;
+
     private final String blackDuckServerUrl;
-    private Properties testProperties;
 
     public IntHttpClientTestHelper() {
-        initProperties();
+        if (null == IntHttpClientTestHelper.testProperties) {
+            initProperties();
+        }
         blackDuckServerUrl = getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
     }
 
-    public IntHttpClientTestHelper(String blackDuckServerUrlPropertyName) {
-        initProperties();
-        blackDuckServerUrl = testProperties.getProperty(blackDuckServerUrlPropertyName);
-    }
-
-    private void initProperties() {
+    public void initProperties() {
         Logger.getLogger(HttpClient.class.getName()).setLevel(Level.INFO);
-        testProperties = new Properties();
+        IntHttpClientTestHelper.testProperties = new Properties();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classLoader.getResourceAsStream("test.properties")) {
-            testProperties.load(is);
+            IntHttpClientTestHelper.testProperties.load(is);
         } catch (Exception e) {
             System.err.println("reading test.properties failed!");
         }
 
-        if (testProperties.isEmpty()) {
+        if (IntHttpClientTestHelper.testProperties.isEmpty()) {
             try {
                 loadOverrideProperties(TestingPropertyKey.values());
             } catch (Exception e) {
@@ -58,7 +56,7 @@ public class IntHttpClientTestHelper {
         for (TestingPropertyKey key : keys) {
             String prop = System.getenv(key.toString());
             if (prop != null && !prop.isEmpty()) {
-                testProperties.setProperty(key.toString(), prop);
+                IntHttpClientTestHelper.testProperties.setProperty(key.toString(), prop);
             }
         }
     }
@@ -68,7 +66,7 @@ public class IntHttpClientTestHelper {
     }
 
     public String getProperty(String key) {
-        return testProperties.getProperty(key);
+        return IntHttpClientTestHelper.testProperties.getProperty(key);
     }
 
     public BlackDuckServerConfig getBlackDuckServerConfig() {
