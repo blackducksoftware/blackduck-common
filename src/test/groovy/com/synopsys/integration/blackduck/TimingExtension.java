@@ -20,7 +20,7 @@ public class TimingExtension implements BeforeTestExecutionCallback, AfterTestEx
         Method testMethod = context.getRequiredTestMethod();
         String currentTimeString = RestConstants.formatDate(new Date(currentTime));
 
-        System.out.println(String.format("%s - %s:%s starting...", currentTimeString, testClass.getName(), testMethod.getName()));
+        System.out.println(String.format("%s - %s:%s starting...", currentTimeString, testClass.getSimpleName(), testMethod.getName()));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TimingExtension implements BeforeTestExecutionCallback, AfterTestEx
         long startTime = getStore(context).remove(TimingExtension.START_TIME, long.class);
         long duration = currentTime - startTime;
 
-        System.out.println(String.format("%s - %s:%s took %s ms.", currentTimeString, testClass.getName(), testMethod.getName(), duration));
+        System.out.println(String.format("%s - %s:%s took %s ms.", currentTimeString, testClass.getSimpleName(), testMethod.getName(), duration));
     }
 
     private ExtensionContext.Store getStore(ExtensionContext context) {
