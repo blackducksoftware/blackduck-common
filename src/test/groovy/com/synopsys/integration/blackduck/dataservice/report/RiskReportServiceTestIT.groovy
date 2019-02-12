@@ -1,6 +1,8 @@
 package com.synopsys.integration.blackduck.dataservice.report
 
 import com.synopsys.integration.blackduck.TimingExtension
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
@@ -34,8 +36,8 @@ class RiskReportServiceTestIT {
         final String testDistribution = restConnectionTestHelper.getProperty("TEST_DISTRIBUTION")
 
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, testProjectVersionName);
-        projectSyncModel.setPhase(testPhase);
-        projectSyncModel.setDistribution(testDistribution);
+        projectSyncModel.setPhase(ProjectVersionPhaseType.valueOf(testPhase));
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.valueOf(testDistribution));
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
         final ProjectService projectService = blackDuckServicesFactory.createProjectService();
