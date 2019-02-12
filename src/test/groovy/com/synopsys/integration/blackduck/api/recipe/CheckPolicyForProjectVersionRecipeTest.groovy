@@ -60,9 +60,9 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         /*
          * We add a new component to the Version that will violate our 'Test Rule'
          */
-        projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
+        projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
-        VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
+        VersionBomPolicyStatusView policyStatus = projectBomService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
