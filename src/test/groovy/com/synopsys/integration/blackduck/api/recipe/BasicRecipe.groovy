@@ -11,7 +11,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
-import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.*
@@ -28,8 +27,6 @@ class BasicRecipe {
     protected Gson gson
     protected ObjectMapper objectMapper
 
-    protected NotificationContentDetailFactory notificationContentDetailFactory
-
     protected IntLogger logger
     protected BlackDuckServicesFactory blackDuckServicesFactory
     protected BlackDuckService blackDuckService
@@ -41,7 +38,6 @@ class BasicRecipe {
     protected NotificationService notificationService
     protected CodeLocationCreationService codeLocationCreationService
     protected PolicyRuleService policyRuleService
-    protected CommonNotificationService commonNotificationService
 
     protected UploadRunner uploadRunner
 
@@ -70,8 +66,6 @@ class BasicRecipe {
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
 
-        notificationContentDetailFactory = new NotificationContentDetailFactory(gson)
-
         blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger)
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
@@ -82,8 +76,6 @@ class BasicRecipe {
         notificationService = blackDuckServicesFactory.createNotificationService()
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
-
-        commonNotificationService = blackDuckServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
 
         uploadRunner = new UploadRunner(logger, blackDuckService)
     }

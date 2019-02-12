@@ -77,6 +77,14 @@ public class BlackDuckJsonTransformer {
         try {
             T blackDuckResponse = gson.fromJson(jsonElement, clazz);
 
+            if (blackDuckResponse.hasSubclasses()) {
+                // when a response can be subclassed, it will use its own state to
+                // determine the specific subclass that should be used
+                Class<? extends BlackDuckResponse> subclass = blackDuckResponse.getSubclass();
+                BlackDuckResponse subclassResponse = gson.fromJson(jsonElement, subclass);
+                blackDuckResponse = (T) subclassResponse;
+            }
+
             blackDuckResponse.setGson(gson);
             blackDuckResponse.setJsonElement(jsonElement);
             blackDuckResponse.setJson(json);
@@ -103,22 +111,6 @@ public class BlackDuckJsonTransformer {
         } catch (JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided json responses with Gson:%s%s", System.lineSeparator(), json));
             throw new BlackDuckIntegrationException(e.getMessage(), e);
-        }
-    }
-
-    public String producePatchedJson_old(BlackDuckResponse blackDuckResponse) {
-        String lossyJson = gson.toJson(blackDuckResponse);
-        try {
-            JsonNode source = objectMapper.readTree(lossyJson);
-            JsonNode patch = blackDuckResponse.getPatch();
-            JsonNode target = JsonPatch.apply(patch, source);
-
-            StringWriter stringWriter = new StringWriter();
-            objectMapper.writeValue(stringWriter, target);
-
-            return stringWriter.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
