@@ -15,7 +15,6 @@ import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -54,6 +53,7 @@ import com.synopsys.integration.blackduck.service.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.ProjectBomService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.ProjectUsersService;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -130,13 +130,11 @@ public class ComprehensiveCookbookTestIT {
         String versionName = "RestConnectionTest";
         ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
         ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
-        ProjectRequestBuilder projectBuilder = new ProjectRequestBuilder();
-        projectBuilder.setProjectName(testProjectName);
-        projectBuilder.setVersionName(versionName);
-        projectBuilder.setPhase(phase);
-        projectBuilder.setDistribution(distribution);
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, versionName);
+        projectSyncModel.setPhase(phase);
+        projectSyncModel.setDistribution(distribution);
 
-        ProjectRequest projectRequest = projectBuilder.build();
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         // create the project
         ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);

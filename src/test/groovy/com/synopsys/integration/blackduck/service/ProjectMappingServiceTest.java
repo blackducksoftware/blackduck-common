@@ -34,7 +34,7 @@ class ProjectMappingServiceTest {
         String testProjectName = intHttpClientTestHelper.getProperty("TEST_PROJECT");
         String testProjectVersion = intHttpClientTestHelper.getProperty("TEST_VERSION");
 
-        ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, testProjectVersion);
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(testProjectName, testProjectVersion);
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
         projectView = projectVersionWrapper.getProjectView();
     }

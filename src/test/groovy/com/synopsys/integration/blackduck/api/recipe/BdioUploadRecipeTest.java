@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
@@ -24,6 +23,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
@@ -93,8 +93,8 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         // then we map the code location to a version
         String versionName = "27.0.0-SNAPSHOT";
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(uniqueProjectName, versionName);
-        projectService.createProject(projectRequestBuilder.build());
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(uniqueProjectName, versionName);
+        projectService.createProject(projectSyncModel.createProjectRequest());
         projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, versionName);
         List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertTrue(versionCodeLocations.isEmpty());

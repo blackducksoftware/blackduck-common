@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
@@ -28,6 +27,7 @@ import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
@@ -175,10 +175,8 @@ public class ProjectServiceTestIT {
         String projectName = "createWithTwo" + Instant.now().toString();
         String projectVersionName = "1.0.0";
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(projectVersionName);
-        ProjectRequest projectRequest = projectRequestBuilder.build();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         ProjectServiceTestIT.projectService.createProject(projectRequest);
 
@@ -202,10 +200,8 @@ public class ProjectServiceTestIT {
         String projectName = "create" + Instant.now().toString();
         String projectVersionName = "1.0.0";
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(projectVersionName);
-        ProjectRequest projectRequest = projectRequestBuilder.build();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         ProjectServiceTestIT.projectService.createProject(projectRequest);
 

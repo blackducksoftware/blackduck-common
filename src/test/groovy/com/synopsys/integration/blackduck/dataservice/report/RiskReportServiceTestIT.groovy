@@ -1,13 +1,13 @@
 package com.synopsys.integration.blackduck.dataservice.report
 
 import com.synopsys.integration.blackduck.TimingExtension
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.ReportService
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled
@@ -33,16 +33,14 @@ class RiskReportServiceTestIT {
         final String testPhase = restConnectionTestHelper.getProperty("TEST_PHASE")
         final String testDistribution = restConnectionTestHelper.getProperty("TEST_DISTRIBUTION")
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(testProjectName);
-        projectRequestBuilder.setVersionName(testProjectVersionName);
-        projectRequestBuilder.setPhase(testPhase);
-        projectRequestBuilder.setDistribution(testDistribution);
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, testProjectVersionName);
+        projectSyncModel.setPhase(testPhase);
+        projectSyncModel.setDistribution(testDistribution);
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
         final ProjectService projectService = blackDuckServicesFactory.createProjectService();
 
-        projectService.syncProjectAndVersion(projectRequestBuilder.build())
+        projectService.syncProjectAndVersion(projectSyncModel)
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
@@ -15,8 +14,10 @@ import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
+import com.synopsys.integration.util.IntEnvironmentVariables
 import org.junit.jupiter.api.BeforeEach
 
 class BasicRecipe {
@@ -63,10 +64,11 @@ class BasicRecipe {
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger)
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger)
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger)
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
@@ -82,19 +84,17 @@ class BasicRecipe {
 
     ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
         /*
-         * the ProjectRequestBuilder is a simple wrapper around creating a
+         * the ProjectSyncModel is a wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
          * create both a project in Black Duck and a version for that created
          * project - a project must have at least one version
          */
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
-        projectRequestBuilder.projectName = projectName
-        projectRequestBuilder.description = 'A sample testing project to demonstrate blackduck-common capabilities.'
-        projectRequestBuilder.versionName = projectVersionName
-        projectRequestBuilder.phase = ProjectVersionPhaseType.DEVELOPMENT.name()
-        projectRequestBuilder.distribution = ProjectVersionDistributionType.OPENSOURCE.name()
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName)
+        projectSyncModel.description = 'A sample testing project to demonstrate blackduck-common capabilities.'
+        projectSyncModel.phase = ProjectVersionPhaseType.DEVELOPMENT
+        projectSyncModel.distribution = ProjectVersionDistributionType.OPENSOURCE
 
-        projectRequestBuilder.build()
+        projectSyncModel.createProjectRequest()
     }
 
     void deleteProject(String projectName) {
