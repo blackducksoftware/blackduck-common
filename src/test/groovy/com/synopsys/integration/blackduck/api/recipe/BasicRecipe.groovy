@@ -2,7 +2,6 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
@@ -82,7 +81,7 @@ class BasicRecipe {
         uploadRunner = new UploadRunner(logger, blackDuckService)
     }
 
-    ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
+    ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {
         /*
          * the ProjectSyncModel is a wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
@@ -94,7 +93,7 @@ class BasicRecipe {
         projectSyncModel.phase = ProjectVersionPhaseType.DEVELOPMENT
         projectSyncModel.distribution = ProjectVersionDistributionType.OPENSOURCE
 
-        projectSyncModel.createProjectRequest()
+        projectSyncModel
     }
 
     void deleteProject(String projectName) {

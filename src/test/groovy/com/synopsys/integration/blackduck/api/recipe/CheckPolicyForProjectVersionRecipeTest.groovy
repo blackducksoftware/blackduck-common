@@ -5,13 +5,13 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId
 import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,13 +30,13 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     @BeforeEach
     void setup() {
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis()
-        ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
+        ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME)
 
         /*
          * We can get the project and version like this, and if they don't
          * exist they will be created for us.
          */
-        projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
+        projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel, false)
 
         policyRuleView = constructTestPolicy(blackDuckServicesFactory.createComponentService())
 

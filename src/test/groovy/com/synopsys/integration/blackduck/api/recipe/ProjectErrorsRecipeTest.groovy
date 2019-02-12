@@ -1,9 +1,9 @@
 package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.TimingExtension
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
@@ -39,15 +39,15 @@ class ProjectErrorsRecipeTest extends BasicRecipe {
         /*
          * First, create a project with a unique name
          */
-        ProjectRequest projectRequest = createProjectRequest(uniqueName, PROJECT_VERSION_NAME)
-        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest)
+        ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueName, PROJECT_VERSION_NAME)
+        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectSyncModel.createProjectRequest())
         projectView = projectVersionWrapper.projectView;
 
         /*
          * Try to create a project with the same name, which should throw an Exception
          */
         try {
-            projectService.createProject(projectRequest)
+            projectService.createProject(projectSyncModel.createProjectRequest())
             fail('Should have thrown an IntegrationRestException')
         } catch (Exception e) {
             assertTrue(e instanceof BlackDuckApiException)

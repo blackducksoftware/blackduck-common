@@ -1,13 +1,13 @@
 package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.TimingExtension
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.BlackDuckService
 import com.synopsys.integration.blackduck.service.ProjectService
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
@@ -32,9 +32,9 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
          * let's post the project/version in Black Duck
          */
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
-        ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
+        ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME)
         ProjectService projectService = blackDuckServicesFactory.createProjectService()
-        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest)
+        ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectSyncModel.createProjectRequest())
         String projectUrl = projectVersionWrapper.projectView.getHref().get()
 
         /*

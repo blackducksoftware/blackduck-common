@@ -14,10 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.model.Forge;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 
 @Tag("integration")
@@ -34,9 +34,9 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
          * we can get the project and version like this, and if they don't exist we will create them
          */
         Optional<ProjectView> projectView = projectService.getProjectByName(uniqueProjectName);
-        ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, versionName);
+        ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, versionName);
         if (!projectView.isPresent()) {
-            projectService.createProject(projectRequest);
+            projectService.createProject(projectSyncModel.createProjectRequest());
             projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, versionName).get();
         } else {
             // the project exists, check the version
@@ -44,7 +44,7 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
             if (projectVersionView.isPresent()) {
                 projectVersionWrapper = new ProjectVersionWrapper(projectView.get(), projectVersionView.get());
             } else {
-                projectService.createProjectVersion(projectView.get(), projectRequest.getVersionRequest());
+                projectService.createProjectVersion(projectView.get(), projectSyncModel.createProjectVersionRequest());
                 projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, versionName).get();
             }
         }
