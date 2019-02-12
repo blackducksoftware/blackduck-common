@@ -67,9 +67,9 @@ public class BlackDuckServicesFactory {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
-    public BlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        intEnvironmentVariables = new IntEnvironmentVariables();
-
+    public BlackDuckServicesFactory(
+            IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.executorService = executorService;
@@ -77,8 +77,8 @@ public class BlackDuckServicesFactory {
         this.logger = logger;
     }
 
-    public BlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        this(gson, objectMapper, null, blackDuckHttpClient, logger);
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -177,7 +177,17 @@ public class BlackDuckServicesFactory {
     public ProjectService createProjectService() {
         BlackDuckService blackDuckService = createBlackDuckService();
         ProjectGetService projectGetService = new ProjectGetService(blackDuckService, logger);
-        return new ProjectService(blackDuckService, logger, projectGetService, createComponentService());
+        return new ProjectService(blackDuckService, logger, projectGetService);
+    }
+
+    public ProjectBomService createProjectBomService() {
+        BlackDuckService blackDuckService = createBlackDuckService();
+        return new ProjectBomService(blackDuckService, logger, createComponentService());
+    }
+
+    public ProjectUsersService createProjectUsersService() {
+        BlackDuckService blackDuckService = createBlackDuckService();
+        return new ProjectUsersService(blackDuckService, logger);
     }
 
     public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {

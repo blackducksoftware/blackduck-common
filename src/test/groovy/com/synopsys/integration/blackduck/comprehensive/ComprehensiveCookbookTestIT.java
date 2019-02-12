@@ -51,7 +51,9 @@ import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.ComponentService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
+import com.synopsys.integration.blackduck.service.ProjectBomService;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.ProjectUsersService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -338,7 +340,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
-        Optional<VersionBomPolicyStatusView> policyStatusItem = blackDuckServices.projectService.getPolicyStatusForVersion(projectVersionView);
+        Optional<VersionBomPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
         assertTrue(policyStatusItem.isPresent());
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
 
@@ -351,6 +353,8 @@ public class ComprehensiveCookbookTestIT {
         public BlackDuckServicesFactory blackDuckServicesFactory;
         public BlackDuckServerConfig blackDuckServerConfig;
         public ProjectService projectService;
+        public ProjectUsersService projectUsersService;
+        public ProjectBomService projectBomService;
         public CodeLocationService codeLocationService;
         public BlackDuckService blackDuckService;
         public ComponentService componentService;
@@ -363,6 +367,8 @@ public class ComprehensiveCookbookTestIT {
             blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
             blackDuckServerConfig = intHttpClientTestHelper.getBlackDuckServerConfig();
             projectService = blackDuckServicesFactory.createProjectService();
+            projectUsersService = blackDuckServicesFactory.createProjectUsersService();
+            projectBomService = blackDuckServicesFactory.createProjectBomService();
             codeLocationService = blackDuckServicesFactory.createCodeLocationService();
             blackDuckService = blackDuckServicesFactory.createBlackDuckService();
             componentService = blackDuckServicesFactory.createComponentService();

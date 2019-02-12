@@ -53,6 +53,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.BuilderStatus;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationBuilder;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
@@ -64,6 +65,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private final Map<Property, String> values = new HashMap<>();
 
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
+    private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
@@ -104,7 +106,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(apiToken())) {
-            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert(), gson, objectMapper, authenticationSupport);
+            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
         } else {
             String username = get(Property.USERNAME);
             String password = get(Property.PASSWORD);
@@ -112,7 +114,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), credentials, proxyInfo, trustCert(), gson, objectMapper, authenticationSupport);
+            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), credentials, proxyInfo, trustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
         }
     }
 
@@ -274,6 +276,17 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfigBuilder setGson(Gson gson) {
         if (null != gson) {
             this.gson = gson;
+        }
+        return this;
+    }
+
+    public IntEnvironmentVariables getIntEnvironmentVariables() {
+        return intEnvironmentVariables;
+    }
+
+    public BlackDuckServerConfigBuilder setIntEnvironmentVariables(IntEnvironmentVariables intEnvironmentVariables) {
+        if (null != intEnvironmentVariables) {
+            this.intEnvironmentVariables = intEnvironmentVariables;
         }
         return this;
     }

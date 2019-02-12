@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 
@@ -34,8 +34,8 @@ class ProjectMappingServiceTest {
         String testProjectName = intHttpClientTestHelper.getProperty("TEST_PROJECT");
         String testProjectVersion = intHttpClientTestHelper.getProperty("TEST_VERSION");
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder(testProjectName, testProjectVersion);
-        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectRequestBuilder.build());
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, testProjectVersion);
+        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
         projectView = projectVersionWrapper.getProjectView();
     }
 

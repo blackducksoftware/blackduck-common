@@ -35,6 +35,8 @@ class BasicRecipe {
     protected BlackDuckService blackDuckService
     protected BlackDuckBucketService blackDuckBucketService
     protected ProjectService projectService
+    protected ProjectUsersService projectUsersService
+    protected ProjectBomService projectBomService
     protected CodeLocationService codeLocationService
     protected NotificationService notificationService
     protected CodeLocationCreationService codeLocationCreationService
@@ -74,6 +76,8 @@ class BasicRecipe {
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
+        projectUsersService = blackDuckServicesFactory.createProjectUsersService()
+        projectBomService = blackDuckServicesFactory.createProjectBomService()
         codeLocationService = blackDuckServicesFactory.createCodeLocationService()
         notificationService = blackDuckServicesFactory.createNotificationService()
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()

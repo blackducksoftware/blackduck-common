@@ -26,10 +26,13 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import com.google.gson.Gson;
@@ -48,31 +51,31 @@ public class BlackDuckJsonTransformer {
     private final ObjectMapper objectMapper;
     private final IntLogger logger;
 
-    public BlackDuckJsonTransformer(final Gson gson, final ObjectMapper objectMapper, final IntLogger logger) {
+    public BlackDuckJsonTransformer(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.logger = logger;
     }
 
-    public <T extends BlackDuckResponse> T getResponse(final Response response, final Class<T> clazz) throws IntegrationException {
-        final String json = response.getContentString();
+    public <T extends BlackDuckResponse> T getResponse(Response response, Class<T> clazz) throws IntegrationException {
+        String json = response.getContentString();
         return getResponseAs(json, clazz);
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final String json, final Class<T> clazz) throws BlackDuckIntegrationException {
+    public <T extends BlackDuckResponse> T getResponseAs(String json, Class<T> clazz) throws BlackDuckIntegrationException {
         try {
-            final JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
+            JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
             return getResponseAs(jsonElement, clazz);
-        } catch (final JsonSyntaxException e) {
+        } catch (JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided json with Gson:%s%s", System.lineSeparator(), json));
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public <T extends BlackDuckResponse> T getResponseAs(final JsonElement jsonElement, final Class<T> clazz) throws BlackDuckIntegrationException {
-        final String json = gson.toJson(jsonElement);
+    public <T extends BlackDuckResponse> T getResponseAs(JsonElement jsonElement, Class<T> clazz) throws BlackDuckIntegrationException {
+        String json = gson.toJson(jsonElement);
         try {
-            final T blackDuckResponse = gson.fromJson(jsonElement, clazz);
+            T blackDuckResponse = gson.fromJson(jsonElement, clazz);
 
             blackDuckResponse.setGson(gson);
             blackDuckResponse.setJsonElement(jsonElement);
@@ -80,53 +83,94 @@ public class BlackDuckJsonTransformer {
             setPatch(blackDuckResponse);
 
             return blackDuckResponse;
-        } catch (final JsonSyntaxException e) {
+        } catch (JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided jsonElement with Gson:%s%s", System.lineSeparator(), json));
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(final String json, final Class<T> clazz) throws IntegrationException {
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(String json, Class<T> clazz) throws IntegrationException {
         try {
-            final JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-            final int totalCount = jsonObject.get("totalCount").getAsInt();
-            final JsonArray items = jsonObject.get("items").getAsJsonArray();
-            final List<T> itemList = new ArrayList<>();
-            for (final JsonElement jsonElement : items) {
+            JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+            int totalCount = jsonObject.get("totalCount").getAsInt();
+            JsonArray items = jsonObject.get("items").getAsJsonArray();
+            List<T> itemList = new ArrayList<>();
+            for (JsonElement jsonElement : items) {
                 itemList.add(getResponseAs(jsonElement, clazz));
             }
 
             return new BlackDuckPageResponse<>(totalCount, itemList);
-        } catch (final JsonSyntaxException e) {
+        } catch (JsonSyntaxException e) {
             logger.error(String.format("Could not parse the provided json responses with Gson:%s%s", System.lineSeparator(), json));
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
     }
 
-    public String producePatchedJson(final BlackDuckResponse blackDuckResponse) {
-        final String lossyJson = gson.toJson(blackDuckResponse);
+    public String producePatchedJson_old(BlackDuckResponse blackDuckResponse) {
+        String lossyJson = gson.toJson(blackDuckResponse);
         try {
-            final JsonNode source = objectMapper.readTree(lossyJson);
-            final JsonNode target = JsonPatch.apply(blackDuckResponse.getPatch(), source);
+            JsonNode source = objectMapper.readTree(lossyJson);
+            JsonNode patch = blackDuckResponse.getPatch();
+            JsonNode target = JsonPatch.apply(patch, source);
 
-            final StringWriter stringWriter = new StringWriter();
+            StringWriter stringWriter = new StringWriter();
             objectMapper.writeValue(stringWriter, target);
 
             return stringWriter.toString();
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setPatch(final BlackDuckResponse blackDuckResponse) {
-        final String lossyJson = gson.toJson(blackDuckResponse);
+    public String producePatchedJson(BlackDuckResponse blackDuckResponse) {
+        String lossyJson = gson.toJson(blackDuckResponse);
+        try {
+            JsonNode target = objectMapper.readTree(lossyJson);
+            JsonNode patch = blackDuckResponse.getPatch();
+
+            List<JsonNode> listOfPatches = transformPatchToListOfPatches(patch);
+            for (JsonNode singleChangePatch : listOfPatches) {
+                try {
+                    target = JsonPatch.apply(singleChangePatch, target);
+                } catch (Exception e) {
+                    logger.warn("Could not apply a particular change - this may not be an issue if change involves an object that wasn't being updated: " + e.getMessage());
+                }
+            }
+
+            StringWriter stringWriter = new StringWriter();
+            objectMapper.writeValue(stringWriter, target);
+
+            return stringWriter.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<JsonNode> transformPatchToListOfPatches(JsonNode patch) {
+        List<JsonNode> listOfPatches = new ArrayList<>();
+
+        Iterator<JsonNode> patchIterator = patch.iterator();
+        while (patchIterator.hasNext()) {
+            JsonNode change = patchIterator.next();
+
+            ArrayNode changeArray = JsonNodeFactory.instance.arrayNode(1);
+            changeArray.add(change);
+
+            listOfPatches.add(changeArray);
+        }
+
+        return listOfPatches;
+    }
+
+    private void setPatch(BlackDuckResponse blackDuckResponse) {
+        String lossyJson = gson.toJson(blackDuckResponse);
 
         try {
-            final JsonNode source = objectMapper.readTree(lossyJson);
-            final JsonNode target = objectMapper.readTree(blackDuckResponse.getJson());
-            final JsonNode patch = JsonDiff.asJson(source, target);
+            JsonNode source = objectMapper.readTree(lossyJson);
+            JsonNode target = objectMapper.readTree(blackDuckResponse.getJson());
+            JsonNode patch = JsonDiff.asJson(source, target);
             blackDuckResponse.setPatch(patch);
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

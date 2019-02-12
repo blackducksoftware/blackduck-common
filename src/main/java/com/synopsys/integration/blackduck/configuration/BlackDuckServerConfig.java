@@ -43,6 +43,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.Buildable;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
@@ -56,32 +57,40 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     private final String apiToken;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
+    private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final ObjectMapper objectMapper;
     private final AuthenticationSupport authenticationSupport;
     private final ExecutorService executorService;
 
     BlackDuckServerConfig(
-            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport,
+            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+            AuthenticationSupport authenticationSupport,
             ExecutorService executorService) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, executorService, credentials, null);
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, credentials, null);
     }
 
     BlackDuckServerConfig(
-            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, credentials, null);
+            URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+            AuthenticationSupport authenticationSupport) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, null, credentials, null);
     }
 
-    BlackDuckServerConfig(URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport,
+    BlackDuckServerConfig(
+            URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+            AuthenticationSupport authenticationSupport,
             ExecutorService executorService) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, executorService, null, apiToken);
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, null, apiToken);
     }
 
-    BlackDuckServerConfig(URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, gson, objectMapper, authenticationSupport, null, null, apiToken);
+    BlackDuckServerConfig(
+            URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+            AuthenticationSupport authenticationSupport) {
+        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, null, null, apiToken);
     }
 
-    private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, Gson gson, ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, ExecutorService executorService,
+    private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+            AuthenticationSupport authenticationSupport, ExecutorService executorService,
             Credentials credentials,
             String apiToken) {
         this.credentials = credentials;
@@ -90,6 +99,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         this.timeoutSeconds = timeoutSeconds;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.authenticationSupport = authenticationSupport;
@@ -173,15 +183,15 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     @Deprecated
     public BlackDuckServicesFactory createBlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
         BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
-        return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
+        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckRestConnection, logger);
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
         BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
         if (null != executorService) {
-            return new BlackDuckServicesFactory(gson, objectMapper, executorService, blackDuckRestConnection, logger);
+            return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckRestConnection, logger);
         } else {
-            return new BlackDuckServicesFactory(gson, objectMapper, blackDuckRestConnection, logger);
+            return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckRestConnection, logger);
         }
     }
 

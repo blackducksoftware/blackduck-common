@@ -51,7 +51,7 @@ public class ProjectAssignmentServiceTestIT {
         ProjectAssignmentServiceTestIT.project = projectVersionWrapper.getProjectView();
         System.out.println("projectUrl: " + ProjectAssignmentServiceTestIT.project.getHref().get());
 
-        List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
+        List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectUsersService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).getName());

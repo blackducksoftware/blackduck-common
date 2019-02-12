@@ -64,9 +64,9 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
         externalId.name = "commons-fileupload";
         externalId.version = "1.2.1";
 
-        projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
+        projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
-        List<VersionBomComponentView> bomComponents = projectService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
+        List<VersionBomComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         VersionBomComponentView component = bomComponents.get(0);
         assertEquals("Apache Commons FileUpload", component.getComponentName());
         assertEquals("1.2.1", component.getComponentVersionName());

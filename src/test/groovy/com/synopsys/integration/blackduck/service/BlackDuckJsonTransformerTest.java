@@ -20,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
@@ -99,6 +100,18 @@ public class BlackDuckJsonTransformerTest {
 
         String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(fruitTest);
         assertJsonStringsEqual(json, patchedJson);
+    }
+
+    @Test
+    public void testSettingObjectToNull() throws Exception {
+        InputStream jsonInputStream = getClass().getResourceAsStream("/json/ProjectVersionView_with_license.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+
+        ProjectVersionView projectVersionView = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, ProjectVersionView.class);
+        projectVersionView.setLicense(null);
+
+        String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(projectVersionView);
+        System.out.println(patchedJson);
     }
 
     private void assertObjectValid(BlackDuckView blackDuckView) {
