@@ -3,8 +3,11 @@ package com.synopsys.integration.blackduck.comprehensive;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -25,8 +28,11 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
+import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
@@ -171,6 +177,9 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
+        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        Date startDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+
         // import the bdio
         File file = intHttpClientTestHelper.getFile("bdio/mtglist_bdio.jsonld");
         UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(codeLocationName, file));
@@ -182,6 +191,23 @@ public class ComprehensiveCookbookTestIT {
         }
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
+
+        Date endDate = new Date();
+        List<NotificationUserView> userNotifications = blackDuckServices.notificationService.getAllUserNotifications(currentUser, startDate, endDate);
+        Set<Class<? extends NotificationUserView>> userNotificationClasses =
+                userNotifications
+                        .stream()
+                        .map(NotificationUserView::getClass)
+                        .collect(Collectors.toSet());
+        assertTrue(userNotificationClasses.size() > 1);
+
+        List<NotificationView> notifications = blackDuckServices.notificationService.getAllNotifications(startDate, endDate);
+        Set<Class<? extends NotificationView>> notificationClasses =
+                notifications
+                        .stream()
+                        .map(NotificationView::getClass)
+                        .collect(Collectors.toSet());
+        assertTrue(notificationClasses.size() > 1);
     }
 
     @Test
