@@ -42,7 +42,11 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 
 public class ProjectSyncModel {
+    // these fields are currently not supported - if you need to create a
+    // project/version with these fields, or update these fields, please use
+    // the create/update methods in ProjectService
     private static final Set<String> IGNORED_REQUEST_FIELDS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("versionRequest", "license")));
+
     private static final Set<Field> ALL_FIELDS = new HashSet<>();
 
     // project fields
@@ -117,6 +121,7 @@ public class ProjectSyncModel {
         projectRequest.setProjectOwner(projectOwner);
         projectRequest.setProjectTier(projectTier);
         projectRequest.setCloneCategories(cloneCategories);
+        projectRequest.setCustomSignatureEnabled(customSignatureEnabled);
 
         projectRequest.setVersionRequest(createProjectVersionRequest());
 

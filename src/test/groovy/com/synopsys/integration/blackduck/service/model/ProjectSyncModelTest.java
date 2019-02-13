@@ -114,4 +114,41 @@ public class ProjectSyncModelTest {
         assertEquals("an override description", projectView.getDescription());
     }
 
+    @Test
+    public void testAllFieldsPopulateRequest() {
+        Date releasedOn = new Date();
+
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel();
+        projectSyncModel.setProjectTier(1);
+        projectSyncModel.setNickname("nick");
+        projectSyncModel.setProjectOwner("owner href");
+        projectSyncModel.setDescription("desc");
+        projectSyncModel.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
+        projectSyncModel.setReleaseComments("released!");
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectSyncModel.setReleasedOn(releasedOn);
+        projectSyncModel.setProjectLevelAdjustments(true);
+        projectSyncModel.setCloneFromReleaseUrl("version href");
+        projectSyncModel.setCustomSignatureEnabled(true);
+        projectSyncModel.setName("project name");
+        projectSyncModel.setVersionName("version name");
+        projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
+        assertEquals("project name", projectRequest.getName());
+        assertEquals("desc", projectRequest.getDescription());
+        assertEquals("owner href", projectRequest.getProjectOwner());
+        assertEquals(new Integer(1), projectRequest.getProjectTier());
+        assertEquals(true, projectRequest.getProjectLevelAdjustments());
+        assertEquals(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA), projectRequest.getCloneCategories());
+        assertEquals(true, projectRequest.getCustomSignatureEnabled());
+        assertEquals("version name", projectRequest.getVersionRequest().getVersionName());
+        assertEquals("version href", projectRequest.getVersionRequest().getCloneFromReleaseUrl());
+        assertEquals("nick", projectRequest.getVersionRequest().getNickname());
+        assertEquals("released!", projectRequest.getVersionRequest().getReleaseComments());
+        assertEquals(releasedOn, projectRequest.getVersionRequest().getReleasedOn());
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectRequest.getVersionRequest().getPhase());
+        assertEquals(ProjectVersionDistributionType.INTERNAL, projectRequest.getVersionRequest().getDistribution());
+    }
+
 }
