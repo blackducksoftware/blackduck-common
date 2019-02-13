@@ -8,9 +8,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
@@ -25,6 +28,7 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class BlackDuckHttpClientTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
@@ -96,10 +100,11 @@ public class BlackDuckHttpClientTestIT {
     }
 
     @Test
+    @Disabled
     public void testProvidedApiToken() {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl("https://int-hub02.dc1.lan");
-        builder.setApiToken("YTM4NTViNWQtNDBkZi00YWY4LWExZmUtOGJlNjU2MWE3MTlkOjdiYzkxOTc2LTlhZWUtNDIzYy04ZTVmLTE1MjBiMWYwNDRkNg==");
+        builder.setApiToken("MTYzZjkxMjAtMDBmMi00NTk4LWJmNjEtZmYzYWIyMmEwNWE2OjJkYjQwZDJiLTAzYWQtNGZiOC05ZTJjLTY3MWQyZTcwNWIzOQ==");
         builder.setTrustCert(true);
         BlackDuckServerConfig blackDuckServerConfig = builder.build();
         assertTrue(blackDuckServerConfig.canConnect());

@@ -20,32 +20,31 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class IntHttpClientTestHelper {
+    private static Properties testProperties;
+
     private final String blackDuckServerUrl;
-    private Properties testProperties;
 
     public IntHttpClientTestHelper() {
-        initProperties();
+        if (null == IntHttpClientTestHelper.testProperties) {
+            initProperties();
+        }
         blackDuckServerUrl = getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
     }
 
-    public IntHttpClientTestHelper(String blackDuckServerUrlPropertyName) {
-        initProperties();
-        blackDuckServerUrl = testProperties.getProperty(blackDuckServerUrlPropertyName);
-    }
-
-    private void initProperties() {
-        Logger.getLogger(HttpClient.class.getName()).setLevel(Level.FINE);
-        testProperties = new Properties();
+    public void initProperties() {
+        Logger.getLogger(HttpClient.class.getName()).setLevel(Level.INFO);
+        IntHttpClientTestHelper.testProperties = new Properties();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try (InputStream is = classLoader.getResourceAsStream("test.properties")) {
-            testProperties.load(is);
+            IntHttpClientTestHelper.testProperties.load(is);
         } catch (Exception e) {
             System.err.println("reading test.properties failed!");
         }
 
-        if (testProperties.isEmpty()) {
+        if (IntHttpClientTestHelper.testProperties.isEmpty()) {
             try {
                 loadOverrideProperties(TestingPropertyKey.values());
             } catch (Exception e) {
@@ -58,7 +57,7 @@ public class IntHttpClientTestHelper {
         for (TestingPropertyKey key : keys) {
             String prop = System.getenv(key.toString());
             if (prop != null && !prop.isEmpty()) {
-                testProperties.setProperty(key.toString(), prop);
+                IntHttpClientTestHelper.testProperties.setProperty(key.toString(), prop);
             }
         }
     }
@@ -68,7 +67,7 @@ public class IntHttpClientTestHelper {
     }
 
     public String getProperty(String key) {
-        return testProperties.getProperty(key);
+        return IntHttpClientTestHelper.testProperties.getProperty(key);
     }
 
     public BlackDuckServerConfig getBlackDuckServerConfig() {
@@ -95,7 +94,7 @@ public class IntHttpClientTestHelper {
     }
 
     public IntLogger createIntLogger() {
-        return new PrintStreamIntLogger(System.out, LogLevel.TRACE);
+        return new PrintStreamIntLogger(System.out, LogLevel.INFO);
     }
 
     public IntLogger createIntLogger(LogLevel logLevel) {
@@ -113,10 +112,11 @@ public class IntHttpClientTestHelper {
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(BlackDuckServerConfig blackDuckServerConfig, IntLogger logger) throws IllegalArgumentException, IntegrationException {
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
 
-        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger);
         return blackDuckServicesFactory;
     }
 

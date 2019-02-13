@@ -12,8 +12,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
@@ -26,11 +27,13 @@ import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class ProjectServiceTestIT {
     private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
     private static BlackDuckServicesFactory blackDuckServicesFactory;
@@ -172,10 +175,8 @@ public class ProjectServiceTestIT {
         String projectName = "createWithTwo" + Instant.now().toString();
         String projectVersionName = "1.0.0";
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(projectVersionName);
-        ProjectRequest projectRequest = projectRequestBuilder.build();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         ProjectServiceTestIT.projectService.createProject(projectRequest);
 
@@ -199,10 +200,8 @@ public class ProjectServiceTestIT {
         String projectName = "create" + Instant.now().toString();
         String projectVersionName = "1.0.0";
 
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder();
-        projectRequestBuilder.setProjectName(projectName);
-        projectRequestBuilder.setVersionName(projectVersionName);
-        ProjectRequest projectRequest = projectRequestBuilder.build();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         ProjectServiceTestIT.projectService.createProject(projectRequest);
 
@@ -243,6 +242,33 @@ public class ProjectServiceTestIT {
 
         ProjectServiceTestIT.project = ProjectServiceTestIT.projectService.getProjectByName(projectName).get();
         assertEquals(projectName, ProjectServiceTestIT.project.getName());
+    }
+
+    @Test
+    public void testProjectSyncModelUpdatesSetFieldsOnly() throws IntegrationException {
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults("testSync", "testSyncVersion");
+        projectSyncModel.setProjectTier(2);
+        projectSyncModel.setDescription("original");
+        projectSyncModel.setNickname("panda bear");
+
+        ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.syncProjectAndVersion(projectSyncModel, true);
+        ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
+
+        ProjectSyncModel updateProjectSyncModel = new ProjectSyncModel("testSync", "testSyncVersion");
+        ProjectVersionWrapper firstUpdate = ProjectServiceTestIT.projectService.syncProjectAndVersion(updateProjectSyncModel, true);
+        assertEquals(new Integer(2), firstUpdate.getProjectView().getProjectTier());
+        assertEquals("original", firstUpdate.getProjectView().getDescription());
+        assertEquals("panda bear", firstUpdate.getProjectVersionView().getNickname());
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, firstUpdate.getProjectVersionView().getPhase());
+
+        ProjectSyncModel update2ProjectSyncModel = new ProjectSyncModel("testSync", "testSyncVersion");
+        update2ProjectSyncModel.setProjectTier(3);
+        update2ProjectSyncModel.setNickname("honey badger");
+        ProjectVersionWrapper secondUpdate = ProjectServiceTestIT.projectService.syncProjectAndVersion(update2ProjectSyncModel, true);
+        assertEquals(new Integer(3), secondUpdate.getProjectView().getProjectTier());
+        assertEquals("original", secondUpdate.getProjectView().getDescription());
+        assertEquals("honey badger", secondUpdate.getProjectVersionView().getNickname());
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, secondUpdate.getProjectVersionView().getPhase());
     }
 
 }

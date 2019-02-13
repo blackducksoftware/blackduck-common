@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.dataservice.policystatus
 
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionPolicyViolationDetails
 import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView
@@ -7,9 +8,11 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummar
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 
+@ExtendWith(TimingExtension.class)
 class PolicyStatusDescriptionTest {
     @Test
     void getCountTest() {

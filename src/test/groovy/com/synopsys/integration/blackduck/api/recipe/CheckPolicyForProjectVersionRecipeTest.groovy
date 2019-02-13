@@ -2,24 +2,27 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.bdio.model.Forge
 import com.synopsys.integration.bdio.model.externalid.ExternalId
+import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     ProjectVersionWrapper projectVersionWrapper
     PolicyRuleView policyRuleView
@@ -27,13 +30,13 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
     @BeforeEach
     void setup() {
         String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis()
-        ProjectRequest projectRequest = createProjectRequest(uniqueProjectName, PROJECT_VERSION_NAME)
+        ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME)
 
         /*
          * We can get the project and version like this, and if they don't
          * exist they will be created for us.
          */
-        projectVersionWrapper = projectService.syncProjectAndVersion(projectRequest, false)
+        projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel, false)
 
         policyRuleView = constructTestPolicy(blackDuckServicesFactory.createComponentService())
 
@@ -57,9 +60,9 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         /*
          * We add a new component to the Version that will violate our 'Test Rule'
          */
-        projectService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
+        projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
-        VersionBomPolicyStatusView policyStatus = projectService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
+        VersionBomPolicyStatusView policyStatus = projectBomService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 

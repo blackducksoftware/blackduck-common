@@ -2,8 +2,6 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
@@ -11,13 +9,14 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
-import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
+import com.synopsys.integration.util.IntEnvironmentVariables
 import org.junit.jupiter.api.BeforeEach
 
 class BasicRecipe {
@@ -28,18 +27,17 @@ class BasicRecipe {
     protected Gson gson
     protected ObjectMapper objectMapper
 
-    protected NotificationContentDetailFactory notificationContentDetailFactory
-
     protected IntLogger logger
     protected BlackDuckServicesFactory blackDuckServicesFactory
     protected BlackDuckService blackDuckService
     protected BlackDuckBucketService blackDuckBucketService
     protected ProjectService projectService
+    protected ProjectUsersService projectUsersService
+    protected ProjectBomService projectBomService
     protected CodeLocationService codeLocationService
     protected NotificationService notificationService
     protected CodeLocationCreationService codeLocationCreationService
     protected PolicyRuleService policyRuleService
-    protected CommonNotificationService commonNotificationService
 
     protected UploadRunner uploadRunner
 
@@ -65,40 +63,37 @@ class BasicRecipe {
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger)
+        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
 
-        notificationContentDetailFactory = new NotificationContentDetailFactory(gson)
-
-        blackDuckServicesFactory = new BlackDuckServicesFactory(gson, objectMapper, blackDuckHttpClient, logger)
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger)
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
+        projectUsersService = blackDuckServicesFactory.createProjectUsersService()
+        projectBomService = blackDuckServicesFactory.createProjectBomService()
         codeLocationService = blackDuckServicesFactory.createCodeLocationService()
         notificationService = blackDuckServicesFactory.createNotificationService()
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
 
-        commonNotificationService = blackDuckServicesFactory.createCommonNotificationService(notificationContentDetailFactory, true)
-
         uploadRunner = new UploadRunner(logger, blackDuckService)
     }
 
-    ProjectRequest createProjectRequest(String projectName, String projectVersionName) {
+    ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {
         /*
-         * the ProjectRequestBuilder is a simple wrapper around creating a
+         * the ProjectSyncModel is a wrapper around creating a
          * ProjectRequest that will also include a ProjectVersionRequest to
          * create both a project in Black Duck and a version for that created
          * project - a project must have at least one version
          */
-        ProjectRequestBuilder projectRequestBuilder = new ProjectRequestBuilder()
-        projectRequestBuilder.projectName = projectName
-        projectRequestBuilder.description = 'A sample testing project to demonstrate blackduck-common capabilities.'
-        projectRequestBuilder.versionName = projectVersionName
-        projectRequestBuilder.phase = ProjectVersionPhaseType.DEVELOPMENT.name()
-        projectRequestBuilder.distribution = ProjectVersionDistributionType.OPENSOURCE.name()
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName)
+        projectSyncModel.description = 'A sample testing project to demonstrate blackduck-common capabilities.'
+        projectSyncModel.phase = ProjectVersionPhaseType.DEVELOPMENT
+        projectSyncModel.distribution = ProjectVersionDistributionType.OPENSOURCE
 
-        projectRequestBuilder.build()
+        projectSyncModel
     }
 
     void deleteProject(String projectName) {

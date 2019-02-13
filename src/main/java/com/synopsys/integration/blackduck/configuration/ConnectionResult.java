@@ -27,19 +27,19 @@ import java.util.Optional;
 
 public class ConnectionResult {
     private final int httpStatusCode;
-    private final String errorMessage;
+    private final String failureMessage;
 
     public static final ConnectionResult SUCCESS(int httpStatusCode) {
         return new ConnectionResult(httpStatusCode, null);
     }
 
-    public static final ConnectionResult FAILURE(int httpStatusCode, String errorMessage) {
-        return new ConnectionResult(httpStatusCode, errorMessage);
+    public static final ConnectionResult FAILURE(int httpStatusCode, String failureMessage) {
+        return new ConnectionResult(httpStatusCode, failureMessage);
     }
 
-    private ConnectionResult(int httpStatusCode, String errorMessage) {
+    private ConnectionResult(int httpStatusCode, String failureMessage) {
         this.httpStatusCode = httpStatusCode;
-        this.errorMessage = errorMessage;
+        this.failureMessage = failureMessage;
     }
 
     public boolean isSuccess() {
@@ -47,15 +47,15 @@ public class ConnectionResult {
     }
 
     public boolean isFailure() {
-        return getErrorMessage().isPresent();
+        return getFailureMessage().isPresent();
     }
 
     public int getHttpStatusCode() {
         return httpStatusCode;
     }
 
-    public Optional<String> getErrorMessage() {
-        return Optional.ofNullable(errorMessage);
+    public Optional<String> getFailureMessage() {
+        return Optional.ofNullable(failureMessage);
     }
 
 }

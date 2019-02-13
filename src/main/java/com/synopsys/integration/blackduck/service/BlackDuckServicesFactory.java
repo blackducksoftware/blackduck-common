@@ -38,7 +38,6 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.notification.content.detail.NotificationContentDetailFactory;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -67,9 +66,9 @@ public class BlackDuckServicesFactory {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
-    public BlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        intEnvironmentVariables = new IntEnvironmentVariables();
-
+    public BlackDuckServicesFactory(
+            IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.executorService = executorService;
@@ -77,8 +76,8 @@ public class BlackDuckServicesFactory {
         this.logger = logger;
     }
 
-    public BlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        this(gson, objectMapper, null, blackDuckHttpClient, logger);
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -146,10 +145,6 @@ public class BlackDuckServicesFactory {
         return new CodeLocationService(createBlackDuckService(), logger);
     }
 
-    public CommonNotificationService createCommonNotificationService(NotificationContentDetailFactory notificationContentDetailFactory, boolean oldestFirst) {
-        return new CommonNotificationService(notificationContentDetailFactory, oldestFirst);
-    }
-
     public ComponentService createComponentService() {
         return new ComponentService(createBlackDuckService(), logger);
     }
@@ -177,7 +172,17 @@ public class BlackDuckServicesFactory {
     public ProjectService createProjectService() {
         BlackDuckService blackDuckService = createBlackDuckService();
         ProjectGetService projectGetService = new ProjectGetService(blackDuckService, logger);
-        return new ProjectService(blackDuckService, logger, projectGetService, createComponentService());
+        return new ProjectService(blackDuckService, logger, projectGetService);
+    }
+
+    public ProjectBomService createProjectBomService() {
+        BlackDuckService blackDuckService = createBlackDuckService();
+        return new ProjectBomService(blackDuckService, logger, createComponentService());
+    }
+
+    public ProjectUsersService createProjectUsersService() {
+        BlackDuckService blackDuckService = createBlackDuckService();
+        return new ProjectUsersService(blackDuckService, logger);
     }
 
     public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {
@@ -190,6 +195,10 @@ public class BlackDuckServicesFactory {
 
     public ProjectMappingService createProjectMappingService() {
         return new ProjectMappingService(createBlackDuckService(), logger);
+    }
+
+    public TagService createTagService() {
+        return new TagService(createBlackDuckService(), logger);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

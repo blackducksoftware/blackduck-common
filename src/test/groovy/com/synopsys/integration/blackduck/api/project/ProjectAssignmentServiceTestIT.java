@@ -10,7 +10,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -20,6 +22,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class ProjectAssignmentServiceTestIT {
     private static BlackDuckServicesFactory blackDuckServicesFactory;
     private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
@@ -48,7 +51,7 @@ public class ProjectAssignmentServiceTestIT {
         ProjectAssignmentServiceTestIT.project = projectVersionWrapper.getProjectView();
         System.out.println("projectUrl: " + ProjectAssignmentServiceTestIT.project.getHref().get());
 
-        List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
+        List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectUsersService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
         assertFalse(assignedUsers.isEmpty());
         assertEquals(1, assignedUsers.size());
         assertEquals("sysadmin", assignedUsers.get(0).getName());

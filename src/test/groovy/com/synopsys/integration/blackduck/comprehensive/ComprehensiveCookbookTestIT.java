@@ -3,17 +3,21 @@ package com.synopsys.integration.blackduck.comprehensive;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.ProjectRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -24,8 +28,11 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
+import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
+import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
@@ -49,7 +56,10 @@ import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.ComponentService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.PolicyRuleService;
+import com.synopsys.integration.blackduck.service.ProjectBomService;
 import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.ProjectUsersService;
+import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -57,6 +67,7 @@ import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 
 @Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -125,13 +136,11 @@ public class ComprehensiveCookbookTestIT {
         String versionName = "RestConnectionTest";
         ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
         ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
-        ProjectRequestBuilder projectBuilder = new ProjectRequestBuilder();
-        projectBuilder.setProjectName(testProjectName);
-        projectBuilder.setVersionName(versionName);
-        projectBuilder.setPhase(phase);
-        projectBuilder.setDistribution(distribution);
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, versionName);
+        projectSyncModel.setPhase(phase);
+        projectSyncModel.setDistribution(distribution);
 
-        ProjectRequest projectRequest = projectBuilder.build();
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
 
         // create the project
         ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectRequest);
@@ -168,6 +177,9 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
+        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        Date startDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+
         // import the bdio
         File file = intHttpClientTestHelper.getFile("bdio/mtglist_bdio.jsonld");
         UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(codeLocationName, file));
@@ -179,6 +191,23 @@ public class ComprehensiveCookbookTestIT {
         }
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
+
+        Date endDate = new Date();
+        List<NotificationUserView> userNotifications = blackDuckServices.notificationService.getAllUserNotifications(currentUser, startDate, endDate);
+        Set<Class<? extends NotificationUserView>> userNotificationClasses =
+                userNotifications
+                        .stream()
+                        .map(NotificationUserView::getClass)
+                        .collect(Collectors.toSet());
+        assertTrue(userNotificationClasses.size() > 1);
+
+        List<NotificationView> notifications = blackDuckServices.notificationService.getAllNotifications(startDate, endDate);
+        Set<Class<? extends NotificationView>> notificationClasses =
+                notifications
+                        .stream()
+                        .map(NotificationView::getClass)
+                        .collect(Collectors.toSet());
+        assertTrue(notificationClasses.size() > 1);
     }
 
     @Test
@@ -335,7 +364,7 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
-        Optional<VersionBomPolicyStatusView> policyStatusItem = blackDuckServices.projectService.getPolicyStatusForVersion(projectVersionView);
+        Optional<VersionBomPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
         assertTrue(policyStatusItem.isPresent());
         assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
 
@@ -348,6 +377,8 @@ public class ComprehensiveCookbookTestIT {
         public BlackDuckServicesFactory blackDuckServicesFactory;
         public BlackDuckServerConfig blackDuckServerConfig;
         public ProjectService projectService;
+        public ProjectUsersService projectUsersService;
+        public ProjectBomService projectBomService;
         public CodeLocationService codeLocationService;
         public BlackDuckService blackDuckService;
         public ComponentService componentService;
@@ -360,6 +391,8 @@ public class ComprehensiveCookbookTestIT {
             blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
             blackDuckServerConfig = intHttpClientTestHelper.getBlackDuckServerConfig();
             projectService = blackDuckServicesFactory.createProjectService();
+            projectUsersService = blackDuckServicesFactory.createProjectUsersService();
+            projectBomService = blackDuckServicesFactory.createProjectBomService();
             codeLocationService = blackDuckServicesFactory.createCodeLocationService();
             blackDuckService = blackDuckServicesFactory.createBlackDuckService();
             componentService = blackDuckServicesFactory.createComponentService();

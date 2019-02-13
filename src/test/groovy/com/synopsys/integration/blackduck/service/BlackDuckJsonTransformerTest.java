@@ -12,16 +12,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 
+@ExtendWith(TimingExtension.class)
 public class BlackDuckJsonTransformerTest {
     private static Gson gson;
     private static ObjectMapper objectMapper;
@@ -30,18 +34,18 @@ public class BlackDuckJsonTransformerTest {
 
     @BeforeAll
     public static void setup() {
-        gson = BlackDuckServicesFactory.createDefaultGson();
-        objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-        logger = new BufferedIntLogger();
-        blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
+        BlackDuckJsonTransformerTest.gson = BlackDuckServicesFactory.createDefaultGson();
+        BlackDuckJsonTransformerTest.objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        BlackDuckJsonTransformerTest.logger = new BufferedIntLogger();
+        BlackDuckJsonTransformerTest.blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckJsonTransformerTest.gson, BlackDuckJsonTransformerTest.objectMapper, BlackDuckJsonTransformerTest.logger);
     }
 
     @Test
     public void testConstructionHappyPath() throws Exception {
-        final InputStream jsonInputStream = getClass().getResourceAsStream("/projectViewResponse.json");
-        final String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+        InputStream jsonInputStream = getClass().getResourceAsStream("/projectViewResponse.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
 
-        final ProjectView projectView = blackDuckJsonTransformer.getResponseAs(json, ProjectView.class);
+        ProjectView projectView = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, ProjectView.class);
         assertFalse(StringUtils.isBlank(projectView.getDescription()));
         assertObjectValid(projectView);
         assertJsonValid(json, projectView);
@@ -49,10 +53,10 @@ public class BlackDuckJsonTransformerTest {
 
     @Test
     public void testJsonPreservedWithMissingField() throws Exception {
-        final InputStream jsonInputStream = getClass().getResourceAsStream("/projectViewResponse.json");
-        final String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+        InputStream jsonInputStream = getClass().getResourceAsStream("/projectViewResponse.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
 
-        final ProjectViewWithoutDescription projectView = blackDuckJsonTransformer.getResponseAs(json, ProjectViewWithoutDescription.class);
+        ProjectViewWithoutDescription projectView = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, ProjectViewWithoutDescription.class);
         assertFalse(StringUtils.isBlank(projectView.getJsonElement().getAsJsonObject().get("description").getAsString()));
         assertObjectValid(projectView);
         assertJsonValid(json, projectView);
@@ -60,30 +64,30 @@ public class BlackDuckJsonTransformerTest {
 
     @Test
     public void testPageResults() throws Exception {
-        final InputStream jsonInputStream = getClass().getResourceAsStream("/projectsResponse.json");
-        final String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+        InputStream jsonInputStream = getClass().getResourceAsStream("/projectsResponse.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
 
-        final BlackDuckPageResponse<ProjectView> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(json, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> blackDuckPageResponse = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponses(json, ProjectView.class);
         assertEquals(10, blackDuckPageResponse.getItems().size());
         assertEquals(84, blackDuckPageResponse.getTotalCount());
 
-        final JsonElement jsonElement = gson.fromJson(json, JsonElement.class);
-        final JsonArray items = jsonElement.getAsJsonObject().get("items").getAsJsonArray();
-        final Iterator<JsonElement> itemsIterator = items.iterator();
-        for (final ProjectView projectView : blackDuckPageResponse.getItems()) {
+        JsonElement jsonElement = BlackDuckJsonTransformerTest.gson.fromJson(json, JsonElement.class);
+        JsonArray items = jsonElement.getAsJsonObject().get("items").getAsJsonArray();
+        Iterator<JsonElement> itemsIterator = items.iterator();
+        for (ProjectView projectView : blackDuckPageResponse.getItems()) {
             assertObjectValid(projectView);
             assertTrue(StringUtils.isNotBlank(projectView.getName()));
 
-            final JsonElement item = itemsIterator.next();
-            assertJsonValid(gson.toJson(item), projectView);
+            JsonElement item = itemsIterator.next();
+            assertJsonValid(BlackDuckJsonTransformerTest.gson.toJson(item), projectView);
         }
     }
 
     @Test
     public void testArbitraryJsonDifference() throws Exception {
-        final InputStream jsonInputStream = getClass().getResourceAsStream("/complex.json");
-        final String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
-        final FruitTest fruitTest = blackDuckJsonTransformer.getResponseAs(json, FruitTest.class);
+        InputStream jsonInputStream = getClass().getResourceAsStream("/complex.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+        FruitTest fruitTest = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, FruitTest.class);
 
         assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.APPLE));
         assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.BANANA));
@@ -94,11 +98,23 @@ public class BlackDuckJsonTransformerTest {
         assertTrue(fruitTest.fruits.nestedList.get(2).apple);
         assertTrue(fruitTest.fruits.nestedList.get(2).banana);
 
-        final String patchedJson = blackDuckJsonTransformer.producePatchedJson(fruitTest);
+        String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(fruitTest);
         assertJsonStringsEqual(json, patchedJson);
     }
 
-    private void assertObjectValid(final BlackDuckView blackDuckView) {
+    @Test
+    public void testSettingObjectToNull() throws Exception {
+        InputStream jsonInputStream = getClass().getResourceAsStream("/json/ProjectVersionView_with_license.json");
+        String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
+
+        ProjectVersionView projectVersionView = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, ProjectVersionView.class);
+        projectVersionView.setLicense(null);
+
+        String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(projectVersionView);
+        System.out.println(patchedJson);
+    }
+
+    private void assertObjectValid(BlackDuckView blackDuckView) {
         assertNotNull(blackDuckView);
         assertNotNull(blackDuckView.getMeta());
         assertNotNull(blackDuckView.getGson());
@@ -106,19 +122,19 @@ public class BlackDuckJsonTransformerTest {
         assertNotNull(blackDuckView.getJsonElement());
     }
 
-    private void assertJsonValid(final String json, final BlackDuckView blackDuckView) {
+    private void assertJsonValid(String json, BlackDuckView blackDuckView) {
         assertJsonStringsEqual(json, blackDuckView.getJson());
     }
 
-    private void assertJsonStringsEqual(final String expectedJson, final String actualJson) {
-        final String expectedJsonWithoutWhitespace = expectedJson.replaceAll("\\s+", "");
-        final String actualJsonWithoutWhitespace = actualJson.replaceAll("\\s+", "");
+    private void assertJsonStringsEqual(String expectedJson, String actualJson) {
+        String expectedJsonWithoutWhitespace = expectedJson.replaceAll("\\s+", "");
+        String actualJsonWithoutWhitespace = actualJson.replaceAll("\\s+", "");
         assertEquals(expectedJsonWithoutWhitespace, actualJsonWithoutWhitespace);
     }
 
-    private Set<String> getStringsFromArray(final JsonArray jsonArray) {
-        final Set<String> strings = new HashSet<>();
-        final Iterator<JsonElement> elements = jsonArray.iterator();
+    private Set<String> getStringsFromArray(JsonArray jsonArray) {
+        Set<String> strings = new HashSet<>();
+        Iterator<JsonElement> elements = jsonArray.iterator();
         while (elements.hasNext()) {
             strings.add(elements.next().getAsString());
         }
