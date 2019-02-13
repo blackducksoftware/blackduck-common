@@ -244,4 +244,31 @@ public class ProjectServiceTestIT {
         assertEquals(projectName, ProjectServiceTestIT.project.getName());
     }
 
+    @Test
+    public void testProjectSyncModelUpdatesSetFieldsOnly() throws IntegrationException {
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults("testSync", "testSyncVersion");
+        projectSyncModel.setProjectTier(2);
+        projectSyncModel.setDescription("original");
+        projectSyncModel.setNickname("panda bear");
+
+        ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.syncProjectAndVersion(projectSyncModel, true);
+        ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
+
+        ProjectSyncModel updateProjectSyncModel = new ProjectSyncModel("testSync", "testSyncVersion");
+        ProjectVersionWrapper firstUpdate = ProjectServiceTestIT.projectService.syncProjectAndVersion(updateProjectSyncModel, true);
+        assertEquals(new Integer(2), firstUpdate.getProjectView().getProjectTier());
+        assertEquals("original", firstUpdate.getProjectView().getDescription());
+        assertEquals("panda bear", firstUpdate.getProjectVersionView().getNickname());
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, firstUpdate.getProjectVersionView().getPhase());
+
+        ProjectSyncModel update2ProjectSyncModel = new ProjectSyncModel("testSync", "testSyncVersion");
+        update2ProjectSyncModel.setProjectTier(3);
+        update2ProjectSyncModel.setNickname("honey badger");
+        ProjectVersionWrapper secondUpdate = ProjectServiceTestIT.projectService.syncProjectAndVersion(update2ProjectSyncModel, true);
+        assertEquals(new Integer(3), secondUpdate.getProjectView().getProjectTier());
+        assertEquals("original", secondUpdate.getProjectView().getDescription());
+        assertEquals("honey badger", secondUpdate.getProjectVersionView().getNickname());
+        assertEquals(ProjectVersionPhaseType.DEVELOPMENT, secondUpdate.getProjectVersionView().getPhase());
+    }
+
 }
