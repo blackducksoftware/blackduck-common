@@ -18,17 +18,17 @@ import com.synopsys.integration.blackduck.service.ComponentService;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class ComponentRequestServiceTestIT {
+public class ComponentServiceTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
     @Test
     public void testGettingIntegrationCommon() throws Exception {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-        ComponentService componentRequestService = blackDuckServicesFactory.createComponentService();
+        ComponentService componentService = blackDuckServicesFactory.createComponentService();
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         ExternalId integrationCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "integration-common", "15.0.0");
-        Optional<ComponentSearchResultView> componentView = componentRequestService.getExactComponentMatch(integrationCommonExternalId);
+        Optional<ComponentSearchResultView> componentView = componentService.getExactComponentMatch(integrationCommonExternalId);
 
         assertTrue(componentView.isPresent());
     }
