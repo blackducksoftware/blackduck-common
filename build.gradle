@@ -15,7 +15,7 @@ project.ext.junitShowStandardStreams = 'true'
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.5'
+    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.7'
     api 'com.blackducksoftware.integration:integration-reporting:0.2.0'
     api 'com.blackducksoftware.integration:integration-bdio:17.0.0'
     api 'com.blackducksoftware.integration:phone-home-client:0.20.0'
