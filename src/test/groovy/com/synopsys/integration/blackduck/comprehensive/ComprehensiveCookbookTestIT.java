@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -253,6 +254,8 @@ public class ComprehensiveCookbookTestIT {
     }
 
     @Test
+    @Disabled
+    //disabled because special config is needed to support /api/uploads (binary scan)
     public void testCodeLocationFromBinaryScanUpload() throws Exception {
         BlackDuckServices blackDuckServices = new BlackDuckServices();
 
