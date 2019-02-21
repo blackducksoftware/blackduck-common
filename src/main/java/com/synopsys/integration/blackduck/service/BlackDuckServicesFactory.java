@@ -35,7 +35,9 @@ import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanBatchRunner;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
@@ -83,9 +85,9 @@ public class BlackDuckServicesFactory {
     public BdioUploadService createBdioUploadService() {
         BlackDuckService blackDuckService = createBlackDuckService();
         if (null == executorService) {
-            return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService), createCodeLocationCreationService());
+            return new BdioUploadService(blackDuckService, logger, new UploadBatchRunner(logger, blackDuckService), createCodeLocationCreationService());
         } else {
-            return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
+            return new BdioUploadService(blackDuckService, logger, new UploadBatchRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
         }
     }
 
@@ -95,7 +97,7 @@ public class BlackDuckServicesFactory {
     @Deprecated
     public BdioUploadService createBdioUploadService(ExecutorService executorService) {
         BlackDuckService blackDuckService = createBlackDuckService();
-        return new BdioUploadService(blackDuckService, logger, new UploadRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
+        return new BdioUploadService(blackDuckService, logger, new UploadBatchRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
     }
 
     public BlackDuckBucketService createBlackDuckBucketService() {
@@ -128,8 +130,21 @@ public class BlackDuckServicesFactory {
         return new SignatureScannerService(createBlackDuckService(), logger, scanBatchRunner, createCodeLocationCreationService());
     }
 
+    /**
+     * @deprecated Please use createBinaryScanUploadService instead.
+     */
+    @Deprecated
     public BinaryScannerService createBinaryScannerService() {
         return new BinaryScannerService(createBlackDuckService(), logger);
+    }
+
+    public BinaryScanUploadService createBinaryScanUploadService() {
+        BlackDuckService blackDuckService = createBlackDuckService();
+        if (null == executorService) {
+            return new BinaryScanUploadService(blackDuckService, logger, new BinaryScanBatchRunner(logger, blackDuckService), createCodeLocationCreationService());
+        } else {
+            return new BinaryScanUploadService(blackDuckService, logger, new BinaryScanBatchRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
+        }
     }
 
     public CodeLocationCreationService createCodeLocationCreationService() {

@@ -34,63 +34,63 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.log.IntLogger;
 
-public class UploadRunner {
+public class UploadBatchRunner {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
     private final Optional<ExecutorService> optionalExecutorService;
 
-    public UploadRunner(final IntLogger logger, final BlackDuckService blackDuckService) {
+    public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         optionalExecutorService = Optional.empty();
     }
 
-    public UploadRunner(final IntLogger logger, final BlackDuckService blackDuckService, final ExecutorService executorService) {
+    public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         optionalExecutorService = Optional.of(executorService);
     }
 
-    public UploadBatchOutput executeUploads(final UploadBatch uploadBatch) throws BlackDuckIntegrationException {
+    public UploadBatchOutput executeUploads(UploadBatch uploadBatch) throws BlackDuckIntegrationException {
         logger.info("Starting the codelocation file uploads.");
-        final UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch);
+        UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch);
         logger.info("Completed the codelocation file uploads.");
 
         return uploadBatchOutput;
     }
 
-    private UploadBatchOutput uploadTargets(final UploadBatch uploadBatch) throws BlackDuckIntegrationException {
-        final List<UploadOutput> uploadOutputs = new ArrayList<>();
+    private UploadBatchOutput uploadTargets(UploadBatch uploadBatch) throws BlackDuckIntegrationException {
+        List<UploadOutput> uploadOutputs = new ArrayList<>();
 
         try {
-            final List<UploadCallable> callables = createCallables(uploadBatch);
+            List<UploadCallable> callables = createCallables(uploadBatch);
             if (optionalExecutorService.isPresent()) {
-                final ExecutorService executorService = optionalExecutorService.get();
-                final List<Future<UploadOutput>> submitted = new ArrayList<>();
-                for (final UploadCallable callable : callables) {
+                ExecutorService executorService = optionalExecutorService.get();
+                List<Future<UploadOutput>> submitted = new ArrayList<>();
+                for (UploadCallable callable : callables) {
                     submitted.add(executorService.submit(callable));
                 }
-                for (final Future<UploadOutput> future : submitted) {
-                    final UploadOutput uploadOutput = future.get();
+                for (Future<UploadOutput> future : submitted) {
+                    UploadOutput uploadOutput = future.get();
                     uploadOutputs.add(uploadOutput);
                 }
             } else {
-                for (final UploadCallable callable : callables) {
+                for (UploadCallable callable : callables) {
                     uploadOutputs.add(callable.call());
                 }
             }
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new BlackDuckIntegrationException(String.format("Encountered a problem uploading a file: %s", e.getMessage()), e);
         }
 
         return new UploadBatchOutput(uploadOutputs);
     }
 
-    private List<UploadCallable> createCallables(final UploadBatch uploadBatch) {
-        final List<UploadCallable> callables = uploadBatch.getUploadTargets()
-                                                       .stream()
-                                                       .map(uploadTarget -> new UploadCallable(blackDuckService, uploadTarget))
-                                                       .collect(Collectors.toList());
+    private List<UploadCallable> createCallables(UploadBatch uploadBatch) {
+        List<UploadCallable> callables = uploadBatch.getUploadTargets()
+                                                 .stream()
+                                                 .map(uploadTarget -> new UploadCallable(blackDuckService, uploadTarget))
+                                                 .collect(Collectors.toList());
 
         return callables;
     }

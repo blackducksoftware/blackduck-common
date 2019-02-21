@@ -8,14 +8,22 @@ buildscript {
 }
 plugins { id 'groovy' }
 
-version = '42.0.1-SNAPSHOT'
+version = '42.1.0-SNAPSHOT'
 
+project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.junitShowStandardStreams = 'true'
 
 apply plugin: 'com.blackducksoftware.integration.library'
 
+jar {
+    inputs.property("moduleName", moduleName)
+    manifest {
+        attributes('Automatic-Module-Name': moduleName)
+    }
+}
+
 dependencies {
-    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.5'
+    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.9'
     api 'com.blackducksoftware.integration:integration-reporting:0.2.0'
     api 'com.blackducksoftware.integration:integration-bdio:17.0.0'
     api 'com.blackducksoftware.integration:phone-home-client:0.20.0'

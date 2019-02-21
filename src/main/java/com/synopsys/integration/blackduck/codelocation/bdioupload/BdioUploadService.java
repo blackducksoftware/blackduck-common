@@ -34,17 +34,17 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 public class BdioUploadService extends DataService {
-    private final UploadRunner uploadRunner;
+    private final UploadBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public BdioUploadService(BlackDuckService blackDuckService, IntLogger logger, UploadRunner uploadRunner, CodeLocationCreationService codeLocationCreationService) {
+    public BdioUploadService(BlackDuckService blackDuckService, IntLogger logger, UploadBatchRunner uploadBatchRunner, CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckService, logger);
-        this.uploadRunner = uploadRunner;
+        this.uploadBatchRunner = uploadBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
     public BdioUploadCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch) {
-        return new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        return new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
     }
 
     public CodeLocationCreationData<UploadBatchOutput> uploadBdio(BdioUploadCodeLocationCreationRequest uploadRequest) throws IntegrationException {
@@ -59,7 +59,7 @@ public class BdioUploadService extends DataService {
     public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadTarget uploadTarget) throws IntegrationException {
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(uploadTarget);
-        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
 
         return uploadBdio(uploadRequest);
     }
@@ -76,7 +76,7 @@ public class BdioUploadService extends DataService {
     public UploadBatchOutput uploadBdioAndWait(UploadTarget uploadTarget, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(uploadTarget);
-        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadRunner, uploadBatch);
+        BdioUploadCodeLocationCreationRequest uploadRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
 
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
