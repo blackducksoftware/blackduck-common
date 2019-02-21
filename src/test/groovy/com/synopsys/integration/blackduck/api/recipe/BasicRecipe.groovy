@@ -7,7 +7,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadRunner
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
@@ -39,7 +39,7 @@ class BasicRecipe {
     protected CodeLocationCreationService codeLocationCreationService
     protected PolicyRuleService policyRuleService
 
-    protected UploadRunner uploadRunner
+    protected UploadBatchRunner uploadRunner
 
     @BeforeEach
     void startRecipe() {
@@ -78,7 +78,7 @@ class BasicRecipe {
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
 
-        uploadRunner = new UploadRunner(logger, blackDuckService)
+        uploadRunner = new UploadBatchRunner(logger, blackDuckService)
     }
 
     ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {

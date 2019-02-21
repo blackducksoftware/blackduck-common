@@ -21,23 +21,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.codelocation.bdioupload;
+package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
-    private final UploadBatchRunner uploadBatchRunner;
-    private final UploadBatch uploadBatch;
+public class BinaryScanBatch {
+    private final List<BinaryScan> binaryScans = new ArrayList<>();
 
-    public BdioUploadCodeLocationCreationRequest(UploadBatchRunner uploadBatchRunner, UploadBatch uploadBatch) {
-        this.uploadBatchRunner = uploadBatchRunner;
-        this.uploadBatch = uploadBatch;
+    public BinaryScanBatch() {
     }
 
-    @Override
-    public UploadBatchOutput executeRequest() throws BlackDuckIntegrationException {
-        return uploadBatchRunner.executeUploads(uploadBatch);
+    public BinaryScanBatch(BinaryScan... binaryScans) {
+        this.binaryScans.addAll(Arrays.asList(binaryScans));
+    }
+
+    public void addBinaryScan(BinaryScan binaryScan) {
+        binaryScans.add(binaryScan);
+    }
+
+    public List<BinaryScan> getBinaryScans() {
+        return binaryScans;
     }
 
 }

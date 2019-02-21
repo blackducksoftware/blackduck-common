@@ -25,65 +25,39 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.FormBodyPartBuilder;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.StringBody;
-
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScan;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanCallable;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanOutput;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.request.Response;
 
+/**
+ * @deprecated Please use BinaryScanUploadService instead.
+ */
+@Deprecated
 public class BinaryScannerService extends DataService {
     public BinaryScannerService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocatioName) throws IntegrationException, IOException, URISyntaxException {
-        RequestBuilder builder = blackDuckService.getBlackDuckHttpClient().createRequestBuilder(HttpMethod.POST);
-        URL baseURL = new URL(blackDuckService.getBlackDuckHttpClient().getBaseUrl());
-        URL uploadUrl = new URL(baseURL, "/api/uploads");
-        builder.setUri(uploadUrl.toURI());
-        builder.setEntity(createEntity(binaryFile, projectName, projectVersion, codeLocatioName));
+    public BinaryScanOutput scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException {
+        BinaryScan binaryScan = new BinaryScan(binaryFile, projectName, projectVersion, codeLocationName);
+        BinaryScanCallable binaryScanCallable = new BinaryScanCallable(blackDuckService, binaryScan);
+        BinaryScanOutput binaryScanOutput = binaryScanCallable.call();
 
-        HttpUriRequest request = builder.build();
-        try (Response response = blackDuckService.getBlackDuckHttpClient().execute(request)) {
-            logger.debug("Response: " + response.toString());
-            logger.debug("Response: " + response.getStatusMessage().toString());
-            logger.debug("Response: " + response.getStatusCode().toString());
-            logger.debug("Response: " + response.getContentString());
-            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-                logger.info("Status code OK");
-            } else {
-                logger.error("Unknown status code: " + response.getStatusCode());
-                throw new IntegrationException("Unkown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
-            }
+        logger.debug("Response: " + binaryScanOutput.getResponse());
+        logger.debug("Response: " + binaryScanOutput.getStatusMessage());
+        logger.debug("Response: " + binaryScanOutput.getStatusCode());
+        logger.debug("Response: " + binaryScanOutput.getContentString());
+        if (binaryScanOutput.getStatusCode() >= 200 && binaryScanOutput.getStatusCode() < 300) {
+            logger.info("Status code OK");
+        } else {
+            logger.error("Unknown status code: " + binaryScanOutput.getStatusCode());
+            throw new IntegrationException("Unknown status code when uploading binary scan: " + binaryScanOutput.getStatusCode() + ", " + binaryScanOutput.getStatusMessage());
         }
-    }
 
-    private HttpEntity createEntity(File file, String projectName, String projectVersion, String codeLocatioName) {
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        addPart(builder, "projectName", projectName);
-        addPart(builder, "version", projectVersion);
-        addPart(builder, "codeLocationName", codeLocatioName);
-        builder.addBinaryBody("fileupload", file);
-
-        return builder.build();
-    }
-
-    private void addPart(MultipartEntityBuilder builder, String name, String value) {
-        StringBody body = new StringBody(value, ContentType.DEFAULT_TEXT);
-        FormBodyPart part = FormBodyPartBuilder.create(name, body).build();
-        // part.getHeader().removeFields("Content-Type");
-        builder.addPart(part);
+        return binaryScanOutput;
     }
 
 }
