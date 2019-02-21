@@ -25,42 +25,39 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScan;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanCallable;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanOutput;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
 
+/**
+ * @deprecated Please use BinaryScanUploadService instead.
+ */
+@Deprecated
 public class BinaryScannerService extends DataService {
     public BinaryScannerService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public void scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException {
-        Map<String, String> textParts = new HashMap<>();
-        textParts.put("projectName", projectName);
-        textParts.put("version", projectVersion);
-        textParts.put("codeLocationName", codeLocationName);
+    public BinaryScanOutput scanBinary(File binaryFile, String projectName, String projectVersion, String codeLocationName) throws IntegrationException, IOException {
+        BinaryScan binaryScan = new BinaryScan(binaryFile, projectName, projectVersion, codeLocationName);
+        BinaryScanCallable binaryScanCallable = new BinaryScanCallable(blackDuckService, binaryScan);
+        BinaryScanOutput binaryScanOutput = binaryScanCallable.call();
 
-        Map<String, File> binaryParts = new HashMap<>();
-        binaryParts.put("fileupload", binaryFile);
-
-        Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(binaryParts, textParts);
-        try (Response response = blackDuckService.execute(BlackDuckService.UPLOADS_PATH, requestBuilder)) {
-            logger.debug("Response: " + response.toString());
-            logger.debug("Response: " + response.getStatusMessage().toString());
-            logger.debug("Response: " + response.getStatusCode().toString());
-            logger.debug("Response: " + response.getContentString());
-            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-                logger.info("Status code OK");
-            } else {
-                logger.error("Unknown status code: " + response.getStatusCode());
-                throw new IntegrationException("Unknown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage());
-            }
+        logger.debug("Response: " + binaryScanOutput.getResponse());
+        logger.debug("Response: " + binaryScanOutput.getStatusMessage());
+        logger.debug("Response: " + binaryScanOutput.getStatusCode());
+        logger.debug("Response: " + binaryScanOutput.getContentString());
+        if (binaryScanOutput.getStatusCode() >= 200 && binaryScanOutput.getStatusCode() < 300) {
+            logger.info("Status code OK");
+        } else {
+            logger.error("Unknown status code: " + binaryScanOutput.getStatusCode());
+            throw new IntegrationException("Unknown status code when uploading binary scan: " + binaryScanOutput.getStatusCode() + ", " + binaryScanOutput.getStatusMessage());
         }
+
+        return binaryScanOutput;
     }
 
 }

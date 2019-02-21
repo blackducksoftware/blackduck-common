@@ -23,5 +23,35 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
+import java.io.File;
+
 public class BinaryScan {
+    private final File binaryFile;
+    private final String projectName;
+    private final String projectVersion;
+    private final String codeLocationName;
+
+    public BinaryScan(File binaryFile, String projectName, String projectVersion, String codeLocationName) {
+        this.binaryFile = binaryFile;
+        this.projectName = projectName;
+        this.projectVersion = projectVersion;
+        this.codeLocationName = codeLocationName;
+    }
+
+    public File getBinaryFile() {
+        return binaryFile;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public String getProjectVersion() {
+        return projectVersion;
+    }
+
+    public String getCodeLocationName() {
+        return codeLocationName;
+    }
+
 }

@@ -27,17 +27,17 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationReque
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
-    private final UploadRunner uploadRunner;
+    private final UploadBatchRunner uploadBatchRunner;
     private final UploadBatch uploadBatch;
 
-    public BdioUploadCodeLocationCreationRequest(final UploadRunner uploadRunner, final UploadBatch uploadBatch) {
-        this.uploadRunner = uploadRunner;
+    public BdioUploadCodeLocationCreationRequest(UploadBatchRunner uploadBatchRunner, UploadBatch uploadBatch) {
+        this.uploadBatchRunner = uploadBatchRunner;
         this.uploadBatch = uploadBatch;
     }
 
     @Override
     public UploadBatchOutput executeRequest() throws BlackDuckIntegrationException {
-        return uploadRunner.executeUploads(uploadBatch);
+        return uploadBatchRunner.executeUploads(uploadBatch);
     }
 
 }

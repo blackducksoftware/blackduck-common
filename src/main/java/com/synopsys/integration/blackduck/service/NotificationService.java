@@ -30,8 +30,6 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.jayway.jsonpath.JsonPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
@@ -154,20 +152,10 @@ public class NotificationService extends DataService {
     when that is fixed, this can be removed
     UPDATE: as of 2018.12.0, this is fixed - this can likely be removed when we no longer care about supporting flavors of 2018.11
     */
-    private <T extends NotificationViewData> List<T> reallyFilterNotifications2(List<T> notifications, List<String> notificationTypesToInclude) {
+    private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
         return notifications
                        .stream()
                        .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
-                       .collect(Collectors.toList());
-    }
-
-    private <T extends BlackDuckView> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
-        return notifications
-                       .stream()
-                       .filter(notification -> {
-                           String notificationType = JsonPath.read(notification.getJson(), "$.type");
-                           return notificationTypesToInclude.contains(notificationType);
-                       })
                        .collect(Collectors.toList());
     }
 

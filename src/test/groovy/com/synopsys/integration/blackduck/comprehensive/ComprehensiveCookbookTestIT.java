@@ -34,7 +34,7 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.contract.NotificationViewData;
+import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
@@ -46,6 +46,10 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScan;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanOutput;
+import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
@@ -249,6 +253,31 @@ public class ComprehensiveCookbookTestIT {
     }
 
     @Test
+    public void testCodeLocationFromBinaryScanUpload() throws Exception {
+        BlackDuckServices blackDuckServices = new BlackDuckServices();
+
+        String projectName = "binary_scan_project";
+        String projectVersionName = "0.0.1";
+        String codeLocationName = "binary scan test code location";
+
+        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+        Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
+
+        // upload the binary scan
+        File file = new File("/Users/ekerwin/Downloads/Interview.java");
+        BinaryScan binaryScan = new BinaryScan(file, projectName, projectVersionName, codeLocationName);
+
+        BinaryScanUploadService binaryScanUploadService = blackDuckServices.blackDuckServicesFactory.createBinaryScanUploadService();
+        BinaryScanBatchOutput binaryScanBatchOutput = binaryScanUploadService.uploadBinaryScanAndWait(binaryScan, 15 * 60);
+        for (BinaryScanOutput uploadOutput : binaryScanBatchOutput) {
+            assertEquals(Result.SUCCESS, uploadOutput.getResult());
+        }
+
+        checkNotifications(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
+    }
+
+    @Test
     public void testGettingAllProjects() throws IntegrationException {
         assertGettingAll(ApiDiscovery.PROJECTS_LINK_RESPONSE, "project");
     }
@@ -377,7 +406,7 @@ public class ComprehensiveCookbookTestIT {
     }
 
     private void checkNotifications(UserView currentUser, NotificationService notificationService, Date userStartDate, Date systemStartDate) throws IntegrationException {
-        Date endDate = Date.from(new Date().toInstant().plus(1, ChronoUnit.WEEKS));
+        Date endDate = Date.from(new Date().toInstant().plus(7, ChronoUnit.DAYS));
 
         List<NotificationView> allNotifications = notificationService.getAllNotifications(systemStartDate, endDate);
         List<NotificationUserView> allUserNotifications = notificationService.getAllUserNotifications(currentUser, userStartDate, endDate);
@@ -406,10 +435,10 @@ public class ComprehensiveCookbookTestIT {
         assertEquals(getContents(bomComputedNotifications), getContents(bomComputedUserNotifications));
     }
 
-    private List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationViewData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
+    private List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationContentData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
         return notifications
                        .stream()
-                       .map(NotificationViewData::getContent)
+                       .map(NotificationContentData::getContent)
                        .collect(Collectors.toList());
     }
 
