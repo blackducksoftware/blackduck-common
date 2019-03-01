@@ -26,8 +26,6 @@ package com.synopsys.integration.blackduck.configuration;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -193,6 +191,30 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
+    public Set<BuilderPropertyKey> getKeys() {
+        return builderProperties.getKeys();
+    }
+
+    public Set<String> getPropertyKeys() {
+        return builderProperties.getPropertyKeys();
+    }
+
+    public Set<String> getEnvironmentVariableKeys() {
+        return builderProperties.getEnvironmentVariableKeys();
+    }
+
+    public Map<BuilderPropertyKey, String> getProperties() {
+        return builderProperties.getProperties();
+    }
+
+    public void setProperties(final Set<? extends Map.Entry<String, String>> propertyEntries) {
+        builderProperties.setProperties(propertyEntries);
+    }
+
+    public void setProperty(final String key, final String value) {
+        builderProperties.setProperty(key, value);
+    }
+
     public ProxyInfo getProxyInfo() {
         String proxyHost = getProxyHost();
 
@@ -230,11 +252,19 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
+    /**
+     * @deprecated Please use setProperties.
+     */
+    @Deprecated
     public BlackDuckServerConfigBuilder setFromProperties(Map<String, String> properties) {
         builderProperties.setProperties(properties.entrySet());
         return this;
     }
 
+    /**
+     * @deprecated Please use setProperties.
+     */
+    @Deprecated
     public BlackDuckServerConfigBuilder setFromProperties(Properties properties) {
         Map<String, String> propertiesMap = properties.stringPropertyNames()
                                                     .stream()

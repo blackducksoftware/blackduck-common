@@ -22,15 +22,15 @@ public class BlackDuckServerConfigBuilderTest {
         properties.put("BLACKDUCK_PASSWORD", "password");
 
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.URL));
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.USERNAME));
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.PASSWORD));
+        assertNull(blackDuckServerConfigBuilder.getUrl());
+        assertNull(blackDuckServerConfigBuilder.getUsername());
+        assertNull(blackDuckServerConfigBuilder.getPassword());
 
         blackDuckServerConfigBuilder.setFromProperties(properties);
 
-        assertEquals("test url", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.URL));
-        assertEquals("user", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.USERNAME));
-        assertEquals("password", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.PASSWORD));
+        assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
+        assertEquals("user", blackDuckServerConfigBuilder.getUsername());
+        assertEquals("password", blackDuckServerConfigBuilder.getPassword());
     }
 
     @Test
@@ -41,15 +41,15 @@ public class BlackDuckServerConfigBuilderTest {
         properties.put("BLACKDUCK_PASSWORD", "password");
 
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.URL));
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.USERNAME));
-        assertNull(blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.PASSWORD));
+        assertNull(blackDuckServerConfigBuilder.getUrl());
+        assertNull(blackDuckServerConfigBuilder.getUsername());
+        assertNull(blackDuckServerConfigBuilder.getPassword());
 
         blackDuckServerConfigBuilder.setFromProperties(properties);
 
-        assertEquals("test url", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.URL));
-        assertEquals("user", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.USERNAME));
-        assertEquals("password", blackDuckServerConfigBuilder.get(BlackDuckServerConfigBuilder.Property.PASSWORD));
+        assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
+        assertEquals("user", blackDuckServerConfigBuilder.getUsername());
+        assertEquals("password", blackDuckServerConfigBuilder.getPassword());
     }
 
     @Test

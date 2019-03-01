@@ -11,12 +11,12 @@ plugins { id 'groovy' }
 project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '42.1.0-SNAPSHOT'
+version = '42.2.0'
 
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    api 'com.blackducksoftware.integration:blackduck-common-api:2018.12.0.10'
+    api 'com.blackducksoftware.integration:blackduck-common-api:2019.2.0.0'
     api 'com.blackducksoftware.integration:integration-reporting:0.3.0'
     api 'com.blackducksoftware.integration:integration-bdio:17.1.0'
     api 'com.blackducksoftware.integration:phone-home-client:0.21.0'
