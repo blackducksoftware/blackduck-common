@@ -23,26 +23,27 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.text.WordUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.builder.BuilderProperties;
+import com.synopsys.integration.builder.BuilderPropertyKey;
+import com.synopsys.integration.builder.BuilderStatus;
+import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -52,18 +53,25 @@ import com.synopsys.integration.rest.exception.IntegrationCertificateException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
-import com.synopsys.integration.util.BuilderStatus;
 import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.IntegrationBuilder;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
-    public static final String BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX = "BLACKDUCK_";
-    public static final String BLACKDUCK_SERVER_CONFIG_PROPERTY_KEY_PREFIX = "blackduck.";
+    public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("URL");
+    public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("USERNAME");
+    public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("PASSWORD");
+    public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("API_TOKEN");
+    public static final BuilderPropertyKey TIMEOUT_KEY = new BuilderPropertyKey("TIMEOUT");
+    public static final BuilderPropertyKey PROXY_HOST_KEY = new BuilderPropertyKey("PROXY_HOST");
+    public static final BuilderPropertyKey PROXY_PORT_KEY = new BuilderPropertyKey("PROXY_PORT");
+    public static final BuilderPropertyKey PROXY_USERNAME_KEY = new BuilderPropertyKey("PROXY_USERNAME");
+    public static final BuilderPropertyKey PROXY_PASSWORD_KEY = new BuilderPropertyKey("PROXY_PASSWORD");
+    public static final BuilderPropertyKey PROXY_NTLM_DOMAIN_KEY = new BuilderPropertyKey("PROXY_NTLM_DOMAIN");
+    public static final BuilderPropertyKey PROXY_NTLM_WORKSTATION_KEY = new BuilderPropertyKey("PROXY_NTLM_WORKSTATION");
+    public static final BuilderPropertyKey TRUST_CERT_KEY = new BuilderPropertyKey("TRUST_CERT");
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
-    private final Map<Property, String> values = new HashMap<>();
-
+    private final BuilderProperties builderProperties;
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
     private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
@@ -72,10 +80,22 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private ExecutorService executorService = null;
 
     public BlackDuckServerConfigBuilder() {
-        EnumSet.allOf(Property.class).forEach(property -> {
-            values.put(property, null);
-        });
-        values.put(Property.TIMEOUT, String.valueOf(BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS));
+        Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
+        propertyKeys.add(URL_KEY);
+        propertyKeys.add(USERNAME_KEY);
+        propertyKeys.add(PASSWORD_KEY);
+        propertyKeys.add(API_TOKEN_KEY);
+        propertyKeys.add(TIMEOUT_KEY);
+        propertyKeys.add(PROXY_HOST_KEY);
+        propertyKeys.add(PROXY_PORT_KEY);
+        propertyKeys.add(PROXY_USERNAME_KEY);
+        propertyKeys.add(PROXY_PASSWORD_KEY);
+        propertyKeys.add(PROXY_NTLM_DOMAIN_KEY);
+        propertyKeys.add(PROXY_NTLM_WORKSTATION_KEY);
+        propertyKeys.add(TRUST_CERT_KEY);
+        builderProperties = new BuilderProperties("BLACKDUCK", propertyKeys);
+
+        builderProperties.set(TIMEOUT_KEY, Integer.toString(BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS));
     }
 
     @Override
@@ -86,7 +106,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             if (!e.getMessage().contains("SunCertPathBuilderException")) {
                 throw e;
             }
-            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", url()), e);
+            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", getUrl()), e);
         }
     }
 
@@ -94,7 +114,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfig buildWithoutValidation() {
         URL blackDuckURL = null;
         try {
-            String tempUrl = url();
+            String tempUrl = getUrl();
             if (!tempUrl.endsWith("/")) {
                 blackDuckURL = new URL(tempUrl);
             } else {
@@ -105,87 +125,36 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
 
         ProxyInfo proxyInfo = getProxyInfo();
-        if (StringUtils.isNotBlank(apiToken())) {
-            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), apiToken(), proxyInfo, trustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
+        if (StringUtils.isNotBlank(getApiToken())) {
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
         } else {
-            String username = get(Property.USERNAME);
-            String password = get(Property.PASSWORD);
+            String username = getUsername();
+            String password = getPassword();
             CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckURL, timeoutSeconds(), credentials, proxyInfo, trustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
         }
-    }
-
-    private ProxyInfo getProxyInfo() {
-        String proxyHost = values.get(Property.PROXY_HOST);
-
-        if (StringUtils.isBlank(proxyHost)) {
-            return ProxyInfo.NO_PROXY_INFO;
-        }
-
-        int proxyPort = NumberUtils.toInt(values.get(Property.PROXY_PORT), 0);
-        String username = get(Property.PROXY_USERNAME);
-        String password = get(Property.PROXY_PASSWORD);
-        CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
-        credentialsBuilder.setUsernameAndPassword(username, password);
-        Credentials proxyCredentials = credentialsBuilder.build();
-        String proxyNtlmDomain = values.get(Property.PROXY_NTLM_DOMAIN);
-        String proxyNtlmWorkstation = values.get(Property.PROXY_NTLM_WORKSTATION);
-
-        ProxyInfoBuilder proxyInfoBuilder = ProxyInfo.newBuilder();
-        proxyInfoBuilder.setHost(proxyHost);
-        proxyInfoBuilder.setPort(proxyPort);
-        proxyInfoBuilder.setCredentials(proxyCredentials);
-        proxyInfoBuilder.setNtlmDomain(proxyNtlmDomain);
-        proxyInfoBuilder.setNtlmWorkstation(proxyNtlmWorkstation);
-
-        return proxyInfoBuilder.build();
-    }
-
-    public BlackDuckServerConfigBuilder setFromProperties(Map<String, String> properties) {
-        for (Property configProperty : Property.values()) {
-            if (configProperty.isWithin(properties.keySet())) {
-                String value = configProperty.getValueFrom(properties);
-                String setterMethodName = configProperty.getBuilderPropertySetterName();
-                try {
-                    Method setter = getClass().getMethod(setterMethodName, String.class);
-                    setter.invoke(this, value);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-                    // who cares - ekerwin 2018-05-15
-                }
-            }
-        }
-        return this;
-    }
-
-    public BlackDuckServerConfigBuilder setFromProperties(Properties properties) {
-        Map<String, String> propertiesMap = new HashMap<>();
-        for (String propertyName : properties.stringPropertyNames()) {
-            propertiesMap.put(propertyName, properties.getProperty(propertyName));
-        }
-
-        return setFromProperties(propertiesMap);
     }
 
     @Override
     protected void validate(BuilderStatus builderStatus) {
-        if (StringUtils.isBlank(url())) {
+        if (StringUtils.isBlank(getUrl())) {
             builderStatus.addErrorMessage("The Black Duck url must be specified.");
         } else {
             try {
-                URL blackDuckURL = new URL(url());
+                URL blackDuckURL = new URL(getUrl());
                 blackDuckURL.toURI();
             } catch (MalformedURLException | URISyntaxException e) {
-                builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", url()));
+                builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", getUrl()));
             }
         }
 
-        if (StringUtils.isBlank(apiToken())) {
+        if (StringUtils.isBlank(getApiToken())) {
             CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
-            credentialsBuilder.setUsername(values.get(Property.USERNAME));
-            credentialsBuilder.setPassword(values.get(Property.PASSWORD));
+            credentialsBuilder.setUsername(getUsername());
+            credentialsBuilder.setPassword(getPassword());
             BuilderStatus credentialsBuilderStatus = credentialsBuilder.validateAndGetBuilderStatus();
             if (!credentialsBuilderStatus.isValid()) {
                 builderStatus.addAllErrorMessages(credentialsBuilderStatus.getErrorMessages());
@@ -197,8 +166,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             }
         }
         CredentialsBuilder proxyCredentialsBuilder = new CredentialsBuilder();
-        proxyCredentialsBuilder.setUsername(values.get(Property.PROXY_USERNAME));
-        proxyCredentialsBuilder.setPassword(values.get(Property.PROXY_PASSWORD));
+        proxyCredentialsBuilder.setUsername(getProxyUsername());
+        proxyCredentialsBuilder.setPassword(getProxyPassword());
         BuilderStatus proxyCredentialsBuilderStatus = proxyCredentialsBuilder.validateAndGetBuilderStatus();
         if (!proxyCredentialsBuilderStatus.isValid()) {
             builderStatus.addErrorMessage("The proxy credentials were not valid.");
@@ -207,35 +176,101 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             Credentials proxyCredentials = proxyCredentialsBuilder.build();
             ProxyInfoBuilder proxyInfoBuilder = new ProxyInfoBuilder();
             proxyInfoBuilder.setCredentials(proxyCredentials);
-            proxyInfoBuilder.setHost(values.get(Property.PROXY_HOST));
-            proxyInfoBuilder.setPort(NumberUtils.toInt(values.get(Property.PROXY_PORT), 0));
-            proxyInfoBuilder.setNtlmDomain(values.get(Property.PROXY_NTLM_DOMAIN));
-            proxyInfoBuilder.setNtlmWorkstation(values.get(Property.PROXY_NTLM_WORKSTATION));
+            proxyInfoBuilder.setHost(getProxyHost());
+            proxyInfoBuilder.setPort(getProxyPort());
+            proxyInfoBuilder.setNtlmDomain(getProxyNtlmDomain());
+            proxyInfoBuilder.setNtlmWorkstation(getProxyNtlmWorkstation());
             BuilderStatus proxyInfoBuilderStatus = proxyInfoBuilder.validateAndGetBuilderStatus();
             if (!proxyInfoBuilderStatus.isValid()) {
                 builderStatus.addAllErrorMessages(proxyInfoBuilderStatus.getErrorMessages());
             }
         }
 
-        if (timeoutSeconds() <= 0) {
+        if (getTimemoutInSeconds() <= 0) {
             builderStatus.addErrorMessage("The timeout must be greater than zero.");
         }
     }
 
-    private String url() {
-        return values.get(Property.URL);
+    public Set<BuilderPropertyKey> getKeys() {
+        return builderProperties.getKeys();
     }
 
-    private String apiToken() {
-        return values.get(Property.API_TOKEN);
+    public Set<String> getPropertyKeys() {
+        return builderProperties.getPropertyKeys();
     }
 
-    private int timeoutSeconds() {
-        return NumberUtils.toInt(values.get(Property.TIMEOUT), BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS);
+    public Set<String> getEnvironmentVariableKeys() {
+        return builderProperties.getEnvironmentVariableKeys();
     }
 
-    private boolean trustCert() {
-        return Boolean.parseBoolean(values.get(Property.TRUST_CERT));
+    public Map<BuilderPropertyKey, String> getProperties() {
+        return builderProperties.getProperties();
+    }
+
+    public void setProperties(final Set<? extends Map.Entry<String, String>> propertyEntries) {
+        builderProperties.setProperties(propertyEntries);
+    }
+
+    public void setProperty(final String key, final String value) {
+        builderProperties.setProperty(key, value);
+    }
+
+    public ProxyInfo getProxyInfo() {
+        String proxyHost = getProxyHost();
+
+        if (StringUtils.isBlank(proxyHost)) {
+            return ProxyInfo.NO_PROXY_INFO;
+        }
+
+        int proxyPort = getProxyPort();
+        String username = getProxyUsername();
+        String password = getProxyPassword();
+        CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
+        credentialsBuilder.setUsernameAndPassword(username, password);
+        Credentials proxyCredentials = credentialsBuilder.build();
+        String proxyNtlmDomain = getProxyNtlmDomain();
+        String proxyNtlmWorkstation = getProxyNtlmWorkstation();
+
+        ProxyInfoBuilder proxyInfoBuilder = ProxyInfo.newBuilder();
+        proxyInfoBuilder.setHost(proxyHost);
+        proxyInfoBuilder.setPort(proxyPort);
+        proxyInfoBuilder.setCredentials(proxyCredentials);
+        proxyInfoBuilder.setNtlmDomain(proxyNtlmDomain);
+        proxyInfoBuilder.setNtlmWorkstation(proxyNtlmWorkstation);
+
+        return proxyInfoBuilder.build();
+    }
+
+    public BlackDuckServerConfigBuilder setProxyInfo(ProxyInfo proxyInfo) {
+        setProxyHost(proxyInfo.getHost().orElse(null));
+        setProxyPort(proxyInfo.getPort());
+        setProxyUsername(proxyInfo.getUsername().orElse(null));
+        setProxyPassword(proxyInfo.getPassword().orElse(null));
+        setProxyNtlmDomain(proxyInfo.getNtlmDomain().orElse(null));
+        setProxyNtlmWorkstation(proxyInfo.getNtlmWorkstation().orElse(null));
+
+        return this;
+    }
+
+    /**
+     * @deprecated Please use setProperties.
+     */
+    @Deprecated
+    public BlackDuckServerConfigBuilder setFromProperties(Map<String, String> properties) {
+        builderProperties.setProperties(properties.entrySet());
+        return this;
+    }
+
+    /**
+     * @deprecated Please use setProperties.
+     */
+    @Deprecated
+    public BlackDuckServerConfigBuilder setFromProperties(Properties properties) {
+        Map<String, String> propertiesMap = properties.stringPropertyNames()
+                                                    .stream()
+                                                    .collect(Collectors.toMap(name -> name, name -> properties.getProperty(name)));
+
+        return setFromProperties(propertiesMap);
     }
 
     public IntLogger getLogger() {
@@ -302,54 +337,103 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    public String get(Property property) {
-        return values.get(property);
+    public String getUrl() {
+        return builderProperties.get(URL_KEY);
     }
 
-    // setters for the values of BlackDuckServerConfigBuilder
     public BlackDuckServerConfigBuilder setUrl(String url) {
-        values.put(Property.URL, url);
+        builderProperties.set(URL_KEY, url);
         return this;
     }
 
     public BlackDuckServerConfigBuilder setCredentials(Credentials credentials) {
-        values.put(Property.USERNAME, credentials.getUsername().orElse(null));
-        values.put(Property.PASSWORD, credentials.getPassword().orElse(null));
+        builderProperties.set(USERNAME_KEY, credentials.getUsername().orElse(null));
+        builderProperties.set(PASSWORD_KEY, credentials.getPassword().orElse(null));
         return this;
+    }
+
+    public String getUsername() {
+        return builderProperties.get(USERNAME_KEY);
     }
 
     public BlackDuckServerConfigBuilder setUsername(String username) {
-        values.put(Property.USERNAME, username);
+        builderProperties.set(USERNAME_KEY, username);
         return this;
+    }
+
+    public String getPassword() {
+        return builderProperties.get(PASSWORD_KEY);
     }
 
     public BlackDuckServerConfigBuilder setPassword(String password) {
-        values.put(Property.PASSWORD, password);
+        builderProperties.set(PASSWORD_KEY, password);
         return this;
+    }
+
+    public String getApiToken() {
+        return builderProperties.get(API_TOKEN_KEY);
     }
 
     public BlackDuckServerConfigBuilder setApiToken(String apiToken) {
-        values.put(Property.API_TOKEN, apiToken);
+        builderProperties.set(API_TOKEN_KEY, apiToken);
         return this;
     }
 
+    /**
+     * @deprecated Please use getTimeoutInSeconds
+     */
+    @Deprecated
+    public int getTimemout() {
+        return getTimemoutInSeconds();
+    }
+
+    public int getTimemoutInSeconds() {
+        return NumberUtils.toInt(builderProperties.get(TIMEOUT_KEY), BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * @deprecated Please use setTimeoutInSeconds
+     */
+    @Deprecated
     public BlackDuckServerConfigBuilder setTimeout(String timeout) {
-        values.put(Property.TIMEOUT, timeout);
+        builderProperties.set(TIMEOUT_KEY, timeout);
         return this;
     }
 
+    /**
+     * @deprecated Please use setTimeoutInSeconds
+     */
+    @Deprecated
     public BlackDuckServerConfigBuilder setTimeout(int timeout) {
         setTimeout(String.valueOf(timeout));
         return this;
     }
 
-    public BlackDuckServerConfigBuilder setProxyHost(String proxyHost) {
-        values.put(Property.PROXY_HOST, proxyHost);
+    public BlackDuckServerConfigBuilder setTimeoutInSeconds(String timeout) {
+        builderProperties.set(TIMEOUT_KEY, timeout);
         return this;
     }
 
+    public BlackDuckServerConfigBuilder setTimeoutInSeconds(int timeout) {
+        setTimeoutInSeconds(String.valueOf(timeout));
+        return this;
+    }
+
+    public String getProxyHost() {
+        return builderProperties.get(PROXY_HOST_KEY);
+    }
+
+    public BlackDuckServerConfigBuilder setProxyHost(String proxyHost) {
+        builderProperties.set(PROXY_HOST_KEY, proxyHost);
+        return this;
+    }
+
+    public int getProxyPort() {
+        return NumberUtils.toInt(builderProperties.get(PROXY_PORT_KEY), 0);
+    }
+
     public BlackDuckServerConfigBuilder setProxyPort(String proxyPort) {
-        values.put(Property.PROXY_PORT, proxyPort);
+        builderProperties.set(PROXY_PORT_KEY, proxyPort);
         return this;
     }
 
@@ -358,94 +442,54 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
+    public String getProxyUsername() {
+        return builderProperties.get(PROXY_USERNAME_KEY);
+    }
+
     public BlackDuckServerConfigBuilder setProxyUsername(String proxyUsername) {
-        values.put(Property.PROXY_USERNAME, proxyUsername);
+        builderProperties.set(PROXY_USERNAME_KEY, proxyUsername);
         return this;
+    }
+
+    public String getProxyPassword() {
+        return builderProperties.get(PROXY_PASSWORD_KEY);
     }
 
     public BlackDuckServerConfigBuilder setProxyPassword(String proxyPassword) {
-        values.put(Property.PROXY_PASSWORD, proxyPassword);
+        builderProperties.set(PROXY_PASSWORD_KEY, proxyPassword);
         return this;
+    }
+
+    public String getProxyNtlmDomain() {
+        return builderProperties.get(PROXY_NTLM_DOMAIN_KEY);
     }
 
     public BlackDuckServerConfigBuilder setProxyNtlmDomain(String proxyNtlmDomain) {
-        values.put(Property.PROXY_NTLM_DOMAIN, proxyNtlmDomain);
+        builderProperties.set(PROXY_NTLM_DOMAIN_KEY, proxyNtlmDomain);
         return this;
+    }
+
+    public String getProxyNtlmWorkstation() {
+        return builderProperties.get(PROXY_NTLM_WORKSTATION_KEY);
     }
 
     public BlackDuckServerConfigBuilder setProxyNtlmWorkstation(String proxyNtlmWorkstation) {
-        values.put(Property.PROXY_NTLM_WORKSTATION, proxyNtlmWorkstation);
+        builderProperties.set(PROXY_NTLM_WORKSTATION_KEY, proxyNtlmWorkstation);
         return this;
     }
 
+    public boolean isTrustCert() {
+        return Boolean.parseBoolean(builderProperties.get(TRUST_CERT_KEY));
+    }
+
     public BlackDuckServerConfigBuilder setTrustCert(String trustCert) {
-        values.put(Property.TRUST_CERT, trustCert);
+        builderProperties.set(TRUST_CERT_KEY, trustCert);
         return this;
     }
 
     public BlackDuckServerConfigBuilder setTrustCert(boolean trustCert) {
         setTrustCert(String.valueOf(trustCert));
         return this;
-    }
-
-    public enum Property {
-        URL,
-        USERNAME,
-        PASSWORD,
-        API_TOKEN,
-        TIMEOUT,
-        PROXY_HOST,
-        PROXY_PORT,
-        PROXY_USERNAME,
-        PROXY_PASSWORD,
-        PROXY_NTLM_DOMAIN,
-        PROXY_NTLM_WORKSTATION,
-        TRUST_CERT;
-
-        private final String blackDuckEnvironmentVariableKey;
-        private final String blackDuckPropertyKey;
-        private final String builderPropertyName;
-        private final String builderPropertySetterName;
-
-        private Property() {
-            String name = name();
-            blackDuckEnvironmentVariableKey = BlackDuckServerConfigBuilder.BLACKDUCK_SERVER_CONFIG_ENVIRONMENT_VARIABLE_PREFIX + name;
-            blackDuckPropertyKey = blackDuckEnvironmentVariableKey.toLowerCase().replace("_", ".");
-
-            String camelCaseName = WordUtils.capitalizeFully(name, '_').replace("_", "");
-            builderPropertyName = StringUtils.uncapitalize(camelCaseName);
-            builderPropertySetterName = "set" + camelCaseName;
-        }
-
-        public boolean isWithin(Set<String> keys) {
-            return keys.contains(blackDuckEnvironmentVariableKey) || keys.contains(blackDuckPropertyKey);
-        }
-
-        public String getValueFrom(Map<String, String> values) {
-            String key = blackDuckEnvironmentVariableKey;
-            if (values.containsKey(blackDuckPropertyKey)) {
-                key = blackDuckPropertyKey;
-            }
-
-            return values.get(key);
-        }
-
-        public String getBlackDuckEnvironmentVariableKey() {
-            return blackDuckEnvironmentVariableKey;
-        }
-
-        public String getBlackDuckPropertyKey() {
-            return blackDuckPropertyKey;
-        }
-
-        public String getBuilderPropertyName() {
-            return builderPropertyName;
-        }
-
-        public String getBuilderPropertySetterName() {
-            return builderPropertySetterName;
-        }
-
     }
 
 }
