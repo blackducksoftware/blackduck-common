@@ -110,34 +110,33 @@ public class ProjectService extends DataService {
 
         Optional<ProjectView> optionalProjectView = getProjectByName(projectName);
         if (!optionalProjectView.isPresent()) {
-            // nothing exists, so create and return
+            logger.info(String.format("The %s project was not found, so it will be created - if a version was included, it will also be created.", projectName));
             ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
             return createProject(projectRequest);
         }
 
-        // the project exists, so do updating and then deal with the version
         ProjectView projectView = optionalProjectView.get();
         if (performUpdate) {
+            logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
             projectSyncModel.populateProjectView(projectView);
             blackDuckService.put(projectView);
             projectView = blackDuckService.getResponse(projectView.getHref().get(), ProjectView.class);
         }
         ProjectVersionView projectVersionView = null;
 
-        // dealing with the version
         if (projectSyncModel.shouldHandleProjectVersion()) {
             String projectVersionName = projectSyncModel.getVersionName();
             Optional<ProjectVersionView> optionalProjectVersionView = getProjectVersion(projectView, projectVersionName);
             if (optionalProjectVersionView.isPresent()) {
-                // the version already exists, so do updating
                 projectVersionView = optionalProjectVersionView.get();
                 if (performUpdate) {
+                    logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
                     projectSyncModel.populateProjectVersionView(projectVersionView);
                     blackDuckService.put(projectVersionView);
                     projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
                 }
             } else {
-                // the version did not exist, so create it
+                logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));
                 ProjectVersionRequest projectVersionRequest = projectSyncModel.createProjectVersionRequest();
                 projectVersionView = createProjectVersion(projectView, projectVersionRequest);
             }
