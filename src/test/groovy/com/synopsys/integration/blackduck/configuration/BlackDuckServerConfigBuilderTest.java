@@ -2,8 +2,11 @@ package com.synopsys.integration.blackduck.configuration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,6 +136,29 @@ public class BlackDuckServerConfigBuilderTest {
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
         blackDuckServerConfigBuilder.setTimeout(0);
         assertFalse(blackDuckServerConfigBuilder.isValid());
+    }
+
+    @Test
+    public void testPopulatingExecutorService() throws Exception {
+        ExecutorService executorService = null;
+        try {
+            executorService = Executors.newSingleThreadExecutor();
+
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+            blackDuckServerConfigBuilder.setUrl("http://this.might.exist/somewhere");
+            blackDuckServerConfigBuilder.setApiToken("a valid, non-empty api token");
+            BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
+
+            Field executorServiceField = BlackDuckServerConfig.class.getDeclaredField("executorService");
+            executorServiceField.setAccessible(true);
+            assertNull(executorServiceField.get(blackDuckServerConfig));
+
+            blackDuckServerConfigBuilder.setExecutorService(executorService);
+            blackDuckServerConfig = blackDuckServerConfigBuilder.build();
+            assertNotNull(executorServiceField.get(blackDuckServerConfig));
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
 }
