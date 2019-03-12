@@ -56,18 +56,18 @@ import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
-    public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("URL");
-    public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("USERNAME");
-    public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("PASSWORD");
-    public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("API_TOKEN");
-    public static final BuilderPropertyKey TIMEOUT_KEY = new BuilderPropertyKey("TIMEOUT");
-    public static final BuilderPropertyKey PROXY_HOST_KEY = new BuilderPropertyKey("PROXY_HOST");
-    public static final BuilderPropertyKey PROXY_PORT_KEY = new BuilderPropertyKey("PROXY_PORT");
-    public static final BuilderPropertyKey PROXY_USERNAME_KEY = new BuilderPropertyKey("PROXY_USERNAME");
-    public static final BuilderPropertyKey PROXY_PASSWORD_KEY = new BuilderPropertyKey("PROXY_PASSWORD");
-    public static final BuilderPropertyKey PROXY_NTLM_DOMAIN_KEY = new BuilderPropertyKey("PROXY_NTLM_DOMAIN");
-    public static final BuilderPropertyKey PROXY_NTLM_WORKSTATION_KEY = new BuilderPropertyKey("PROXY_NTLM_WORKSTATION");
-    public static final BuilderPropertyKey TRUST_CERT_KEY = new BuilderPropertyKey("TRUST_CERT");
+    public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
+    public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_USERNAME");
+    public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PASSWORD");
+    public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_API_TOKEN");
+    public static final BuilderPropertyKey TIMEOUT_KEY = new BuilderPropertyKey("BLACKDUCK_TIMEOUT");
+    public static final BuilderPropertyKey PROXY_HOST_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_HOST");
+    public static final BuilderPropertyKey PROXY_PORT_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_PORT");
+    public static final BuilderPropertyKey PROXY_USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_USERNAME");
+    public static final BuilderPropertyKey PROXY_PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_PASSWORD");
+    public static final BuilderPropertyKey PROXY_NTLM_DOMAIN_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_NTLM_DOMAIN");
+    public static final BuilderPropertyKey PROXY_NTLM_WORKSTATION_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_NTLM_WORKSTATION");
+    public static final BuilderPropertyKey TRUST_CERT_KEY = new BuilderPropertyKey("BLACKDUCK_TRUST_CERT");
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
@@ -93,7 +93,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         propertyKeys.add(PROXY_NTLM_DOMAIN_KEY);
         propertyKeys.add(PROXY_NTLM_WORKSTATION_KEY);
         propertyKeys.add(TRUST_CERT_KEY);
-        builderProperties = new BuilderProperties("BLACKDUCK", propertyKeys);
+        builderProperties = new BuilderProperties(propertyKeys);
 
         builderProperties.set(TIMEOUT_KEY, Integer.toString(BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS));
     }

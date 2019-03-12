@@ -48,7 +48,7 @@ public class BlackDuckServerConfigBuilderTest {
         assertNull(blackDuckServerConfigBuilder.getUsername());
         assertNull(blackDuckServerConfigBuilder.getPassword());
 
-        blackDuckServerConfigBuilder.setFromProperties(properties);
+        blackDuckServerConfigBuilder.setProperties(properties.entrySet());
 
         assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
         assertEquals("user", blackDuckServerConfigBuilder.getUsername());
