@@ -26,7 +26,6 @@ package com.synopsys.integration.blackduck.service.bucket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -36,18 +35,23 @@ import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckBucketService extends DataService {
-    private final Optional<ExecutorService> executorService;
+    private final ExecutorService executorService;
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger) {
         super(blackDuckService, logger);
-        executorService = Optional.empty();
+        executorService = new NoThreadExecutorService();
     }
 
     public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger, final ExecutorService executorService) {
         super(blackDuckService, logger);
-        this.executorService = Optional.of(executorService);
+        this.executorService = executorService;
     }
 
     public BlackDuckBucket startTheBucket(final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
@@ -74,16 +78,10 @@ public class BlackDuckBucketService extends DataService {
         final List<BlackDuckBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
             return new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, uriSingleResponse);
         }).collect(Collectors.toList());
-        if (executorService.isPresent()) {
-            // NOTE: it is up to the user of the bucket service to shutdown the executor
-            taskList.forEach(task -> {
-                executorService.get().execute(task);
-            });
-        } else {
-            taskList.forEach(task -> {
-                task.run();
-            });
-        }
+        // NOTE: it is up to the user of the bucket service to shutdown the executor
+        taskList.forEach(task -> {
+            executorService.execute(task);
+        });
     }
 
 }

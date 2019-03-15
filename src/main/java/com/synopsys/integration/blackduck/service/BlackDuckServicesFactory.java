@@ -78,6 +78,10 @@ public class BlackDuckServicesFactory {
         this.logger = logger;
     }
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
         this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
     }

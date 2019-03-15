@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServerConfigBuilderTest {
@@ -48,7 +49,7 @@ public class BlackDuckServerConfigBuilderTest {
         assertNull(blackDuckServerConfigBuilder.getUsername());
         assertNull(blackDuckServerConfigBuilder.getPassword());
 
-        blackDuckServerConfigBuilder.setFromProperties(properties);
+        blackDuckServerConfigBuilder.setProperties(properties.entrySet());
 
         assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
         assertEquals("user", blackDuckServerConfigBuilder.getUsername());
@@ -151,7 +152,7 @@ public class BlackDuckServerConfigBuilderTest {
 
             Field executorServiceField = BlackDuckServerConfig.class.getDeclaredField("executorService");
             executorServiceField.setAccessible(true);
-            assertNull(executorServiceField.get(blackDuckServerConfig));
+            assertTrue(executorServiceField.get(blackDuckServerConfig) instanceof NoThreadExecutorService);
 
             blackDuckServerConfigBuilder.setExecutorService(executorService);
             blackDuckServerConfig = blackDuckServerConfigBuilder.build();

@@ -39,10 +39,10 @@ import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NoThreadExecutorService;
 import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanBatchRunner {
-    private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScannerZipInstaller scannerZipInstaller;
     private final ScanPathsUtility scanPathsUtility;
@@ -59,10 +59,14 @@ public class ScanBatchRunner {
         return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables);
     }
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables) {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
-        ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility);
+        ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility, new NoThreadExecutorService());
 
         return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
     }
@@ -80,22 +84,21 @@ public class ScanBatchRunner {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
 
-        return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
+        return new ScanBatchRunner(intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public static ScanBatchRunner createWithNoInstaller(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, File defaultInstallDirectory, ScanPathsUtility scanPathsUtility,
+    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, File defaultInstallDirectory, ScanPathsUtility scanPathsUtility,
             ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchRunner(logger, intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
+        return new ScanBatchRunner(intEnvironmentVariables, null, scanPathsUtility, scanCommandRunner, defaultInstallDirectory);
     }
 
-    public static ScanBatchRunner createComplete(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility,
+    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility,
             ScanCommandRunner scanCommandRunner) {
-        return new ScanBatchRunner(logger, intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
+        return new ScanBatchRunner(intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }
 
-    public ScanBatchRunner(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner,
+    public ScanBatchRunner(IntEnvironmentVariables intEnvironmentVariables, ScannerZipInstaller scannerZipInstaller, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner,
             File defaultInstallDirectory) {
-        this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scannerZipInstaller = scannerZipInstaller;
         this.scanPathsUtility = scanPathsUtility;
