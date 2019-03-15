@@ -46,6 +46,7 @@ import com.synopsys.integration.phonehome.enums.ProductIdEnum;
 import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
@@ -54,22 +55,27 @@ public class BlackDuckPhoneHomeHelper {
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
-        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, null);
+        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
     }
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
+        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
+
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
-        PhoneHomeService intPhoneHomeService;
-        if (executorService != null) {
-            intPhoneHomeService = PhoneHomeService
-                                          .createAsynchronousPhoneHomeService(intLogger, BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckServicesFactory.getGson()),
-                                                  executorService);
-        } else {
-            intPhoneHomeService = PhoneHomeService.createPhoneHomeService(intLogger, BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckServicesFactory.getGson()));
-        }
-        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckServicesFactory.createBlackDuckService(), intPhoneHomeService, blackDuckServicesFactory.createBlackDuckRegistrationService(),
-                blackDuckServicesFactory.getEnvironmentVariables());
+        IntEnvironmentVariables intEnvironmentVariables = blackDuckServicesFactory.getEnvironmentVariables();
+        IntHttpClient intHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
+        Gson gson = blackDuckServicesFactory.getGson();
+        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, intHttpClient, gson);
+
+        PhoneHomeService phoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, phoneHomeClient, executorService);
+
+        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckService, phoneHomeService, blackDuckRegistrationService, intEnvironmentVariables);
     }
 
     public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, IntHttpClient intHttpClient, Gson gson) {
@@ -155,4 +161,5 @@ public class BlackDuckPhoneHomeHelper {
         }
         return registrationId;
     }
+
 }

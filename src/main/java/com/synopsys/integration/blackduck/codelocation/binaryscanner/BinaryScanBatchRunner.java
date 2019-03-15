@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -33,22 +32,27 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BinaryScanBatchRunner {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
-    private final Optional<ExecutorService> optionalExecutorService;
+    private final ExecutorService executorService;
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public BinaryScanBatchRunner(IntLogger logger, BlackDuckService blackDuckService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
-        optionalExecutorService = Optional.empty();
+        executorService = new NoThreadExecutorService();
     }
 
     public BinaryScanBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
-        optionalExecutorService = Optional.of(executorService);
+        this.executorService = executorService;
     }
 
     public BinaryScanBatchOutput executeUploads(BinaryScanBatch binaryScanBatch) throws BlackDuckIntegrationException {
@@ -64,20 +68,13 @@ public class BinaryScanBatchRunner {
 
         try {
             List<BinaryScanCallable> callables = createCallables(binaryScanBatch);
-            if (optionalExecutorService.isPresent()) {
-                ExecutorService executorService = optionalExecutorService.get();
-                List<Future<BinaryScanOutput>> submitted = new ArrayList<>();
-                for (BinaryScanCallable callable : callables) {
-                    submitted.add(executorService.submit(callable));
-                }
-                for (Future<BinaryScanOutput> future : submitted) {
-                    BinaryScanOutput uploadOutput = future.get();
-                    uploadOutputs.add(uploadOutput);
-                }
-            } else {
-                for (BinaryScanCallable callable : callables) {
-                    uploadOutputs.add(callable.call());
-                }
+            List<Future<BinaryScanOutput>> submitted = new ArrayList<>();
+            for (BinaryScanCallable callable : callables) {
+                submitted.add(executorService.submit(callable));
+            }
+            for (Future<BinaryScanOutput> future : submitted) {
+                BinaryScanOutput uploadOutput = future.get();
+                uploadOutputs.add(uploadOutput);
             }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException(String.format("Encountered a problem uploading a binary file: %s", e.getMessage()), e);
@@ -96,4 +93,5 @@ public class BinaryScanBatchRunner {
 
         return callables;
     }
+
 }

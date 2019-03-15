@@ -54,6 +54,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
     public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
@@ -77,7 +78,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
-    private ExecutorService executorService = null;
+    private ExecutorService executorService = new NoThreadExecutorService();
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -126,11 +127,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            if (null != executorService) {
-                return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
-            } else {
-                return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
-            }
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -138,11 +135,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            if (null != executorService) {
-                return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
-            } else {
-                return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport);
-            }
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         }
     }
 

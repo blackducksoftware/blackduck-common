@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -33,22 +32,27 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class UploadBatchRunner {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
-    private final Optional<ExecutorService> optionalExecutorService;
+    private final ExecutorService executorService;
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
-        optionalExecutorService = Optional.empty();
+        this.executorService = new NoThreadExecutorService();
     }
 
     public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
-        optionalExecutorService = Optional.of(executorService);
+        this.executorService = executorService;
     }
 
     public UploadBatchOutput executeUploads(UploadBatch uploadBatch) throws BlackDuckIntegrationException {
@@ -64,20 +68,13 @@ public class UploadBatchRunner {
 
         try {
             List<UploadCallable> callables = createCallables(uploadBatch);
-            if (optionalExecutorService.isPresent()) {
-                ExecutorService executorService = optionalExecutorService.get();
-                List<Future<UploadOutput>> submitted = new ArrayList<>();
-                for (UploadCallable callable : callables) {
-                    submitted.add(executorService.submit(callable));
-                }
-                for (Future<UploadOutput> future : submitted) {
-                    UploadOutput uploadOutput = future.get();
-                    uploadOutputs.add(uploadOutput);
-                }
-            } else {
-                for (UploadCallable callable : callables) {
-                    uploadOutputs.add(callable.call());
-                }
+            List<Future<UploadOutput>> submitted = new ArrayList<>();
+            for (UploadCallable callable : callables) {
+                submitted.add(executorService.submit(callable));
+            }
+            for (Future<UploadOutput> future : submitted) {
+                UploadOutput uploadOutput = future.get();
+                uploadOutputs.add(uploadOutput);
             }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException(String.format("Encountered a problem uploading a file: %s", e.getMessage()), e);

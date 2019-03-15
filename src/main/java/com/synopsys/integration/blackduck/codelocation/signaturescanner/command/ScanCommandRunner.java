@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -33,22 +32,27 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class ScanCommandRunner {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScanPathsUtility scanPathsUtility;
-    private final Optional<ExecutorService> optionalExecutorService;
+    private final ExecutorService executorService;
 
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
     public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility) {
-        this(logger, intEnvironmentVariables, scanPathsUtility, null);
+        this(logger, intEnvironmentVariables, scanPathsUtility, new NoThreadExecutorService());
     }
 
     public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanPathsUtility = scanPathsUtility;
-        optionalExecutorService = Optional.ofNullable(executorService);
+        this.executorService = executorService;
     }
 
     public List<ScanCommandOutput> executeScans(final List<ScanCommand> scanCommands, final boolean cleanupOutput) throws ScanFailedException {
@@ -64,21 +68,14 @@ public class ScanCommandRunner {
 
         try {
             final List<ScanCommandCallable> callables = createCallables(scanCommands, cleanupOutput);
-            if (optionalExecutorService.isPresent()) {
-                final ExecutorService executorService = optionalExecutorService.get();
-                final List<Future<ScanCommandOutput>> submitted = new ArrayList<>();
-                for (final ScanCommandCallable callable : callables) {
-                    submitted.add(executorService.submit(callable));
-                }
-                for (final Future<ScanCommandOutput> future : submitted) {
-                    final ScanCommandOutput scanCommandOutput = future.get();
-                    if (scanCommandOutput != null) {
-                        scanCommandOutputs.add(scanCommandOutput);
-                    }
-                }
-            } else {
-                for (final ScanCommandCallable callable : callables) {
-                    scanCommandOutputs.add(callable.call());
+            final List<Future<ScanCommandOutput>> submitted = new ArrayList<>();
+            for (final ScanCommandCallable callable : callables) {
+                submitted.add(executorService.submit(callable));
+            }
+            for (final Future<ScanCommandOutput> future : submitted) {
+                final ScanCommandOutput scanCommandOutput = future.get();
+                if (scanCommandOutput != null) {
+                    scanCommandOutputs.add(scanCommandOutput);
                 }
             }
         } catch (final Exception e) {
