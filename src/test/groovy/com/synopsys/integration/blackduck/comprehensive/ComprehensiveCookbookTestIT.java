@@ -319,13 +319,14 @@ public class ComprehensiveCookbookTestIT {
         BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
 
         BlackDuckPageResponse<T> pageResponse = blackDuckService.getPageResponses(pathResponses, true);
-        assertTrue(pageResponse.getTotalCount() > 0);
-        assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
+        if (pageResponse.getTotalCount() > 0) {
+            assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
 
-        if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
-            System.out.println(String.format("%s count: %d", labelForOutput, pageResponse.getTotalCount()));
-            for (BlackDuckResponse blackDuckResponse : pageResponse.getItems()) {
-                System.out.println(String.format("%s: %s", labelForOutput, blackDuckResponse.toString()));
+            if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
+                System.out.println(String.format("%s count: %d", labelForOutput, pageResponse.getTotalCount()));
+                for (BlackDuckResponse blackDuckResponse : pageResponse.getItems()) {
+                    System.out.println(String.format("%s: %s", labelForOutput, blackDuckResponse.toString()));
+                }
             }
         }
     }
