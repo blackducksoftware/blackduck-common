@@ -201,7 +201,8 @@ public class BlackDuckServicesFactory {
 
     public ProjectUsersService createProjectUsersService() {
         BlackDuckService blackDuckService = createBlackDuckService();
-        return new ProjectUsersService(blackDuckService, logger);
+        UserGroupService userGroupService = createUserGroupService();
+        return new ProjectUsersService(blackDuckService, userGroupService, logger);
     }
 
     public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {

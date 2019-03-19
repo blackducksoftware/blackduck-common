@@ -26,20 +26,26 @@ package com.synopsys.integration.blackduck.service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.generated.component.AssignedUserGroupRequest;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 public class ProjectUsersService extends DataService {
-    public ProjectUsersService(BlackDuckService blackDuckService, IntLogger logger) {
+    private final UserGroupService userGroupService;
+
+    public ProjectUsersService(BlackDuckService blackDuckService, UserGroupService userGroupService, IntLogger logger) {
         super(blackDuckService, logger);
+        this.userGroupService = userGroupService;
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(ProjectView project) throws IntegrationException {
@@ -107,6 +113,27 @@ public class ProjectUsersService extends DataService {
                        .stream()
                        .filter(userView -> userView.getActive())
                        .collect(Collectors.toSet());
+    }
+
+    public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
+        Optional<UserGroupView> optionalUserGroupView = userGroupService.getGroupByName(groupName);
+        optionalUserGroupView.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
+
+        UserGroupView userGroupView = optionalUserGroupView.get();
+        List<UserGroupView> currentGroups = getGroupsForProject(projectView);
+        if (currentGroups.contains(userGroupView)) {
+            logger.info(String.format("The supplied project (%s) already contained the group (%s).", projectView.getName(), groupName));
+            return;
+        }
+
+        userGroupView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The %s user group does not have an href so it can not be added to a project.", groupName)));
+
+        Optional<String> projectUserGroupsLinkOptional = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
+        projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
+
+        AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
+        userGroupRequest.setGroup(userGroupView.getHref().get());
+        blackDuckService.post(projectUserGroupsLinkOptional.get(), userGroupRequest);
     }
 
 }

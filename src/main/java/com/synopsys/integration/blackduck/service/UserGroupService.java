@@ -30,12 +30,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.generated.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
@@ -46,6 +50,12 @@ public class UserGroupService {
     public UserGroupService(final BlackDuckService blackDuckService, final IntLogger logger) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
+    }
+
+    public UserGroupView createUserGroup(UserGroupRequest userGroupRequest) throws IntegrationException {
+        String userGroupUrl = blackDuckService.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
+        UserGroupView userGroupView = blackDuckService.getResponse(userGroupUrl, UserGroupView.class);
+        return userGroupView;
     }
 
     public Optional<UserView> getUserByUsername(final String username) throws IntegrationException {
