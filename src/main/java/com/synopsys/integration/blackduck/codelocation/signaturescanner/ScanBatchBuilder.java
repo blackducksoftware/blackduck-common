@@ -34,9 +34,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.builder.BuilderStatus;
+import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
-public class ScanBatchBuilder {
+public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -52,6 +54,7 @@ public class ScanBatchBuilder {
     private String additionalScanArguments;
 
     private SnippetMatching snippetMatching;
+    private boolean uploadSource;
 
     private URL blackDuckUrl;
     private String blackDuckUsername;
@@ -65,41 +68,28 @@ public class ScanBatchBuilder {
 
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
-    public ScanBatch build() throws IllegalArgumentException {
-        assertValid();
-
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, blackDuckUrl, blackDuckUsername,
+    @Override
+    protected ScanBatch buildWithoutValidation() {
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
-    public void assertValid() throws IllegalArgumentException {
-        final String errorMessage = createErrorMessage();
-        if (!errorMessage.isEmpty()) {
-            throw new IllegalStateException(errorMessage);
-        }
-    }
-
-    public boolean isValid() {
-        return createErrorMessage().isEmpty();
-    }
-
-    public String createErrorMessage() {
-        final List<String> errorMessages = new ArrayList<>();
-
+    @Override
+    protected void validate(final BuilderStatus builderStatus) {
         if (scanTargets == null || scanTargets.size() < 1) {
-            errorMessages.add("At least one target path must be provided.");
+            builderStatus.addErrorMessage("At least one target path must be provided.");
         } else {
             for (final ScanTarget scanTarget : scanTargets) {
                 try {
                     new File(scanTarget.getPath()).getCanonicalPath();
                 } catch (final IOException e) {
-                    errorMessages.add(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
+                    builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
                 }
                 if (scanTarget.getExclusionPatterns() != null && scanTarget.getExclusionPatterns().size() > 0) {
                     for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
                         if (StringUtils.isNotBlank(exclusionPattern)) {
                             if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
-                                errorMessages.add("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
+                                builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
                             }
                         }
                     }
@@ -109,23 +99,30 @@ public class ScanBatchBuilder {
 
         if (blackDuckUrl != null) {
             if (StringUtils.isBlank(blackDuckApiToken) && (StringUtils.isBlank(blackDuckUsername) || StringUtils.isBlank(blackDuckPassword))) {
-                errorMessages.add("Either an api token or a username and password is required.");
+                builderStatus.addErrorMessage("Either an api token or a username and password is required.");
             }
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
-            errorMessages.add(String.format("The minimum amount of memory for the scan is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
+            builderStatus.addErrorMessage(String.format("The minimum amount of memory for the scan is %d MB.", MINIMUM_MEMORY_IN_MEGABYTES));
         }
 
         if (!StringUtils.isAllBlank(projectName, projectVersionName) && (StringUtils.isBlank(projectName) || StringUtils.isBlank(projectVersionName))) {
-            errorMessages.add("Both projectName and projectVersionName must be provided or omitted together");
+            builderStatus.addErrorMessage("Both projectName and projectVersionName must be provided or omitted together");
         }
 
         if (blackDuckUrl != null && proxyInfo == null) {
-            errorMessages.add("Must provide proxy info.");
+            builderStatus.addErrorMessage("Must provide proxy info.");
         }
+    }
 
-        return StringUtils.join(errorMessages, ' ');
+    /**
+     * @deprecated Please use validateAndGetBuilderStatus.
+     */
+    @Deprecated
+    public String createErrorMessage() {
+        BuilderStatus builderStatus = validateAndGetBuilderStatus();
+        return builderStatus.getFullErrorMessage();
     }
 
     public ScanBatchBuilder fromBlackDuckServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
@@ -253,6 +250,16 @@ public class ScanBatchBuilder {
 
     public ScanBatchBuilder snippetMatching(final SnippetMatching snippetMatching) {
         this.snippetMatching = snippetMatching;
+        return this;
+    }
+
+    public boolean getUploadSource() {
+        return uploadSource;
+    }
+
+    public ScanBatchBuilder uploadSource(final SnippetMatching snippetMatching, boolean uploadSource) {
+        snippetMatching(snippetMatching);
+        this.uploadSource = uploadSource;
         return this;
     }
 

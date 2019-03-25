@@ -35,11 +35,17 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.builder.Buildable;
+import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
 
-public class ScanBatch extends Stringable {
+public class ScanBatch extends Stringable implements Buildable {
+    public static ScanBatchBuilder newBuilder() {
+        return new ScanBatchBuilder();
+    }
+
     private final File signatureScannerInstallDirectory;
     private final File outputDirectory;
     private final boolean cleanupOutput;
@@ -50,6 +56,7 @@ public class ScanBatch extends Stringable {
     private final String scanCliOpts;
     private final String additionalScanArguments;
     private final SnippetMatching snippetMatchingMode;
+    private final boolean uploadSource;
     private final URL blackDuckUrl;
     private final String blackDuckUsername;
     private final String blackDuckPassword;
@@ -61,7 +68,7 @@ public class ScanBatch extends Stringable {
     private final List<ScanTarget> scanTargets;
 
     public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
-            final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
+            final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final boolean uploadSource, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
             final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -73,6 +80,7 @@ public class ScanBatch extends Stringable {
         this.scanCliOpts = scanCliOpts;
         this.additionalScanArguments = additionalScanArguments;
         this.snippetMatchingMode = snippetMatchingMode;
+        this.uploadSource = uploadSource;
         this.blackDuckUrl = blackDuckUrl;
         this.blackDuckUsername = blackDuckUsername;
         this.blackDuckPassword = blackDuckPassword;
@@ -130,7 +138,7 @@ public class ScanBatch extends Stringable {
             }
             final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
-                    scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
+                    uploadSource, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);
         }
 
@@ -175,6 +183,10 @@ public class ScanBatch extends Stringable {
 
     public SnippetMatching getSnippetMatchingMode() {
         return snippetMatchingMode;
+    }
+
+    public boolean isUploadSource() {
+        return uploadSource;
     }
 
     public URL getBlackDuckUrl() {
