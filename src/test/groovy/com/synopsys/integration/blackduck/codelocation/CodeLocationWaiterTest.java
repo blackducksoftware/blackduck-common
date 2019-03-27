@@ -49,7 +49,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 0);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -91,7 +91,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 7);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 7);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -113,7 +113,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 7);
         assertTrue(CodeLocationWaitResult.Status.PARTIAL == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getErrorMessage().isPresent());

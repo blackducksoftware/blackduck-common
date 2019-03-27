@@ -44,7 +44,7 @@ public class UploadOutput extends CodeLocationOutput {
     }
 
     private UploadOutput(final String codeLocationName, final Result result, final String response, final String errorMessage, final Exception exception) {
-        super(result, codeLocationName, errorMessage, exception);
+        super(result, codeLocationName, 1, errorMessage, exception);
         this.response = response;
     }
 

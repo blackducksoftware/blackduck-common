@@ -61,14 +61,14 @@ public class CodeLocationCreationService extends DataService {
         NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
         T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, output.getSuccessfulCodeLocationNames(), timeoutInSeconds);
+        waitForCodeLocations(notificationTaskRange, output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds);
 
         return output;
     }
 
-    public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, codeLocationNames, timeoutInSeconds);
+        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
     public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {

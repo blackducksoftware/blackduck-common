@@ -41,20 +41,31 @@ public class ScanCommandOutput extends CodeLocationOutput {
     private final Integer scanExitCode;
 
     public static ScanCommandOutput SUCCESS(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand) {
-        return new ScanCommandOutput(codeLocationName, Result.SUCCESS, logger, scanCommand, null, null, 0);
+        int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.SUCCESS, logger, scanCommand, null, null, 0);
     }
 
     public static ScanCommandOutput FAILURE(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception) {
-        return new ScanCommandOutput(codeLocationName, Result.FAILURE, logger, scanCommand, errorMessage, exception, null);
+        int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, errorMessage, exception, null);
     }
 
     public static ScanCommandOutput FAILURE(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand, final int scanExitCode) {
         final String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
-        return new ScanCommandOutput(codeLocationName, Result.FAILURE, logger, scanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
+        int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
     }
 
-    private ScanCommandOutput(final String codeLocationName, final Result result, final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception, final Integer scanExitCode) {
-        super(result, codeLocationName, errorMessage, exception);
+    private static int calculateExpectedNotificationCount(ScanCommand scanCommand) {
+        if (scanCommand.isSnippetMatching() || scanCommand.isSnippetMatchingOnly()) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    private ScanCommandOutput(final String codeLocationName, int expectedNotificationCount, final Result result, final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception, final Integer scanExitCode) {
+        super(result, codeLocationName, expectedNotificationCount, errorMessage, exception);
         this.logger = logger;
         this.scanCommand = scanCommand;
         this.scanExitCode = scanExitCode;

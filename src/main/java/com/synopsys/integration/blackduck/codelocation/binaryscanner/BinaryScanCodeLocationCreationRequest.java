@@ -41,4 +41,3 @@ public class BinaryScanCodeLocationCreationRequest extends CodeLocationCreationR
     }
 
 }
- 

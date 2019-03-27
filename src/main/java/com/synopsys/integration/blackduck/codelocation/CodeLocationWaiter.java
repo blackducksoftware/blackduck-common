@@ -57,7 +57,8 @@ public class CodeLocationWaiter {
         this.notificationService = notificationService;
     }
 
-    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds)
+            throws IntegrationException, InterruptedException {
         boolean allCompleted = false;
         int attemptCount = 1;
         while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
@@ -71,6 +72,7 @@ public class CodeLocationWaiter {
                 }
             }
 
+            int actualNotificationCount = 0;
             if (codeLocationNamesToViews.size() > 0) {
                 logger.debug("At least one code location has been found, now looking for notifications.");
                 List<NotificationUserView> notifications = notificationService
@@ -81,17 +83,20 @@ public class CodeLocationWaiter {
                 for (NotificationUserView notificationView : notifications) {
                     Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
                     if (codeLocationUrl.isPresent() && codeLocationUrlsToNames.containsKey(codeLocationUrl.get())) {
-                        foundCodeLocationNames.add(codeLocationUrlsToNames.get(codeLocationUrl.get()));
+                        String codeLocationName = codeLocationUrlsToNames.get(codeLocationUrl.get());
+                        foundCodeLocationNames.add(codeLocationName);
+                        actualNotificationCount++;
+                        logger.info(String.format("Found %s code location (%d of %d).", codeLocationName, actualNotificationCount, expectedNotificationCount));
                     }
                 }
+            }
 
-                if (foundCodeLocationNames.containsAll(codeLocationNames)) {
-                    allCompleted = true;
-                } else {
-                    attemptCount++;
-                    logger.info(String.format("All code locations have not been added to the BOM yet, waiting another 5 seconds (try #%d)...", attemptCount));
-                    Thread.sleep(5000);
-                }
+            if (foundCodeLocationNames.containsAll(codeLocationNames) && actualNotificationCount >= expectedNotificationCount) {
+                allCompleted = true;
+            } else {
+                attemptCount++;
+                logger.info(String.format("All code locations have not been added to the BOM yet, waiting another 5 seconds (try #%d)...", attemptCount));
+                Thread.sleep(5000);
             }
         }
 

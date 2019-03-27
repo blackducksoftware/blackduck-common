@@ -69,8 +69,8 @@ public class SignatureScannerService extends DataService {
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
+    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, int expectedNotificationCount, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
 }
