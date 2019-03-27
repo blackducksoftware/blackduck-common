@@ -24,7 +24,6 @@
 package com.synopsys.integration.blackduck.codelocation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,19 +33,17 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
-    private final Map<String, Integer> successfulCodeLocationNamesToExpectedNotificationCounts = new HashMap<>();
+    private final Map<String, Integer> successfulCodeLocationNamesToExpectedNotificationCounts;
     private final List<T> outputs = new ArrayList<>();
 
     public CodeLocationBatchOutput(List<T> outputs) {
-        successfulCodeLocationNamesToExpectedNotificationCounts
-                .putAll(
-                        outputs
-                                .stream()
-                                .peek(this.outputs::add)
-                                .filter(output -> Result.SUCCESS == output.getResult())
-                                .filter(output -> StringUtils.isNotBlank(output.getCodeLocationName()))
-                                .collect(Collectors.toMap(CodeLocationOutput::getCodeLocationName, CodeLocationOutput::getExpectedNotificationCount))
-                );
+        successfulCodeLocationNamesToExpectedNotificationCounts =
+                outputs
+                        .stream()
+                        .peek(this.outputs::add)
+                        .filter(output -> Result.SUCCESS == output.getResult())
+                        .filter(output -> StringUtils.isNotBlank(output.getCodeLocationName()))
+                        .collect(Collectors.toMap(CodeLocationOutput::getCodeLocationName, CodeLocationOutput::getExpectedNotificationCount));
     }
 
     public List<T> getOutputs() {
