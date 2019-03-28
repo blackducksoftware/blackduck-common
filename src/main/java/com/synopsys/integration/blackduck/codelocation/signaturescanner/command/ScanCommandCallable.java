@@ -59,13 +59,15 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
 
     @Override
     public ScanCommandOutput call() {
+        String commandToExecute = "command_not_yet_configured";
         try {
             final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
 
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
             cmd.add(scanCommand.getTargetPath());
 
-            printCommand(cmd);
+            commandToExecute = createPrintableCommand(cmd);
+            logger.info(String.format("Black Duck CLI command: %s", commandToExecute));
 
             final File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
             try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
@@ -112,12 +114,12 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
-                    return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, returnCode);
+                    return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, commandToExecute, returnCode);
                 }
             }
         } catch (final Exception e) {
             final String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
-            return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, errorMessage, e);
+            return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
         if (!scanCommand.isDryRun() && cleanupOutput) {
@@ -132,13 +134,13 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             }
         }
 
-        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand);
+        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand, commandToExecute);
     }
 
     /**
      * Code to mask passwords in the logs
      */
-    private void printCommand(final List<String> cmd) {
+    private String createPrintableCommand(final List<String> cmd) {
         final List<String> cmdToOutput = new ArrayList<>();
         cmdToOutput.addAll(cmd);
 
@@ -159,7 +161,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         maskIndex(cmdToOutput, passwordIndex);
         maskIndex(cmdToOutput, proxyPasswordIndex);
 
-        logger.info(String.format("Black Duck CLI command: %s", StringUtils.join(cmdToOutput, " ")));
+        return StringUtils.join(cmdToOutput, " ");
     }
 
     private void maskIndex(final List<String> cmd, final int indexToMask) {

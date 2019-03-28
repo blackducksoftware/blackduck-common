@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanCommand {

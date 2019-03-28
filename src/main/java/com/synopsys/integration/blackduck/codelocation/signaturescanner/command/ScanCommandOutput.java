@@ -38,22 +38,23 @@ public class ScanCommandOutput extends CodeLocationOutput {
 
     private final IntLogger logger;
     private final ScanCommand scanCommand;
+    private final String executedScanCommand;
     private final Integer scanExitCode;
 
-    public static ScanCommandOutput SUCCESS(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand) {
+    public static ScanCommandOutput SUCCESS(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand) {
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.SUCCESS, logger, scanCommand, null, null, 0);
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.SUCCESS, logger, scanCommand, executedScanCommand, null, null, 0);
     }
 
-    public static ScanCommandOutput FAILURE(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception) {
+    public static ScanCommandOutput FAILURE(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception) {
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, errorMessage, exception, null);
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, exception, null);
     }
 
-    public static ScanCommandOutput FAILURE(final String codeLocationName, final IntLogger logger, final ScanCommand scanCommand, final int scanExitCode) {
-        final String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
+    public static ScanCommandOutput FAILURE(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, int scanExitCode) {
+        String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
+        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
     }
 
     private static int calculateExpectedNotificationCount(ScanCommand scanCommand) {
@@ -64,17 +65,18 @@ public class ScanCommandOutput extends CodeLocationOutput {
         }
     }
 
-    private ScanCommandOutput(final String codeLocationName, int expectedNotificationCount, final Result result, final IntLogger logger, final ScanCommand scanCommand, final String errorMessage, final Exception exception, final Integer scanExitCode) {
+    private ScanCommandOutput(String codeLocationName, int expectedNotificationCount, Result result, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception, Integer scanExitCode) {
         super(result, codeLocationName, expectedNotificationCount, errorMessage, exception);
         this.logger = logger;
         this.scanCommand = scanCommand;
+        this.executedScanCommand = executedScanCommand;
         this.scanExitCode = scanExitCode;
     }
 
-    private Optional<File> getResultFile(final String resultDirectoryName) {
-        final File resultDirectory = new File(scanCommand.getOutputDirectory(), resultDirectoryName);
+    private Optional<File> getResultFile(String resultDirectoryName) {
+        File resultDirectory = new File(scanCommand.getOutputDirectory(), resultDirectoryName);
         if (null != resultDirectory && resultDirectory.exists()) {
-            final File[] resultFiles = resultDirectory.listFiles((dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
+            File[] resultFiles = resultDirectory.listFiles((dir, name) -> FilenameUtils.wildcardMatchOnSystem(name, "*.json"));
             if (null != resultFiles && resultFiles.length == 1) {
                 return Optional.of(resultFiles[0]);
             }
@@ -101,6 +103,10 @@ public class ScanCommandOutput extends CodeLocationOutput {
 
     public String getScanTarget() {
         return scanCommand.getTargetPath();
+    }
+
+    public String getExecutedScanCommand() {
+        return executedScanCommand;
     }
 
     public Optional<Integer> getScanExitCode() {
