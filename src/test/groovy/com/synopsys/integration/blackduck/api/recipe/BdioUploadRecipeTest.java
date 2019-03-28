@@ -105,7 +105,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.get().getProjectVersionView());
 
-        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.getName(), "pants")), 3 * 60);
+        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.getName(), "pants")), 1, 3 * 60);
         System.out.println("wait status: " + waitResult.getStatus());
         if (waitResult.getErrorMessage().isPresent()) {
             System.out.println(waitResult.getErrorMessage().get());

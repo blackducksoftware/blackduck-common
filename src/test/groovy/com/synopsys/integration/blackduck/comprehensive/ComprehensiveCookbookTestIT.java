@@ -244,6 +244,14 @@ public class ComprehensiveCookbookTestIT {
         ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
 
         for (ScanCommandOutput scanCommandOutput : scanBatchOutput) {
+            if (!Result.SUCCESS.equals(scanCommandOutput.getResult())) {
+                scanCommandOutput.getException().ifPresent(exception -> System.out.println(String.format("Scan exception: %s", exception.getMessage())));
+                scanCommandOutput.getErrorMessage().ifPresent(msg -> System.out.println(String.format("Scan error message: %s", msg)));
+                scanCommandOutput.getScanExitCode().ifPresent(exitCode -> System.out.println(String.format("Scan exit code: %s", exitCode)));
+                System.out.println("Scan command start");
+                System.out.println(scanCommandOutput.getExecutedScanCommand());
+                System.out.println("Scan command end");
+            }
             assertEquals(Result.SUCCESS, scanCommandOutput.getResult());
             assertNotNull(scanCommandOutput.getDryRunFile());
         }

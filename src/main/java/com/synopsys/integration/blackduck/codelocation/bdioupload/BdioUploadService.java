@@ -81,8 +81,8 @@ public class BdioUploadService extends DataService {
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBdioUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
+    public void waitForBdioUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
 }

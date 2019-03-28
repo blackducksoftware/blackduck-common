@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanCommand {
@@ -51,6 +52,7 @@ public class ScanCommand {
     private final boolean snippetMatching;
     private final boolean snippetMatchingOnly;
     private final boolean fullSnippetScan;
+    private final boolean uploadSource;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
     private final String targetPath;
@@ -61,7 +63,7 @@ public class ScanCommand {
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -79,6 +81,7 @@ public class ScanCommand {
         this.snippetMatching = snippetMatching;
         this.snippetMatchingOnly = snippetMatchingOnly;
         this.fullSnippetScan = fullSnippetScan;
+        this.uploadSource = uploadSource;
         this.excludePatterns = excludePatterns;
         this.additionalArguments = additionalArguments;
         this.targetPath = targetPath;
@@ -190,8 +193,20 @@ public class ScanCommand {
             cmd.add(name);
         }
 
-        if (snippetMatching) {
-            cmd.add("--snippet-matching");
+        if (snippetMatching || snippetMatchingOnly) {
+            if (snippetMatching) {
+                cmd.add("--snippet-matching");
+            } else {
+                cmd.add("--snippet-matching-only");
+            }
+
+            if (fullSnippetScan) {
+                cmd.add("--full-snippet-scan");
+            }
+
+            if (uploadSource) {
+                cmd.add("--upload-source");
+            }
         }
 
         if (excludePatterns != null) {
@@ -280,6 +295,10 @@ public class ScanCommand {
 
     public boolean isFullSnippetScan() {
         return fullSnippetScan;
+    }
+
+    public boolean isUploadSource() {
+        return uploadSource;
     }
 
     public Set<String> getExcludePatterns() {

@@ -64,7 +64,7 @@ public class BinaryScanOutput extends CodeLocationOutput {
     }
 
     private BinaryScanOutput(Result result, String codeLocationName, String errorMessage, Exception exception, String response, String statusMessage, int statusCode, String contentString) {
-        super(result, codeLocationName, errorMessage, exception);
+        super(result, codeLocationName, 1, errorMessage, exception);
         this.response = response;
         this.statusMessage = statusMessage;
         this.statusCode = statusCode;

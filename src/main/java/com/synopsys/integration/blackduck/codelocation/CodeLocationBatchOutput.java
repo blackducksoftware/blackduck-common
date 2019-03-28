@@ -26,16 +26,24 @@ package com.synopsys.integration.blackduck.codelocation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
+    private final Map<String, Integer> successfulCodeLocationNamesToExpectedNotificationCounts;
     private final List<T> outputs = new ArrayList<>();
 
     public CodeLocationBatchOutput(List<T> outputs) {
-        this.outputs.addAll(outputs);
+        successfulCodeLocationNamesToExpectedNotificationCounts =
+                outputs
+                        .stream()
+                        .peek(this.outputs::add)
+                        .filter(output -> Result.SUCCESS == output.getResult())
+                        .filter(output -> StringUtils.isNotBlank(output.getCodeLocationName()))
+                        .collect(Collectors.toMap(CodeLocationOutput::getCodeLocationName, CodeLocationOutput::getExpectedNotificationCount));
     }
 
     public List<T> getOutputs() {
@@ -43,11 +51,15 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
     }
 
     public Set<String> getSuccessfulCodeLocationNames() {
-        return getOutputs().stream()
-                       .filter(output -> Result.SUCCESS == output.getResult())
-                       .map(CodeLocationOutput::getCodeLocationName)
-                       .filter(StringUtils::isNotBlank)
-                       .collect(Collectors.toSet());
+        return successfulCodeLocationNamesToExpectedNotificationCounts.keySet();
+    }
+
+    public int getExpectedNotificationCount() {
+        return successfulCodeLocationNamesToExpectedNotificationCounts
+                       .values()
+                       .stream()
+                       .mapToInt(Integer::intValue)
+                       .sum();
     }
 
     @Override

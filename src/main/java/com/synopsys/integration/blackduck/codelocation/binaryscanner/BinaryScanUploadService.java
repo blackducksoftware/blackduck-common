@@ -81,8 +81,8 @@ public class BinaryScanUploadService extends DataService {
         return uploadBinaryScanAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, timeoutInSeconds);
+    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
 }

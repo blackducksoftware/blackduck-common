@@ -28,12 +28,14 @@ import java.util.Optional;
 public abstract class CodeLocationOutput {
     private final Result result;
     private final String codeLocationName;
+    private final int expectedNotificationCount;
     private final String errorMessage;
     private final Exception exception;
 
-    public CodeLocationOutput(final Result result, final String codeLocationName, final String errorMessage, final Exception exception) {
+    public CodeLocationOutput(final Result result, final String codeLocationName, int expectedNotificationCount, final String errorMessage, final Exception exception) {
         this.result = result;
         this.codeLocationName = codeLocationName;
+        this.expectedNotificationCount = expectedNotificationCount;
         this.errorMessage = errorMessage;
         this.exception = exception;
     }
@@ -44,6 +46,10 @@ public abstract class CodeLocationOutput {
 
     public String getCodeLocationName() {
         return codeLocationName;
+    }
+
+    public int getExpectedNotificationCount() {
+        return expectedNotificationCount;
     }
 
     public Optional<String> getErrorMessage() {
