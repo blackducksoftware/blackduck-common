@@ -58,7 +58,7 @@ public class ScanCommandOutput extends CodeLocationOutput {
     }
 
     private static int calculateExpectedNotificationCount(ScanCommand scanCommand) {
-        if (scanCommand.isSnippetMatching() || scanCommand.isSnippetMatchingOnly()) {
+        if (scanCommand.isSnippetMatching()) {
             return 2;
         } else {
             return 1;
