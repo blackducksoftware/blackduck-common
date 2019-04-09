@@ -197,9 +197,9 @@ public class ReportService extends DataService {
     private BomComponent createBomComponentFromBomComponentView(VersionBomComponentView bomEntry) {
         BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.getComponentName());
-        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
+        component.setComponentURL(getReportComponentUrl(bomEntry.getComponent()));
         component.setComponentVersion(bomEntry.getComponentVersionName());
-        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
+        component.setComponentVersionURL(getReportComponentVersionUrl(bomEntry.getComponent(), bomEntry.getComponentVersion()));
         component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
             for (RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
@@ -283,6 +283,35 @@ public class ReportService extends DataService {
         if (!isComponent) {
             urlBuilder.append("/view:bom");
         }
+        return urlBuilder.toString();
+    }
+
+    private String getReportComponentUrl(String componentUrl) {
+        if (componentUrl == null) {
+            return null;
+        }
+        String componentId = componentUrl.substring(componentUrl.lastIndexOf("/") + 1);
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/components/");
+        urlBuilder.append(componentId);
+
+        return urlBuilder.toString();
+    }
+
+    private String getReportComponentVersionUrl(String componentUrl, String versionUrl) {
+        if (componentUrl == null || versionUrl == null) {
+            return null;
+        }
+        String componentId = componentUrl.substring(componentUrl.lastIndexOf("/") + 1);
+        String versionId = versionUrl.substring(versionUrl.lastIndexOf("/") + 1);
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(getBaseUrl());
+        urlBuilder.append("/api/components/");
+        urlBuilder.append(componentId);
+        urlBuilder.append("/versions/");
+        urlBuilder.append(versionId);
+
         return urlBuilder.toString();
     }
 
