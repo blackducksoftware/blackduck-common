@@ -157,6 +157,7 @@ public class ScannerZipInstaller {
             try {
                 logger.info("Downloading the Black Duck Signature Scanner.");
                 try (InputStream responseStream = response.getContent()) {
+                    logger.info(String.format("If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.", scannerExpansionDirectory.getAbsolutePath()));
                     cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
                 }
                 long lastModifiedOnServer = response.getLastModified();
