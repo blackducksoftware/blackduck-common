@@ -128,15 +128,14 @@ public class ReportService extends DataService {
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
         List<VersionBomComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
-        for (VersionBomComponentView bomEntry : bomEntries) {
-            BomComponent component = createBomComponentFromBomComponentView(bomEntry);
-            String policyStatus = bomEntry.getApprovalStatus().toString();
+        for (VersionBomComponentView versionBomComponentView : bomEntries) {
+            String policyStatus = versionBomComponentView.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(bomEntry.getComponentVersion())) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponentVersion());
+                if (!StringUtils.isBlank(versionBomComponentView.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, versionBomComponentView.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, bomEntry.getComponent());
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, versionBomComponentView.getComponent());
                 }
                 if (!policyFailure) {
                     // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
@@ -149,8 +148,10 @@ public class ReportService extends DataService {
                     }
                 }
             }
+
+            BomComponent component = createBomComponentFromBomComponentView(versionBomComponentView);
             component.setPolicyStatus(policyStatus);
-            populatePolicyRuleInfo(component, bomEntry);
+            populatePolicyRuleInfo(component, versionBomComponentView);
             components.add(component);
         }
         reportData.setComponents(components);
@@ -197,9 +198,9 @@ public class ReportService extends DataService {
     private BomComponent createBomComponentFromBomComponentView(VersionBomComponentView bomEntry) {
         BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.getComponentName());
-        component.setComponentURL(getReportProjectUrl(bomEntry.getComponent()));
+        component.setComponentURL(bomEntry.getComponent());
         component.setComponentVersion(bomEntry.getComponentVersionName());
-        component.setComponentVersionURL(getReportVersionUrl(bomEntry.getComponentVersion(), true));
+        component.setComponentVersionURL(bomEntry.getComponentVersion());
         component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
             for (RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {

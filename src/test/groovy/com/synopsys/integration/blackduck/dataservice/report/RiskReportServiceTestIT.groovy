@@ -114,11 +114,11 @@ class RiskReportServiceTestIT {
     @Disabled
     public void createReportFilesManually() {
         // fill these values in with your particulars
-        final String projectName = 'detect'
-        final String projectVersionName = '3.6.0'
-        final String localPathForHtmlReport = '/Users/ekerwin/Documents/working/riskreport_html'
-        final String localPathForPdfReport = '/Users/ekerwin/Documents/working/riskreport_pdf'
-        final String localPathForNoticesReport = '/Users/ekerwin/Documents/working/notices'
+        final String projectName = 'synopsys-detect'
+        final String projectVersionName = '5.5.0-SNAPSHOT'
+        final String localPathForHtmlReport = 'C:\\Users\\ekerwin\\Documents\\working\\riskreport_html'
+        final String localPathForPdfReport = 'C:\\Users\\ekerwin\\Documents\\working\\riskreport_pdf'
+        final String localPathForNoticesReport = 'C:\\Users\\ekerwin\\Documents\\working\\notices'
 
         final BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory()
         final ProjectService projectService = blackDuckServicesFactory.createProjectService();
