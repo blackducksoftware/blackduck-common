@@ -155,6 +155,32 @@ public class ScanCommand {
             if (runInsecure) {
                 cmd.add("--insecure");
             }
+
+            if (snippetMatching || snippetMatchingOnly) {
+                if (snippetMatching) {
+                    cmd.add("--snippet-matching");
+                } else {
+                    cmd.add("--snippet-matching-only");
+                }
+
+                if (fullSnippetScan) {
+                    cmd.add("--full-snippet-scan");
+                }
+
+                if (uploadSource) {
+                    cmd.add("--upload-source");
+                }
+            }
+        } else {
+            logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
+            if (snippetMatching || snippetMatchingOnly || fullSnippetScan || uploadSource) {
+                logger.warn("No snippet functionality is supported when running a dry run signature scan.");
+            }
+
+            // The dryRunWriteDir is the same as the log directory path
+            // The CLI will create a subdirectory for the json files
+            cmd.add("--dryRunWriteDir");
+            cmd.add(specificRunOutputDirectoryPath);
         }
 
         if (verbose) {
@@ -166,13 +192,6 @@ public class ScanCommand {
 
         cmd.add("--logDir");
         cmd.add(specificRunOutputDirectoryPath);
-
-        if (dryRun) {
-            // The dryRunWriteDir is the same as the log directory path
-            // The CLI will create a subdirectory for the json files
-            cmd.add("--dryRunWriteDir");
-            cmd.add(specificRunOutputDirectoryPath);
-        }
 
         // Only add the statusWriteDir option if Black Duck supports the statusWriteDir option
         // The scanStatusDirectoryPath is the same as the log directory path
@@ -190,22 +209,6 @@ public class ScanCommand {
         if (StringUtils.isNotBlank(name)) {
             cmd.add("--name");
             cmd.add(name);
-        }
-
-        if (snippetMatching || snippetMatchingOnly) {
-            if (snippetMatching) {
-                cmd.add("--snippet-matching");
-            } else {
-                cmd.add("--snippet-matching-only");
-            }
-
-            if (fullSnippetScan) {
-                cmd.add("--full-snippet-scan");
-            }
-
-            if (uploadSource) {
-                cmd.add("--upload-source");
-            }
         }
 
         if (excludePatterns != null) {

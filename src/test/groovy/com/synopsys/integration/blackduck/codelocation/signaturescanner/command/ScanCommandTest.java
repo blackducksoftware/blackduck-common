@@ -3,10 +3,13 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.synopsys.integration.log.BufferedIntLogger;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +94,35 @@ public class ScanCommandTest {
         assertFalse(commandList.contains("--upload-source"));
     }
 
+    @Test
+    public void testSnippetScanLoggingWhenDryRun() throws BlackDuckIntegrationException {
+        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
+
+        ScanBatch scanBatch = scanBatchBuilder.build();
+        ScanCommand scanCommand = assertCommand(scanBatch);
+
+        BufferedIntLogger bufferedLogger = new BufferedIntLogger();
+        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
+        scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
+        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
+
+        scanBatchBuilder.dryRun(true);
+        scanBatch = scanBatchBuilder.build();
+        scanCommand = assertCommand(scanBatch);
+
+        bufferedLogger = new BufferedIntLogger();
+        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
+        scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
+        assertEquals(1, bufferedLogger.getOutputList(LogLevel.WARN).size());
+    }
+
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
+        try {
+            scanBatchBuilder.blackDuckUrl(new URL("http://fakeserver.com"));
+            scanBatchBuilder.blackDuckApiToken("fake_token");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path"));
         scanBatchBuilder.outputDirectory(tempDirectory.toFile());
     }
