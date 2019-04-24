@@ -23,6 +23,7 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -95,18 +96,13 @@ public class PolicyStatusDescription {
     }
 
     private void getPolicySeverityMessage(final StringBuilder stringBuilder) {
-        final List<String> policySeverityItems = new ArrayList<>();
         stringBuilder.append("Policy Severity counts: ");
         // let's loop over the actual enum values for a consistently ordered output
-        Arrays.stream(PolicySeverityType.values())
+        final String policySeverityItems = Arrays.stream(PolicySeverityType.values())
                 .filter(policySeverityCount::containsKey)
-                .forEach(policySeverityType -> {
-                    final ComponentVersionPolicyViolationCount policySeverity = policySeverityCount.get(policySeverityType);
-                    if (policySeverity != null) {
-                        policySeverityItems.add(fixMatchPlural("%d %s a severity level of %s", policySeverity.value, policySeverityType));
-                    }
-                });
-        stringBuilder.append(StringUtils.join(policySeverityItems, ", "));
+                .map(policySeverityType -> fixMatchPlural("%d %s a severity level of %s", policySeverityCount.get(policySeverityType).value, policySeverityType))
+                .collect(Collectors.joining(", "));
+        stringBuilder.append(policySeverityItems);
     }
 
     public ComponentVersionStatusCount getCountInViolation() {
