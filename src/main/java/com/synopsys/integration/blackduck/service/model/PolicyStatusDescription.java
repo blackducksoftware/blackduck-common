@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2019 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,10 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,31 +81,31 @@ public class PolicyStatusDescription {
         final int notInViolationCount = getCountOfStatus(PolicySummaryStatusType.NOT_IN_VIOLATION);
 
         final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Black Duck found: ");
-        stringBuilder.append(inViolationCount);
-        stringBuilder.append(" components in violation");
-        if (getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION) != 0) {
+        stringBuilder.append("Black Duck found:");
+        stringBuilder.append(fixComponentPlural(" %d %s in violation", inViolationCount));
+        if (getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION) > 0) {
             stringBuilder.append(" (");
             getPolicySeverityMessage(stringBuilder);
             stringBuilder.append(")");
         }
-        stringBuilder.append(", ");
-        stringBuilder.append(inViolationOverriddenCount);
-        stringBuilder.append(" components in violation, but overridden, and ");
-        stringBuilder.append(notInViolationCount);
-        stringBuilder.append(" components not in violation.");
+        stringBuilder.append(",");
+        stringBuilder.append(fixComponentPlural(" %d %s in violation, but overridden, and", inViolationOverriddenCount));
+        stringBuilder.append(fixComponentPlural(" %d %s not in violation.", notInViolationCount));
         return stringBuilder.toString();
     }
 
     private void getPolicySeverityMessage(final StringBuilder stringBuilder) {
         final List<String> policySeverityItems = new ArrayList<>();
         stringBuilder.append("Policy Severity counts: ");
-        for (final PolicySeverityType policySeverityEnum : policySeverityCount.keySet()) {
-            final ComponentVersionPolicyViolationCount policySeverity = policySeverityCount.get(policySeverityEnum);
-            if (policySeverity != null) {
-                policySeverityItems.add(policySeverity.value + " component(s) have a severity level of " + policySeverityEnum.toString());
-            }
-        }
+        // let's loop over the actual enum values for a consistently ordered output
+        Arrays.stream(PolicySeverityType.values())
+                .filter(policySeverityCount::containsKey)
+                .forEach(policySeverityType -> {
+                    final ComponentVersionPolicyViolationCount policySeverity = policySeverityCount.get(policySeverityType);
+                    if (policySeverity != null) {
+                        policySeverityItems.add(fixMatchPlural("%d %s a severity level of %s", policySeverity.value, policySeverityType));
+                    }
+                });
         stringBuilder.append(StringUtils.join(policySeverityItems, ", "));
     }
 
@@ -138,6 +135,20 @@ public class PolicyStatusDescription {
             return 0;
         }
         return count.value;
+    }
+
+    private String fixComponentPlural(String formatString, int count) {
+        String label = "components";
+        if (count == 1)
+            label = "component";
+        return String.format(formatString, count, label);
+    }
+
+    private String fixMatchPlural(String formatString, int count, PolicySeverityType policySeverityType) {
+        String label = "matches have";
+        if (count == 1)
+            label = "match has";
+        return String.format(formatString, count, label, policySeverityType);
     }
 
 }
