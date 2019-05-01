@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.generated.component.AssignedUserGroupRequest;
+import com.synopsys.integration.blackduck.api.generated.component.AssignedUserRequest;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -109,9 +110,9 @@ public class ProjectUsersService extends DataService {
         }
 
         return users
-                       .stream()
-                       .filter(userView -> userView.getActive())
-                       .collect(Collectors.toSet());
+                   .stream()
+                   .filter(userView -> userView.getActive())
+                   .collect(Collectors.toSet());
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
@@ -133,6 +134,22 @@ public class ProjectUsersService extends DataService {
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
         userGroupRequest.setGroup(userGroupView.getHref().get());
         blackDuckService.post(projectUserGroupsLinkOptional.get(), userGroupRequest);
+    }
+
+    public void addUserToProject(ProjectView projectView, UserView userView) throws IntegrationException {
+        final List<UserView> currentUsers = getUsersForProject(projectView);
+        if (currentUsers.contains(userView)) {
+            logger.info(String.format("The supplied project (%s) already contained the user (%s).", projectView.getName(), userView.getUserName()));
+            return;
+        }
+
+        final AssignedUserRequest assignedUserRequest = new AssignedUserRequest();
+        assignedUserRequest.setUser(userView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The user %s does not have an href so it can not be added to a project.", userView.getUserName()))));
+
+        final Optional<String> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
+        projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
+
+        blackDuckService.post(projectUsersLinkOptional.get(), assignedUserRequest);
     }
 
 }
