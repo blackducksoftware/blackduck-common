@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.generated.component.AssignedUserGroupRequest;
 import com.synopsys.integration.blackduck.api.generated.component.AssignedUserRequest;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -134,6 +135,20 @@ public class ProjectUsersService extends DataService {
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
         userGroupRequest.setGroup(userGroupView.getHref().get());
         blackDuckService.post(projectUserGroupsLinkOptional.get(), userGroupRequest);
+    }
+
+    public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
+        final List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        UserView userView = null;
+        for (final UserView user : allUsers) {
+            if (user.getUserName().equalsIgnoreCase(username)) {
+                userView = user;
+            }
+        }
+        if (null == userView) {
+            throw new BlackDuckIntegrationException(String.format("The user (%s) does not exist.", username));
+        }
+        addUserToProject(projectView, userView);
     }
 
     public void addUserToProject(ProjectView projectView, UserView userView) throws IntegrationException {

@@ -131,7 +131,7 @@ public class UserServiceTestIT {
             List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);
             assertFalse(projectUsers.contains(userView));
 
-            projectUsersService.addUserToProject(projectView, userView);
+            projectUsersService.addUserToProject(projectView, userName);
 
             projectUsers = projectUsersService.getUsersForProject(projectView);
             assertTrue(projectUsers.contains(userView));
