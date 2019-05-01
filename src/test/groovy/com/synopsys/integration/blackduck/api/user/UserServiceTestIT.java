@@ -1,6 +1,8 @@
 package com.synopsys.integration.blackduck.api.user;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -10,9 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.component.UserGroupRequest;
+import com.synopsys.integration.blackduck.api.generated.component.UserRequest;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -86,6 +91,61 @@ public class UserServiceTestIT {
             if (null != userGroupView) {
                 try {
                     blackDuckService.delete(userGroupView);
+                } catch (Exception ignored) {
+                    // ignored
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testAddingUserToProject() throws IntegrationException {
+        BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
+
+        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
+
+        String projectName = "user-group-project" + System.currentTimeMillis();
+        String userName = "user" + System.currentTimeMillis();
+        ProjectView projectView = null;
+        UserView userView = null;
+
+        try {
+            ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
+            projectService.syncProjectAndVersion(projectSyncModel);
+
+            projectView = projectService.getProjectByName(projectName).get();
+
+            UserRequest userRequest = new UserRequest();
+            userRequest.setUserName(userName);
+            userRequest.setFirstName("Test User");
+            userRequest.setLastName("IntegrationTest");
+            userRequest.setActive(true);
+            userRequest.setEmail("noreply@synopsys.com");
+            userRequest.setPassword("blackduck");
+
+            String userUrl = blackDuckService.post(ApiDiscovery.USERS_LINK, userRequest);
+            userView = blackDuckService.getResponse(userUrl, UserView.class);
+
+            List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);
+            assertFalse(projectUsers.contains(userView));
+
+            projectUsersService.addUserToProject(projectView, userName);
+
+            projectUsers = projectUsersService.getUsersForProject(projectView);
+            assertTrue(projectUsers.contains(userView));
+        } finally {
+            if (null != projectView) {
+                try {
+                    blackDuckService.delete(projectView);
+                } catch (Exception ignored) {
+                    // ignored
+                }
+            }
+            if (null != userView) {
+                try {
+                    blackDuckService.delete(userView);
                 } catch (Exception ignored) {
                     // ignored
                 }
