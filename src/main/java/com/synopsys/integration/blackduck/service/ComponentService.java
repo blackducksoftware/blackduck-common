@@ -78,7 +78,7 @@ public class ComponentService extends DataService {
         String originIdToMatch = externalId.createBlackDuckOriginId();
         for (ComponentSearchResultView componentItem : allComponents) {
             if (null != originIdToMatch) {
-                if (originIdToMatch.equals(componentItem.getOriginId())) {
+                if (originIdToMatch.equalsIgnoreCase(componentItem.getOriginId())) {
                     return Optional.of(componentItem);
                 }
             }
