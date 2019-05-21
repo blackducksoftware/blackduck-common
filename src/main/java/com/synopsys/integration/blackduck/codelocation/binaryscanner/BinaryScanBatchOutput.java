@@ -25,10 +25,22 @@ package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 import java.util.List;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 
 public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOutput> {
     public BinaryScanBatchOutput(List<BinaryScanOutput> outputs) {
         super(outputs);
+    }
+
+    public void throwExceptionForError(IntLogger logger) throws BlackDuckIntegrationException {
+        for (BinaryScanOutput binaryScanOutput : this) {
+            if (binaryScanOutput.getStatusCode() < 200 || binaryScanOutput.getStatusCode() >= 300) {
+                logger.error("Unknown status code: " + binaryScanOutput.getStatusCode());
+                throw new BlackDuckIntegrationException("Unknown status code when uploading binary scan: " + binaryScanOutput.getStatusCode() + ", " + binaryScanOutput.getStatusMessage());
+            }
+        }
     }
 
 }
