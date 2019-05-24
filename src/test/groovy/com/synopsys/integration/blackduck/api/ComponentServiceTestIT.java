@@ -29,19 +29,19 @@ public class ComponentServiceTestIT {
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         ExternalId integrationCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "integration-common", "15.0.0");
-        Optional<ComponentSearchResultView> componentView = componentService.getExactComponentMatch(integrationCommonExternalId);
+        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
 
         assertTrue(componentView.isPresent());
     }
 
     @Test
-    public void testOriginIdMMismatch() throws Exception {
+    public void testOriginIdMismatch() throws Exception {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ComponentService componentService = blackDuckServicesFactory.createComponentService();
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         ExternalId integrationCommonExternalId = simpleBdioFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
-        Optional<ComponentSearchResultView> componentView = componentService.getExactComponentMatch(integrationCommonExternalId);
+        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
 
         assertTrue(componentView.isPresent());
     }

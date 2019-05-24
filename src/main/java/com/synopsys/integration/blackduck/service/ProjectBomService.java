@@ -96,7 +96,7 @@ public class ProjectBomService extends DataService {
 
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
         String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK).orElse(null);
-        Optional<ComponentSearchResultView> componentSearchResultView = componentService.getExactComponentMatch(componentExternalId);
+        Optional<ComponentSearchResultView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
         String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
             if (StringUtils.isNotBlank(componentSearchResultView.get().getVariant())) {

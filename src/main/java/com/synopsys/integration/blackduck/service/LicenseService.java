@@ -44,7 +44,7 @@ public class LicenseService extends DataService {
     }
 
     public Optional<ComplexLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
-        final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getExactComponentMatch(externalId);
+        final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
         }

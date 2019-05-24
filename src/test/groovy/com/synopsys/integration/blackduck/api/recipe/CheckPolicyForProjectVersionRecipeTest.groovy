@@ -6,6 +6,7 @@ import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
+import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
@@ -68,7 +69,8 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
 
     private PolicyRuleView constructTestPolicy(ComponentService componentService) {
         ExternalId externalId = constructExternalId()
-        ComponentVersionView componentVersionView = componentService.getComponentVersion(externalId).get()
+        Optional<ComponentSearchResultView> searchResult = componentService.getSingleOrEmptyResult(externalId)
+        ComponentVersionView componentVersionView = componentService.getComponentVersionView(searchResult.get()).get()
 
         /**
          * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleView*/

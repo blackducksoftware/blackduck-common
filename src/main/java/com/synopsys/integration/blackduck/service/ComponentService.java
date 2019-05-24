@@ -25,6 +25,8 @@ package com.synopsys.integration.blackduck.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
@@ -42,84 +44,67 @@ import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.text.html.Option;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
     public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
+    public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
+            .filter(notEmptyList -> notEmptyList.size() > 0)
+            .map(notEmptyList -> notEmptyList.get(0));
+
+    public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
+            .filter(notEmptyList -> notEmptyList.size() == 1)
+            .map(listOfSingleElement -> listOfSingleElement.get(0));
+
     public ComponentService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
-    public Optional<ComponentVersionView> getComponentVersion(ExternalId externalId) throws IntegrationException {
-        for (ComponentVersionView componentVersion : getAllComponentVersions(externalId)) {
-            if (componentVersion.getVersionName().equals(externalId.version)) {
-                return Optional.of(componentVersion);
-            }
-        }
-        String errMsg = "Could not find version " + externalId.version + " of component " + externalId.createBlackDuckOriginId();
-        logger.error(errMsg);
-        return Optional.empty();
-    }
-
-    public List<ComponentVersionView> getAllComponentVersions(ExternalId externalId) throws IntegrationException {
-        Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
-        if (!componentSearchView.isPresent()) {
-            return Collections.emptyList();
-        }
-        ComponentView componentView = blackDuckService.getResponse(componentSearchView.get().getComponent(), ComponentView.class);
-
-        List<ComponentVersionView> componentVersionViews = blackDuckService.getAllResponses(componentView, ComponentView.VERSIONS_LINK_RESPONSE);
-        return componentVersionViews;
-    }
-
-    public Optional<ComponentSearchResultView> getExactComponentMatch(ExternalId externalId) throws IntegrationException {
-        List<ComponentSearchResultView> allComponents = getAllComponents(externalId);
-        String originIdToMatch = externalId.createBlackDuckOriginId();
-        for (ComponentSearchResultView componentItem : allComponents) {
-            if (null != originIdToMatch) {
-                if (originIdToMatch.equalsIgnoreCase(componentItem.getOriginId())) {
-                    return Optional.of(componentItem);
-                }
-            }
-        }
-        logger.error("Couldn't find an exact component that matches " + originIdToMatch);
-        return Optional.empty();
-    }
-
-    public List<ComponentSearchResultView> getAllComponents(ExternalId externalId) throws IntegrationException {
+    public List<ComponentSearchResultView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
         String forge = externalId.forge.getName();
-        String originId = externalId.createBlackDuckOriginId();
+        String originId = externalId.createExternalId();
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
         Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
-        List<ComponentSearchResultView> allComponents = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
-        return allComponents;
+        List<ComponentSearchResultView> allSearchResults = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
+        return allSearchResults;
     }
 
-    public List<VulnerabilityView> getVulnerabilitiesFromComponentVersion(ExternalId externalId) throws IntegrationException {
-        Optional<ComponentVersionVulnerabilities> componentVersionVulnerabilities = getComponentVersionVulnerabilities(externalId);
-        if (!componentVersionVulnerabilities.isPresent()) {
-            return Collections.emptyList();
-        }
-        return componentVersionVulnerabilities.get().getVulnerabilities();
+    public Optional<ComponentSearchResultView> getSingleOrEmptyResult(ExternalId externalId) throws IntegrationException {
+        return getFilteredSearchResults(getAllSearchResults(externalId), SINGLE_OR_EMPTY_RESULT);
     }
 
-    public Optional<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(ExternalId externalId) throws IntegrationException {
-        Optional<ComponentSearchResultView> componentSearchView = getExactComponentMatch(externalId);
-        if (!componentSearchView.isPresent()) {
+    public Optional<ComponentSearchResultView> getFirstOrEmptyResult(ExternalId externalId) throws IntegrationException {
+        return getFilteredSearchResults(getAllSearchResults(externalId), FIRST_OR_EMPTY_RESULT);
+    }
+
+    public <T> T getFilteredSearchResults(List<ComponentSearchResultView> searchResults, Function<List<ComponentSearchResultView>, T> filterFunction) {
+        return filterFunction.apply(searchResults);
+    }
+
+    public <T> T getFilteredSearchResults(ExternalId externalId, List<ComponentSearchResultView> searchResults, BiFunction<ExternalId, List<ComponentSearchResultView>, T> filterFunction) {
+        return filterFunction.apply(externalId, searchResults);
+    }
+
+    public Optional<ComponentVersionView> getComponentVersionView(ComponentSearchResultView searchResult) throws IntegrationException {
+        if (StringUtils.isNotBlank(searchResult.getVersion())) {
+            return Optional.ofNullable(blackDuckService.getResponse(searchResult.getVersion(), ComponentVersionView.class));
+        } else {
             return Optional.empty();
         }
+    }
 
-        String componentVersionURL = componentSearchView.get().getVersion();
-        if (null != componentVersionURL) {
-            ComponentVersionView componentVersion = blackDuckService.getResponse(componentVersionURL, ComponentVersionView.class);
-            return Optional.ofNullable(getComponentVersionVulnerabilities(componentVersion));
+    public Optional<ComponentView> getComponentView(ComponentSearchResultView searchResult) throws IntegrationException {
+        if (StringUtils.isNotBlank(searchResult.getVersion())) {
+            return Optional.ofNullable(blackDuckService.getResponse(searchResult.getComponent(), ComponentView.class));
+        } else {
+            return Optional.empty();
         }
-
-        logger.error("Couldn't get a componentVersion url from the component matching " + externalId.createExternalId());
-        return Optional.empty();
     }
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {

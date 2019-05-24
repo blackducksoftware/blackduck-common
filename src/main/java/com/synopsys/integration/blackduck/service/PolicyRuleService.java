@@ -29,6 +29,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -60,9 +61,14 @@ public class PolicyRuleService {
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
     public String createPolicyRuleForExternalId(ComponentService componentService, ExternalId externalId, String policyName) throws IntegrationException {
-        Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersion(externalId);
-        if (!componentVersionView.isPresent()) {
+        Optional<ComponentSearchResultView> componentSearchResult = componentService.getSingleOrEmptyResult(externalId);
+        if (!componentSearchResult.isPresent()) {
             throw new BlackDuckIntegrationException(String.format("The external id (%s) provided could not be found, so no policy can be created for it.", externalId.createExternalId()));
+        }
+
+        Optional<ComponentVersionView> componentVersionView = componentService.getComponentVersionView(componentSearchResult.get());
+        if (!componentVersionView.isPresent()) {
+            throw new BlackDuckIntegrationException(String.format("A component version could not be found for the provided external id (%s), so no policy can be created for it.", externalId.createExternalId()));
         }
 
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
