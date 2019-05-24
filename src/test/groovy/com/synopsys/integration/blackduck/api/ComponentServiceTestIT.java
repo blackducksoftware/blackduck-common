@@ -1,7 +1,9 @@
 package com.synopsys.integration.blackduck.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Tag;
@@ -40,10 +42,23 @@ public class ComponentServiceTestIT {
         ComponentService componentService = blackDuckServicesFactory.createComponentService();
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
-        ExternalId integrationCommonExternalId = simpleBdioFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
-        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
+        ExternalId cyclerExternalId = simpleBdioFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
+        List<ComponentSearchResultView> searchResults = componentService.getAllSearchResults(cyclerExternalId);
+        assertEquals(1, searchResults.size());
+        assertTrue(searchResults.get(0).getComponentName().equalsIgnoreCase("cycler"));
+        assertTrue(searchResults.get(0).getVersionName().equals("0.10.0"));
+
+        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(cyclerExternalId);
 
         assertTrue(componentView.isPresent());
+        assertTrue(componentView.get().getComponentName().equalsIgnoreCase("cycler"));
+        assertTrue(componentView.get().getVersionName().equals("0.10.0"));
+
+        componentView = componentService.getSingleOrEmptyResult(cyclerExternalId);
+
+        assertTrue(componentView.isPresent());
+        assertTrue(componentView.get().getComponentName().equalsIgnoreCase("cycler"));
+        assertTrue(componentView.get().getVersionName().equals("0.10.0"));
     }
 
 }
