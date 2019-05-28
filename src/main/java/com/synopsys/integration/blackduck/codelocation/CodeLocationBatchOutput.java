@@ -65,9 +65,7 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
         return outputs
                 .stream()
                 .map(CodeLocationOutput::getResult)
-                .filter(Result.FAILURE::equals)
-                .findFirst()
-                .isPresent();
+                .anyMatch(Result.FAILURE::equals);
     }
 
     @Override
