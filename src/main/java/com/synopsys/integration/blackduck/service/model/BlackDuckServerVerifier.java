@@ -40,6 +40,10 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
 
+@Deprecated
+/**
+ * @deprecated BlackDuckServerConfig should be used to verify a Black Duck server.
+ */
 public class BlackDuckServerVerifier {
     public void verifyIsBlackDuckServer(URL blackDuckUrl, ProxyInfo blackDuckProxyInfo, boolean alwaysTrustServerCertificate, int timeoutSeconds) throws IntegrationException {
         IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);

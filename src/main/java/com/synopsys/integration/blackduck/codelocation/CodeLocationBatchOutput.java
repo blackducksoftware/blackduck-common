@@ -61,6 +61,15 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
                        .sum();
     }
 
+    public boolean hasAnyFailures() {
+        return outputs
+                .stream()
+                .map(CodeLocationOutput::getResult)
+                .filter(Result.FAILURE::equals)
+                .findFirst()
+                .isPresent();
+    }
+
     @Override
     public Iterator<T> iterator() {
         return outputs.iterator();
