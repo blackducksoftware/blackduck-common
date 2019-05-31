@@ -154,7 +154,7 @@ public class ProjectUsersService extends DataService {
     public void addUserToProject(ProjectView projectView, UserView userView) throws IntegrationException {
         final List<UserView> currentUsers = getUsersForProject(projectView);
         if (currentUsers.contains(userView)) {
-            logger.info(String.format("The supplied project (%s) already contained the user (%s).", projectView.getName(), userView.getUserName()));
+            logger.debug(String.format("The supplied project (%s) already contained the user (%s).", projectView.getName(), userView.getUserName()));
             return;
         }
 
