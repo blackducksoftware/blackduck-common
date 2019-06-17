@@ -22,32 +22,41 @@
  */
 package com.synopsys.integration.blackduck.service.bucket;
 
+import java.util.concurrent.Callable;
+
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 
-public class BlackDuckBucketFillTask implements Runnable {
+public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Callable<T> {
     private final BlackDuckService blackDuckService;
     private final BlackDuckBucket blackDuckBucket;
-    private final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse;
+    private final UriSingleResponse<T> uriSingleResponse;
 
-    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse) {
+    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<T> uriSingleResponse) {
         this.blackDuckService = blackDuckService;
         this.blackDuckBucket = blackDuckBucket;
         this.uriSingleResponse = uriSingleResponse;
     }
 
     @Override
-    public void run() {
+    public T call() throws Exception {
         if (!blackDuckBucket.contains(uriSingleResponse.getUri())) {
             try {
-                final BlackDuckResponse blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
+                final T blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
                 blackDuckBucket.addValid(uriSingleResponse.getUri(), blackDuckResponse);
+                return blackDuckResponse;
             } catch (final Exception e) {
                 // it is up to the consumer of the bucket to log or handle any/all Exceptions
                 blackDuckBucket.addError(uriSingleResponse.getUri(), e);
+                //FIXME returning null does not feel right here
+                return null;
             }
         }
+        return blackDuckBucket.get(uriSingleResponse.getUri(), uriSingleResponse.getResponseClass());
     }
 
+    public UriSingleResponse<T> getUriSingleResponse() {
+        return uriSingleResponse;
+    }
 }
