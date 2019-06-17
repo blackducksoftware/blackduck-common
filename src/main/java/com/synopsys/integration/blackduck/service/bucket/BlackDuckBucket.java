@@ -88,6 +88,14 @@ public class BlackDuckBucket {
         bucket.put(uri, new BlackDuckBucketItem<>(uri, e));
     }
 
+    public Boolean hasAnyErrors() {
+        return bucket.values()
+                   .stream()
+                   .filter(blackDuckResponseBlackDuckBucketItem -> blackDuckResponseBlackDuckBucketItem.hasException())
+                   .findFirst()
+                   .isPresent();
+    }
+
     public BlackDuckBucketItem<BlackDuckResponse> remove(final String uri) {
         return bucket.remove(uri);
     }

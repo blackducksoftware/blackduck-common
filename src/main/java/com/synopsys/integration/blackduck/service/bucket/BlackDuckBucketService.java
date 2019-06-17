@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.service.bucket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -54,32 +55,32 @@ public class BlackDuckBucketService extends DataService {
         this.executorService = executorService;
     }
 
-    public <T extends BlackDuckResponse> BlackDuckBucket startTheBucket(final List<UriSingleResponse<T>> uriSingleResponses) throws IntegrationException {
+    public BlackDuckBucket startTheBucket(final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
         final BlackDuckBucket blackDuckBucket = new BlackDuckBucket();
         addToTheBucket(blackDuckBucket, uriSingleResponses);
         return blackDuckBucket;
     }
 
-    public <T extends BlackDuckResponse> Future<T> addToTheBucket(final BlackDuckBucket blackDuckBucket, final String uri, final Class<T> responseClass) throws IntegrationException {
-        UriSingleResponse<T> uriSingleResponse = new UriSingleResponse<>(uri, responseClass);
+    public Future<Optional<? extends BlackDuckResponse>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final String uri, final Class<? extends BlackDuckResponse> responseClass) throws IntegrationException {
+        UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse = new UriSingleResponse<>(uri, responseClass);
         BlackDuckBucketFillTask blackDuckBucketFillTask = new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, uriSingleResponse);
         return executorService.submit(blackDuckBucketFillTask);
     }
 
-    public <T extends BlackDuckResponse> List<Future<T>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final Map<String, Class<T>> uriToResponseClass) throws IntegrationException {
-        final List<UriSingleResponse<T>> uriSingleResponses = new ArrayList<>();
+    public List<Future<Optional<? extends BlackDuckResponse>>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final Map<String, Class<? extends BlackDuckResponse>> uriToResponseClass) throws IntegrationException {
+        final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriToResponseClass.forEach((key, value) -> {
             uriSingleResponses.add(new UriSingleResponse<>(key, value));
         });
         return addToTheBucket(blackDuckBucket, uriSingleResponses);
     }
 
-    public <T extends BlackDuckResponse> List<Future<T>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final List<UriSingleResponse<T>> uriSingleResponses) throws IntegrationException {
+    public List<Future<Optional<? extends BlackDuckResponse>>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses) throws IntegrationException {
         final List<BlackDuckBucketFillTask> taskList = uriSingleResponses.stream().map(uriSingleResponse -> {
             return new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, uriSingleResponse);
         }).collect(Collectors.toList());
         // NOTE: it is up to the user of the bucket service to shutdown the executor
-        List<Future<T>> futures = new ArrayList<>();
+        List<Future<Optional<? extends BlackDuckResponse>>> futures = new ArrayList<>();
         taskList.forEach(task -> {
             futures.add(executorService.submit(task));
         });
