@@ -91,7 +91,7 @@ public class BlackDuckBucket {
     public Boolean hasAnyErrors() {
         return bucket.values()
                    .stream()
-                   .filter(blackDuckResponseBlackDuckBucketItem -> blackDuckResponseBlackDuckBucketItem.hasException())
+                   .filter(BlackDuckBucketItem::hasException)
                    .findFirst()
                    .isPresent();
     }
