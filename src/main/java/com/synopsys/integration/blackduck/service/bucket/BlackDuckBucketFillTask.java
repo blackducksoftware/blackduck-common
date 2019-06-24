@@ -29,22 +29,22 @@ import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 
-public class BlackDuckBucketFillTask implements Callable<Optional<? extends BlackDuckResponse>> {
+public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Callable<Optional<T>> {
     private final BlackDuckService blackDuckService;
     private final BlackDuckBucket blackDuckBucket;
-    private final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse;
+    private final UriSingleResponse<T> uriSingleResponse;
 
-    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse) {
+    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<T> uriSingleResponse) {
         this.blackDuckService = blackDuckService;
         this.blackDuckBucket = blackDuckBucket;
         this.uriSingleResponse = uriSingleResponse;
     }
 
     @Override
-    public Optional<? extends BlackDuckResponse> call() {
+    public Optional<T> call() {
         if (!blackDuckBucket.contains(uriSingleResponse.getUri())) {
             try {
-                final BlackDuckResponse blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
+                final T blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
                 blackDuckBucket.addValid(uriSingleResponse.getUri(), blackDuckResponse);
                 return Optional.of(blackDuckResponse);
             } catch (final Exception e) {
