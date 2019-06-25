@@ -67,7 +67,7 @@ public class BlackDuckBucketService extends DataService {
         return executorService.submit(blackDuckBucketFillTask);
     }
 
-    public <T extends BlackDuckResponse> List<Future<Optional<? extends BlackDuckResponse>>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final Map<String, Class<T>> uriToResponseClass) throws IntegrationException {
+    public List<Future<Optional<? extends BlackDuckResponse>>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final Map<String, Class<? extends BlackDuckResponse>> uriToResponseClass) throws IntegrationException {
         final List<UriSingleResponse<? extends BlackDuckResponse>> uriSingleResponses = new ArrayList<>();
         uriToResponseClass.forEach((key, value) -> {
             uriSingleResponses.add(new UriSingleResponse<>(key, value));
