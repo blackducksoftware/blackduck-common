@@ -44,6 +44,10 @@ public class CodeLocationService extends DataService {
         super(blackDuckService, logger);
     }
 
+    public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
+        return blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+    }
+
     public void unmapCodeLocations(List<CodeLocationView> codeLocationViews) throws IntegrationException {
         for (CodeLocationView codeLocationView : codeLocationViews) {
             unmapCodeLocation(codeLocationView);

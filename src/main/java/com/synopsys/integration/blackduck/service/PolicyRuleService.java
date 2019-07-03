@@ -43,6 +43,10 @@ public class PolicyRuleService {
         this.blackDuckService = blackDuckService;
     }
 
+    public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
+        return blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+    }
+
     public Optional<PolicyRuleView> getPolicyRuleViewByName(String policyRuleName) throws IntegrationException {
         List<PolicyRuleView> allPolicyRules = blackDuckService.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
         for (PolicyRuleView policyRule : allPolicyRules) {

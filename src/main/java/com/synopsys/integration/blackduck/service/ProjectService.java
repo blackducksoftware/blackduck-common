@@ -44,6 +44,10 @@ public class ProjectService extends DataService {
         this.projectGetService = projectGetService;
     }
 
+    public List<ProjectView> getAllProjects() throws IntegrationException {
+        return blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+    }
+
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
         String projectUrl = blackDuckService.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
         ProjectView projectView = blackDuckService.getResponse(projectUrl, ProjectView.class);
