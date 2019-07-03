@@ -1,18 +1,11 @@
 package com.synopsys.integration.blackduck.codelocation;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+import com.synopsys.integration.log.LogLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -30,6 +23,8 @@ import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(TimingExtension.class)
 public class CodeLocationWaiterTest {
@@ -117,6 +112,30 @@ public class CodeLocationWaiterTest {
         assertTrue(CodeLocationWaitResult.Status.PARTIAL == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getErrorMessage().isPresent());
+    }
+
+    @Test
+    public void testTimoutIsObeyed() throws IntegrationException, InterruptedException {
+        BufferedIntLogger logger = new BufferedIntLogger();
+        CodeLocationService mockCodeLocationService = Mockito.mock(CodeLocationService.class);
+        Mockito.when(mockCodeLocationService.getCodeLocationByName(Mockito.anyString())).thenReturn(Optional.empty());
+
+        NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
+        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Collections.emptyList());
+
+        NotificationTaskRange notificationTaskRange = createTestRange();
+        Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
+
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
+        long testStart = System.currentTimeMillis();
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 20);
+        long testEnd = System.currentTimeMillis();
+        assertEquals(20, (testEnd - testStart) / 1000);
+
+        assertEquals(CodeLocationWaitResult.Status.PARTIAL, codeLocationWaitResult.getStatus());
+        assertNull(logger.getOutputString(LogLevel.ERROR));
+        assertNull(logger.getOutputString(LogLevel.WARN));
+        System.out.println(logger.getOutputString(LogLevel.INFO));
     }
 
     private NotificationTaskRange createTestRange() {
