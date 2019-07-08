@@ -59,6 +59,10 @@ public class ProjectService extends DataService {
         return new ProjectVersionWrapper(projectView, projectVersionView.orElse(null));
     }
 
+    public List<ProjectVersionView> getAllProjectVersions(ProjectView projectView) throws IntegrationException {
+        return blackDuckService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE);
+    }
+
     public ProjectVersionView createProjectVersion(ProjectView projectView, ProjectVersionRequest projectVersionRequest) throws IntegrationException {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
