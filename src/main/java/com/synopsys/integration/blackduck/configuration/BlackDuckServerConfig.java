@@ -26,11 +26,11 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
+import com.synopsys.integration.rest.response.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.rest.ApiTokenBlackDuckHttpClient;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.rest.CredentialsBlackDuckHttpClient;

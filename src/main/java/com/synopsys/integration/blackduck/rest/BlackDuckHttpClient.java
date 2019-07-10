@@ -22,16 +22,6 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpUriRequest;
-
-import com.jayway.jsonpath.JsonPath;
-import com.synopsys.integration.blackduck.api.component.ErrorResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -39,6 +29,14 @@ import com.synopsys.integration.rest.client.AuthenticatingIntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.ErrorResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
@@ -79,21 +77,6 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         } catch (IntegrationRestException e) {
             throw transformException(e);
         }
-    }
-
-    public Optional<ErrorResponse> extractErrorResponse(String responseContent) {
-        if (StringUtils.isNotBlank(responseContent)) {
-            try {
-                String errorMessage = JsonPath.read(responseContent, "$.errorMessage");
-                String errorCode = JsonPath.read(responseContent, "$.errorCode");
-                if (!StringUtils.isAllBlank(errorMessage, errorCode)) {
-                    return Optional.of(new ErrorResponse(errorMessage, errorCode));
-                }
-            } catch (Exception ignored) {
-                //ignored
-            }
-        }
-        return Optional.empty();
     }
 
     public String getBaseUrl() {

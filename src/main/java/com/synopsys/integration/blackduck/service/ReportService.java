@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.synopsys.integration.blackduck.api.generated.view.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.JsonArray;
@@ -40,12 +41,6 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummar
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyStatusView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.ReportView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
@@ -242,9 +237,9 @@ public class ReportService extends DataService {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
             PolicySummaryStatusType status = bomEntry.getApprovalStatus();
             if (status == PolicySummaryStatusType.IN_VIOLATION) {
-                List<PolicyRuleView> rules = blackDuckService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
+                List<VersionBomPolicyRuleView> rules = blackDuckService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
-                for (PolicyRuleView policyRuleView : rules) {
+                for (VersionBomPolicyRuleView policyRuleView : rules) {
                     PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
                     rulesViolated.add(ruleViolated);
                 }
