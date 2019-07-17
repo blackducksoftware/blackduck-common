@@ -1,13 +1,11 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.enumeration.OperationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
@@ -19,7 +17,6 @@ import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
-import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
