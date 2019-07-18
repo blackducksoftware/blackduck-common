@@ -100,6 +100,16 @@ public class ProjectService extends DataService {
         return Optional.empty();
     }
 
+    public Optional<ProjectVersionView> getLatestProjectVersion(ProjectView projectView) throws IntegrationException {
+        List<ProjectVersionView> projectVersionViews = getAllProjectVersions(projectView);
+        //FIXME I'm sure rotte can make this better
+        if (projectVersionViews.isEmpty()) {
+            return Optional.empty();
+        }
+        //FIXME this is obviously wrong, but at least it compiles! :)
+        return Optional.of(projectVersionViews.get(0));
+    }
+
     public void updateProject(ProjectView projectView) throws IntegrationException {
         blackDuckService.put(projectView);
     }
