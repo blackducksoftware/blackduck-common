@@ -22,6 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,8 +107,7 @@ public class ProjectService extends DataService {
         if (projectVersionViews.isEmpty()) {
             return Optional.empty();
         }
-        //FIXME this is obviously wrong, but at least it compiles! :)
-        return Optional.of(projectVersionViews.get(0));
+        return projectVersionViews.stream().max(Comparator.comparing(ProjectVersionView::getCreatedAt));
     }
 
     public void updateProject(ProjectView projectView) throws IntegrationException {
