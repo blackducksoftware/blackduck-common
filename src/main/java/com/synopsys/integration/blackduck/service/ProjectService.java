@@ -103,10 +103,6 @@ public class ProjectService extends DataService {
 
     public Optional<ProjectVersionView> getLatestProjectVersion(ProjectView projectView) throws IntegrationException {
         List<ProjectVersionView> projectVersionViews = getAllProjectVersions(projectView);
-        //FIXME I'm sure rotte can make this better
-        if (projectVersionViews.isEmpty()) {
-            return Optional.empty();
-        }
         return projectVersionViews.stream().max(Comparator.comparing(ProjectVersionView::getCreatedAt));
     }
 
