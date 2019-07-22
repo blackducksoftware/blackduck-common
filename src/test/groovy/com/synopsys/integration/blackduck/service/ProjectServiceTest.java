@@ -43,7 +43,7 @@ public class ProjectServiceTest {
 
         Mockito.when(blackDuckService.getAllResponses(Mockito.eq(projectView), Mockito.eq(ProjectView.VERSIONS_LINK_RESPONSE))).thenReturn(projectVersionViews);
 
-        Optional<ProjectVersionView> projectVersionView = projectService.getLatestProjectVersion(projectView);
+        Optional<ProjectVersionView> projectVersionView = projectService.getNewestProjectVersion(projectView);
         assertTrue(projectVersionView.isPresent());
         assertEquals("dockertar", projectVersionView.get().getVersionName());
     }

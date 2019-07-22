@@ -185,7 +185,7 @@ public class ProjectServiceTestIT {
         List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
-        Optional<ProjectVersionView> latestProjectVersionView = ProjectServiceTestIT.projectService.getLatestProjectVersion(ProjectServiceTestIT.project);
+        Optional<ProjectVersionView> latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
         assertTrue(latestProjectVersionView.isPresent());
         assertEquals("1.0.0", latestProjectVersionView.get().getVersionName());
 
@@ -197,7 +197,7 @@ public class ProjectServiceTestIT {
         List<ProjectVersionView> projectVersionViewsAfterUpdate = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViewsAfterUpdate.size());
 
-        latestProjectVersionView = ProjectServiceTestIT.projectService.getLatestProjectVersion(ProjectServiceTestIT.project);
+        latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
         assertTrue(latestProjectVersionView.isPresent());
         assertEquals("2.0.0", latestProjectVersionView.get().getVersionName());
     }
