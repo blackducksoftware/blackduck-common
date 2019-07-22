@@ -101,7 +101,7 @@ public class ProjectService extends DataService {
         return Optional.empty();
     }
 
-    public Optional<ProjectVersionView> getLatestProjectVersion(ProjectView projectView) throws IntegrationException {
+    public Optional<ProjectVersionView> getNewestProjectVersion(ProjectView projectView) throws IntegrationException {
         List<ProjectVersionView> projectVersionViews = getAllProjectVersions(projectView);
         return projectVersionViews.stream().max(Comparator.comparing(ProjectVersionView::getCreatedAt));
     }
