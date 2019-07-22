@@ -266,6 +266,11 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
+    public ScanBatchBuilder uploadSource(boolean uploadSource) {
+        this.uploadSource = uploadSource;
+        return this;
+    }
+
     public URL getBlackDuckUrl() {
         return blackDuckUrl;
     }
