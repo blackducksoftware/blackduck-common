@@ -1,0 +1,909 @@
+{
+  "totalCount": 5,
+  "items": [
+    {
+      "createdAt": "2019-07-03T17:48:30.609Z",
+      "createdBy": "sysadmin",
+      "createdByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "settingUpdatedAt": "2019-07-17T16:16:37.788Z",
+      "settingUpdatedBy": "sysadmin",
+      "settingUpdatedByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "versionName": "510",
+      "releaseComments": "",
+      "source": "CUSTOM",
+      "phase": "DEVELOPMENT",
+      "distribution": "EXTERNAL",
+      "_meta": {
+        "allow": [
+          "DELETE",
+          "GET",
+          "PUT"
+        ],
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a",
+        "links": [
+          {
+            "rel": "versionReport",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/reports"
+          },
+          {
+            "rel": "licenseReports",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/license-reports"
+          },
+          {
+            "rel": "riskProfile",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/risk-profile"
+          },
+          {
+            "rel": "components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/components"
+          },
+          {
+            "rel": "vulnerable-components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/vulnerable-bom-components"
+          },
+          {
+            "rel": "comparison",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/comparison"
+          },
+          {
+            "rel": "project",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/custom-fields"
+          },
+          {
+            "rel": "policy-status",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/policy-status"
+          },
+          {
+            "rel": "codelocations",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/codelocations"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/custom-fields"
+          },
+          {
+            "rel": "issues",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a\/issues"
+          },
+          {
+            "rel": "project-version-journal",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/journal\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/f5bdad44-314d-43f0-9476-04b0cd19e26a"
+          }
+        ]
+      },
+      "license": {
+        "type": "DISJUNCTIVE",
+        "licenses": [
+          {
+            "license": "https:\/\/int-hub02.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+            "licenses": [
+
+            ],
+            "name": "Unknown License",
+            "ownership": "UNKNOWN",
+            "licenseDisplay": "Unknown License",
+            "licenseFamilySummary": {
+              "name": "Unknown",
+              "href": "https:\/\/int-hub02.dc1.lan\/api\/license-families\/5"
+            }
+          }
+        ],
+        "licenseDisplay": "Unknown License"
+      },
+      "securityRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 6
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 5
+          },
+          {
+            "countType": "LOW",
+            "count": 4
+          },
+          {
+            "countType": "OK",
+            "count": 14
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "licenseRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 6
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 0
+          },
+          {
+            "countType": "LOW",
+            "count": 0
+          },
+          {
+            "countType": "OK",
+            "count": 23
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "operationalRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 3
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 13
+          },
+          {
+            "countType": "LOW",
+            "count": 11
+          },
+          {
+            "countType": "OK",
+            "count": 2
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "policyStatus": "NOT_IN_VIOLATION",
+      "policyStatusSummaries": [
+
+      ],
+      "lastBomUpdateDate": "2019-07-14T16:22:41.696Z",
+      "lastScanDate": "2019-07-03T17:48:55.611Z"
+    },
+    {
+      "createdAt": "2019-07-03T17:53:59.571Z",
+      "createdBy": "sysadmin",
+      "createdByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "settingUpdatedAt": "2019-07-17T16:16:37.788Z",
+      "settingUpdatedBy": "sysadmin",
+      "settingUpdatedByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "versionName": "dockertar",
+      "source": "CUSTOM",
+      "phase": "DEVELOPMENT",
+      "distribution": "EXTERNAL",
+      "_meta": {
+        "allow": [
+          "DELETE",
+          "GET",
+          "PUT"
+        ],
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08",
+        "links": [
+          {
+            "rel": "versionReport",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/reports"
+          },
+          {
+            "rel": "licenseReports",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/license-reports"
+          },
+          {
+            "rel": "riskProfile",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/risk-profile"
+          },
+          {
+            "rel": "components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/components"
+          },
+          {
+            "rel": "vulnerable-components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/vulnerable-bom-components"
+          },
+          {
+            "rel": "comparison",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/comparison"
+          },
+          {
+            "rel": "project",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/custom-fields"
+          },
+          {
+            "rel": "policy-status",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/policy-status"
+          },
+          {
+            "rel": "codelocations",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/codelocations"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/custom-fields"
+          },
+          {
+            "rel": "issues",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08\/issues"
+          },
+          {
+            "rel": "project-version-journal",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/journal\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/bb2db58e-8a39-4b71-b3a7-7e5d0ee34f08"
+          }
+        ]
+      },
+      "license": {
+        "type": "DISJUNCTIVE",
+        "licenses": [
+          {
+            "license": "https:\/\/int-hub02.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+            "licenses": [
+
+            ],
+            "name": "Unknown License",
+            "ownership": "UNKNOWN",
+            "licenseDisplay": "Unknown License",
+            "licenseFamilySummary": {
+              "name": "Unknown",
+              "href": "https:\/\/int-hub02.dc1.lan\/api\/license-families\/5"
+            }
+          }
+        ],
+        "licenseDisplay": "Unknown License"
+      },
+      "securityRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 4
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 5
+          },
+          {
+            "countType": "LOW",
+            "count": 1
+          },
+          {
+            "countType": "OK",
+            "count": 13
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "licenseRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 5
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 0
+          },
+          {
+            "countType": "LOW",
+            "count": 0
+          },
+          {
+            "countType": "OK",
+            "count": 18
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "operationalRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 1
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 11
+          },
+          {
+            "countType": "LOW",
+            "count": 9
+          },
+          {
+            "countType": "OK",
+            "count": 2
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "policyStatus": "NOT_IN_VIOLATION",
+      "policyStatusSummaries": [
+
+      ],
+      "lastBomUpdateDate": "2019-07-14T16:22:41.696Z",
+      "lastScanDate": "2019-07-03T17:54:29.178Z"
+    },
+    {
+      "createdAt": "2019-07-02T22:14:18.142Z",
+      "createdBy": "sysadmin",
+      "createdByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "settingUpdatedAt": "2019-07-17T16:16:37.788Z",
+      "settingUpdatedBy": "sysadmin",
+      "settingUpdatedByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "versionName": "new2",
+      "source": "CUSTOM",
+      "phase": "DEVELOPMENT",
+      "distribution": "EXTERNAL",
+      "_meta": {
+        "allow": [
+          "DELETE",
+          "GET",
+          "PUT"
+        ],
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f",
+        "links": [
+          {
+            "rel": "versionReport",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/reports"
+          },
+          {
+            "rel": "licenseReports",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/license-reports"
+          },
+          {
+            "rel": "riskProfile",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/risk-profile"
+          },
+          {
+            "rel": "components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/components"
+          },
+          {
+            "rel": "vulnerable-components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/vulnerable-bom-components"
+          },
+          {
+            "rel": "comparison",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/comparison"
+          },
+          {
+            "rel": "project",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/custom-fields"
+          },
+          {
+            "rel": "policy-status",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/policy-status"
+          },
+          {
+            "rel": "codelocations",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/codelocations"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/custom-fields"
+          },
+          {
+            "rel": "issues",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f\/issues"
+          },
+          {
+            "rel": "project-version-journal",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/journal\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/20bd2587-d68c-4edc-8bb3-7fa8a1746f2f"
+          }
+        ]
+      },
+      "license": {
+        "type": "DISJUNCTIVE",
+        "licenses": [
+          {
+            "license": "https:\/\/int-hub02.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+            "licenses": [
+
+            ],
+            "name": "Unknown License",
+            "ownership": "UNKNOWN",
+            "licenseDisplay": "Unknown License",
+            "licenseFamilySummary": {
+              "name": "Unknown",
+              "href": "https:\/\/int-hub02.dc1.lan\/api\/license-families\/5"
+            }
+          }
+        ],
+        "licenseDisplay": "Unknown License"
+      },
+      "securityRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 6
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 7
+          },
+          {
+            "countType": "LOW",
+            "count": 4
+          },
+          {
+            "countType": "OK",
+            "count": 18
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "licenseRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 8
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 0
+          },
+          {
+            "countType": "LOW",
+            "count": 0
+          },
+          {
+            "countType": "OK",
+            "count": 27
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "operationalRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 3
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 17
+          },
+          {
+            "countType": "LOW",
+            "count": 13
+          },
+          {
+            "countType": "OK",
+            "count": 2
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "policyStatus": "NOT_IN_VIOLATION",
+      "policyStatusSummaries": [
+
+      ],
+      "lastBomUpdateDate": "2019-07-15T17:24:35.931Z",
+      "lastScanDate": "2019-07-03T19:46:00.211Z"
+    },
+    {
+      "createdAt": "2019-07-02T22:41:50.791Z",
+      "createdBy": "sysadmin",
+      "createdByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "settingUpdatedAt": "2019-07-17T16:16:37.788Z",
+      "settingUpdatedBy": "sysadmin",
+      "settingUpdatedByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "versionName": "prev2",
+      "source": "CUSTOM",
+      "phase": "DEVELOPMENT",
+      "distribution": "EXTERNAL",
+      "_meta": {
+        "allow": [
+          "DELETE",
+          "GET",
+          "PUT"
+        ],
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c",
+        "links": [
+          {
+            "rel": "versionReport",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/reports"
+          },
+          {
+            "rel": "licenseReports",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/license-reports"
+          },
+          {
+            "rel": "riskProfile",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/risk-profile"
+          },
+          {
+            "rel": "components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/components"
+          },
+          {
+            "rel": "vulnerable-components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/vulnerable-bom-components"
+          },
+          {
+            "rel": "comparison",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/comparison"
+          },
+          {
+            "rel": "project",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/custom-fields"
+          },
+          {
+            "rel": "policy-status",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/policy-status"
+          },
+          {
+            "rel": "codelocations",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/codelocations"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/custom-fields"
+          },
+          {
+            "rel": "issues",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c\/issues"
+          },
+          {
+            "rel": "project-version-journal",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/journal\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/733758dd-95d7-453d-b385-8652f9a2f53c"
+          }
+        ]
+      },
+      "license": {
+        "type": "DISJUNCTIVE",
+        "licenses": [
+          {
+            "license": "https:\/\/int-hub02.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+            "licenses": [
+
+            ],
+            "name": "Unknown License",
+            "ownership": "UNKNOWN",
+            "licenseDisplay": "Unknown License",
+            "licenseFamilySummary": {
+              "name": "Unknown",
+              "href": "https:\/\/int-hub02.dc1.lan\/api\/license-families\/5"
+            }
+          }
+        ],
+        "licenseDisplay": "Unknown License"
+      },
+      "securityRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 2
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 5
+          },
+          {
+            "countType": "LOW",
+            "count": 1
+          },
+          {
+            "countType": "OK",
+            "count": 10
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "licenseRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 4
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 0
+          },
+          {
+            "countType": "LOW",
+            "count": 0
+          },
+          {
+            "countType": "OK",
+            "count": 14
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "operationalRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 1
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 10
+          },
+          {
+            "countType": "LOW",
+            "count": 6
+          },
+          {
+            "countType": "OK",
+            "count": 1
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "policyStatus": "NOT_IN_VIOLATION",
+      "policyStatusSummaries": [
+
+      ],
+      "lastBomUpdateDate": "2019-07-15T17:24:34.797Z",
+      "lastScanDate": "2019-07-02T22:42:37.367Z"
+    },
+    {
+      "createdAt": "2019-07-03T00:14:22.673Z",
+      "createdBy": "sysadmin",
+      "createdByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "settingUpdatedAt": "2019-07-17T16:16:37.788Z",
+      "settingUpdatedBy": "sysadmin",
+      "settingUpdatedByUser": "https:\/\/int-hub02.dc1.lan\/api\/users\/00000000-0000-0000-0001-000000000001",
+      "versionName": "released",
+      "source": "CUSTOM",
+      "phase": "DEVELOPMENT",
+      "distribution": "EXTERNAL",
+      "_meta": {
+        "allow": [
+          "DELETE",
+          "GET",
+          "PUT"
+        ],
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f",
+        "links": [
+          {
+            "rel": "versionReport",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/reports"
+          },
+          {
+            "rel": "licenseReports",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/license-reports"
+          },
+          {
+            "rel": "riskProfile",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/risk-profile"
+          },
+          {
+            "rel": "components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/components"
+          },
+          {
+            "rel": "vulnerable-components",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/vulnerable-bom-components"
+          },
+          {
+            "rel": "comparison",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/comparison"
+          },
+          {
+            "rel": "project",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/custom-fields"
+          },
+          {
+            "rel": "policy-status",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/policy-status"
+          },
+          {
+            "rel": "codelocations",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/codelocations"
+          },
+          {
+            "rel": "custom-fields",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/custom-fields"
+          },
+          {
+            "rel": "issues",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f\/issues"
+          },
+          {
+            "rel": "project-version-journal",
+            "href": "https:\/\/int-hub02.dc1.lan\/api\/journal\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions\/b1f458b7-e0ea-4643-b424-a9a5ccde4d2f"
+          }
+        ]
+      },
+      "license": {
+        "type": "DISJUNCTIVE",
+        "licenses": [
+          {
+            "license": "https:\/\/int-hub02.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+            "licenses": [
+
+            ],
+            "name": "Unknown License",
+            "ownership": "UNKNOWN",
+            "licenseDisplay": "Unknown License",
+            "licenseFamilySummary": {
+              "name": "Unknown",
+              "href": "https:\/\/int-hub02.dc1.lan\/api\/license-families\/5"
+            }
+          }
+        ],
+        "licenseDisplay": "Unknown License"
+      },
+      "securityRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 3
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 3
+          },
+          {
+            "countType": "LOW",
+            "count": 1
+          },
+          {
+            "countType": "OK",
+            "count": 6
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "licenseRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 2
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 0
+          },
+          {
+            "countType": "LOW",
+            "count": 0
+          },
+          {
+            "countType": "OK",
+            "count": 11
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "operationalRiskProfile": {
+        "counts": [
+          {
+            "countType": "HIGH",
+            "count": 1
+          },
+          {
+            "countType": "MEDIUM",
+            "count": 6
+          },
+          {
+            "countType": "LOW",
+            "count": 5
+          },
+          {
+            "countType": "OK",
+            "count": 1
+          },
+          {
+            "countType": "UNKNOWN",
+            "count": 0
+          }
+        ]
+      },
+      "policyStatus": "NOT_IN_VIOLATION",
+      "policyStatusSummaries": [
+
+      ],
+      "lastBomUpdateDate": "2019-07-15T17:24:34.542Z",
+      "lastScanDate": "2019-07-03T00:14:46.640Z"
+    }
+  ],
+  "appliedFilters": [
+
+  ],
+  "_meta": {
+    "allow": [
+      "POST",
+      "GET"
+    ],
+    "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions",
+    "links": [
+      {
+        "rel": "static-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=distribution",
+        "name": "distribution",
+        "label": "Distribution"
+      },
+      {
+        "rel": "dynamic-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=license",
+        "name": "license",
+        "label": "License"
+      },
+      {
+        "rel": "static-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=licenseRisk",
+        "name": "licenseRisk",
+        "label": "License risk"
+      },
+      {
+        "rel": "static-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=operationalRisk",
+        "name": "operationalRisk",
+        "label": "Operational risk"
+      },
+      {
+        "rel": "static-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=phase",
+        "name": "phase",
+        "label": "Release phase"
+      },
+      {
+        "rel": "static-filter",
+        "href": "https:\/\/int-hub02.dc1.lan\/api\/projects\/15f28501-781c-4c19-884a-89609054f05a\/versions-filters?filterKey=securityRisk",
+        "name": "securityRisk",
+        "label": "Security risk"
+      }
+    ]
+  }
+}

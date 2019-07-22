@@ -22,6 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,6 +99,11 @@ public class ProjectService extends DataService {
         }
 
         return Optional.empty();
+    }
+
+    public Optional<ProjectVersionView> getNewestProjectVersion(ProjectView projectView) throws IntegrationException {
+        List<ProjectVersionView> projectVersionViews = getAllProjectVersions(projectView);
+        return projectVersionViews.stream().max(Comparator.comparing(ProjectVersionView::getCreatedAt));
     }
 
     public void updateProject(ProjectView projectView) throws IntegrationException {
