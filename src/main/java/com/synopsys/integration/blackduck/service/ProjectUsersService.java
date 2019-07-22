@@ -118,23 +118,22 @@ public class ProjectUsersService extends DataService {
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
         Optional<UserGroupView> optionalUserGroupView = userGroupService.getGroupByName(groupName);
-        optionalUserGroupView.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
+        UserGroupView userGroupView = optionalUserGroupView.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
 
-        UserGroupView userGroupView = optionalUserGroupView.get();
         List<UserGroupView> currentGroups = getGroupsForProject(projectView);
         if (currentGroups.contains(userGroupView)) {
             logger.info(String.format("The supplied project (%s) already contained the group (%s).", projectView.getName(), groupName));
             return;
         }
 
-        userGroupView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The %s user group does not have an href so it can not be added to a project.", groupName)));
+        String userGroupHref = userGroupView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The %s user group does not have an href so it can not be added to a project.", groupName)));
 
         Optional<String> projectUserGroupsLinkOptional = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
-        projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
+        String createUserGroupLink = projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
 
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
-        userGroupRequest.setGroup(userGroupView.getHref().get());
-        blackDuckService.post(projectUserGroupsLinkOptional.get(), userGroupRequest);
+        userGroupRequest.setGroup(userGroupHref);
+        blackDuckService.post(createUserGroupLink, userGroupRequest);
     }
 
     public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
@@ -162,9 +161,9 @@ public class ProjectUsersService extends DataService {
         assignedUserRequest.setUser(userView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The user %s does not have an href so it can not be added to a project.", userView.getUserName()))));
 
         final Optional<String> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
-        projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
+        String addUserLink = projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
 
-        blackDuckService.post(projectUsersLinkOptional.get(), assignedUserRequest);
+        blackDuckService.post(addUserLink, assignedUserRequest);
     }
 
 }
