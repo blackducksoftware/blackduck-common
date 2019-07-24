@@ -1,6 +1,7 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenLocal()
+        maven { url "${project.ext.downloadArtifactoryUrl}/${project.ext.artifactoryReleaseRepo}"}
         mavenCentral()
         maven { url 'https://plugins.gradle.org/m2/' }
     }
@@ -28,11 +29,4 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.18.3'
 
     testRuntime 'org.slf4j:slf4j-simple:1.7.25'
-}
-
-task outputProps {
-    doLast {
-        println "ext deploy:" + project.ext.deployArtifactoryUrl
-        println "deploy:" + project.findProperty('deployArtifactoryUrl')
-    }
 }
