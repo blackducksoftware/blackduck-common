@@ -45,7 +45,7 @@ public class CodeLocationWaiterTest {
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
         CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 0);
-        assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
+        assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus(), "Status was not COMPLETE but was " + codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
         assertFalse(codeLocationWaitResult.getErrorMessage().isPresent());
