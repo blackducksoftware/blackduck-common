@@ -19,30 +19,42 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 
 public class CodeLocationServiceTest {
-
     public static final String CODELOCATION_NAME_LOWERCASE = "abc";
     public static final String CODELOCATION_NAME_TITLECASE = "Abc";
+    public static final String CODELOCATION_NAME_ALL_CAPS = "ABC";
 
     @Test
     public void testCodeLocationCaseSensitivity() throws IntegrationException {
-
         final BlackDuckService blackDuckService = Mockito.mock(BlackDuckService.class);
         final IntLogger logger = new BufferedIntLogger();
 
-        final CodeLocationService svc = new CodeLocationService(blackDuckService, logger);
+        final CodeLocationService codeLocationService = new CodeLocationService(blackDuckService, logger);
 
         final List<CodeLocationView> codeLocations = new ArrayList<>();
-        final CodeLocationView mockedCodeLocationWithLowercaseName = Mockito.mock(CodeLocationView.class);
-        Mockito.when(mockedCodeLocationWithLowercaseName.getName()).thenReturn(CODELOCATION_NAME_LOWERCASE);
-        codeLocations.add(mockedCodeLocationWithLowercaseName);
-        Mockito.doReturn(codeLocations).when(blackDuckService).getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class), Mockito.any(Request.Builder.class));
+        final CodeLocationView codeLocationWithLowercaseName = new CodeLocationView();
+        codeLocationWithLowercaseName.setName(CODELOCATION_NAME_LOWERCASE);
+        codeLocations.add(codeLocationWithLowercaseName);
+        Mockito.when(blackDuckService.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class), Mockito.any(Request.Builder.class))).thenReturn(codeLocations);
 
-        final Optional<CodeLocationView> searchForSameCaseResult = svc.getCodeLocationByName(CODELOCATION_NAME_LOWERCASE);
-        assertTrue(searchForSameCaseResult.isPresent());
-        assertEquals(mockedCodeLocationWithLowercaseName, searchForSameCaseResult.get());
+        assertSearchResultFound(codeLocationService, CODELOCATION_NAME_LOWERCASE);
+        assertSearchResultFound(codeLocationService, CODELOCATION_NAME_TITLECASE);
+        assertSearchResultFound(codeLocationService, CODELOCATION_NAME_ALL_CAPS);
 
-        // Verify that codelocation name check is case sensitive
-        final Optional<CodeLocationView> searchForDifferentCaseResult = svc.getCodeLocationByName(CODELOCATION_NAME_TITLECASE);
-        assertFalse(searchForDifferentCaseResult.isPresent());
+        assertSearchResultNotFound(codeLocationService, CODELOCATION_NAME_LOWERCASE + " ");
+        assertSearchResultNotFound(codeLocationService, CODELOCATION_NAME_LOWERCASE + CODELOCATION_NAME_LOWERCASE);
+        assertSearchResultNotFound(codeLocationService, CODELOCATION_NAME_TITLECASE + CODELOCATION_NAME_TITLECASE);
+        assertSearchResultNotFound(codeLocationService, CODELOCATION_NAME_ALL_CAPS + CODELOCATION_NAME_ALL_CAPS);
     }
+
+    private void assertSearchResultFound(CodeLocationService svc, String nameToSearchFor) throws IntegrationException {
+        final Optional<CodeLocationView> searchResult = svc.getCodeLocationByName(nameToSearchFor);
+        assertTrue(searchResult.isPresent());
+        assertEquals(CODELOCATION_NAME_LOWERCASE, searchResult.get().getName());
+    }
+
+    private void assertSearchResultNotFound(CodeLocationService svc, String nameToSearchFor) throws IntegrationException {
+        final Optional<CodeLocationView> searchResult = svc.getCodeLocationByName(nameToSearchFor);
+        assertFalse(searchResult.isPresent());
+    }
+
 }
