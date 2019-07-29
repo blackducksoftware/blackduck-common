@@ -60,35 +60,10 @@ public class CodeLocationWaiter {
             throws IntegrationException, InterruptedException {
         boolean allCompleted = false;
         int attemptCount = 1;
-        while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000) {
-            for (String codeLocationName : codeLocationNames) {
-                if (!codeLocationNamesToViews.containsKey(codeLocationName)) {
-                    Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
-                    if (codeLocationView.flatMap(CodeLocationView::getHref).isPresent()) {
-                        codeLocationNamesToViews.put(codeLocationName, codeLocationView.get());
-                        codeLocationUrlsToNames.put(codeLocationView.get().getHref().get(), codeLocationName);
-                    }
-                }
-            }
-
-            int actualNotificationCount = 0;
-            if (codeLocationNamesToViews.size() > 0) {
-                logger.debug("At least one code location has been found, now looking for notifications.");
-                List<NotificationUserView> notifications = notificationService
-                                                                   .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                                                                           Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
-                logger.debug(String.format("There were %d notifications found.", notifications.size()));
-
-                for (NotificationUserView notificationView : notifications) {
-                    Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
-                    if (codeLocationUrl.isPresent() && codeLocationUrlsToNames.containsKey(codeLocationUrl.get())) {
-                        String codeLocationName = codeLocationUrlsToNames.get(codeLocationUrl.get());
-                        foundCodeLocationNames.add(codeLocationName);
-                        actualNotificationCount++;
-                        logger.info(String.format("Found %s code location (%d of %d).", codeLocationName, actualNotificationCount, expectedNotificationCount));
-                    }
-                }
-            }
+        do {
+            // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
+            // regardless of the timeout provided, we always want to check at least once
+            int actualNotificationCount = retrieveCompletedCount(userView, notificationTaskRange, codeLocationNames, expectedNotificationCount);
 
             if (foundCodeLocationNames.containsAll(codeLocationNames) && actualNotificationCount >= expectedNotificationCount) {
                 allCompleted = true;
@@ -97,7 +72,7 @@ public class CodeLocationWaiter {
                 logger.info(String.format("All code locations have not been added to the BOM yet, waiting another 5 seconds (try #%d)...", attemptCount));
                 Thread.sleep(5000);
             }
-        }
+        } while (!allCompleted && System.currentTimeMillis() - notificationTaskRange.getTaskStartTime() <= timeoutInSeconds * 1000);
 
         if (!allCompleted) {
             return CodeLocationWaitResult.PARTIAL(foundCodeLocationNames, String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
@@ -105,6 +80,38 @@ public class CodeLocationWaiter {
             logger.info("All code locations have been added to the BOM.");
             return CodeLocationWaitResult.COMPLETE(foundCodeLocationNames);
         }
+    }
+
+    private int retrieveCompletedCount(UserView userView, NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount) throws IntegrationException {
+        for (String codeLocationName : codeLocationNames) {
+            if (!codeLocationNamesToViews.containsKey(codeLocationName)) {
+                Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+                if (codeLocationView.flatMap(CodeLocationView::getHref).isPresent()) {
+                    codeLocationNamesToViews.put(codeLocationName, codeLocationView.get());
+                    codeLocationUrlsToNames.put(codeLocationView.get().getHref().get(), codeLocationName);
+                }
+            }
+        }
+
+        int actualNotificationCount = 0;
+        if (codeLocationNamesToViews.size() > 0) {
+            logger.debug("At least one code location has been found, now looking for notifications.");
+            List<NotificationUserView> notifications = notificationService
+                    .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                            Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+            logger.debug(String.format("There were %d notifications found.", notifications.size()));
+
+            for (NotificationUserView notificationView : notifications) {
+                Optional<String> codeLocationUrl = getCodeLocationUrl(notificationView);
+                if (codeLocationUrl.isPresent() && codeLocationUrlsToNames.containsKey(codeLocationUrl.get())) {
+                    String codeLocationName = codeLocationUrlsToNames.get(codeLocationUrl.get());
+                    foundCodeLocationNames.add(codeLocationName);
+                    actualNotificationCount++;
+                    logger.info(String.format("Found %s code location (%d of %d).", codeLocationName, actualNotificationCount, expectedNotificationCount));
+                }
+            }
+        }
+        return actualNotificationCount;
     }
 
     private Optional<String> getCodeLocationUrl(NotificationUserView notificationView) {
