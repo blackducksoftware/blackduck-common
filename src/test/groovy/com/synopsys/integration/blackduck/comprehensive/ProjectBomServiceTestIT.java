@@ -65,7 +65,19 @@ public class ProjectBomServiceTestIT {
 
         // delete the projects, if they exist
         intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, projectName);
-        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, projectNameToAdd);
+
+        // as this might have been previously added to a bom, it might still register as in use - try a few times
+        int count = 0;
+        boolean succeeded = false;
+        while (count < 10 && !succeeded) {
+            try {
+                intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, projectNameToAdd);
+                succeeded = true;
+            } catch (Exception ignored) {
+                // ignored
+            }
+            count++;
+        }
 
         // create the projects
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
