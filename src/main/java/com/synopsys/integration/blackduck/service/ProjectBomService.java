@@ -110,8 +110,34 @@ public class ProjectBomService extends DataService {
         return Optional.ofNullable(componentVersionUrl);
     }
 
+    /**
+     * @deprecated Please use either:
+     */
+    @Deprecated
     public void addComponentToProjectVersion(String mediaType, String projectVersionComponentsUri, String componentVersionUrl) throws IntegrationException {
         Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
+        try (Response response = blackDuckService.execute(request)) {
+        } catch (IOException e) {
+            throw new IntegrationException(e.getMessage(), e);
+        }
+    }
+
+    public void addProjectVersionToProjectVersion(ProjectVersionView projectVersionViewToAdd, ProjectVersionView targetProjectVersionView) throws IntegrationException {
+        String toAdd = projectVersionViewToAdd.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView to add does not have an href.\n%s", projectVersionViewToAdd)));
+        String target = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK).orElseThrow(() -> new IntegrationException(String.format("The target ProjectVersionView does not have a '%' link.\n%s", ProjectVersionView.COMPONENTS_LINK, targetProjectVersionView)));
+
+        addComponentToProjectVersion(toAdd, target);
+    }
+
+    public void addComponentToProjectVersion(ComponentVersionView componentVersionView, ProjectVersionView projectVersionView) throws IntegrationException {
+        String componentVersionUrl = componentVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ComponentVersionView does not have an href.\n%s", componentVersionView)));
+        String projectVersionUrl = projectVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have an href.\n%s", projectVersionView)));
+
+        addComponentToProjectVersion(componentVersionUrl, projectVersionUrl);
+    }
+
+    public void addComponentToProjectVersion(String componentVersionUrl, String projectVersionComponentsUri) throws IntegrationException {
+        Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).build();
         try (Response response = blackDuckService.execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

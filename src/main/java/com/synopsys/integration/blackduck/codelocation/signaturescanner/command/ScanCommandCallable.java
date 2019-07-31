@@ -82,11 +82,12 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                     }
                 }
                 processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
+                processBuilder.redirectErrorStream(true);
 
                 final Process blackDuckCliProcess = processBuilder.start();
 
                 // The cli logs go the error stream for some reason
-                final StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getErrorStream(), splitOutputStream);
+                final StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getInputStream(), splitOutputStream);
                 redirectThread.start();
 
                 int returnCode = -1;

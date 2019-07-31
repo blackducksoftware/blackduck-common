@@ -74,7 +74,7 @@ public class ComprehensiveCookbookTestIT {
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
+        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
 
         // get the count of all projects now
         int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
@@ -119,7 +119,7 @@ public class ComprehensiveCookbookTestIT {
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
+        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
 
         // get the count of all projects now
         int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
@@ -316,17 +316,6 @@ public class ComprehensiveCookbookTestIT {
                     System.out.println(String.format("%s: %s", labelForOutput, blackDuckResponse.toString()));
                 }
             }
-        }
-    }
-
-    private void deleteIfProjectExists(IntLogger logger, ProjectService projectService, BlackDuckService blackDuckService, String projectName) throws Exception {
-        try {
-            Optional<ProjectView> project = projectService.getProjectByName(projectName);
-            if (project.isPresent()) {
-                blackDuckService.delete(project.get());
-            }
-        } catch (BlackDuckIntegrationException e) {
-            logger.warn("Project didn't exist");
         }
     }
 

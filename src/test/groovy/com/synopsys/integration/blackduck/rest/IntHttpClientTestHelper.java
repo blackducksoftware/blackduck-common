@@ -5,10 +5,15 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.ProjectService;
 import org.apache.http.client.HttpClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -128,6 +133,17 @@ public class IntHttpClientTestHelper {
         } catch (Exception e) {
             fail("Could not get file: " + e.getMessage());
             return null;
+        }
+    }
+
+    public void deleteIfProjectExists(IntLogger logger, ProjectService projectService, BlackDuckService blackDuckService, String projectName) throws Exception {
+        try {
+            Optional<ProjectView> project = projectService.getProjectByName(projectName);
+            if (project.isPresent()) {
+                blackDuckService.delete(project.get());
+            }
+        } catch (BlackDuckIntegrationException e) {
+            logger.warn("Project didn't exist");
         }
     }
 
