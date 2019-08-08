@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.comprehensive;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -11,12 +12,16 @@ import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.log.IntLogger;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class ProjectBomServiceTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
