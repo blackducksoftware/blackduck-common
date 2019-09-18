@@ -53,7 +53,7 @@ public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Cal
                 return Optional.empty();
             }
         }
-        return Optional.of(blackDuckBucket.get(uriSingleResponse.getUri(), uriSingleResponse.getResponseClass()));
+        return Optional.ofNullable(blackDuckBucket.get(uriSingleResponse.getUri(), uriSingleResponse.getResponseClass()));
     }
 
 }
