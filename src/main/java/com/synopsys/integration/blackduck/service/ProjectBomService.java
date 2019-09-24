@@ -95,7 +95,8 @@ public class ProjectBomService extends DataService {
     }
 
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
-        String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK).orElse(null);
+        String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
+                                                 .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
         Optional<ComponentSearchResultView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
         String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
@@ -131,9 +132,10 @@ public class ProjectBomService extends DataService {
 
     public void addComponentToProjectVersion(ComponentVersionView componentVersionView, ProjectVersionView projectVersionView) throws IntegrationException {
         String componentVersionUrl = componentVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ComponentVersionView does not have an href.\n%s", componentVersionView)));
-        String projectVersionUrl = projectVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have an href.\n%s", projectVersionView)));
+        String projectVersionComponentsUri = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
+                                                 .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
 
-        addComponentToProjectVersion(componentVersionUrl, projectVersionUrl);
+        addComponentToProjectVersion(componentVersionUrl, projectVersionComponentsUri);
     }
 
     public void addComponentToProjectVersion(String componentVersionUrl, String projectVersionComponentsUri) throws IntegrationException {
