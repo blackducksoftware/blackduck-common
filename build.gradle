@@ -20,7 +20,7 @@ apply plugin: 'com.blackducksoftware.integration.library'
 dependencies {
     api 'com.blackducksoftware.integration:blackduck-common-api:2019.6.0.2'
     api 'com.blackducksoftware.integration:integration-reporting:0.3.5'
-    api 'com.blackducksoftware.integration:integration-bdio:18.2.0'
+    api 'com.blackducksoftware.integration:integration-bdio:18.2.9'
     api 'com.blackducksoftware.integration:phone-home-client:0.21.5'
 
     testImplementation 'org.hamcrest:hamcrest-core:1.3'
