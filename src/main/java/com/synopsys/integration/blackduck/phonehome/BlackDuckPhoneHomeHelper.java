@@ -94,9 +94,9 @@ public class BlackDuckPhoneHomeHelper {
         return handlePhoneHome(integrationRepoName, integrationVersion, Collections.emptyMap());
     }
 
-    public PhoneHomeResponse handlePhoneHome(String integrationRepoName, String integrationVersion, Map<String, String> metaData) {
+    public PhoneHomeResponse handlePhoneHome(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
         try {
-            PhoneHomeRequestBody phoneHomeRequestBody = createPhoneHomeRequestBody(integrationRepoName, integrationVersion, metaData);
+            PhoneHomeRequestBody phoneHomeRequestBody = createPhoneHomeRequestBody(integrationRepoName, integrationVersion, metaData, artifactModules);
             return phoneHomeService.phoneHome(phoneHomeRequestBody, getEnvironmentVariables());
         } catch (Exception e) {
             logger.debug("Problem phoning home: " + e.getMessage(), e);
@@ -104,7 +104,7 @@ public class BlackDuckPhoneHomeHelper {
         return PhoneHomeResponse.createResponse(Boolean.FALSE);
     }
 
-    private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData) {
+    private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
         BlackDuckPhoneHomeRequestBuilder blackDuckBuilder = new BlackDuckPhoneHomeRequestBuilder();
         blackDuckBuilder.setIntegrationRepoName(integrationRepoName);
         blackDuckBuilder.setIntegrationVersion(integrationVersion);
@@ -116,6 +116,7 @@ public class BlackDuckPhoneHomeHelper {
         blackDuckBuilder.setCustomerDomainName(getHostName());
 
         PhoneHomeRequestBody.Builder actualBuilder = blackDuckBuilder.getBuilder();
+        actualBuilder.setArtifactModules(artifactModules);
         boolean metaDataSuccess = actualBuilder.addAllToMetaData(metaData);
         if (!metaDataSuccess) {
             logger.debug("The metadata provided to phone-home exceeded its size limit. At least some metadata will be missing.");
