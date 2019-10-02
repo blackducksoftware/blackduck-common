@@ -42,7 +42,6 @@ import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.enums.ProductIdEnum;
-import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
@@ -78,13 +77,12 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, IntHttpClient intHttpClient, Gson gson) {
-        String googleAnalyticsTrackingId = GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID;
         HttpClientBuilder httpClientBuilder = intHttpClient.getClientBuilder();
-        return new PhoneHomeClient(googleAnalyticsTrackingId, intLogger, httpClientBuilder, gson);
+        return new PhoneHomeClient(intLogger, httpClientBuilder, gson);
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, BlackDuckService blackDuckService, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
-            IntEnvironmentVariables intEnvironmentVariables) {
+        IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;
