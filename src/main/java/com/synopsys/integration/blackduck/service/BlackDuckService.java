@@ -87,6 +87,14 @@ public class BlackDuckService {
         return gson;
     }
 
+    public BlackDuckResponseTransformer getBlackDuckResponseTransformer() {
+        return blackDuckResponseTransformer;
+    }
+
+    public BlackDuckResponsesTransformer getBlackDuckResponsesTransformer() {
+        return blackDuckResponsesTransformer;
+    }
+
     public <T extends BlackDuckResponse> T transformResponse(Response response, Class<T> clazz) throws IntegrationException {
         return blackDuckJsonTransformer.getResponse(response, clazz);
     }
