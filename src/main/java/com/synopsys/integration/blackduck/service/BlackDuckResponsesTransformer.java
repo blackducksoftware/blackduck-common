@@ -48,6 +48,11 @@ public class BlackDuckResponsesTransformer {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
+        int maxPageCount = getAll ? Integer.MAX_VALUE : 1;
+        return getResponses(pagedRequest, clazz, maxPageCount);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, int maxPageCount) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
@@ -59,12 +64,14 @@ public class BlackDuckResponsesTransformer {
             allResponses.addAll(blackDuckPageResponse.getItems());
 
             totalCount = blackDuckPageResponse.getTotalCount();
-            if (!getAll) {
+            if (maxPageCount <= 1) {
                 return new BlackDuckPageResponse<>(totalCount, allResponses);
             }
 
-            while (allResponses.size() < totalCount && currentOffset < totalCount) {
+            int currentPageCount = 1;
+            while (allResponses.size() < totalCount && currentOffset < totalCount && currentPageCount < maxPageCount) {
                 currentOffset += pagedRequest.getLimit();
+                currentPageCount += 1;
                 PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
                 request = offsetPagedRequest.createRequest();
                 try (Response response = blackDuckHttpClient.execute(request)) {

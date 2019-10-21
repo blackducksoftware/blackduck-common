@@ -128,13 +128,19 @@ public class BlackDuckService {
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
     }
 
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, int maxPageCount) throws IntegrationException {
+        String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), maxPageCount);
+    }
+
     public <T extends BlackDuckResponse> List<T> getResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder, boolean getAll)
-            throws IntegrationException {
+        throws IntegrationException {
         return getPageResponses(blackDuckPathMultipleResponses, requestBuilder, getAll).getItems();
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder, boolean getAll)
-            throws IntegrationException {
+        throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
@@ -159,17 +165,37 @@ public class BlackDuckService {
         return getResponses(blackDuckView, linkMultipleResponses, true);
     }
 
+    public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, int maxPageCount) throws IntegrationException {
+        return getResponses(blackDuckView, linkMultipleResponses, maxPageCount);
+    }
+
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, Request.Builder requestBuilder) throws IntegrationException {
         return getResponses(blackDuckView, linkMultipleResponses, requestBuilder, true);
     }
 
     public <T extends BlackDuckResponse> List<T> getResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, boolean getAll) throws IntegrationException {
-        Optional<String> uri = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
-        if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
+        final PagedRequest pagedRequest = createResponsesPagedRequest(blackDuckView, linkMultipleResponses);
+        if (pagedRequest == null) {
             return Collections.emptyList();
         }
+        return blackDuckResponsesTransformer.getResponses(pagedRequest, linkMultipleResponses.getResponseClass(), getAll).getItems();
+    }
+
+    public <T extends BlackDuckResponse> List<T> getResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, int maxPageCount) throws IntegrationException {
+        final PagedRequest pagedRequest = createResponsesPagedRequest(blackDuckView, linkMultipleResponses);
+        if (pagedRequest == null) {
+            return Collections.emptyList();
+        }
+        return blackDuckResponsesTransformer.getResponses(pagedRequest, linkMultipleResponses.getResponseClass(), maxPageCount).getItems();
+    }
+
+    private <T extends BlackDuckResponse> PagedRequest createResponsesPagedRequest(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) {
+        Optional<String> uri = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
+        if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
+            return null;
+        }
         Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get());
-        return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.getResponseClass(), getAll).getItems();
+        return new PagedRequest(requestBuilder);
     }
 
     public <T extends BlackDuckResponse> List<T> getResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, Request.Builder requestBuilder, boolean getAll) throws IntegrationException {
