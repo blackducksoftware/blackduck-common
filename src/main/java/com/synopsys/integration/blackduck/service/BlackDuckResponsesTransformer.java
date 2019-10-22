@@ -48,10 +48,23 @@ public class BlackDuckResponsesTransformer {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
+        int limit = getAll ? Integer.MAX_VALUE : -1;
+        return getResponses(pagedRequest, clazz, limit);
+    }
+
+    /**
+     * @param maxLimit is the maximum number of entries returned. Providing a maxLimit of less than 0 will only get the first page of results.
+     */
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, int maxLimit) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
-        Request request = pagedRequest.createRequest();
+        int pagedLimit = pagedRequest.getLimit();
+        if (maxLimit >= 0) {
+            pagedLimit = Integer.min(pagedLimit, maxLimit);
+        }
+        PagedRequest finalPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), pagedRequest.getOffset(), pagedLimit);
+        Request request = finalPagedRequest.createRequest();
         try (Response initialResponse = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
             String initialJsonResponse = initialResponse.getContentString();
@@ -59,13 +72,17 @@ public class BlackDuckResponsesTransformer {
             allResponses.addAll(blackDuckPageResponse.getItems());
 
             totalCount = blackDuckPageResponse.getTotalCount();
-            if (!getAll) {
+            if (maxLimit < 0 || allResponses.size() == maxLimit) {
                 return new BlackDuckPageResponse<>(totalCount, allResponses);
             }
 
-            while (allResponses.size() < totalCount && currentOffset < totalCount) {
-                currentOffset += pagedRequest.getLimit();
-                PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
+            while (allResponses.size() < totalCount && allResponses.size() < maxLimit && currentOffset < totalCount) {
+                currentOffset += finalPagedRequest.getLimit();
+                int finalLimit = finalPagedRequest.getLimit();
+                if (currentOffset + finalLimit > maxLimit) {
+                    finalLimit = maxLimit - currentOffset;
+                }
+                PagedRequest offsetPagedRequest = new PagedRequest(finalPagedRequest.getRequestBuilder(), currentOffset, finalLimit);
                 request = offsetPagedRequest.createRequest();
                 try (Response response = blackDuckHttpClient.execute(request)) {
                     blackDuckHttpClient.throwExceptionForError(response);
