@@ -36,17 +36,14 @@ public class PagedRequest {
 
     public PagedRequest(final Request.Builder requestBuilder) {
         this.requestBuilder = requestBuilder;
-        int offset = 0;
-        int limit = 100;
+        int offset = RequestFactory.DEFAULT_OFFSET;
+        int limit = RequestFactory.DEFAULT_LIMIT;
         if (requestBuilder.getQueryParameters() != null) {
-            // we know that limit and offset are only ever set as single values
-            // so iterator().next() is a reasonable way to get them out of the
-            // Set
-            if (requestBuilder.getQueryParameters().containsKey("offset")) {
-                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get("offset").iterator().next(), 0);
+            if (requestBuilder.getQueryParameters().containsKey(RequestFactory.OFFSET_PARAMETER)) {
+                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(RequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
             }
-            if (requestBuilder.getQueryParameters().containsKey("limit")) {
-                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get("limit").iterator().next(), 100);
+            if (requestBuilder.getQueryParameters().containsKey(RequestFactory.LIMIT_PARAMETER)) {
+                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(RequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
             }
         }
 
@@ -68,8 +65,8 @@ public class PagedRequest {
         final Set<String> offsetValue = new HashSet<>();
         offsetValue.add(String.valueOf(getOffset()));
 
-        request.getQueryParameters().put("limit", limitValue);
-        request.getQueryParameters().put("offset", offsetValue);
+        request.getQueryParameters().put(RequestFactory.LIMIT_PARAMETER, limitValue);
+        request.getQueryParameters().put(RequestFactory.OFFSET_PARAMETER, offsetValue);
         return request;
     }
 

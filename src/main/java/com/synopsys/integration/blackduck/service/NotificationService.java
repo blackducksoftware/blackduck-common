@@ -53,7 +53,7 @@ public class NotificationService extends DataService {
     public List<NotificationView> getAllNotifications(Date startDate, Date endDate) throws IntegrationException {
         List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
-        List<NotificationView> allNotificationItems = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
+        List<NotificationView> allNotificationItems = blackDuckService.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
 
         return allNotificationItems;
     }
@@ -61,21 +61,21 @@ public class NotificationService extends DataService {
     public List<NotificationUserView> getAllUserNotifications(UserView user, Date startDate, Date endDate) throws IntegrationException {
         List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         Request.Builder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, allKnownNotificationTypes);
-        List<NotificationUserView> allUserNotificationItems = blackDuckService.getResponses(requestBuilder, NotificationUserView.class, true);
+        List<NotificationUserView> allUserNotificationItems = blackDuckService.getAllResponses(requestBuilder, NotificationUserView.class);
 
         return allUserNotificationItems;
     }
 
     public List<NotificationView> getFilteredNotifications(Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        List<NotificationView> allNotificationItems = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, true);
+        List<NotificationView> allNotificationItems = blackDuckService.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
 
         return reallyFilterNotifications(allNotificationItems, notificationTypesToInclude);
     }
 
     public List<NotificationUserView> getFilteredUserNotifications(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         Request.Builder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, notificationTypesToInclude);
-        List<NotificationUserView> allUserNotificationItems = blackDuckService.getResponses(requestBuilder, NotificationUserView.class, true);
+        List<NotificationUserView> allUserNotificationItems = blackDuckService.getAllResponses(requestBuilder, NotificationUserView.class);
 
         return reallyFilterNotifications(allUserNotificationItems, notificationTypesToInclude);
     }
@@ -86,7 +86,7 @@ public class NotificationService extends DataService {
      */
     public Date getLatestNotificationDate() throws IntegrationException {
         Request.Builder requestBuilder = createLatestDateRequestBuilder();
-        List<NotificationView> notifications = blackDuckService.getResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
+        List<NotificationView> notifications = blackDuckService.getSomeResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, 1);
         return getFirstCreatedAtDate(notifications);
     }
 
@@ -96,7 +96,7 @@ public class NotificationService extends DataService {
      */
     public Date getLatestUserNotificationDate(UserView userView) throws IntegrationException {
         Request.Builder requestBuilder = createLatestDateRequestBuilder();
-        List<NotificationUserView> userNotifications = blackDuckService.getResponses(userView, UserView.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, false);
+        List<NotificationUserView> userNotifications = blackDuckService.getSomeResponses(userView, UserView.NOTIFICATIONS_LINK_RESPONSE, requestBuilder, 1);
         return getFirstCreatedAtDate(userNotifications);
     }
 
@@ -117,7 +117,7 @@ public class NotificationService extends DataService {
     }
 
     private Request.Builder createLatestDateRequestBuilder() {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(1, RequestFactory.DEFAULT_OFFSET);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder();
         RequestFactory.addBlackDuckFilter(requestBuilder, createFilterForAllKnownTypes());
         return requestBuilder;
     }

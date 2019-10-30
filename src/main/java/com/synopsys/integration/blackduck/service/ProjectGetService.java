@@ -49,9 +49,9 @@ public class ProjectGetService extends DataService {
 
     public List<ProjectView> getProjectMatches(final String projectName, final int limit) throws IntegrationException {
         final Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
-        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery, limit, RequestFactory.DEFAULT_OFFSET);
+        final Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
-        final List<ProjectView> projectItems = blackDuckService.getResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, false);
+        final List<ProjectView> projectItems = blackDuckService.getSomeResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, requestBuilder, limit);
         return projectItems;
     }
 

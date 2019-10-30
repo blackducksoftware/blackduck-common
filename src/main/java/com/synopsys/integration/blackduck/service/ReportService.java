@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.view.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,12 +63,14 @@ public class ReportService extends DataService {
     private final ProjectService projectDataService;
     private final IntegrationEscapeUtil escapeUtil;
     private final long timeoutInMilliseconds;
+    private final String blackDuckBaseUrl;
+    private final Gson gson;
 
-    public ReportService(BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
-        this(blackDuckService, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
+    public ReportService(Gson gson, String blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
+        this(gson, blackDuckBaseUrl, blackDuckService, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
     }
 
-    public ReportService(BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
+    public ReportService(Gson gson, String blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
         super(blackDuckService, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
@@ -78,6 +81,8 @@ public class ReportService extends DataService {
             this.logger.alwaysLog(timeoutInMilliseconds + "ms is not a valid BOM wait time, using : " + timeout + "ms instead");
         }
         this.timeoutInMilliseconds = timeout;
+        this.gson = gson;
+        this.blackDuckBaseUrl = blackDuckBaseUrl;
     }
 
     public String getNoticesReportData(ProjectView project, ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -162,7 +167,7 @@ public class ReportService extends DataService {
         try {
             logger.trace("Creating Risk Report Files in : " + outputDirectory.getCanonicalPath());
             RiskReportWriter writer = new RiskReportWriter();
-            writer.createHtmlReportFiles(blackDuckService.getGson(), outputDirectory, reportData);
+            writer.createHtmlReportFiles(gson, outputDirectory, reportData);
         } catch (RiskReportException | IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
@@ -248,17 +253,13 @@ public class ReportService extends DataService {
         }
     }
 
-    private String getBaseUrl() {
-        return blackDuckService.getBlackDuckBaseUrl().toString();
-    }
-
     private String getReportProjectUrl(String projectURL) {
         if (projectURL == null) {
             return null;
         }
         String projectId = projectURL.substring(projectURL.lastIndexOf("/") + 1);
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
+        urlBuilder.append(blackDuckBaseUrl);
         urlBuilder.append("#");
         urlBuilder.append("projects/id:");
         urlBuilder.append(projectId);
@@ -272,7 +273,7 @@ public class ReportService extends DataService {
         }
         String versionId = versionURL.substring(versionURL.lastIndexOf("/") + 1);
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getBaseUrl());
+        urlBuilder.append(blackDuckBaseUrl);
         urlBuilder.append("#");
         urlBuilder.append("versions/id:");
         urlBuilder.append(versionId);
@@ -367,7 +368,7 @@ public class ReportService extends DataService {
         try (Response response = blackDuckService.get(reportContentUri)) {
             String jsonResponse = response.getContentString();
 
-            JsonObject json = blackDuckService.getGson().fromJson(jsonResponse, JsonObject.class);
+            JsonObject json = gson.fromJson(jsonResponse, JsonObject.class);
             JsonElement content = json.get("reportContent");
             JsonArray reportConentArray = content.getAsJsonArray();
             JsonObject reportFile = reportConentArray.get(0).getAsJsonObject();
