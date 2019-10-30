@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.service;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import com.synopsys.integration.util.NoThreadExecutorService;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -54,6 +55,8 @@ public class BlackDuckServicesFactory {
     private final ExecutorService executorService;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
+
+    public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
 
     public static Gson createDefaultGson() {
         return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
@@ -121,7 +124,7 @@ public class BlackDuckServicesFactory {
 
     public SignatureScannerService createSignatureScannerService() {
         if (null == executorService) {
-            ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables);
+            ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, new NoThreadExecutorService());
             return createSignatureScannerService(scanBatchRunner);
         } else {
             ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, executorService);
@@ -204,8 +207,8 @@ public class BlackDuckServicesFactory {
         return new ProjectUsersService(blackDuckService, userGroupService, logger);
     }
 
-    public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+    public ReportService createReportService(long timeoutInMilliseconds) {
+        return new ReportService(gson, blackDuckHttpClient.getBaseUrl(), createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public UserGroupService createUserGroupService() {

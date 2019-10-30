@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -44,10 +45,30 @@ public class BlackDuckResponsesTransformer {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getResponses(pagedRequest, clazz, true);
+        return getInternalResponses(pagedRequest, clazz, Integer.MAX_VALUE);
     }
 
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {
+        return getInternalResponses(pagedRequest, clazz, totalLimit);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
+        return getInternalResponses(pagedRequest, clazz, pagedRequest.getLimit());
+    }
+
+    @Deprecated
+    /**
+     * @deprecated Please use the appropriate getAll or getSome method
+     */
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
+        int totalLimit = Integer.MAX_VALUE;
+        if (!getAll) {
+            totalLimit = pagedRequest.getLimit();
+        }
+        return getInternalResponses(pagedRequest, clazz, totalLimit);
+    }
+
+    private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
@@ -59,11 +80,9 @@ public class BlackDuckResponsesTransformer {
             allResponses.addAll(blackDuckPageResponse.getItems());
 
             totalCount = blackDuckPageResponse.getTotalCount();
-            if (!getAll) {
-                return new BlackDuckPageResponse<>(totalCount, allResponses);
-            }
+            int totalItemsToRetrieve = Math.min(totalCount, totalLimit);
 
-            while (allResponses.size() < totalCount && currentOffset < totalCount) {
+            while (allResponses.size() < totalItemsToRetrieve && currentOffset < totalItemsToRetrieve) {
                 currentOffset += pagedRequest.getLimit();
                 PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
                 request = offsetPagedRequest.createRequest();
@@ -76,11 +95,12 @@ public class BlackDuckResponsesTransformer {
                     throw new BlackDuckIntegrationException(e);
                 }
             }
+
+            allResponses = allResponses.stream().limit(totalLimit).collect(Collectors.toList());
+            return new BlackDuckPageResponse<>(totalCount, allResponses);
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
-
-        return new BlackDuckPageResponse<>(totalCount, allResponses);
     }
 
 }
