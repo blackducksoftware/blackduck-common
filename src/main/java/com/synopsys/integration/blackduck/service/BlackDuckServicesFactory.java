@@ -207,8 +207,8 @@ public class BlackDuckServicesFactory {
         return new ProjectUsersService(blackDuckService, userGroupService, logger);
     }
 
-    public ReportService createReportService(long timeoutInMilliseconds) throws IntegrationException {
-        return new ReportService(createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+    public ReportService createReportService(long timeoutInMilliseconds) {
+        return new ReportService(gson, blackDuckHttpClient.getBaseUrl(), createBlackDuckService(), logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public UserGroupService createUserGroupService() {
