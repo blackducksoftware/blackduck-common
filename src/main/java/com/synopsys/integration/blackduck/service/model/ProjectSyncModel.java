@@ -32,11 +32,11 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 
@@ -77,7 +77,7 @@ public class ProjectSyncModel {
 
     // version fields
     private String cloneFromReleaseUrl;
-    private ProjectVersionDistributionType distribution;
+    private LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution;
     private String nickname;
     private ProjectVersionPhaseType phase;
     private String releaseComments;
@@ -98,7 +98,7 @@ public class ProjectSyncModel {
 
     public static ProjectSyncModel createWithDefaults(String projectName, String projectVersionName) {
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName);
-        projectSyncModel.setDistribution(ProjectVersionDistributionType.EXTERNAL);
+        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL);
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         return projectSyncModel;
     }
@@ -272,11 +272,11 @@ public class ProjectSyncModel {
         fieldsWithSetValues.add(ProjectSyncModel.CLONE_FROM_RELEASE_URL_FIELD);
     }
 
-    public ProjectVersionDistributionType getDistribution() {
+    public LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(ProjectVersionDistributionType distribution) {
+    public void setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution) {
         this.distribution = distribution;
         fieldsWithSetValues.add(ProjectSyncModel.DISTRIBUTION_FIELD);
     }

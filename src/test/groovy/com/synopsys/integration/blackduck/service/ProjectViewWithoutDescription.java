@@ -1,7 +1,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.OriginSourceType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentSourceType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 
 public class ProjectViewWithoutDescription extends BlackDuckView {
@@ -13,7 +13,7 @@ public class ProjectViewWithoutDescription extends BlackDuckView {
     private Boolean projectLevelAdjustments;
     private String projectOwner;
     private Integer projectTier;
-    private OriginSourceType source;
+    private ComponentSourceType source;
     private java.util.Date updatedAt;
     private String updatedBy;
     private String updatedByUser;
@@ -82,11 +82,11 @@ public class ProjectViewWithoutDescription extends BlackDuckView {
         this.projectTier = projectTier;
     }
 
-    public OriginSourceType getSource() {
+    public ComponentSourceType getSource() {
         return source;
     }
 
-    public void setSource(final OriginSourceType source) {
+    public void setSource(final ComponentSourceType source) {
         this.source = source;
     }
 

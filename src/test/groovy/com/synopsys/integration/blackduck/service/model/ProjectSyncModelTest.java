@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 
 public class ProjectSyncModelTest {
@@ -82,7 +82,7 @@ public class ProjectSyncModelTest {
         assertTrue(((Set) setFields.get(projectSyncModel)).isEmpty());
 
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
-        projectSyncModel.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectSyncModel.setDescription("desc");
         projectSyncModel.setVersionName("version name");
         projectSyncModel.setName("name");
@@ -125,7 +125,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setDescription("desc");
         projectSyncModel.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
         projectSyncModel.setReleaseComments("released!");
-        projectSyncModel.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectSyncModel.setReleasedOn(releasedOn);
         projectSyncModel.setProjectLevelAdjustments(true);
         projectSyncModel.setCloneFromReleaseUrl("version href");
@@ -148,7 +148,7 @@ public class ProjectSyncModelTest {
         assertEquals("released!", projectRequest.getVersionRequest().getReleaseComments());
         assertEquals(releasedOn, projectRequest.getVersionRequest().getReleasedOn());
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectRequest.getVersionRequest().getPhase());
-        assertEquals(ProjectVersionDistributionType.INTERNAL, projectRequest.getVersionRequest().getDistribution());
+        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL, projectRequest.getVersionRequest().getDistribution());
     }
 
 }

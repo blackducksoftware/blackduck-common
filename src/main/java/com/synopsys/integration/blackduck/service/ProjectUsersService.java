@@ -29,11 +29,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.api.generated.component.AssignedUserGroupRequest;
-import com.synopsys.integration.blackduck.api.generated.component.AssignedUserRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.AssignedUserGroupView;
-import com.synopsys.integration.blackduck.api.generated.view.AssignedUserView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedUserGroupView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;

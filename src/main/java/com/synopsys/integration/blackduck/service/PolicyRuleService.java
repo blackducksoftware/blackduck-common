@@ -27,9 +27,9 @@ import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -77,7 +77,7 @@ public class PolicyRuleService {
 
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView.get());
-        PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView();
+        PolicyRuleExpressionView expressionSet = builder.createPolicyRuleExpressionView();
 
         PolicyRuleView policyRuleView = new PolicyRuleView();
         policyRuleView.setName(policyName);

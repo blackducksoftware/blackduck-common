@@ -24,7 +24,7 @@ package com.synopsys.integration.blackduck.service;
 
 import java.util.List;
 
-import com.synopsys.integration.blackduck.api.generated.view.ProjectMappingView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;

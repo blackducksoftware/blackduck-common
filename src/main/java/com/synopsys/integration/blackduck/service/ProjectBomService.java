@@ -30,13 +30,13 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
-import com.synopsys.integration.blackduck.api.generated.view.VulnerableComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.VulnerableComponentView;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel;
@@ -53,9 +53,9 @@ public class ProjectBomService extends DataService {
         this.componentService = componentService;
     }
 
-    public List<VersionBomComponentView> getComponentsForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<VersionBomComponentView> versionBomComponentViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
-        return versionBomComponentViews;
+    public List<ProjectVersionComponentView> getComponentsForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
+        List<ProjectVersionComponentView> ProjectVersionComponentViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        return ProjectVersionComponentViews;
     }
 
     public List<VulnerableComponentView> getVulnerableComponentsForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
@@ -64,11 +64,11 @@ public class ProjectBomService extends DataService {
     }
 
     public List<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<VersionBomComponentView> versionBomComponentViews = getComponentsForProjectVersion(projectVersionView);
+        List<ProjectVersionComponentView> ProjectVersionComponentViews = getComponentsForProjectVersion(projectVersionView);
         List<ComponentVersionView> componentVersionViews = new ArrayList<>();
-        for (VersionBomComponentView versionBomComponentView : versionBomComponentViews) {
-            if (StringUtils.isNotBlank(versionBomComponentView.getComponentVersion())) {
-                ComponentVersionView componentVersionView = blackDuckService.getResponse(versionBomComponentView.getComponentVersion(), ComponentVersionView.class);
+        for (ProjectVersionComponentView ProjectVersionComponentView : ProjectVersionComponentViews) {
+            if (StringUtils.isNotBlank(ProjectVersionComponentView.getComponentVersion())) {
+                ComponentVersionView componentVersionView = blackDuckService.getResponse(ProjectVersionComponentView.getComponentVersion(), ComponentVersionView.class);
                 componentVersionViews.add(componentVersionView);
             }
         }
@@ -82,15 +82,15 @@ public class ProjectBomService extends DataService {
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(ProjectVersionView version) throws IntegrationException {
-        List<VersionBomComponentView> bomComponents = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomComponents = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         List<VersionBomComponentModel> modelBomComponents = new ArrayList<>(bomComponents.size());
-        for (VersionBomComponentView component : bomComponents) {
+        for (ProjectVersionComponentView component : bomComponents) {
             modelBomComponents.add(new VersionBomComponentModel(component, getMatchedFiles(component)));
         }
         return modelBomComponents;
     }
 
-    public Optional<VersionBomPolicyStatusView> getPolicyStatusForVersion(ProjectVersionView version) throws IntegrationException {
+    public Optional<ProjectVersionPolicyStatusView> getPolicyStatusForVersion(ProjectVersionView version) throws IntegrationException {
         return blackDuckService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
@@ -146,9 +146,9 @@ public class ProjectBomService extends DataService {
         }
     }
 
-    private List<MatchedFileView> getMatchedFiles(VersionBomComponentView component) throws IntegrationException {
+    private List<MatchedFileView> getMatchedFiles(ProjectVersionComponentView component) throws IntegrationException {
         List<MatchedFileView> matchedFiles = new ArrayList<>(0);
-        List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, VersionBomComponentView.MATCHED_FILES_LINK_RESPONSE);
+        List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, ProjectVersionComponentView.MATCHED_FILES_LINK_RESPONSE);
         if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
             matchedFiles = tempMatchedFiles;
         }
