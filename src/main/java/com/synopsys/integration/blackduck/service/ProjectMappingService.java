@@ -60,7 +60,7 @@ public class ProjectMappingService extends DataService {
     }
 
     public List<ProjectMappingView> getProjectMappings(ProjectView projectView) throws IntegrationException {
-        return blackDuckService.getResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE, true);
+        return blackDuckService.getAllResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE);
     }
 
 }

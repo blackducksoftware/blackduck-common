@@ -22,12 +22,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
@@ -46,7 +40,10 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.text.html.Option;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";

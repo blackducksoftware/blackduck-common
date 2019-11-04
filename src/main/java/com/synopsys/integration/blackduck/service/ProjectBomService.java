@@ -94,6 +94,7 @@ public class ProjectBomService extends DataService {
         return blackDuckService.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
     }
 
+    //TODO investigate what variant is
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
         String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
                                                  .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
@@ -112,7 +113,7 @@ public class ProjectBomService extends DataService {
     }
 
     /**
-     * @deprecated Please use either:
+     * @deprecated
      */
     @Deprecated
     public void addComponentToProjectVersion(String mediaType, String projectVersionComponentsUri, String componentVersionUrl) throws IntegrationException {

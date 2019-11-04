@@ -22,13 +22,6 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
-import java.net.URL;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-
-import com.synopsys.integration.rest.response.ErrorResponse;
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.rest.ApiTokenBlackDuckHttpClient;
@@ -38,13 +31,20 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.Buildable;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.client.ConnectionResult;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
 import com.synopsys.integration.util.Stringable;
+import org.apache.commons.lang3.StringUtils;
+
+import java.net.URL;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
     public static BlackDuckServerConfigBuilder newBuilder() {
@@ -98,9 +98,9 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
-            AuthenticationSupport authenticationSupport, ExecutorService executorService,
-            Credentials credentials,
-            String apiToken) {
+                                  AuthenticationSupport authenticationSupport, ExecutorService executorService,
+                                  Credentials credentials,
+                                  String apiToken) {
         this.credentials = credentials;
         this.apiToken = apiToken;
         blackDuckUrl = url;
@@ -155,6 +155,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
     public ConnectionResult attemptConnection(IntLogger logger) {
         String errorMessage = null;
+        Exception exception = null;
         int httpStatusCode = 0;
 
         try {
@@ -174,11 +175,12 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
             }
         } catch (Exception e) {
             errorMessage = e.getMessage();
+            exception = e;
         }
 
         if (null != errorMessage) {
             logger.error(errorMessage);
-            return ConnectionResult.FAILURE(httpStatusCode, errorMessage);
+            return ConnectionResult.FAILURE(httpStatusCode, errorMessage, exception);
         }
 
         logger.info("A successful connection was made.");
