@@ -28,4 +28,4 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.18.3'
 
     testRuntime 'org.slf4j:slf4j-simple:1.7.25'
-} git
+}
