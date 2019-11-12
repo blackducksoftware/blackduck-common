@@ -12,7 +12,7 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '44.4.3-SNAPSHOT'
+version = '44.4.4-SNAPSHOT'
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
 apply plugin: 'com.blackducksoftware.integration.library'
@@ -28,4 +28,4 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.18.3'
 
     testRuntime 'org.slf4j:slf4j-simple:1.7.25'
-}
+} git
