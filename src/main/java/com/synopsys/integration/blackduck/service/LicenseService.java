@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomLicenseView;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionLicenseLicensesView; // was ComplexLicenseView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView; // was ComplexLicenseView
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;

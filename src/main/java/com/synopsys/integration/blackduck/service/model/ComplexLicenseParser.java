@@ -23,7 +23,7 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentLicensesLicenseTypeType;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionLicenseLicensesView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 
 public class ComplexLicenseParser {
     private final ProjectVersionLicenseLicensesView complexLicense;
