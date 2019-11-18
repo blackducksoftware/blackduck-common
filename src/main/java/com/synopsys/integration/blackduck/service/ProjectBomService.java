@@ -30,7 +30,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
