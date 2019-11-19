@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentLicensesLicenseTypeType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseLicensesTypeType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -34,7 +34,7 @@ public class LicenseDataServiceTestIT {
         ProjectVersionLicenseLicensesView complexLicense = optionalComplexLicense.get();
 
         assertEquals("Apache License 2.0", complexLicense.getLicenseDisplay());
-        assertEquals(ProjectVersionComponentLicensesLicenseTypeType.DISJUNCTIVE, complexLicense.getType());
+        assertEquals(ProjectVersionLicenseLicensesTypeType.DISJUNCTIVE, complexLicense.getType());
         assertEquals(1, complexLicense.getLicenses().size());
 
         ProjectVersionLicenseLicensesView embeddedLicense = complexLicense.getLicenses().get(0);

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentActivityDataView;
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileActivityDataView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
@@ -47,7 +47,7 @@ public class VersionBomComponentModel {
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
 
-    public ProjectVersionComponentActivityDataView getActivityData() {
+    public ComponentVersionRiskProfileActivityDataView getActivityData() {
         return component.getActivityData();
     }
 

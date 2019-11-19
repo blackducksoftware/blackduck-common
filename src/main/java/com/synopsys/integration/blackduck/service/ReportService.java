@@ -41,7 +41,7 @@ import com.synopsys.integration.blackduck.api.generated.component.ComponentVersi
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ReportReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportFormatType;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
@@ -90,7 +90,7 @@ public class ReportService extends DataService {
 
     public String getNoticesReportData(ProjectView project, ProjectVersionView version) throws InterruptedException, IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
-        return generateBlackDuckNoticesReport(version, ReportReportFormatType.TEXT);
+        return generateBlackDuckNoticesReport(version, LicenseReportsReportReportFormatType.TEXT);
     }
 
     public File createNoticesReportFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -289,7 +289,7 @@ public class ReportService extends DataService {
     /**
      * Assumes the BOM has already been updated
      */
-    public String generateBlackDuckNoticesReport(ProjectVersionView version, ReportReportFormatType reportFormat) throws InterruptedException, IntegrationException {
+    public String generateBlackDuckNoticesReport(ProjectVersionView version, LicenseReportsReportReportFormatType reportFormat) throws InterruptedException, IntegrationException {
         if (version.hasLink(ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
@@ -324,7 +324,7 @@ public class ReportService extends DataService {
         return null;
     }
 
-    public String startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportReportFormatType reportFormat) throws IntegrationException {
+    public String startGeneratingBlackDuckNoticesReport(ProjectVersionView version, LicenseReportsReportReportFormatType reportFormat) throws IntegrationException {
         String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
 
         JsonObject jsonObject = new JsonObject();

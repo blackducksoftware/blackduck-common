@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserGroupRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
