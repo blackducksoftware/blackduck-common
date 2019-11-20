@@ -30,21 +30,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.view.*;
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyStatusView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportFormatType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ReportView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
@@ -245,9 +247,9 @@ public class ReportService extends DataService {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
             PolicyStatusType status = bomEntry.getApprovalStatus();
             if (status == PolicyStatusType.IN_VIOLATION) {
-                List<VersionBomPolicyRuleView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
+                List<ComponentPolicyRulesView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
-                for (VersionBomPolicyRuleView policyRuleView : rules) {
+                for (ComponentPolicyRulesView policyRuleView : rules) {
                     PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
                     rulesViolated.add(ruleViolated);
                 }
