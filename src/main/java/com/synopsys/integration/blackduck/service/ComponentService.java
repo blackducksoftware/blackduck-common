@@ -63,7 +63,7 @@ public class ComponentService extends DataService {
     }
 
     public List<ComponentSearchResultView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
-        String forge = externalId.forge.getName();
+        String forge = externalId.getForge().getName();
         String originId = externalId.createExternalId();
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
