@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
@@ -38,31 +45,25 @@ import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
     public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
     public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-            .filter(notEmptyList -> notEmptyList.size() > 0)
-            .map(notEmptyList -> notEmptyList.get(0));
+                                                                                                                                             .filter(notEmptyList -> notEmptyList.size() > 0)
+                                                                                                                                             .map(notEmptyList -> notEmptyList.get(0));
 
     public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-            .filter(notEmptyList -> notEmptyList.size() == 1)
-            .map(listOfSingleElement -> listOfSingleElement.get(0));
+                                                                                                                                              .filter(notEmptyList -> notEmptyList.size() == 1)
+                                                                                                                                              .map(listOfSingleElement -> listOfSingleElement.get(0));
 
     public ComponentService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
 
     public List<ComponentSearchResultView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
-        String forge = externalId.forge.getName();
+        String forge = externalId.getForge().getName();
         String originId = externalId.createExternalId();
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);

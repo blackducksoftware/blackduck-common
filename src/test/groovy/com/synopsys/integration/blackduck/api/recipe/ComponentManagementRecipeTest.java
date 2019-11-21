@@ -60,9 +60,9 @@ public class ComponentManagementRecipeTest extends BasicRecipe {
     @Test
     public void testAddingAComponent() throws Exception {
         ExternalId externalId = new ExternalId(Forge.MAVEN);
-        externalId.group = "commons-fileupload";
-        externalId.name = "commons-fileupload";
-        externalId.version = "1.2.1";
+        externalId.setGroup("commons-fileupload");
+        externalId.setName("commons-fileupload");
+        externalId.setVersion("1.2.1");
 
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
