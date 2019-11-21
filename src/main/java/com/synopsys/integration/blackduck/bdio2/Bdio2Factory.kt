@@ -1,5 +1,5 @@
 /**
- * integration-bdio
+ * blackduck-common
  *
  * Copyright (c) 2019 Synopsys, Inc.
  *
