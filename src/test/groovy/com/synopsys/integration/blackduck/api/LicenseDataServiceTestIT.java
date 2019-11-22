@@ -12,8 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseLicensesTypeType;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseTypeType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.LicenseService;
@@ -34,15 +35,15 @@ public class LicenseDataServiceTestIT {
         ProjectVersionLicenseView complexLicense = optionalComplexLicense.get();
 
         assertEquals("Apache License 2.0", complexLicense.getLicenseDisplay());
-        assertEquals(ProjectVersionLicenseLicensesTypeType.DISJUNCTIVE, complexLicense.getType());
+        assertEquals(ProjectVersionLicenseTypeType.DISJUNCTIVE, complexLicense.getType());
         assertEquals(1, complexLicense.getLicenses().size());
 
-        ProjectVersionLicenseView embeddedLicense = complexLicense.getLicenses().get(0);
+        ProjectVersionLicenseLicensesView embeddedLicense = complexLicense.getLicenses().get(0);
         assertTrue(StringUtils.isNotBlank(embeddedLicense.getLicense()));
         assertEquals("Apache License 2.0", embeddedLicense.getLicenseDisplay());
         assertEquals("Apache License 2.0", embeddedLicense.getName());
         assertEquals("OPEN_SOURCE", embeddedLicense.getOwnership());
-        //assertNull(embeddedLicense.getType());
+        assertNull(embeddedLicense.getType());
         assertEquals(0, embeddedLicense.getLicenses().size());
 
         System.out.println(complexLicense);

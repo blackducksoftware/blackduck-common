@@ -180,7 +180,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
         if (null != errorMessage) {
             logger.error(errorMessage);
-            return ConnectionResult.FAILURE(httpStatusCode, errorMessage);
+            return ConnectionResult.FAILURE(httpStatusCode, errorMessage, exception);
         }
 
         logger.info("A successful connection was made.");
