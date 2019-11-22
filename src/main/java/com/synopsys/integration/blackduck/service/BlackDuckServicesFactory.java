@@ -25,13 +25,13 @@ package com.synopsys.integration.blackduck.service;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import com.synopsys.integration.util.NoThreadExecutorService;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
@@ -42,21 +42,40 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServicesFactory {
+    public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final ObjectMapper objectMapper;
     private final ExecutorService executorService;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
+    private final MediaTypeDiscovery mediaTypeDiscovery;
 
-    public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
+    public BlackDuckServicesFactory(
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this.intEnvironmentVariables = intEnvironmentVariables;
+        this.gson = gson;
+        this.objectMapper = objectMapper;
+        this.executorService = executorService;
+        this.blackDuckHttpClient = blackDuckHttpClient;
+        this.logger = logger;
+        this.mediaTypeDiscovery = new MediaTypeDiscovery();
+    }
+
+    /**
+     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
+     */
+    @Deprecated
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
+    }
 
     public static Gson createDefaultGson() {
         return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
@@ -68,24 +87,6 @@ public class BlackDuckServicesFactory {
 
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
-    }
-
-    public BlackDuckServicesFactory(
-            IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        this.intEnvironmentVariables = intEnvironmentVariables;
-        this.gson = gson;
-        this.objectMapper = objectMapper;
-        this.executorService = executorService;
-        this.blackDuckHttpClient = blackDuckHttpClient;
-        this.logger = logger;
-    }
-
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -175,7 +176,7 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckService createBlackDuckService() {
-        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
+        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, createMediaTypeDiscovery());
     }
 
     public LicenseService createLicenseService() {
@@ -225,6 +226,10 @@ public class BlackDuckServicesFactory {
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
         return new IntegrationEscapeUtil();
+    }
+
+    public MediaTypeDiscovery createMediaTypeDiscovery() {
+        return new MediaTypeDiscovery();
     }
 
     public void addEnvironmentVariable(String key, String value) {

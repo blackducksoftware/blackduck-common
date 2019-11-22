@@ -1,6 +1,8 @@
 package com.synopsys.integration.blackduck.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,16 +16,19 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.TimingExtension;;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.request.Response;
+
+;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServiceTest {
@@ -39,7 +44,7 @@ public class BlackDuckServiceTest {
         ProjectVersionView projectVersionViewWithMissingLink = blackDuckJsonTransformer.getResponseAs(incompleteJson, ProjectVersionView.class);
 
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
-        BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
+        BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, new MediaTypeDiscovery());
 
         Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertFalse(ProjectVersionPolicyStatusView.isPresent());
@@ -64,7 +69,7 @@ public class BlackDuckServiceTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         Mockito.when(blackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
 
-        BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
+        BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, new MediaTypeDiscovery());
 
         Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertTrue(ProjectVersionPolicyStatusView.isPresent());
