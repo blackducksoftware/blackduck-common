@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView; // was ComplexLicenseView
 import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
@@ -43,7 +44,7 @@ public class LicenseService extends DataService {
         this.componentDataService = componentDataService;
     }
 
-    public Optional<ProjectVersionLicenseLicensesView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
+    public Optional<ProjectVersionLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
         final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();

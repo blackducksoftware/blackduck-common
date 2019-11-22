@@ -22,7 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseLicensesTypeType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseTypeType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 
 public class ComplexLicenseParser {
@@ -44,7 +44,7 @@ public class ComplexLicenseParser {
         if (complexLicense.getLicenses() != null && complexLicense.getLicenses().isEmpty()) {
             return complexLicense.getName();
         } else {
-            final String operator = complexLicense.getType() == ProjectVersionLicenseLicensesTypeType.CONJUNCTIVE ? " AND " : " OR ";
+            final String operator = complexLicense.getType() == ProjectVersionLicenseTypeType.CONJUNCTIVE ? " AND " : " OR ";
             final StringBuilder licenseText = new StringBuilder();
             int i = 1;
             for (final ProjectVersionLicenseLicensesView childLicense : complexLicense.getLicenses()) {
