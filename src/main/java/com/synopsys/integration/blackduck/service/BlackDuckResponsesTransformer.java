@@ -75,7 +75,7 @@ public class BlackDuckResponsesTransformer {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
-        pagedRequest.getRequestBuilder().addAdditionalHeader("Accept", mediaTypeDiscovery.determineMediaType(clazz));
+        applyMediaType(pagedRequest.getRequestBuilder(), clazz);
         Request request = pagedRequest.createRequest();
         try (Response initialResponse = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
@@ -107,4 +107,10 @@ public class BlackDuckResponsesTransformer {
         }
     }
 
+    private <T extends BlackDuckResponse> void applyMediaType(Request.Builder requestBuilder, Class<T> clazz) {
+        String mediaType = mediaTypeDiscovery.determineMediaType(clazz);
+        if (null != mediaType) {
+            requestBuilder.addAdditionalHeader("Accept", mediaType);
+        }
+    }
 }

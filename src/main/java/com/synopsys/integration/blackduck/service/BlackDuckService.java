@@ -76,7 +76,7 @@ public class BlackDuckService {
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
         this.blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
-        this.blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        this.blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer, mediaTypeDiscovery);
         this.blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, mediaTypeDiscovery);
     }
 
@@ -202,13 +202,13 @@ public class BlackDuckService {
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, Request.Builder requestBuilder) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
-        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
+        return blackDuckResponseTransformer.getResponse(requestBuilder, blackDuckPathSingleResponse.getResponseClass());
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
-        Request request = RequestFactory.createCommonGetRequest(uri);
-        return blackDuckResponseTransformer.getResponse(request, blackDuckPathSingleResponse.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        return blackDuckResponseTransformer.getResponse(requestBuilder, blackDuckPathSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------
@@ -261,8 +261,8 @@ public class BlackDuckService {
         if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
             return Optional.empty();
         }
-        Request request = RequestFactory.createCommonGetRequest(uri.get());
-        return Optional.of(blackDuckResponseTransformer.getResponse(request, linkSingleResponse.getResponseClass()));
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get());
+        return Optional.of(blackDuckResponseTransformer.getResponse(requestBuilder, linkSingleResponse.getResponseClass()));
     }
 
     // ------------------------------------------------
@@ -307,16 +307,16 @@ public class BlackDuckService {
     }
 
     public <T extends BlackDuckResponse> T getResponse(String uri, Class<T> responseClass) throws IntegrationException {
-        Request request = RequestFactory.createCommonGetRequest(uri);
-        return blackDuckResponseTransformer.getResponse(request, responseClass);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        return blackDuckResponseTransformer.getResponse(requestBuilder, responseClass);
     }
 
     // ------------------------------------------------
     // getting responses from a UriSingleResponse
     // ------------------------------------------------
     public <T extends BlackDuckResponse> T getResponse(UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
-        Request request = RequestFactory.createCommonGetRequest(uriSingleResponse.getUri());
-        return blackDuckResponseTransformer.getResponse(request, uriSingleResponse.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uriSingleResponse.getUri());
+        return blackDuckResponseTransformer.getResponse(requestBuilder, uriSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------
