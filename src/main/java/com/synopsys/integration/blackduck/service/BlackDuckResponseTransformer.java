@@ -23,6 +23,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
@@ -63,9 +64,9 @@ public class BlackDuckResponseTransformer {
     }
 
     private <T extends BlackDuckResponse> void applyMediaType(Request.Builder requestBuilder, Class<T> clazz) {
-        String mediaType = mediaTypeDiscovery.determineMediaType(clazz);
-        if (null != mediaType) {
-            requestBuilder.addAdditionalHeader("Accept", mediaType);
+        Optional<String> mediaType = mediaTypeDiscovery.determineMediaType(clazz);
+        if (mediaType.isPresent()) {
+            requestBuilder.addAdditionalHeader("Accept", mediaType.get());
         }
     }
 
