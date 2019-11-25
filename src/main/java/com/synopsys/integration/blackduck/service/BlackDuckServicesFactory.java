@@ -176,7 +176,7 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckService createBlackDuckService() {
-        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, createMediaTypeDiscovery());
+        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, createMediaTypeLookup());
     }
 
     public LicenseService createLicenseService() {
@@ -228,8 +228,8 @@ public class BlackDuckServicesFactory {
         return new IntegrationEscapeUtil();
     }
 
-    public MediaTypeDiscovery createMediaTypeDiscovery() {
-        return new MediaTypeDiscovery();
+    public BlackDuckMediaTypeLookup createMediaTypeLookup() {
+        return new BlackDuckMediaTypeLookup(new MediaTypeDiscovery());
     }
 
     public void addEnvironmentVariable(String key, String value) {

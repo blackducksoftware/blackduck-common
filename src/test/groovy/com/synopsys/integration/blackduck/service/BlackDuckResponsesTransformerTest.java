@@ -14,7 +14,6 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
@@ -42,7 +41,7 @@ public class BlackDuckResponsesTransformerTest {
         requestBuilder.addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100");
         requestBuilder.addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, new MediaTypeDiscovery());
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
         assertEquals(69, allPagesResponse.getTotalCount());
@@ -67,7 +66,7 @@ public class BlackDuckResponsesTransformerTest {
         requestBuilder.addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20");
         requestBuilder.addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, new MediaTypeDiscovery());
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
         assertEquals(69, allPagesResponse.getTotalCount());
@@ -89,7 +88,7 @@ public class BlackDuckResponsesTransformerTest {
         requestBuilder.addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100");
         requestBuilder.addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, new MediaTypeDiscovery());
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getResponses(pagedRequest, ProjectView.class, false);
         assertEquals(69, allPagesResponse.getTotalCount());
@@ -114,7 +113,7 @@ public class BlackDuckResponsesTransformerTest {
         requestBuilder.addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20");
         requestBuilder.addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, new MediaTypeDiscovery());
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getResponses(pagedRequest, ProjectView.class, false);
         assertEquals(69, allPagesResponse.getTotalCount());

@@ -42,7 +42,6 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
@@ -66,25 +65,28 @@ public class BlackDuckService {
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final String blackDuckBaseUrl;
     private final Gson gson;
+    private final BlackDuckMediaTypeLookup mediaTypeLookup;
 
     @Deprecated
     /**
      * @deprecated Please use BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer, BlackDuckResponsesTransformer blackDuckResponsesTransformer)
      */
-    public BlackDuckService(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson, ObjectMapper objectMapper, MediaTypeDiscovery mediaTypeDiscovery) {
+    public BlackDuckService(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson, ObjectMapper objectMapper, BlackDuckMediaTypeLookup mediaTypeLookup) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
+        this.mediaTypeLookup = mediaTypeLookup;
         this.blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
-        this.blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer, mediaTypeDiscovery);
-        this.blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer, mediaTypeDiscovery);
+        this.blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        this.blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
     }
 
     public BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckMediaTypeLookup mediaTypeLookup) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
+        this.mediaTypeLookup = mediaTypeLookup;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
@@ -175,7 +177,8 @@ public class BlackDuckService {
      */
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, boolean getAll) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        String mediaType = mediaTypeLookup.findMediaType(blackDuckPathMultipleResponses.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
     }
 
@@ -202,13 +205,14 @@ public class BlackDuckService {
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, Request.Builder requestBuilder) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
-        return blackDuckResponseTransformer.getResponse(requestBuilder, blackDuckPathSingleResponse.getResponseClass());
+        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return blackDuckResponseTransformer.getResponse(requestBuilder, blackDuckPathSingleResponse.getResponseClass());
+        String mediaType = mediaTypeLookup.findMediaType(blackDuckPathSingleResponse.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
+        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------
@@ -239,7 +243,8 @@ public class BlackDuckService {
         if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
             return Collections.emptyList();
         }
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get());
+        String mediaType = mediaTypeLookup.findMediaType(linkMultipleResponses.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get(), mediaType);
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), linkMultipleResponses.getResponseClass(), getAll).getItems();
     }
 
@@ -261,20 +266,23 @@ public class BlackDuckService {
         if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
             return Optional.empty();
         }
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get());
-        return Optional.of(blackDuckResponseTransformer.getResponse(requestBuilder, linkSingleResponse.getResponseClass()));
+        String mediaType = mediaTypeLookup.findMediaType(linkSingleResponse.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri.get(), mediaType);
+        return Optional.of(blackDuckResponseTransformer.getResponse(requestBuilder.build(), linkSingleResponse.getResponseClass()));
     }
 
     // ------------------------------------------------
     // getting responses from a uri
     // ------------------------------------------------
     public <T extends BlackDuckResponse> List<T> getAllResponses(String uri, Class<T> responseClass) throws IntegrationException {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        String mediaType = mediaTypeLookup.findMediaType(responseClass);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
         return blackDuckResponsesTransformer.getAllResponses(new PagedRequest(requestBuilder), responseClass).getItems();
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(String uri, Class<T> responseClass, int totalLimit) throws IntegrationException {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        String mediaType = mediaTypeLookup.findMediaType(responseClass);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
         return blackDuckResponsesTransformer.getSomeResponses(new PagedRequest(requestBuilder), responseClass, totalLimit).getItems();
     }
 
@@ -294,7 +302,8 @@ public class BlackDuckService {
      * @deprecated Please use the appropriate getAll or getSome method
      */
     public <T extends BlackDuckResponse> List<T> getResponses(String uri, Class<T> responseClass, boolean getAll) throws IntegrationException {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        String mediaType = mediaTypeLookup.findMediaType(responseClass);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
         return getResponses(requestBuilder, responseClass, getAll);
     }
 
@@ -307,16 +316,18 @@ public class BlackDuckService {
     }
 
     public <T extends BlackDuckResponse> T getResponse(String uri, Class<T> responseClass) throws IntegrationException {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
-        return blackDuckResponseTransformer.getResponse(requestBuilder, responseClass);
+        String mediaType = mediaTypeLookup.findMediaType(responseClass);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri, mediaType);
+        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), responseClass);
     }
 
     // ------------------------------------------------
     // getting responses from a UriSingleResponse
     // ------------------------------------------------
     public <T extends BlackDuckResponse> T getResponse(UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uriSingleResponse.getUri());
-        return blackDuckResponseTransformer.getResponse(requestBuilder, uriSingleResponse.getResponseClass());
+        String mediaType = mediaTypeLookup.findMediaType(uriSingleResponse.getResponseClass());
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uriSingleResponse.getUri(), mediaType);
+        return blackDuckResponseTransformer.getResponse(requestBuilder.build(), uriSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------
@@ -447,5 +458,4 @@ public class BlackDuckService {
         }
         return url.toString();
     }
-
 }

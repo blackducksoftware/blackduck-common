@@ -23,11 +23,9 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -37,17 +35,14 @@ import com.synopsys.integration.rest.request.Response;
 public class BlackDuckResponseTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
-    private final MediaTypeDiscovery mediaTypeDiscovery;
 
-    public BlackDuckResponseTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, MediaTypeDiscovery mediaTypeDiscovery) {
+    public BlackDuckResponseTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
-        this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 
-    public <T extends BlackDuckResponse> T getResponse(Request.Builder requestBuilder, Class<T> clazz) throws IntegrationException {
-        applyMediaType(requestBuilder, clazz);
-        try (Response response = blackDuckHttpClient.execute(requestBuilder.build())) {
+    public <T extends BlackDuckResponse> T getResponse(Request request, Class<T> clazz) throws IntegrationException {
+        try (Response response = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(response);
             return blackDuckJsonTransformer.getResponse(response, clazz);
         } catch (IOException e) {
@@ -62,12 +57,4 @@ public class BlackDuckResponseTransformer {
     public <T extends BlackDuckResponse> T getResponseAs(JsonElement jsonElement, Class<T> clazz) throws BlackDuckIntegrationException {
         return blackDuckJsonTransformer.getResponseAs(jsonElement, clazz);
     }
-
-    private <T extends BlackDuckResponse> void applyMediaType(Request.Builder requestBuilder, Class<T> clazz) {
-        Optional<String> mediaType = mediaTypeDiscovery.determineMediaType(clazz);
-        if (mediaType.isPresent()) {
-            requestBuilder.addAdditionalHeader("Accept", mediaType.get());
-        }
-    }
-
 }

@@ -25,11 +25,9 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
@@ -40,12 +38,10 @@ import com.synopsys.integration.rest.request.Response;
 public class BlackDuckResponsesTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
-    private final MediaTypeDiscovery mediaTypeDiscovery;
 
-    public BlackDuckResponsesTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, MediaTypeDiscovery mediaTypeDiscovery) {
+    public BlackDuckResponsesTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
-        this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
@@ -76,7 +72,6 @@ public class BlackDuckResponsesTransformer {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
         int currentOffset = pagedRequest.getOffset();
-        applyMediaType(pagedRequest.getRequestBuilder(), clazz);
         Request request = pagedRequest.createRequest();
         try (Response initialResponse = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
@@ -105,13 +100,6 @@ public class BlackDuckResponsesTransformer {
             return new BlackDuckPageResponse<>(totalCount, allResponses);
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
-        }
-    }
-
-    private <T extends BlackDuckResponse> void applyMediaType(Request.Builder requestBuilder, Class<T> clazz) {
-        Optional<String> mediaType = mediaTypeDiscovery.determineMediaType(clazz);
-        if (mediaType.isPresent()) {
-            requestBuilder.addAdditionalHeader("Accept", mediaType.get());
         }
     }
 }

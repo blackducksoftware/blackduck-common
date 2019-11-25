@@ -18,7 +18,7 @@ public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() {
         BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), blackDuckRequestFilter, 1, 0);
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", RequestFactory.DEFAULT_MEDIA_TYPE, Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

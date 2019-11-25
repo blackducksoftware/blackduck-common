@@ -43,43 +43,67 @@ public class RequestFactory {
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;
+    public static final String DEFAULT_MEDIA_TYPE = "application/json";
 
     public static Request.Builder createCommonGetRequestBuilder() {
-        return RequestFactory.createCommonGetRequestBuilder(null, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+        return RequestFactory.createCommonGetRequestBuilder(null, RequestFactory.DEFAULT_MEDIA_TYPE, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(String uri) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+        return RequestFactory.createCommonGetRequestBuilder(uri, RequestFactory.DEFAULT_MEDIA_TYPE);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(String uri, String mediaType) {
+        return RequestFactory.createCommonGetRequestBuilder(uri, mediaType, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(Optional<BlackDuckQuery> blackDuckQuery) {
-        return RequestFactory.createCommonGetRequestBuilder(null, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+        return RequestFactory.createCommonGetRequestBuilder(blackDuckQuery, RequestFactory.DEFAULT_MEDIA_TYPE);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(Optional<BlackDuckQuery> blackDuckQuery, String mediaType) {
+        return RequestFactory.createCommonGetRequestBuilder(null, mediaType, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(null, Optional.empty(), limit, offset);
+        return RequestFactory.createCommonGetRequestBuilder(RequestFactory.DEFAULT_MEDIA_TYPE, limit, offset);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+        return RequestFactory.createCommonGetRequestBuilder(uri, RequestFactory.DEFAULT_MEDIA_TYPE, blackDuckQuery);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(String uri, String mediaType, Optional<BlackDuckQuery> blackDuckQuery) {
+        return RequestFactory.createCommonGetRequestBuilder(uri, mediaType, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(String uri, int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, Optional.empty(), limit, offset);
+        return RequestFactory.createCommonGetRequestBuilder(uri, RequestFactory.DEFAULT_MEDIA_TYPE, limit, offset);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(String uri, String mediaType, int limit, int offset) {
+        return RequestFactory.createCommonGetRequestBuilder(uri, mediaType, Optional.empty(), limit, offset);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(null, blackDuckQuery, limit, offset);
+        return createCommonGetRequestBuilder(RequestFactory.DEFAULT_MEDIA_TYPE, blackDuckQuery, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, blackDuckQuery, null, limit, offset);
+    public static Request.Builder createCommonGetRequestBuilder(String mediaType, Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
+        return RequestFactory.createCommonGetRequestBuilder(null, mediaType, blackDuckQuery, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
+    public static Request.Builder createCommonGetRequestBuilder(String uri, String mediaType, Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
+        return RequestFactory.createCommonGetRequestBuilder(uri, mediaType, blackDuckQuery, null, limit, offset);
+    }
+
+    public static Request.Builder createCommonGetRequestBuilder(String uri, String mediaType, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
         Request.Builder requestBuilder = new Request.Builder();
         if (StringUtils.isNotBlank(uri)) {
             requestBuilder.uri(uri);
+        }
+        if (StringUtils.isNotBlank(mediaType)) {
+            requestBuilder.mimeType(mediaType);
         }
         RequestFactory.addBlackDuckQuery(requestBuilder, blackDuckQuery);
         RequestFactory.addBlackDuckFilter(requestBuilder, blackDuckRequestFilter);
@@ -89,7 +113,7 @@ public class RequestFactory {
     }
 
     public static Request createCommonGetRequest(String uri) {
-        return RequestFactory.createCommonGetRequestBuilder(uri).build();
+        return RequestFactory.createCommonGetRequestBuilder(uri, RequestFactory.DEFAULT_MEDIA_TYPE).build();
     }
 
     public static Request.Builder addLimit(Request.Builder requestBuilder, int limit) {
