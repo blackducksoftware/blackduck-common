@@ -58,7 +58,7 @@ public class BlackDuckService {
     public static final BlackDuckPath BOMIMPORT_PATH = new BlackDuckPath("/api/bom-import");
     public static final BlackDuckPath SCANSUMMARIES_PATH = new BlackDuckPath("/api/scan-summaries");
     public static final BlackDuckPath UPLOADS_PATH = new BlackDuckPath("/api/uploads");
-    public static final BlackDuckPath SCAN_DATA_PATH = new BlackDuckPath("/api/scan/data");
+    public static final BlackDuckPath SCAN_DATA_PATH = new BlackDuckPath("/api/scan/data/"); // TODO: Determine why this endpoint requires a slash at the end.
 
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
