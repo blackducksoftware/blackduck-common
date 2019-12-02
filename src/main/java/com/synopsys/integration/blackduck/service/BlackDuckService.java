@@ -25,12 +25,10 @@ package com.synopsys.integration.blackduck.service;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import com.synopsys.integration.function.ThrowingBiFunction;
-import com.synopsys.integration.function.ThrowingFunction;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +47,8 @@ import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.function.ThrowingBiFunction;
+import com.synopsys.integration.function.ThrowingFunction;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.request.Request;
@@ -58,6 +58,7 @@ public class BlackDuckService {
     public static final BlackDuckPath BOMIMPORT_PATH = new BlackDuckPath("/api/bom-import");
     public static final BlackDuckPath SCANSUMMARIES_PATH = new BlackDuckPath("/api/scan-summaries");
     public static final BlackDuckPath UPLOADS_PATH = new BlackDuckPath("/api/uploads");
+    public static final BlackDuckPath SCAN_DATA_PATH = new BlackDuckPath("/api/scan/data/"); // TODO: Determine why this endpoint requires a slash at the end.
 
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
@@ -79,7 +80,8 @@ public class BlackDuckService {
         this.blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
     }
 
-    public BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer, BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
+    public BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
@@ -182,7 +184,7 @@ public class BlackDuckService {
      * @deprecated Please use the appropriate getAll or getSome method
      */
     public <T extends BlackDuckResponse> List<T> getResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder, boolean getAll)
-            throws IntegrationException {
+        throws IntegrationException {
         return getPageResponses(blackDuckPathMultipleResponses, requestBuilder, getAll).getItems();
     }
 
@@ -191,7 +193,7 @@ public class BlackDuckService {
      * @deprecated The BlackDuckResponsesTransformer should be used directly if BlackDuckPageResponse is needed.
      */
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder, boolean getAll)
-            throws IntegrationException {
+        throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
@@ -412,16 +414,20 @@ public class BlackDuckService {
         }
     }
 
-    private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder, ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
-        return getSpecialResponses((obj) -> Optional.ofNullable(pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath())), blackDuckPathMultipleResponses.getResponseClass(), requestBuilder, responsesTransformer);
+    private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder,
+        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+        return getSpecialResponses((obj) -> Optional.ofNullable(pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath())), blackDuckPathMultipleResponses.getResponseClass(), requestBuilder,
+            responsesTransformer);
     }
 
-    private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, Request.Builder requestBuilder, ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+    private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, Request.Builder requestBuilder,
+        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
         return getSpecialResponses((obj) -> blackDuckView.getFirstLink(linkMultipleResponses.getLink()), linkMultipleResponses.getResponseClass(), requestBuilder, responsesTransformer);
     }
 
     //TODO replace with ThrowingSupplier once it exists
-    private <T extends BlackDuckResponse> List<T> getSpecialResponses(ThrowingFunction<Void, Optional<String>, BlackDuckIntegrationException> uriSupplier, Class<T> responseClass, Request.Builder requestBuilder, ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+    private <T extends BlackDuckResponse> List<T> getSpecialResponses(ThrowingFunction<Void, Optional<String>, BlackDuckIntegrationException> uriSupplier, Class<T> responseClass, Request.Builder requestBuilder,
+        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
         Optional<String> uri = uriSupplier.apply(null);
         if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
             return Collections.emptyList();
