@@ -30,7 +30,7 @@ import com.blackducksoftware.common.value.ProductList
 import com.synopsys.integration.bdio.graph.DependencyGraph
 import com.synopsys.integration.bdio.model.dependency.Dependency
 import com.synopsys.integration.bdio.model.externalid.ExternalId
-import org.apache.commons.codec.digest.DigestUtils
+import com.synopsys.integration.blackduck.bdio2.LegacyUtilitiesClone
 import java.time.ZonedDateTime
 
 class Bdio2Factory {
@@ -42,7 +42,7 @@ class Bdio2Factory {
 
     fun createBdioMetadata(codeLocationName: String, creationDateTime: ZonedDateTime = ZonedDateTime.now(), productListBuilder: ProductList.Builder = ProductList.Builder()): BdioMetadata {
         return BdioMetadata()
-                .id(DigestUtils.md5Hex(codeLocationName))
+                .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
                 .name(codeLocationName)
                 .creationDateTime(creationDateTime)
                 .publisher(productListBuilder

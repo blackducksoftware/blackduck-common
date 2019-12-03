@@ -25,7 +25,7 @@ dependencies {
     api 'com.blackducksoftware.integration:integration-reporting:0.3.7'
     api 'com.blackducksoftware.integration:integration-bdio:18.3.0'
     api 'com.blackducksoftware.integration:phone-home-client:0.21.9'
-    api 'com.blackducksoftware.bdio:bdio-rxjava:3.0.0-beta.47'
+    api 'com.blackducksoftware.bdio:bdio2:3.0.0-beta.47'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
