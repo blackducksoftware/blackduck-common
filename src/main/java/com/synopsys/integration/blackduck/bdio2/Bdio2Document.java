@@ -20,10 +20,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.bdio.bdio2
+package com.synopsys.integration.blackduck.bdio2;
 
-import com.blackducksoftware.bdio2.BdioMetadata
-import com.blackducksoftware.bdio2.model.Component
-import com.blackducksoftware.bdio2.model.Project
+import java.util.List;
 
-data class Bdio2Document(val bdioMetadata: BdioMetadata, val bdioProject: Project, val components: List<Component>)
+import com.blackducksoftware.bdio2.BdioMetadata;
+import com.blackducksoftware.bdio2.model.Component;
+import com.blackducksoftware.bdio2.model.Project;
+
+public class Bdio2Document {
+    private final BdioMetadata bdioMetadata;
+    private final Project project;
+    private final List<Component> components;
+
+    public Bdio2Document(final BdioMetadata bdioMetadata, final Project project, final List<Component> components) {
+        this.bdioMetadata = bdioMetadata;
+        this.project = project;
+        this.components = components;
+    }
+
+    public BdioMetadata getBdioMetadata() {
+        return bdioMetadata;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public List<Component> getComponents() {
+        return components;
+    }
+}
