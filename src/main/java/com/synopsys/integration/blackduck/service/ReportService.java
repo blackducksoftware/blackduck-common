@@ -22,6 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,10 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.view.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -42,12 +43,19 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummar
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ReportView;
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
 import com.synopsys.integration.blackduck.service.model.PolicyRule;
 import com.synopsys.integration.blackduck.service.model.ReportData;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.blackduck.service.model.pdf.FontLoader;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportPdfWriter;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportWriter;
 import com.synopsys.integration.exception.IntegrationException;
@@ -174,14 +182,22 @@ public class ReportService extends DataService {
     }
 
     public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws IntegrationException {
+        return createReportPdfFile(outputDirectory, project, version, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version, FontLoader fontLoader, FontLoader boldFontLoader) throws IntegrationException {
         ReportData reportData = getRiskReportData(project, version);
-        return createReportPdfFile(outputDirectory, reportData);
+        return createReportPdfFile(outputDirectory, reportData, fontLoader, boldFontLoader);
     }
 
     public File createReportPdfFile(File outputDirectory, ReportData reportData) throws BlackDuckIntegrationException {
+        return createReportPdfFile(outputDirectory, reportData, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ReportData reportData, FontLoader fontLoader, FontLoader boldFontLoader) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger);
+            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger, fontLoader, boldFontLoader, Color.BLACK, 10.0f);
             File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
