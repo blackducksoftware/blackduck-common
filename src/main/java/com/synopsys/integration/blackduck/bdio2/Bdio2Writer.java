@@ -38,9 +38,9 @@ public class Bdio2Writer {
         return new BdioWriter(bdioMetadata, streamSupplier);
     }
 
-    public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) {
+    public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) throws IOException {
         final BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
-
+        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getComponents());
     }
 
     public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final List<Component> components) throws IOException {
