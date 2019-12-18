@@ -29,7 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import com.blackducksoftware.bdio2.BdioMetadata;
+import com.blackducksoftware.bdio2.BdioObject;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.blackducksoftware.common.value.Product;
@@ -66,41 +69,21 @@ public class Bdio2Factory {
     }
 
     public List<Component> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
-        return createAndLinkComponentsFromGraph(dependencyGraph, project, dependencyGraph.getRootDependencies());
+        return createAndLinkComponentsFromGraph(dependencyGraph, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>());
     }
 
-    private List<Component> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final Project project, final Set<Dependency> dependencies) {
-        final Map<ExternalId, Component> existingComponents = new HashMap<>();
+    private List<Component> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final DependencyFunction dependencyFunction, final Set<Dependency> dependencies, final Map<ExternalId, Component> existingComponents) {
         final List<Component> addedComponents = new ArrayList<>();
 
         for (final Dependency dependency : dependencies) {
             final Component component = componentFromDependency(dependency);
-            project.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
+            dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
 
             if (!existingComponents.containsKey(dependency.getExternalId())) {
                 addedComponents.add(component);
 
                 existingComponents.put(dependency.getExternalId(), component);
-                final List<Component> children = createAndLinkComponentsToParent(dependencyGraph, component, dependencyGraph.getChildrenForParent(dependency), existingComponents);
-                addedComponents.addAll(children);
-            }
-        }
-
-        return addedComponents;
-    }
-
-    private List<Component> createAndLinkComponentsToParent(final DependencyGraph dependencyGraph, final Component currentComponent, final Set<Dependency> dependencies, final Map<ExternalId, Component> existingComponents) {
-        final List<Component> addedComponents = new ArrayList<>();
-
-        for (final Dependency dependency : dependencies) {
-            final Component component = componentFromDependency(dependency);
-            currentComponent.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
-
-            if (!existingComponents.containsKey(dependency.getExternalId())) {
-                addedComponents.add(component);
-
-                existingComponents.put(dependency.getExternalId(), component);
-                final List<Component> children = createAndLinkComponentsToParent(dependencyGraph, component, dependencyGraph.getChildrenForParent(dependency), existingComponents);
+                final List<Component> children = createAndLinkComponentsFromGraph(dependencyGraph, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingComponents);
                 addedComponents.addAll(children);
             }
         }
@@ -114,5 +97,10 @@ public class Bdio2Factory {
                    .version(dependency.getVersion())
                    .identifier(dependency.getExternalId().createExternalId())
                    .namespace(dependency.getExternalId().getForge().getName());
+    }
+
+    @FunctionalInterface
+    private interface DependencyFunction {
+        BdioObject dependency(@Nullable com.blackducksoftware.bdio2.model.Dependency dependency);
     }
 }
