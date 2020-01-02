@@ -26,6 +26,9 @@ dependencies {
     api 'com.blackducksoftware.integration:phone-home-client:0.21.12'
     api 'com.blackducksoftware.bdio:bdio2:3.0.0-beta.47'
 
+    //temporary - ejk
+    api 'com.blackducksoftware.integration:integration-common:18.1.0-SNAPSHOT'
+
     testImplementation 'org.hamcrest:hamcrest-core:1.3'
     testImplementation 'org.codehaus.groovy:groovy-all:2.4.12'
     testImplementation 'org.mockito:mockito-core:2.18.3'
