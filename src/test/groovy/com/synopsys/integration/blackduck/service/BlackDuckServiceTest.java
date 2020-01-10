@@ -14,10 +14,10 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
+import com.synopsys.integration.blackduck.TimingExtension;;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
@@ -41,8 +41,8 @@ public class BlackDuckServiceTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
 
-        Optional<VersionBomPolicyStatusView> versionBomPolicyStatusView = blackDuckService.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
-        assertFalse(versionBomPolicyStatusView.isPresent());
+        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        assertFalse(ProjectVersionPolicyStatusView.isPresent());
     }
 
     @Test
@@ -66,9 +66,9 @@ public class BlackDuckServiceTest {
 
         BlackDuckService blackDuckService = new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
 
-        Optional<VersionBomPolicyStatusView> versionBomPolicyStatusView = blackDuckService.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
-        assertTrue(versionBomPolicyStatusView.isPresent());
-        assertEquals(PolicySummaryStatusType.IN_VIOLATION, versionBomPolicyStatusView.get().getOverallStatus());
+        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        assertTrue(ProjectVersionPolicyStatusView.isPresent());
+        assertEquals(PolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
     }
 
 }

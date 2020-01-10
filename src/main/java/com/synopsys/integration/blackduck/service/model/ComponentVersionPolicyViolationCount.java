@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType;
-import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
 import com.synopsys.integration.util.Stringable;
 
 public class ComponentVersionPolicyViolationCount extends Stringable {

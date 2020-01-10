@@ -34,7 +34,8 @@ import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.RemediationOptionsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
@@ -112,13 +113,13 @@ public class ComponentService extends DataService {
     }
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
-    public Optional<RemediationOptionsView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
+    public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
         if (!componentVersionView.getHref().isPresent()) {
             return Optional.empty();
         }
 
         String remediatingUrl = componentVersionView.getHref().get() + "/" + ComponentService.REMEDIATING_LINK;
-        UriSingleResponse<RemediationOptionsView> uriSingleResponse = new UriSingleResponse<>(remediatingUrl, RemediationOptionsView.class);
+        UriSingleResponse<ComponentVersionRemediatingView> uriSingleResponse = new UriSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
         return Optional.ofNullable(blackDuckService.getResponse(uriSingleResponse));
     }
 

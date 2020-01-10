@@ -28,26 +28,26 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType;
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionPolicyViolationDetails;
-import com.synopsys.integration.blackduck.api.generated.component.NameValuePairView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 
 public class PolicyStatusDescription {
-    private final VersionBomPolicyStatusView policyStatusItem;
+    private final ProjectVersionPolicyStatusView policyStatusItem;
 
-    private final Map<PolicySummaryStatusType, ComponentVersionStatusCount> policyStatusCount = new HashMap<>();
+    private final Map<PolicyStatusType, ComponentVersionStatusCount> policyStatusCount = new HashMap<>();
     private final Map<PolicySeverityType, ComponentVersionPolicyViolationCount> policySeverityCount = new HashMap<>();
 
-    public PolicyStatusDescription(final VersionBomPolicyStatusView policyStatusItem) {
+    public PolicyStatusDescription(final ProjectVersionPolicyStatusView policyStatusItem) {
         this.policyStatusItem = policyStatusItem;
         populatePolicySeverityMap();
         populatePolicyStatusMap();
     }
 
     private void populatePolicySeverityMap() {
-        final ComponentVersionPolicyViolationDetails policyViolationDetails = policyStatusItem.getComponentVersionPolicyViolationDetails();
-        if (policyViolationDetails != null && PolicySummaryStatusType.IN_VIOLATION.equals(policyStatusItem.getOverallStatus())) {
+        final ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView policyViolationDetails = policyStatusItem.getComponentVersionPolicyViolationDetails();
+        if (policyViolationDetails != null && PolicyStatusType.IN_VIOLATION.equals(policyStatusItem.getOverallStatus())) {
             final List<NameValuePairView> nameValuePairs = policyViolationDetails.getSeverityLevels();
             if (nameValuePairs != null) {
                 for (final NameValuePairView nameValuePairView : nameValuePairs) {
@@ -77,14 +77,14 @@ public class PolicyStatusDescription {
             return "Black Duck found no components.";
         }
 
-        final int inViolationCount = getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION);
-        final int inViolationOverriddenCount = getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION_OVERRIDDEN);
-        final int notInViolationCount = getCountOfStatus(PolicySummaryStatusType.NOT_IN_VIOLATION);
+        final int inViolationCount = getCountOfStatus(PolicyStatusType.IN_VIOLATION);
+        final int inViolationOverriddenCount = getCountOfStatus(PolicyStatusType.IN_VIOLATION_OVERRIDDEN);
+        final int notInViolationCount = getCountOfStatus(PolicyStatusType.NOT_IN_VIOLATION);
 
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Black Duck found:");
         stringBuilder.append(fixComponentPlural(" %d %s in violation", inViolationCount));
-        if (getCountOfStatus(PolicySummaryStatusType.IN_VIOLATION) > 0) {
+        if (getCountOfStatus(PolicyStatusType.IN_VIOLATION) > 0) {
             stringBuilder.append(" (");
             getPolicySeverityMessage(stringBuilder);
             stringBuilder.append(")");
@@ -106,18 +106,18 @@ public class PolicyStatusDescription {
     }
 
     public ComponentVersionStatusCount getCountInViolation() {
-        return policyStatusCount.get(PolicySummaryStatusType.IN_VIOLATION);
+        return policyStatusCount.get(PolicyStatusType.IN_VIOLATION);
     }
 
     public ComponentVersionStatusCount getCountNotInViolation() {
-        return policyStatusCount.get(PolicySummaryStatusType.NOT_IN_VIOLATION);
+        return policyStatusCount.get(PolicyStatusType.NOT_IN_VIOLATION);
     }
 
     public ComponentVersionStatusCount getCountInViolationOverridden() {
-        return policyStatusCount.get(PolicySummaryStatusType.IN_VIOLATION_OVERRIDDEN);
+        return policyStatusCount.get(PolicyStatusType.IN_VIOLATION_OVERRIDDEN);
     }
 
-    public int getCountOfStatus(final PolicySummaryStatusType overallStatus) {
+    public int getCountOfStatus(final PolicyStatusType overallStatus) {
         final ComponentVersionStatusCount count = policyStatusCount.get(overallStatus);
         if (count == null) {
             return 0;

@@ -1,8 +1,8 @@
 package com.synopsys.integration.blackduck.api.recipe
 
 import com.synopsys.integration.blackduck.TimingExtension
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
 import com.synopsys.integration.blackduck.service.BlackDuckService
@@ -51,7 +51,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
 
         assertEquals(PROJECT_VERSION_NAME, projectVersionView.versionName)
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectVersionView.phase)
-        assertEquals(ProjectVersionDistributionType.OPENSOURCE, projectVersionView.distribution)
+        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE, projectVersionView.distribution)
     }
 
 }

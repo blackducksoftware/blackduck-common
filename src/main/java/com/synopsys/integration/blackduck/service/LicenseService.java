@@ -26,9 +26,10 @@ import java.io.IOException;
 import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.generated.component.VersionBomLicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ComplexLicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomLicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView; // was ComplexLicenseView
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.exception.IntegrationException;
@@ -43,7 +44,7 @@ public class LicenseService extends DataService {
         this.componentDataService = componentDataService;
     }
 
-    public Optional<ComplexLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
+    public Optional<ProjectVersionLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
         final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
@@ -59,8 +60,8 @@ public class LicenseService extends DataService {
         return getLicenseView(versionBomLicenseView.getLicense());
     }
 
-    public LicenseView getLicenseView(final ComplexLicenseView complexLicenseView) throws IntegrationException {
-        return getLicenseView(complexLicenseView.getLicense());
+    public LicenseView getLicenseView(final ProjectVersionLicenseLicensesView ProjectVersionLicenseLicensesView) throws IntegrationException {
+        return getLicenseView(ProjectVersionLicenseLicensesView.getLicense());
     }
 
     public LicenseView getLicenseView(final String licenseUrl) throws IntegrationException {

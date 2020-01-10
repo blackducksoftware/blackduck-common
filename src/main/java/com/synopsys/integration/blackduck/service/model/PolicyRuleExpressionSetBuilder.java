@@ -30,13 +30,13 @@ import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleComponentUsa
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
 import com.synopsys.integration.blackduck.api.enumeration.ReviewStatusType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionParameter;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.CustomLicenseRequestCodeSharingType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionSetOperatorType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.PolicyRuleExpressionSetOperatorType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
@@ -45,7 +45,7 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.rest.RestConstants;
 
 public class PolicyRuleExpressionSetBuilder {
-    private final List<PolicyRuleExpressionView> expressions = new ArrayList<>();
+    private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
 
     public void addProjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ProjectView projectView) throws BlackDuckIntegrationException {
         addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref().orElse(null));
@@ -128,22 +128,23 @@ public class PolicyRuleExpressionSetBuilder {
     }
 
     public void addMultiCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, List<String> values) throws BlackDuckIntegrationException {
-        PolicyRuleExpressionParameter expressionParameter = new PolicyRuleExpressionParameter();
+        PolicyRuleExpressionExpressionsParametersView expressionParameter = new PolicyRuleExpressionExpressionsParametersView();
         expressionParameter.setValues(values);
-        PolicyRuleExpressionView expression = new PolicyRuleExpressionView();
+        PolicyRuleExpressionExpressionsView expression = new PolicyRuleExpressionExpressionsView();
         expression.setName(policyRuleConditionType.toString());
         expression.setOperation(policyRuleConditionOperator.toString());
         expression.setParameters(expressionParameter);
         expressions.add(expression);
     }
 
-    public PolicyRuleExpressionSetView createPolicyRuleExpressionSetView() {
-        return createPolicyRuleExpressionSetView(PolicyRuleExpressionSetOperatorType.AND);
+    public PolicyRuleExpressionView createPolicyRuleExpressionView() {
+        return createPolicyRuleExpressionView(PolicyRuleExpressionSetOperatorType.AND);
     }
 
-    public PolicyRuleExpressionSetView createPolicyRuleExpressionSetView(PolicyRuleExpressionSetOperatorType expressionOperatorType) {
-        PolicyRuleExpressionSetView expressionSet = new PolicyRuleExpressionSetView();
-        expressionSet.setOperator(expressionOperatorType);
+    public PolicyRuleExpressionView createPolicyRuleExpressionView(PolicyRuleExpressionSetOperatorType expressionOperatorType) {
+        PolicyRuleExpressionView expressionSet = new PolicyRuleExpressionView();
+        // TODO - setOperator was originally passed an enum
+        expressionSet.setOperator(expressionOperatorType.toString());
         expressionSet.setExpressions(expressions);
         return expressionSet;
     }

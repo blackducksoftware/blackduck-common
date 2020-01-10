@@ -22,7 +22,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,24 +30,29 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
+import com.synopsys.integration.blackduck.api.generated.view.*;
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.synopsys.integration.blackduck.api.generated.component.RiskCountView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ReportType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyRuleView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
@@ -134,16 +138,16 @@ public class ReportService extends DataService {
         reportData.setDistribution(version.getDistribution().toString());
         List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        List<VersionBomComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
-        for (VersionBomComponentView versionBomComponentView : bomEntries) {
-            String policyStatus = versionBomComponentView.getApprovalStatus().toString();
+        for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
+            String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(versionBomComponentView.getComponentVersion())) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, versionBomComponentView.getComponentVersion());
+                if (!StringUtils.isBlank(ProjectVersionComponentView.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, versionBomComponentView.getComponent());
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponent());
                 }
                 if (!policyFailure) {
                     // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
@@ -157,9 +161,9 @@ public class ReportService extends DataService {
                 }
             }
 
-            BomComponent component = createBomComponentFromBomComponentView(versionBomComponentView);
+            BomComponent component = createBomComponentFromBomComponentView(ProjectVersionComponentView);
             component.setPolicyStatus(policyStatus);
-            populatePolicyRuleInfo(component, versionBomComponentView);
+            populatePolicyRuleInfo(component, ProjectVersionComponentView);
             components.add(component);
         }
         reportData.setComponents(components);
@@ -182,22 +186,14 @@ public class ReportService extends DataService {
     }
 
     public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws IntegrationException {
-        return createReportPdfFile(outputDirectory, project, version, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
-    }
-
-    public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version, FontLoader fontLoader, FontLoader boldFontLoader) throws IntegrationException {
         ReportData reportData = getRiskReportData(project, version);
-        return createReportPdfFile(outputDirectory, reportData, fontLoader, boldFontLoader);
+        return createReportPdfFile(outputDirectory, reportData);
     }
 
     public File createReportPdfFile(File outputDirectory, ReportData reportData) throws BlackDuckIntegrationException {
-        return createReportPdfFile(outputDirectory, reportData, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
-    }
-
-    public File createReportPdfFile(File outputDirectory, ReportData reportData, FontLoader fontLoader, FontLoader boldFontLoader) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger, fontLoader, boldFontLoader, Color.BLACK, 10.0f);
+            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger);
             File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
@@ -211,7 +207,7 @@ public class ReportService extends DataService {
         return versionURL + "/" + componentVersionSegments + "/" + "policy-status";
     }
 
-    private BomComponent createBomComponentFromBomComponentView(VersionBomComponentView bomEntry) {
+    private BomComponent createBomComponentFromBomComponentView(ProjectVersionComponentView bomEntry) {
         BomComponent component = new BomComponent();
         component.setComponentName(bomEntry.getComponentName());
         component.setComponentURL(bomEntry.getComponent());
@@ -219,48 +215,48 @@ public class ReportService extends DataService {
         component.setComponentVersionURL(bomEntry.getComponentVersion());
         component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
         if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
-            for (RiskCountView count : bomEntry.getSecurityRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
-                    component.setSecurityRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
-                    component.setSecurityRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
-                    component.setSecurityRiskLowCount(count.getCount());
+            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getSecurityRiskProfile().getCounts()) {
+                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
+                    component.setSecurityRiskHighCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
+                    component.setSecurityRiskMediumCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
+                    component.setSecurityRiskLowCount(count.getCount().intValue());
                 }
             }
         }
         if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().getCounts() != null && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
-            for (RiskCountView count : bomEntry.getLicenseRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
-                    component.setLicenseRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
-                    component.setLicenseRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
-                    component.setLicenseRiskLowCount(count.getCount());
+            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getLicenseRiskProfile().getCounts()) {
+                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
+                    component.setLicenseRiskHighCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
+                    component.setLicenseRiskMediumCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
+                    component.setLicenseRiskLowCount(count.getCount().intValue());
                 }
             }
         }
         if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().getCounts() != null && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
-            for (RiskCountView count : bomEntry.getOperationalRiskProfile().getCounts()) {
-                if (count.getCountType() == RiskCountType.HIGH && count.getCount() > 0) {
-                    component.setOperationalRiskHighCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.MEDIUM && count.getCount() > 0) {
-                    component.setOperationalRiskMediumCount(count.getCount());
-                } else if (count.getCountType() == RiskCountType.LOW && count.getCount() > 0) {
-                    component.setOperationalRiskLowCount(count.getCount());
+            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getOperationalRiskProfile().getCounts()) {
+                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
+                    component.setOperationalRiskHighCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
+                    component.setOperationalRiskMediumCount(count.getCount().intValue());
+                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
+                    component.setOperationalRiskLowCount(count.getCount().intValue());
                 }
             }
         }
         return component;
     }
 
-    public void populatePolicyRuleInfo(BomComponent component, VersionBomComponentView bomEntry) throws IntegrationException {
+    public void populatePolicyRuleInfo(BomComponent component, ProjectVersionComponentView bomEntry) throws IntegrationException {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
-            PolicySummaryStatusType status = bomEntry.getApprovalStatus();
-            if (status == PolicySummaryStatusType.IN_VIOLATION) {
-                List<VersionBomPolicyRuleView> rules = blackDuckService.getAllResponses(bomEntry, VersionBomComponentView.POLICY_RULES_LINK_RESPONSE);
+             PolicyStatusType status = bomEntry.getApprovalStatus();
+            if (status ==  PolicyStatusType.IN_VIOLATION) {
+                List<ComponentPolicyRulesView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
-                for (VersionBomPolicyRuleView policyRuleView : rules) {
+                for (ComponentPolicyRulesView policyRuleView : rules) {
                     PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
                     rulesViolated.add(ruleViolated);
                 }
