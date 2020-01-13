@@ -20,7 +20,7 @@ description = 'A library for using various capabilities of Black Duck, notably t
 apply plugin: 'com.blackducksoftware.integration.library'
 
 dependencies {
-    api 'com.blackducksoftware.integration:blackduck-common-api:2019.12.0.0-SNAPSHOT'
+    api 'com.blackducksoftware.integration:blackduck-common-api:2019.12.0.0'
     api 'com.blackducksoftware.integration:integration-reporting:0.4.3'
     api 'com.blackducksoftware.integration:integration-bdio:18.3.4'
     api 'com.blackducksoftware.integration:phone-home-client:0.21.12'
