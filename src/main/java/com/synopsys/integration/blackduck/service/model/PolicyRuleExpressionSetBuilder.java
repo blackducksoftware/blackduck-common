@@ -34,8 +34,8 @@ import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpr
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.PolicyRuleExpressionSetOperatorType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
@@ -95,8 +95,8 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_PHASE, projectVersionPhaseTypes);
     }
 
-    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<ProjectVersionDistributionType> projectVersionDistributionTypes) throws BlackDuckIntegrationException {
-        addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, projectVersionDistributionTypes);
+    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType> LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes) throws BlackDuckIntegrationException {
+        addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes);
     }
 
     public void addComponentUsageCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<PolicyRuleComponentUsageValueSetType> componentUsageTypes) throws BlackDuckIntegrationException {
@@ -138,13 +138,13 @@ public class PolicyRuleExpressionSetBuilder {
     }
 
     public PolicyRuleExpressionView createPolicyRuleExpressionView() {
-        return createPolicyRuleExpressionView(PolicyRuleExpressionSetOperatorType.AND);
+        return createPolicyRuleExpressionView(PolicyRuleExpressionOperatorType.AND);
     }
 
-    public PolicyRuleExpressionView createPolicyRuleExpressionView(PolicyRuleExpressionSetOperatorType expressionOperatorType) {
+    public PolicyRuleExpressionView createPolicyRuleExpressionView(PolicyRuleExpressionOperatorType expressionOperatorType) {
         PolicyRuleExpressionView expressionSet = new PolicyRuleExpressionView();
         // TODO - setOperator was originally passed an enum
-        expressionSet.setOperator(expressionOperatorType.toString());
+        expressionSet.setOperator(expressionOperatorType);
         expressionSet.setExpressions(expressions);
         return expressionSet;
     }
