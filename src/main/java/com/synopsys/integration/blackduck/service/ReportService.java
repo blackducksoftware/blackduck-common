@@ -110,8 +110,8 @@ public class ReportService extends DataService {
         if (noticesReportContent == null) {
             return null;
         }
-        String escapedProjectName = escapeUtil.escapeForUri(projectName);
-        String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
+        String escapedProjectName = escapeUtil.replaceWithUnderscore(projectName);
+        String escapedProjectVersionName = escapeUtil.replaceWithUnderscore(projectVersionName);
         File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Black_Duck_Notices_Report.txt");
         if (noticesReportFile.exists()) {
             noticesReportFile.delete();
