@@ -111,11 +111,12 @@ public class RiskReportPdfWriter {
     }
 
     private PDRectangle writeHeader(final float pageWidth, final float startingHeight) throws IOException, URISyntaxException {
-        final PDRectangle rectangle = pdfManager.drawRectangle(0, startingHeight - 100, pageWidth, 100, Color.BLACK);
-        pdfManager.drawImage(pageWidth - 220, rectangle.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Black_Duck_BD_logo.png");
-        pdfManager.writeText(5, rectangle.getLowerLeftY() + 40F, "Black Duck Risk Report", boldFont, 20, Color.WHITE);
+        PDRectangle rectangleLogo = pdfManager.drawRectangle(0, startingHeight - 100, pageWidth, 100, Color.WHITE);
+        pdfManager.drawImage(30, rectangleLogo.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Synopsys_logo.png");
+        final PDRectangle rectangleTitle = pdfManager.drawRectangle(0, rectangleLogo.getLowerLeftY() - 80, pageWidth, 80, new Color(120, 0, 255));
+        pdfManager.writeText(35, rectangleTitle.getLowerLeftY() + 32F, "Black Duck Risk Report", boldFont, 20, Color.WHITE);
         logger.trace("Finished writing the pdf header.");
-        return rectangle;
+        return rectangleTitle;
     }
 
     private PDRectangle writeProjectInformation(final float pageWidth, final float startingHeight, final ReportData reportData) throws IOException {
