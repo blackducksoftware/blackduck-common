@@ -22,6 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormat
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
 import com.synopsys.integration.blackduck.api.generated.view.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -186,14 +188,22 @@ public class ReportService extends DataService {
     }
 
     public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws IntegrationException {
+        return createReportPdfFile(outputDirectory, project, version, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version, FontLoader fontLoader, FontLoader boldFontLoader) throws IntegrationException {
         ReportData reportData = getRiskReportData(project, version);
-        return createReportPdfFile(outputDirectory, reportData);
+        return createReportPdfFile(outputDirectory, reportData, fontLoader, boldFontLoader);
     }
 
     public File createReportPdfFile(File outputDirectory, ReportData reportData) throws BlackDuckIntegrationException {
+        return createReportPdfFile(outputDirectory, reportData, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ReportData reportData, FontLoader fontLoader, FontLoader boldFontLoader) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger);
+            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger, fontLoader, boldFontLoader, Color.BLACK, 10.0f);
             File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
