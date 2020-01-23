@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
         maven { url 'https://plugins.gradle.org/m2/' }
     }
-    dependencies { classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+' }
+    dependencies { classpath 'com.synopsys.integration:common-gradle-plugin:1.0.0' }
 }
 
 plugins { id 'groovy' }
@@ -12,13 +12,13 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '44.4.7-SNAPSHOT'
+version = '45.1.1-SNAPSHOT'
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
-apply plugin: 'com.blackducksoftware.integration.library'
+apply plugin: 'com.synopsys.integration.library'
 
 dependencies {
-    api 'com.blackducksoftware.integration:blackduck-common-api:2019.10.0.1-SNAPSHOT'
+    api 'com.synopsys.integration:blackduck-common-api:2019.12.0.2-SNAPSHOT'
     api 'com.blackducksoftware.integration:integration-reporting:0.3.7'
     api 'com.blackducksoftware.integration:integration-bdio:18.2.11'
     api 'com.blackducksoftware.integration:phone-home-client:0.21.9'
