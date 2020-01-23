@@ -76,8 +76,8 @@ public class RiskReportPdfWriter {
 
     public File createPDFReportFile(final File outputDirectory, final ReportData report) throws RiskReportException {
         final IntegrationEscapeUtil escapeUtil = new IntegrationEscapeUtil();
-        final String escapedProjectName = escapeUtil.escapeForUri(report.getProjectName());
-        final String escapedProjectVersionName = escapeUtil.escapeForUri(report.getProjectVersion());
+        final String escapedProjectName = escapeUtil.replaceWithUnderscore(report.getProjectName());
+        final String escapedProjectVersionName = escapeUtil.replaceWithUnderscore(report.getProjectVersion());
         final File pdfFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_BlackDuck_RiskReport.pdf");
         if (pdfFile.exists()) {
             pdfFile.delete();
