@@ -22,29 +22,30 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.synopsys.integration.blackduck.api.generated.component.RiskCountView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.RiskCountType;
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
 import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {
-    private final Map<RiskCountType, Integer> countsMap;
+    private final Map<ComponentVersionRiskProfileRiskDataCountsCountTypeType, BigDecimal> countsMap;
 
     public RiskProfileCounts(final RiskProfileView view) {
         countsMap = new HashMap<>();
-        for (final RiskCountType value : RiskCountType.values()) {
-            countsMap.put(value, 0);
+        for (final ComponentVersionRiskProfileRiskDataCountsCountTypeType value : ComponentVersionRiskProfileRiskDataCountsCountTypeType.values()) {
+            countsMap.put(value, new BigDecimal(0));
         }
         if (view != null) {
-            for (final RiskCountView count : view.getCounts()) {
+            for (final ComponentVersionRiskProfileRiskDataCountsView count : view.getCounts()) {
                 countsMap.put(count.getCountType(), count.getCount());
             }
         }
     }
 
-    public int getCount(final RiskCountType level) {
+    public BigDecimal getCount(final ComponentVersionRiskProfileRiskDataCountsCountTypeType level) {
         return countsMap.get(level);
     }
 }

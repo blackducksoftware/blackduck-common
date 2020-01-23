@@ -25,16 +25,16 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.api.generated.component.CompositePathWithArchiveContext;
-import com.synopsys.integration.blackduck.api.generated.enumeration.MatchedFileUsagesType;
-import com.synopsys.integration.blackduck.api.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.CompositePathWithArchiveContext;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
 
 public class MatchedFilesModel {
     private final String path;
     private final String archiveContext;
     private final String fileName;
     private final String compositePathContext;
-    private final Set<MatchedFileUsagesType> usages;
+    private final Set<LicenseFamilyLicenseFamilyRiskRulesUsageType> usages;
 
     public MatchedFilesModel(final MatchedFileView matchedFile) {
         final CompositePathWithArchiveContext pathView = matchedFile.getFilePath();
@@ -61,7 +61,7 @@ public class MatchedFilesModel {
         return compositePathContext;
     }
 
-    public Set<MatchedFileUsagesType> getUsages() {
+    public Set<LicenseFamilyLicenseFamilyRiskRulesUsageType> getUsages() {
         return usages;
     }
 }

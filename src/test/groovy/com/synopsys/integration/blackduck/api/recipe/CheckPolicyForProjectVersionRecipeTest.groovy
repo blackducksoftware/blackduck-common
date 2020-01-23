@@ -4,12 +4,12 @@ import com.synopsys.integration.bdio.model.Forge
 import com.synopsys.integration.bdio.model.externalid.ExternalId
 import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionSetView
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType
-import com.synopsys.integration.blackduck.api.generated.view.ComponentSearchResultView
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyStatusView
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
@@ -63,8 +63,8 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          */
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView())
 
-        VersionBomPolicyStatusView policyStatus = projectBomService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
-        assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatus.overallStatus)
+        ProjectVersionPolicyStatusView policyStatus = projectBomService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get()
+        assertEquals(PolicyStatusType.IN_VIOLATION, policyStatus.overallStatus)
     }
 
     private PolicyRuleView constructTestPolicy(ComponentService componentService) {
@@ -76,7 +76,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleView*/
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder()
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView)
-        PolicyRuleExpressionSetView expressionSet = builder.createPolicyRuleExpressionSetView()
+        PolicyRuleExpressionView expressionSet = builder.createPolicyRuleExpressionView()
 
         PolicyRuleView policyRuleView = new PolicyRuleView()
         policyRuleView.name = 'Test Rule' + System.currentTimeMillis()

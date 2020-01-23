@@ -13,18 +13,29 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
+<<<<<<< HEAD
 version = '45.1.0-SNAPSHOT'
+=======
+version = '45.0.8-SNAPSHOT'
+>>>>>>> c9d1d3c7e05a8a73e3a82f3ee30f4ff938032771
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
 apply plugin: 'com.synopsys.integration.library'
 
 dependencies {
+<<<<<<< HEAD
     api 'com.synopsys.integration:blackduck-common-api:2019.6.0.9'
     api 'com.synopsys.integration:integration-reporting:1.0.0'
     api 'com.synopsys.integration:integration-bdio:19.0.0'
     api 'com.synopsys.integration:phone-home-client:1.0.0'
 
+=======
+    api 'com.blackducksoftware.integration:blackduck-common-api:2019.12.0.1'
+    api 'com.blackducksoftware.integration:integration-reporting:0.4.3'
+    api 'com.blackducksoftware.integration:integration-bdio:18.3.4'
+    api 'com.blackducksoftware.integration:phone-home-client:0.21.12'
+>>>>>>> c9d1d3c7e05a8a73e3a82f3ee30f4ff938032771
     api 'com.blackducksoftware.bdio:bdio2:3.0.0-beta.47'
 
     testImplementation 'org.hamcrest:hamcrest-core:1.3'

@@ -26,8 +26,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;

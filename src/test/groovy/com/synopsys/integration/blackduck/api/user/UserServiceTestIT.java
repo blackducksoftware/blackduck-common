@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.component.UserGroupRequest;
-import com.synopsys.integration.blackduck.api.generated.component.UserRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;

@@ -14,8 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComplexLicenseType;
-import com.synopsys.integration.blackduck.api.generated.view.ComplexLicenseView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseTypeType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.LicenseService;
@@ -32,14 +33,14 @@ public class LicenseDataServiceTestIT {
 
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
         ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
-        Optional<ComplexLicenseView> optionalComplexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
-        ComplexLicenseView complexLicense = optionalComplexLicense.get();
+        Optional<ProjectVersionLicenseView> optionalComplexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
+        ProjectVersionLicenseView complexLicense = optionalComplexLicense.get();
 
         assertEquals("Apache License 2.0", complexLicense.getLicenseDisplay());
-        assertEquals(ComplexLicenseType.DISJUNCTIVE, complexLicense.getType());
+        assertEquals(ProjectVersionLicenseTypeType.DISJUNCTIVE, complexLicense.getType());
         assertEquals(1, complexLicense.getLicenses().size());
 
-        ComplexLicenseView embeddedLicense = complexLicense.getLicenses().get(0);
+        ProjectVersionLicenseLicensesView embeddedLicense = complexLicense.getLicenses().get(0);
         assertTrue(StringUtils.isNotBlank(embeddedLicense.getLicense()));
         assertEquals("Apache License 2.0", embeddedLicense.getLicenseDisplay());
         assertEquals("Apache License 2.0", embeddedLicense.getName());

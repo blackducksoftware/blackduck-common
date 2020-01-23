@@ -2,7 +2,7 @@ package com.synopsys.integration.blackduck.comprehensive;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;

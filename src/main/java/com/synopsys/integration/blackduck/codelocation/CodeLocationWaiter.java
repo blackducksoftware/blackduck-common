@@ -22,6 +22,20 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+<<<<<<< HEAD
+=======
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import com.jayway.jsonpath.JsonPath;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
+>>>>>>> c9d1d3c7e05a8a73e3a82f3ee30f4ff938032771
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.CodeLocationService;

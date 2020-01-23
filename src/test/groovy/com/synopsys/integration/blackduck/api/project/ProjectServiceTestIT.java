@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
@@ -72,17 +72,17 @@ public class ProjectServiceTestIT {
         System.out.println("projectUrl: " + projectUrl);
 
         ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
-        projectVersionRequest1.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest1.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectVersionRequest1.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest1.setVersionName(testProjectVersion1Name);
 
         ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
-        projectVersionRequest2.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest2.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectVersionRequest2.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest2.setVersionName(testProjectVersion2Name);
 
         ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
-        projectVersionRequest3.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest3.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectVersionRequest3.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest3.setVersionName(testProjectVersion3Name);
 
@@ -146,7 +146,7 @@ public class ProjectServiceTestIT {
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.setVersionName("Initial VersionName");
         projectVersionRequest.setPhase(ProjectVersionPhaseType.PLANNING);
-        projectVersionRequest.setDistribution(ProjectVersionDistributionType.EXTERNAL);
+        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL);
         projectRequest.setVersionRequest(projectVersionRequest);
 
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
@@ -155,18 +155,18 @@ public class ProjectServiceTestIT {
 
         assertEquals("Initial VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.PLANNING, projectVersionView.getPhase());
-        assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.getDistribution());
+        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL, projectVersionView.getDistribution());
 
         projectVersionView.setVersionName("New VersionName");
         projectVersionView.setPhase(ProjectVersionPhaseType.DEPRECATED);
-        projectVersionView.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionView.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         ProjectServiceTestIT.blackDuckService.put(projectVersionView);
 
         projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
-        assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.getDistribution());
+        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL, projectVersionView.getDistribution());
     }
 
     @Test
@@ -233,7 +233,7 @@ public class ProjectServiceTestIT {
         projectVersionRequest.setCloneFromReleaseUrl(projectVersionUrl);
         projectVersionRequest.setVersionName("1.0.0-clone");
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
-        projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
+        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE);
         ProjectServiceTestIT.projectService.createProjectVersion(ProjectServiceTestIT.project, projectVersionRequest);
 
         projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);

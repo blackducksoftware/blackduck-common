@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleCategoryType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 
 public class PolicyRuleModel {
@@ -41,7 +41,7 @@ public class PolicyRuleModel {
         return rule != null && rule.getExpression() != null && rule.getExpression().getExpressions() != null && !rule.getExpression().getExpressions().isEmpty();
     }
 
-    public List<PolicyRuleExpressionView> getExpressionList() {
+    public List<PolicyRuleExpressionExpressionsView> getExpressionList() {
         if (hasExpressions()) {
             return rule.getExpression().getExpressions();
         } else {
@@ -52,7 +52,7 @@ public class PolicyRuleModel {
     public boolean hasOnlyProjectLevelConditions() {
         boolean hasNonProjectLevelCondition = false;
 
-        for (PolicyRuleExpressionView expression : getExpressionList()) {
+        for (PolicyRuleExpressionExpressionsView expression : getExpressionList()) {
             PolicyRuleConditionType condition = PolicyRuleConditionType.valueOf(expression.getName());
             if (PolicyRuleConditionType.UNKNOWN_RULE_CONDTION == condition) {
                 continue;

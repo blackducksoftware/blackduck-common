@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.UserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.AssignedProjectView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;

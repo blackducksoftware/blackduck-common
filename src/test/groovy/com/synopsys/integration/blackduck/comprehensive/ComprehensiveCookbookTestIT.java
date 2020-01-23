@@ -5,13 +5,13 @@ import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicySummaryStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.generated.view.*;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
@@ -96,7 +96,7 @@ public class ComprehensiveCookbookTestIT {
         int projectVersionCount = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest.setVersionName("RestConnectionTest");
         ProjectVersionView projectVersionItem = projectService.createProjectVersion(projectItem, projectVersionRequest);
@@ -125,7 +125,7 @@ public class ComprehensiveCookbookTestIT {
         int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         String versionName = "RestConnectionTest";
-        ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
+        LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution = LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL;
         ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, versionName);
         projectSyncModel.setPhase(phase);
@@ -335,12 +335,12 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(projectVersion);
 
         // check that we have components in the BOM
-        List<VersionBomComponentView> bomComponents = blackDuckServices.blackDuckService.getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckService.getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         assertTrue(bomComponents.size() > 0);
 
         // Look for testComponent in BOM
-        VersionBomComponentView foundComp = null;
-        for (VersionBomComponentView comp : bomComponents) {
+        ProjectVersionComponentView foundComp = null;
+        for (ProjectVersionComponentView comp : bomComponents) {
             if (checkPolicyData.componentName.equals(comp.getComponentName()) && (checkPolicyData.componentVersion.equals(comp.getComponentVersionName()))) {
                 foundComp = comp;
             }
@@ -350,9 +350,9 @@ public class ComprehensiveCookbookTestIT {
 
         // verify the policy
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
-        Optional<VersionBomPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
+        Optional<ProjectVersionPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
         assertTrue(policyStatusItem.isPresent());
-        assertEquals(PolicySummaryStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
+        assertEquals(PolicyStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
 
         Optional<PolicyRuleView> checkPolicyRule = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         assertTrue(checkPolicyRule.isPresent());
