@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2019 Synopsys, Inc.
+ * Copyright (c) 2020 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -30,9 +30,9 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
@@ -98,7 +98,7 @@ public class ProjectBomService extends DataService {
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
         String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
                                                  .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
-        Optional<ComponentSearchResultView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
+        Optional<ComponentsView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
         String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
             if (StringUtils.isNotBlank(componentSearchResultView.get().getVariant())) {
@@ -147,9 +147,9 @@ public class ProjectBomService extends DataService {
         }
     }
 
-    private List<MatchedFileView> getMatchedFiles(ProjectVersionComponentView component) throws IntegrationException {
-        List<MatchedFileView> matchedFiles = new ArrayList<>(0);
-        List<MatchedFileView> tempMatchedFiles = blackDuckService.getAllResponses(component, ProjectVersionComponentView.MATCHED_FILES_LINK_RESPONSE);
+    private List<ComponentMatchedFilesView> getMatchedFiles(ProjectVersionComponentView component) throws IntegrationException {
+        List<ComponentMatchedFilesView> matchedFiles = new ArrayList<>(0);
+        List<ComponentMatchedFilesView> tempMatchedFiles = blackDuckService.getAllResponses(component, ProjectVersionComponentView.MATCHED_FILES_LINK_RESPONSE);
         if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
             matchedFiles = tempMatchedFiles;
         }

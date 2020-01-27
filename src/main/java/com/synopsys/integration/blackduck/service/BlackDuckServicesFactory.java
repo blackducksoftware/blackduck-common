@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2019 Synopsys, Inc.
+ * Copyright (c) 2020 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.service;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import com.synopsys.integration.util.NoThreadExecutorService;
 import org.apache.commons.lang3.builder.RecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -34,6 +33,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
+import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
+import com.synopsys.integration.blackduck.codelocation.bdio2upload.UploadBdio2BatchRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanBatchRunner;
@@ -42,11 +43,11 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -71,7 +72,7 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckServicesFactory(
-            IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
@@ -95,6 +96,11 @@ public class BlackDuckServicesFactory {
         } else {
             return new BdioUploadService(blackDuckService, logger, new UploadBatchRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
         }
+    }
+
+    public Bdio2UploadService createBdio2UploadService() {
+        final BlackDuckService blackDuckService = createBlackDuckService();
+        return new Bdio2UploadService(blackDuckService, logger, new UploadBdio2BatchRunner(logger, blackDuckService, executorService), createCodeLocationCreationService());
     }
 
     /**

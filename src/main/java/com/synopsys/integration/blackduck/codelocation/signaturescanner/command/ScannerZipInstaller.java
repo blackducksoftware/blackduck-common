@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2019 Synopsys, Inc.
+ * Copyright (c) 2020 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -105,14 +105,14 @@ public class ScannerZipInstaller {
         try {
             versionFile = retrieveVersionFile(scannerExpansionDirectory);
         } catch (IOException e) {
-            throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage());
+            throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage(), e);
         }
 
         String downloadUrl = getDownloadUrl();
         try {
             downloadIfModified(scannerExpansionDirectory, versionFile, downloadUrl);
         } catch (Exception e) {
-            throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage());
+            throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
         }
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());

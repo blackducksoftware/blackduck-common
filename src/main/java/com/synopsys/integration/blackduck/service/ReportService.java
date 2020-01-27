@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2019 Synopsys, Inc.
+ * Copyright (c) 2020 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,6 +22,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,9 +31,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
+import com.synopsys.integration.blackduck.api.generated.view.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -47,7 +53,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
-import com.synopsys.integration.blackduck.api.generated.view.VersionBomPolicyRuleView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
@@ -55,6 +61,7 @@ import com.synopsys.integration.blackduck.service.model.BomComponent;
 import com.synopsys.integration.blackduck.service.model.PolicyRule;
 import com.synopsys.integration.blackduck.service.model.ReportData;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.blackduck.service.model.pdf.FontLoader;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportPdfWriter;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportWriter;
 import com.synopsys.integration.exception.IntegrationException;
@@ -105,8 +112,8 @@ public class ReportService extends DataService {
         if (noticesReportContent == null) {
             return null;
         }
-        String escapedProjectName = escapeUtil.escapeForUri(projectName);
-        String escapedProjectVersionName = escapeUtil.escapeForUri(projectVersionName);
+        String escapedProjectName = escapeUtil.replaceWithUnderscore(projectName);
+        String escapedProjectVersionName = escapeUtil.replaceWithUnderscore(projectVersionName);
         File noticesReportFile = new File(outputDirectory, escapedProjectName + "_" + escapedProjectVersionName + "_Black_Duck_Notices_Report.txt");
         if (noticesReportFile.exists()) {
             noticesReportFile.delete();
@@ -135,14 +142,14 @@ public class ReportService extends DataService {
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
         List<ProjectVersionComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
-        for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
-            String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
+        for (ProjectVersionComponentView projectVersionComponentView : bomEntries) {
+            String policyStatus = projectVersionComponentView.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(ProjectVersionComponentView.getComponentVersion())) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponentVersion());
+                if (!StringUtils.isBlank(projectVersionComponentView.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, projectVersionComponentView.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponent());
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, projectVersionComponentView.getComponent());
                 }
                 if (!policyFailure) {
                     // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
@@ -156,9 +163,9 @@ public class ReportService extends DataService {
                 }
             }
 
-            BomComponent component = createBomComponentFromBomComponentView(ProjectVersionComponentView);
+            BomComponent component = createBomComponentFromBomComponentView(projectVersionComponentView);
             component.setPolicyStatus(policyStatus);
-            populatePolicyRuleInfo(component, ProjectVersionComponentView);
+            populatePolicyRuleInfo(component, projectVersionComponentView);
             components.add(component);
         }
         reportData.setComponents(components);
@@ -181,14 +188,22 @@ public class ReportService extends DataService {
     }
 
     public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws IntegrationException {
+        return createReportPdfFile(outputDirectory, project, version, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ProjectView project, ProjectVersionView version, FontLoader fontLoader, FontLoader boldFontLoader) throws IntegrationException {
         ReportData reportData = getRiskReportData(project, version);
-        return createReportPdfFile(outputDirectory, reportData);
+        return createReportPdfFile(outputDirectory, reportData, fontLoader, boldFontLoader);
     }
 
     public File createReportPdfFile(File outputDirectory, ReportData reportData) throws BlackDuckIntegrationException {
+        return createReportPdfFile(outputDirectory, reportData, document -> PDType1Font.HELVETICA, document -> PDType1Font.HELVETICA_BOLD);
+    }
+
+    public File createReportPdfFile(File outputDirectory, ReportData reportData, FontLoader fontLoader, FontLoader boldFontLoader) throws BlackDuckIntegrationException {
         try {
             logger.trace("Creating Risk Report Pdf in : " + outputDirectory.getCanonicalPath());
-            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger);
+            RiskReportPdfWriter writer = new RiskReportPdfWriter(logger, fontLoader, boldFontLoader, Color.BLACK, 10.0f);
             File pdfFile = writer.createPDFReportFile(outputDirectory, reportData);
             logger.trace("Created Risk Report Pdf : " + pdfFile.getCanonicalPath());
             return pdfFile;
@@ -247,8 +262,8 @@ public class ReportService extends DataService {
 
     public void populatePolicyRuleInfo(BomComponent component, ProjectVersionComponentView bomEntry) throws IntegrationException {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
-            PolicyStatusType status = bomEntry.getApprovalStatus();
-            if (status == PolicyStatusType.IN_VIOLATION) {
+             PolicyStatusType status = bomEntry.getApprovalStatus();
+            if (status ==  PolicyStatusType.IN_VIOLATION) {
                 List<ComponentPolicyRulesView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (ComponentPolicyRulesView policyRuleView : rules) {

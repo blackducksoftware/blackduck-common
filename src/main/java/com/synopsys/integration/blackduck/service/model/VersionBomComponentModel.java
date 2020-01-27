@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2019 Synopsys, Inc.
+ * Copyright (c) 2020 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -29,20 +29,20 @@ import java.util.List;
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileActivityDataView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.VersionBomComponentMatchType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.VersionBomComponentReviewStatusType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComparisonItemsComponentMatchTypesType;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentView component;
     private final List<MatchedFilesModel> matchedFiles;
 
-    public VersionBomComponentModel(final ProjectVersionComponentView component, final List<MatchedFileView> matchedFiles) {
+    public VersionBomComponentModel(final ProjectVersionComponentView component, final List<ComponentMatchedFilesView> matchedFiles) {
         this.component = component;
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
@@ -99,7 +99,7 @@ public class VersionBomComponentModel {
         return component.getOrigins();
     }
 
-    public List<VersionBomComponentMatchType> getMatchTypes() {
+    public List<ProjectVersionComparisonItemsComponentMatchTypesType> getMatchTypes() {
         return component.getMatchTypes();
     }
 
@@ -127,7 +127,7 @@ public class VersionBomComponentModel {
         return hasRisk(getVersionRiskProfile());
     }
 
-    public VersionBomComponentReviewStatusType getReviewStatus() {
+    public ProjectVersionComponentReviewStatusType getReviewStatus() {
         return component.getReviewStatus();
     }
 
@@ -150,9 +150,9 @@ public class VersionBomComponentModel {
         return false;
     }
 
-    private List<MatchedFilesModel> getMatchedFilesModel(final List<MatchedFileView> matchedFiles) {
+    private List<MatchedFilesModel> getMatchedFilesModel(final List<ComponentMatchedFilesView> matchedFiles) {
         final List<MatchedFilesModel> matchedFileModels = new ArrayList<>(matchedFiles.size());
-        for (final MatchedFileView matchedFile : matchedFiles) {
+        for (final ComponentMatchedFilesView matchedFile : matchedFiles) {
             matchedFileModels.add(new MatchedFilesModel(matchedFile));
         }
         return matchedFileModels;
