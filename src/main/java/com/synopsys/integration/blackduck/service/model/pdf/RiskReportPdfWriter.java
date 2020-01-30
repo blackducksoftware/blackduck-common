@@ -113,21 +113,21 @@ public class RiskReportPdfWriter {
     private PDRectangle writeHeader(final float pageWidth, final float startingHeight) throws IOException, URISyntaxException {
         PDRectangle rectangleLogo = pdfManager.drawRectangle(0, startingHeight - 100, pageWidth, 100, Color.WHITE);
         pdfManager.drawImage(30, rectangleLogo.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Synopsys_logo.png");
-        final PDRectangle rectangleTitle = pdfManager.drawRectangle(0, rectangleLogo.getLowerLeftY() - 80, pageWidth, 80, new Color(120, 0, 255));
+        final PDRectangle rectangleTitle = pdfManager.drawRectangle(0, rectangleLogo.getLowerLeftY() - 80, pageWidth - 35, 80, new Color(110, 50, 155).darker());
         pdfManager.writeText(35, rectangleTitle.getLowerLeftY() + 32F, "Black Duck Risk Report", boldFont, 20, Color.WHITE);
         logger.trace("Finished writing the pdf header.");
         return rectangleTitle;
     }
 
     private PDRectangle writeProjectInformation(final float pageWidth, final float startingHeight, final ReportData reportData) throws IOException {
-        final float height = startingHeight - 18;
+        final float height = startingHeight - 40;
         PDRectangle rectangle = pdfManager.writeWrappedLink(5, height, 280, reportData.getProjectName(), reportData.getProjectURL(), font, 18);
         final String dash = " - ";
         rectangle = pdfManager.writeText(5 + rectangle.getUpperRightX(), height, dash, font, 18, Color.BLACK);
         rectangle = pdfManager.writeWrappedLink(5 + rectangle.getUpperRightX(), height, 280 - rectangle.getWidth(), reportData.getProjectVersion(), reportData.getProjectVersionURL(), font, 18);
 
         final String projectAttributesString = "Phase:  " + reportData.getPhase() + "    |    Distribution:  " + reportData.getDistribution();
-        rectangle = pdfManager.writeWrappedText(5, rectangle.getLowerLeftY() - 18, 300, projectAttributesString, font, fontSize, textColor);
+        rectangle = pdfManager.writeWrappedText(5, rectangle.getLowerLeftY() - 40, 300, projectAttributesString, font, fontSize, textColor);
         logger.trace("Finished writing the project information.");
         return rectangle;
     }
@@ -136,7 +136,7 @@ public class RiskReportPdfWriter {
 
         final float center = pageWidth / 2;
 
-        final float height = startingHeight - 20;
+        final float height = startingHeight - 40;
         writeSummaryTable(center - 180, height, "Security Risk", reportData.getVulnerabilityRiskHighCount(), reportData.getVulnerabilityRiskMediumCount(), reportData.getVulnerabilityRiskLowCount(),
             reportData.getVulnerabilityRiskNoneCount(), reportData.getTotalComponents());
         writeSummaryTable(center, height, "License Risk", reportData.getLicenseRiskHighCount(), reportData.getLicenseRiskMediumCount(), reportData.getLicenseRiskLowCount(), reportData.getLicenseRiskNoneCount(),
@@ -172,7 +172,7 @@ public class RiskReportPdfWriter {
 
     private PDRectangle writeComponentTable(final float pageWidth, final float startingHeight, final ReportData reportData) throws IOException, URISyntaxException {
         // new Color(221, 221, 221)
-        final float height = startingHeight - 20;
+        final float height = startingHeight - 40;
 
         final PDRectangle rectangle = pdfManager.writeText(30, height, "BOM Entries " + reportData.getTotalComponents(), font, fontSize, textColor);
 
