@@ -29,7 +29,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView; // was ComplexLicenseView
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.exception.IntegrationException;
@@ -45,7 +45,7 @@ public class LicenseService extends DataService {
     }
 
     public Optional<ProjectVersionLicenseView> getComplexLicenseItemFromComponent(final ExternalId externalId) throws IntegrationException {
-        final Optional<ComponentsView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
+        final Optional<ComponentSearchResultView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
         }

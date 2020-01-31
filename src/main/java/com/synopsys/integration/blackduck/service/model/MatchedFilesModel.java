@@ -25,9 +25,9 @@ package com.synopsys.integration.blackduck.service.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.api.generated.component.ComponentMatchedFilesItemsFilePathView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.CompositePathWithArchiveContext;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
 
 public class MatchedFilesModel {
     private final String path;
@@ -36,8 +36,8 @@ public class MatchedFilesModel {
     private final String compositePathContext;
     private final Set<LicenseFamilyLicenseFamilyRiskRulesUsageType> usages;
 
-    public MatchedFilesModel(final ComponentMatchedFilesView matchedFile) {
-        final ComponentMatchedFilesItemsFilePathView pathView = matchedFile.getFilePath();
+    public MatchedFilesModel(final MatchedFileView matchedFile) {
+        final CompositePathWithArchiveContext pathView = matchedFile.getFilePath();
         path = pathView.getPath();
         archiveContext = pathView.getArchiveContext();
         fileName = pathView.getFileName();

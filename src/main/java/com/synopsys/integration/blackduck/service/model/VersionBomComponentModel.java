@@ -34,15 +34,15 @@ import com.synopsys.integration.blackduck.api.manual.throwaway.generated.compone
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComparisonItemsComponentMatchTypesType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.MatchedFileView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentView component;
     private final List<MatchedFilesModel> matchedFiles;
 
-    public VersionBomComponentModel(final ProjectVersionComponentView component, final List<ComponentMatchedFilesView> matchedFiles) {
+    public VersionBomComponentModel(final ProjectVersionComponentView component, final List<MatchedFileView> matchedFiles) {
         this.component = component;
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
@@ -150,9 +150,9 @@ public class VersionBomComponentModel {
         return false;
     }
 
-    private List<MatchedFilesModel> getMatchedFilesModel(final List<ComponentMatchedFilesView> matchedFiles) {
+    private List<MatchedFilesModel> getMatchedFilesModel(final List<MatchedFileView> matchedFiles) {
         final List<MatchedFilesModel> matchedFileModels = new ArrayList<>(matchedFiles.size());
-        for (final ComponentMatchedFilesView matchedFile : matchedFiles) {
+        for (final MatchedFileView matchedFile : matchedFiles) {
             matchedFileModels.add(new MatchedFilesModel(matchedFile));
         }
         return matchedFileModels;

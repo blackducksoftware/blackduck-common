@@ -14,7 +14,7 @@ import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.Forge;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.ComponentService;
@@ -31,7 +31,7 @@ public class ComponentServiceTestIT {
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         ExternalId integrationCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "integration-common", "15.0.0");
-        Optional<ComponentsView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
+        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
 
         assertTrue(componentView.isPresent());
     }
@@ -43,12 +43,12 @@ public class ComponentServiceTestIT {
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
 
         ExternalId cyclerExternalId = simpleBdioFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
-        List<ComponentsView> searchResults = componentService.getAllSearchResults(cyclerExternalId);
+        List<ComponentSearchResultView> searchResults = componentService.getAllSearchResults(cyclerExternalId);
         assertEquals(1, searchResults.size());
         assertTrue(searchResults.get(0).getComponentName().equalsIgnoreCase("cycler"));
         assertTrue(searchResults.get(0).getVersionName().equals("0.10.0"));
 
-        Optional<ComponentsView> componentView = componentService.getFirstOrEmptyResult(cyclerExternalId);
+        Optional<ComponentSearchResultView> componentView = componentService.getFirstOrEmptyResult(cyclerExternalId);
 
         assertTrue(componentView.isPresent());
         assertTrue(componentView.get().getComponentName().equalsIgnoreCase("cycler"));

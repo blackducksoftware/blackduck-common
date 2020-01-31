@@ -101,7 +101,7 @@ public class ReportService extends DataService {
 
     public String getNoticesReportData(ProjectView project, ProjectVersionView version) throws InterruptedException, IntegrationException {
         logger.trace("Getting the Notices Report Contents using the Report Rest Server");
-        return generateBlackDuckNoticesReport(version, LicenseReportsReportReportFormatType.TEXT);
+        return generateBlackDuckNoticesReport(version, ReportFormatType.TEXT);
     }
 
     public File createNoticesReportFile(File outputDirectory, ProjectView project, ProjectVersionView version) throws InterruptedException, IntegrationException {
@@ -142,19 +142,19 @@ public class ReportService extends DataService {
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
         List<ProjectVersionComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
-        for (ProjectVersionComponentView projectVersionComponentView : bomEntries) {
-            String policyStatus = projectVersionComponentView.getApprovalStatus().toString();
+        for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
+            String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
                 String componentPolicyStatusURL = null;
-                if (!StringUtils.isBlank(projectVersionComponentView.getComponentVersion())) {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, projectVersionComponentView.getComponentVersion());
+                if (!StringUtils.isBlank(ProjectVersionComponentView.getComponentVersion())) {
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponentVersion());
                 } else {
-                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, projectVersionComponentView.getComponent());
+                    componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponent());
                 }
                 if (!policyFailure) {
                     // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
                     try {
-                        ComponentPolicyStatusView bomPolicyStatus = blackDuckService.getResponse(componentPolicyStatusURL, ComponentPolicyStatusView.class);
+                        PolicyStatusView bomPolicyStatus = blackDuckService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                         policyStatus = bomPolicyStatus.getApprovalStatus().toString();
                     } catch (IntegrationException e) {
                         policyFailure = true;
@@ -163,9 +163,9 @@ public class ReportService extends DataService {
                 }
             }
 
-            BomComponent component = createBomComponentFromBomComponentView(projectVersionComponentView);
+            BomComponent component = createBomComponentFromBomComponentView(ProjectVersionComponentView);
             component.setPolicyStatus(policyStatus);
-            populatePolicyRuleInfo(component, projectVersionComponentView);
+            populatePolicyRuleInfo(component, ProjectVersionComponentView);
             components.add(component);
         }
         reportData.setComponents(components);
@@ -308,7 +308,7 @@ public class ReportService extends DataService {
     /**
      * Assumes the BOM has already been updated
      */
-    public String generateBlackDuckNoticesReport(ProjectVersionView version, LicenseReportsReportReportFormatType reportFormat) throws InterruptedException, IntegrationException {
+    public String generateBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws InterruptedException, IntegrationException {
         if (version.hasLink(ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
@@ -343,7 +343,7 @@ public class ReportService extends DataService {
         return null;
     }
 
-    public String startGeneratingBlackDuckNoticesReport(ProjectVersionView version, LicenseReportsReportReportFormatType reportFormat) throws IntegrationException {
+    public String startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws IntegrationException {
         String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
 
         JsonObject jsonObject = new JsonObject();

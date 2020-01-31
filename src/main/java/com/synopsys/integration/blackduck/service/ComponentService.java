@@ -33,8 +33,8 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.UriSingleResponse;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
+import com.synopsys.integration.blackduck.api.generated.response.RemediationOptionsView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
@@ -49,13 +49,13 @@ import com.synopsys.integration.rest.request.Request;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
-    public static final LinkSingleResponse<ComponentVersionRemediatingView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, ComponentVersionRemediatingView.class);
+    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
-    public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
+    public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
                                                                                                                                              .filter(notEmptyList -> notEmptyList.size() > 0)
                                                                                                                                              .map(notEmptyList -> notEmptyList.get(0));
 
-    public static final Function<List<ComponentsView>, Optional<ComponentsView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
+    public static final Function<List<ComponentSearchResultView>, Optional<ComponentSearchResultView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
                                                                                                                                               .filter(notEmptyList -> notEmptyList.size() == 1)
                                                                                                                                               .map(listOfSingleElement -> listOfSingleElement.get(0));
 
@@ -63,34 +63,34 @@ public class ComponentService extends DataService {
         super(blackDuckService, logger);
     }
 
-    public List<ComponentsView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
+    public List<ComponentSearchResultView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
         String forge = externalId.getForge().getName();
         String originId = externalId.createExternalId();
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
         Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
-        List<ComponentsView> allSearchResults = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
+        List<ComponentSearchResultView> allSearchResults = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allSearchResults;
     }
 
-    public Optional<ComponentsView> getSingleOrEmptyResult(ExternalId externalId) throws IntegrationException {
+    public Optional<ComponentSearchResultView> getSingleOrEmptyResult(ExternalId externalId) throws IntegrationException {
         return getFilteredSearchResults(getAllSearchResults(externalId), SINGLE_OR_EMPTY_RESULT);
     }
 
-    public Optional<ComponentsView> getFirstOrEmptyResult(ExternalId externalId) throws IntegrationException {
+    public Optional<ComponentSearchResultView> getFirstOrEmptyResult(ExternalId externalId) throws IntegrationException {
         return getFilteredSearchResults(getAllSearchResults(externalId), FIRST_OR_EMPTY_RESULT);
     }
 
-    public <T> T getFilteredSearchResults(List<ComponentsView> searchResults, Function<List<ComponentsView>, T> filterFunction) {
+    public <T> T getFilteredSearchResults(List<ComponentSearchResultView> searchResults, Function<List<ComponentSearchResultView>, T> filterFunction) {
         return filterFunction.apply(searchResults);
     }
 
-    public <T> T getFilteredSearchResults(ExternalId externalId, List<ComponentsView> searchResults, BiFunction<ExternalId, List<ComponentsView>, T> filterFunction) {
+    public <T> T getFilteredSearchResults(ExternalId externalId, List<ComponentSearchResultView> searchResults, BiFunction<ExternalId, List<ComponentSearchResultView>, T> filterFunction) {
         return filterFunction.apply(externalId, searchResults);
     }
 
-    public Optional<ComponentVersionView> getComponentVersionView(ComponentsView searchResult) throws IntegrationException {
+    public Optional<ComponentVersionView> getComponentVersionView(ComponentSearchResultView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
             return Optional.ofNullable(blackDuckService.getResponse(searchResult.getVersion(), ComponentVersionView.class));
         } else {
@@ -98,7 +98,7 @@ public class ComponentService extends DataService {
         }
     }
 
-    public Optional<ComponentView> getComponentView(ComponentsView searchResult) throws IntegrationException {
+    public Optional<ComponentView> getComponentView(ComponentSearchResultView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
             return Optional.ofNullable(blackDuckService.getResponse(searchResult.getComponent(), ComponentView.class));
         } else {

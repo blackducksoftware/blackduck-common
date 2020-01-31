@@ -32,7 +32,7 @@ import java.util.Set;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.UserProjectsView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
@@ -78,10 +78,10 @@ public class UserGroupService {
 
     public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
-        final List<UserProjectsView> assignedProjectViews = blackDuckService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
+        final List<AssignedProjectView> assignedProjectViews = blackDuckService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
         final List<ProjectView> resolvedProjectViews = new ArrayList<>();
-        for (final UserProjectsView assigned : assignedProjectViews) {
+        for (final AssignedProjectView assigned : assignedProjectViews) {
             final ProjectView project = blackDuckService.getResponse(assigned.getProject(), ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
