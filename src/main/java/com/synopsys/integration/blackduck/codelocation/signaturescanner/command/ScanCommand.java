@@ -59,10 +59,11 @@ public class ScanCommand {
     private final boolean debug;
     private final String projectName;
     private final String versionName;
+    private final boolean licenseSearch;
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName, final boolean licenseSearch) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -88,6 +89,7 @@ public class ScanCommand {
         this.debug = debug;
         this.projectName = projectName;
         this.versionName = versionName;
+        this.licenseSearch = licenseSearch;
     }
 
     public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException {
@@ -218,6 +220,10 @@ public class ScanCommand {
                     cmd.add(exclusionPattern);
                 }
             }
+        }
+
+        if (licenseSearch) {
+            cmd.add("--license-search");
         }
         final String additionalScanArguments = additionalArguments;
         if (StringUtils.isNotBlank(additionalScanArguments)) {
