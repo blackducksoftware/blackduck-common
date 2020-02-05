@@ -29,7 +29,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentSearchResultView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -65,7 +65,7 @@ public class PolicyRuleService {
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
     public String createPolicyRuleForExternalId(ComponentService componentService, ExternalId externalId, String policyName) throws IntegrationException {
-        Optional<ComponentSearchResultView> componentSearchResult = componentService.getSingleOrEmptyResult(externalId);
+        Optional<ComponentsView> componentSearchResult = componentService.getSingleOrEmptyResult(externalId);
         if (!componentSearchResult.isPresent()) {
             throw new BlackDuckIntegrationException(String.format("The external id (%s) provided could not be found, so no policy can be created for it.", externalId.createExternalId()));
         }

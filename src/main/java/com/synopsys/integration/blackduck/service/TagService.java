@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.TagView;
+import com.synopsys.integration.blackduck.api.generated.view.TagView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -37,15 +37,15 @@ public class TagService extends DataService {
         super(blackDuckService, logger);
     }
 
-    public List<TagView> getAllTags(ProjectView projectView) throws IntegrationException {
+    public List<com.synopsys.integration.blackduck.api.generated.view.TagView> getAllTags(ProjectView projectView) throws IntegrationException {
         return blackDuckService.getAllResponses(projectView, ProjectView.TAGS_LINK_RESPONSE);
     }
 
     public Optional<TagView> findMatchingTag(ProjectView projectView, String tagName) throws IntegrationException {
         return getAllTags(projectView)
-                       .stream()
-                       .filter(tagView -> tagView.getName().equals(tagName))
-                       .findFirst();
+                   .stream()
+                   .filter(tagView -> tagView.getName().equals(tagName))
+                   .findFirst();
     }
 
     public void updateTag(TagView tag) throws IntegrationException {
