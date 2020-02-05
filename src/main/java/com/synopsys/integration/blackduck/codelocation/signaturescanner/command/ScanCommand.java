@@ -309,6 +309,10 @@ public class ScanCommand {
         return uploadSource;
     }
 
+    public boolean isLicenseSearch() {
+        return licenseSearch;
+    }
+
     public Set<String> getExcludePatterns() {
         return excludePatterns;
     }
@@ -337,7 +341,4 @@ public class ScanCommand {
         return versionName;
     }
 
-    public boolean isLicenseSearch() {
-        return licenseSearch;
-    }
 }

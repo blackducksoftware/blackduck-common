@@ -273,6 +273,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
+    public boolean isLicenseSearch() {
+        return licenseSearch;
+    }
+
+    public void licenseSearch(final boolean licenseSearch) {
+        this.licenseSearch = licenseSearch;
+    }
+
     public URL getBlackDuckUrl() {
         return blackDuckUrl;
     }
@@ -333,14 +341,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public String getProjectVersionName() {
         return projectVersionName;
-    }
-
-    public boolean isLicenseSearch() {
-        return licenseSearch;
-    }
-
-    public void licenseSearch(final boolean licenseSearch) {
-        this.licenseSearch = licenseSearch;
     }
 
     public List<ScanTarget> getScanTargets() {

@@ -190,6 +190,10 @@ public class ScanBatch extends Stringable implements Buildable {
         return uploadSource;
     }
 
+    public boolean isLicenseSearch() {
+        return licenseSearch;
+    }
+
     public URL getBlackDuckUrl() {
         return blackDuckUrl;
     }
