@@ -55,6 +55,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
 
+    private String individualFileMatching;
+
     private URL blackDuckUrl;
     private String blackDuckUsername;
     private String blackDuckPassword;
@@ -69,7 +71,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, blackDuckUrl, blackDuckUsername,
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, individualFileMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -269,6 +271,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public ScanBatchBuilder uploadSource(boolean uploadSource) {
         this.uploadSource = uploadSource;
         return this;
+    }
+
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
+    }
+
+    public void individualFileMatching(final String individualFileMatching) {
+        this.individualFileMatching = individualFileMatching;
     }
 
     public URL getBlackDuckUrl() {
