@@ -65,12 +65,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private String projectName;
     private String projectVersionName;
 
+    private String individualFileMatching;
+
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
     @Override
     protected ScanBatch buildWithoutValidation() {
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, blackDuckUrl, blackDuckUsername,
-                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
+                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, individualFileMatching, scanTargets);
     }
 
     @Override
@@ -331,6 +333,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public String getProjectVersionName() {
         return projectVersionName;
+    }
+
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
+    }
+
+    public void individualFileMatching(final String individualFileMatching) {
+        this.individualFileMatching = individualFileMatching;
     }
 
     public List<ScanTarget> getScanTargets() {

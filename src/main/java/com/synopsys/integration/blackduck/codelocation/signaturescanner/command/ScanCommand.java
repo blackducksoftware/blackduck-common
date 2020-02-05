@@ -337,4 +337,7 @@ public class ScanCommand {
         return versionName;
     }
 
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
+    }
 }

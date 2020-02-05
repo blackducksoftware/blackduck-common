@@ -35,7 +35,6 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.builder.Buildable;
-import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
@@ -64,11 +63,12 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean alwaysTrustServerCertificate;
     private final String projectName;
     private final String projectVersionName;
+    private final String individualFileMatching;
     private final List<ScanTarget> scanTargets;
 
     public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
             final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final boolean uploadSource, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
-            final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
+            final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final String individualFileMatching, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
@@ -88,6 +88,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
+        this.individualFileMatching = individualFileMatching;
         this.scanTargets = scanTargets;
     }
 
@@ -137,7 +138,7 @@ public class ScanBatch extends Stringable implements Buildable {
             }
             final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
-                    uploadSource, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
+                    uploadSource, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, individualFileMatching);
             scanCommands.add(scanCommand);
         }
 
@@ -218,6 +219,10 @@ public class ScanBatch extends Stringable implements Buildable {
 
     public String getProjectVersionName() {
         return projectVersionName;
+    }
+
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
     }
 
     public List<ScanTarget> getScanTargets() {
