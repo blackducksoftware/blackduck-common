@@ -193,7 +193,8 @@ public class ScanBatch extends Stringable implements Buildable {
 
     public boolean isLicenseSearch() {
         return licenseSearch;
-  
+    }
+
     public String getIndividualFileMatching() {
         return individualFileMatching;
     }
