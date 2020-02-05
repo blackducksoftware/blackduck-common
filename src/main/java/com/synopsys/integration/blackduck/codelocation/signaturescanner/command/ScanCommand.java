@@ -30,7 +30,6 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanCommand {
@@ -59,10 +58,11 @@ public class ScanCommand {
     private final boolean debug;
     private final String projectName;
     private final String versionName;
+    private final String individualFileMatching;
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName, final String individualFileMatching) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -88,6 +88,7 @@ public class ScanCommand {
         this.debug = debug;
         this.projectName = projectName;
         this.versionName = versionName;
+        this.individualFileMatching = individualFileMatching;
     }
 
     public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException {
@@ -219,6 +220,11 @@ public class ScanCommand {
                 }
             }
         }
+
+        if (StringUtils.isNotBlank(individualFileMatching)) {
+            cmd.add("--individualFileMatching=" + individualFileMatching);
+        }
+
         final String additionalScanArguments = additionalArguments;
         if (StringUtils.isNotBlank(additionalScanArguments)) {
             for (final String additionalArgument : additionalScanArguments.split(" ")) {
