@@ -65,12 +65,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private String projectName;
     private String projectVersionName;
 
+    private boolean licenseSearch;
+
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
     @Override
     protected ScanBatch buildWithoutValidation() {
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, blackDuckUrl, blackDuckUsername,
-                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
+                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, licenseSearch, scanTargets);
     }
 
     @Override
@@ -331,6 +333,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public String getProjectVersionName() {
         return projectVersionName;
+    }
+
+    public boolean isLicenseSearch() {
+        return licenseSearch;
+    }
+
+    public void licenseSearch(final boolean licenseSearch) {
+        this.licenseSearch = licenseSearch;
     }
 
     public List<ScanTarget> getScanTargets() {
