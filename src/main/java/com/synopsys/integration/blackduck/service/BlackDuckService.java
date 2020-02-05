@@ -42,6 +42,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
@@ -66,28 +67,31 @@ public class BlackDuckService {
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final String blackDuckBaseUrl;
     private final Gson gson;
+    private final MediaTypeDiscovery mediaTypeDiscovery;
 
     @Deprecated
     /**
      * @deprecated Please use BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer, BlackDuckResponsesTransformer blackDuckResponsesTransformer)
      */
-    public BlackDuckService(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson, ObjectMapper objectMapper) {
+    public BlackDuckService(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson, ObjectMapper objectMapper, MediaTypeDiscovery mediaTypeDiscovery) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
         this.blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         this.blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         this.blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 
     public BlackDuckService(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer, MediaTypeDiscovery mediaTypeDiscovery) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
         this.gson = gson;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
+        this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 
     @Deprecated
@@ -176,6 +180,7 @@ public class BlackDuckService {
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, boolean getAll) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
         Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(uri);
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri));
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
     }
 
@@ -196,19 +201,19 @@ public class BlackDuckService {
         throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri));
         return blackDuckResponsesTransformer.getResponses(new PagedRequest(requestBuilder), blackDuckPathMultipleResponses.getResponseClass(), getAll);
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, Request.Builder requestBuilder) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
         requestBuilder.uri(uri);
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri));
         return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
-        String uri = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathSingleResponse.getBlackDuckPath().getPath());
-        Request request = RequestFactory.createCommonGetRequest(uri);
-        return blackDuckResponseTransformer.getResponse(request, blackDuckPathSingleResponse.getResponseClass());
+        return getResponse(blackDuckPathSingleResponse, RequestFactory.createCommonGetRequestBuilder());
     }
 
     // ------------------------------------------------
@@ -387,6 +392,7 @@ public class BlackDuckService {
     public Response execute(BlackDuckPath path, Request.Builder requestBuilder) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, path.getPath());
         requestBuilder.uri(uri);
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri));
         Request request = requestBuilder.build();
         return execute(request);
     }
@@ -403,6 +409,7 @@ public class BlackDuckService {
     public String executePostRequestAndRetrieveURL(BlackDuckPath path, Request.Builder requestBuilder) throws IntegrationException {
         String uri = pieceTogetherUri(blackDuckBaseUrl, path.getPath());
         requestBuilder.uri(uri);
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri));
         return executePostRequestAndRetrieveURL(requestBuilder.build());
     }
 
@@ -433,7 +440,7 @@ public class BlackDuckService {
             return Collections.emptyList();
         }
         requestBuilder.uri(uri.get());
-
+        requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(uri.get()));
         return responsesTransformer.apply(new PagedRequest(requestBuilder), responseClass).getItems();
     }
 

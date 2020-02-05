@@ -2,10 +2,11 @@ package com.synopsys.integration.blackduck.api.recipe
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
@@ -38,8 +39,8 @@ class BasicRecipe {
     protected NotificationService notificationService
     protected CodeLocationCreationService codeLocationCreationService
     protected PolicyRuleService policyRuleService
-
     protected UploadBatchRunner uploadRunner
+    protected MediaTypeDiscovery mediaTypeDiscovery
 
     @BeforeEach
     void startRecipe() {
@@ -66,8 +67,9 @@ class BasicRecipe {
         IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
+        mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery()
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger)
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger, mediaTypeDiscovery)
         blackDuckService = blackDuckServicesFactory.createBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()

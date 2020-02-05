@@ -10,17 +10,18 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.ProjectService;
 import org.apache.http.client.HttpClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -120,8 +121,9 @@ public class IntHttpClientTestHelper {
         IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        MediaTypeDiscovery mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery();
 
-        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger, mediaTypeDiscovery);
         return blackDuckServicesFactory;
     }
 

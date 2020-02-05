@@ -31,6 +31,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
 import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
@@ -56,6 +57,7 @@ public class BlackDuckServicesFactory {
     private final ExecutorService executorService;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
+    private final MediaTypeDiscovery mediaTypeDiscovery;
 
     public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
 
@@ -71,22 +73,27 @@ public class BlackDuckServicesFactory {
         return new GsonBuilder().setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
+    public static MediaTypeDiscovery createDefaultMediaTypeDiscovery() {
+        return new MediaTypeDiscovery();
+    }
+
     public BlackDuckServicesFactory(
-        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, MediaTypeDiscovery mediaTypeDiscovery) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
         this.executorService = executorService;
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.logger = logger;
+        this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 
     /**
      * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
      */
     @Deprecated
-    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger);
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, MediaTypeDiscovery mediaTypeDiscovery) {
+        this(intEnvironmentVariables, gson, objectMapper, null, blackDuckHttpClient, logger, mediaTypeDiscovery);
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -181,7 +188,7 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckService createBlackDuckService() {
-        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper);
+        return new BlackDuckService(logger, blackDuckHttpClient, gson, objectMapper, mediaTypeDiscovery);
     }
 
     public LicenseService createLicenseService() {

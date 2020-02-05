@@ -38,6 +38,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.BuilderProperties;
 import com.synopsys.integration.builder.BuilderPropertyKey;
@@ -78,6 +79,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
     private ExecutorService executorService = new NoThreadExecutorService();
+    private MediaTypeDiscovery mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery();
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -126,7 +128,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -134,7 +136,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery);
         }
     }
 
@@ -267,8 +269,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     @Deprecated
     public BlackDuckServerConfigBuilder setFromProperties(Properties properties) {
         Map<String, String> propertiesMap = properties.stringPropertyNames()
-                                                    .stream()
-                                                    .collect(Collectors.toMap(name -> name, name -> properties.getProperty(name)));
+                                                .stream()
+                                                .collect(Collectors.toMap(name -> name, name -> properties.getProperty(name)));
 
         return setFromProperties(propertiesMap);
     }
@@ -492,4 +494,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
+    public MediaTypeDiscovery getMediaTypeDiscovery() {
+        return mediaTypeDiscovery;
+    }
+
+    public void setMediaTypeDiscovery(final MediaTypeDiscovery mediaTypeDiscovery) {
+        this.mediaTypeDiscovery = mediaTypeDiscovery;
+    }
 }
