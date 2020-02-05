@@ -51,6 +51,7 @@ public class ScanCommand {
     private final boolean snippetMatchingOnly;
     private final boolean fullSnippetScan;
     private final boolean uploadSource;
+    private final boolean licenseSearch;
     private final String individualFileMatching;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
@@ -62,7 +63,7 @@ public class ScanCommand {
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final String individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -81,6 +82,7 @@ public class ScanCommand {
         this.snippetMatchingOnly = snippetMatchingOnly;
         this.fullSnippetScan = fullSnippetScan;
         this.uploadSource = uploadSource;
+        this.licenseSearch = licenseSearch;
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
         this.additionalArguments = additionalArguments;
@@ -220,7 +222,11 @@ public class ScanCommand {
                 }
             }
         }
-
+      
+        if (licenseSearch) {
+            cmd.add("--license-search");
+        }
+      
         if (StringUtils.isNotBlank(individualFileMatching)) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
@@ -308,6 +314,9 @@ public class ScanCommand {
     public boolean isUploadSource() {
         return uploadSource;
     }
+
+    public boolean isLicenseSearch() {
+        return licenseSearch;
 
     public String getIndividualFileMatching() {
         return individualFileMatching;
