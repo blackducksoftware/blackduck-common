@@ -35,7 +35,6 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.builder.Buildable;
-import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.Stringable;
@@ -57,6 +56,7 @@ public class ScanBatch extends Stringable implements Buildable {
     private final SnippetMatching snippetMatchingMode;
     private final boolean uploadSource;
     private final boolean licenseSearch;
+    private final String individualFileMatching;
     private final URL blackDuckUrl;
     private final String blackDuckUsername;
     private final String blackDuckPassword;
@@ -68,7 +68,7 @@ public class ScanBatch extends Stringable implements Buildable {
     private final List<ScanTarget> scanTargets;
 
     public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
-            final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final boolean uploadSource, final boolean licenseSearch, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
+            final String scanCliOpts, final String additionalScanArguments, final SnippetMatching snippetMatchingMode, final boolean uploadSource, final boolean licenseSearch, final String individualFileMatching, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
             final ProxyInfo proxyInfo, final boolean alwaysTrustServerCertificate, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -82,6 +82,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.snippetMatchingMode = snippetMatchingMode;
         this.uploadSource = uploadSource;
         this.licenseSearch = licenseSearch;
+        this.individualFileMatching = individualFileMatching;
         this.blackDuckUrl = blackDuckUrl;
         this.blackDuckUsername = blackDuckUsername;
         this.blackDuckPassword = blackDuckPassword;
@@ -139,7 +140,7 @@ public class ScanBatch extends Stringable implements Buildable {
             }
             final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                     blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, alwaysTrustServerCertificate, scanTarget.getCodeLocationName(), snippetMatching, snippetMatchingOnly, fullSnippetScan,
-                    uploadSource, licenseSearch, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
+                    uploadSource, licenseSearch, individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
             scanCommands.add(scanCommand);
         }
 
@@ -192,6 +193,9 @@ public class ScanBatch extends Stringable implements Buildable {
 
     public boolean isLicenseSearch() {
         return licenseSearch;
+  
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
     }
 
     public URL getBlackDuckUrl() {
