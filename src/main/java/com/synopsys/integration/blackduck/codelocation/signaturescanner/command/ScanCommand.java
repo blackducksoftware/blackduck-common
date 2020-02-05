@@ -51,6 +51,7 @@ public class ScanCommand {
     private final boolean snippetMatchingOnly;
     private final boolean fullSnippetScan;
     private final boolean uploadSource;
+    private final String individualFileMatching;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
     private final String targetPath;
@@ -58,11 +59,10 @@ public class ScanCommand {
     private final boolean debug;
     private final String projectName;
     private final String versionName;
-    private final String individualFileMatching;
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName, final String individualFileMatching) {
+            final boolean fullSnippetScan, final boolean uploadSource, final String individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -81,6 +81,7 @@ public class ScanCommand {
         this.snippetMatchingOnly = snippetMatchingOnly;
         this.fullSnippetScan = fullSnippetScan;
         this.uploadSource = uploadSource;
+        this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
         this.additionalArguments = additionalArguments;
         this.targetPath = targetPath;
@@ -88,7 +89,6 @@ public class ScanCommand {
         this.debug = debug;
         this.projectName = projectName;
         this.versionName = versionName;
-        this.individualFileMatching = individualFileMatching;
     }
 
     public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException {
@@ -309,6 +309,10 @@ public class ScanCommand {
         return uploadSource;
     }
 
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
+    }
+
     public Set<String> getExcludePatterns() {
         return excludePatterns;
     }
@@ -337,7 +341,4 @@ public class ScanCommand {
         return versionName;
     }
 
-    public String getIndividualFileMatching() {
-        return individualFileMatching;
-    }
 }

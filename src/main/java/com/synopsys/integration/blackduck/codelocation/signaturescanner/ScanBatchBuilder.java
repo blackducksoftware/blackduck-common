@@ -55,6 +55,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
 
+    private String individualFileMatching;
+
     private URL blackDuckUrl;
     private String blackDuckUsername;
     private String blackDuckPassword;
@@ -65,14 +67,12 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private String projectName;
     private String projectVersionName;
 
-    private String individualFileMatching;
-
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, blackDuckUrl, blackDuckUsername,
-                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, individualFileMatching, scanTargets);
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, individualFileMatching, blackDuckUrl, blackDuckUsername,
+                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
     @Override
@@ -273,6 +273,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
+    public String getIndividualFileMatching() {
+        return individualFileMatching;
+    }
+
+    public void individualFileMatching(final String individualFileMatching) {
+        this.individualFileMatching = individualFileMatching;
+    }
+
     public URL getBlackDuckUrl() {
         return blackDuckUrl;
     }
@@ -333,14 +341,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public String getProjectVersionName() {
         return projectVersionName;
-    }
-
-    public String getIndividualFileMatching() {
-        return individualFileMatching;
-    }
-
-    public void individualFileMatching(final String individualFileMatching) {
-        this.individualFileMatching = individualFileMatching;
     }
 
     public List<ScanTarget> getScanTargets() {
