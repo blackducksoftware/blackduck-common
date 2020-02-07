@@ -37,7 +37,7 @@ public class TagService extends DataService {
         super(blackDuckService, logger);
     }
 
-    public List<com.synopsys.integration.blackduck.api.generated.view.TagView> getAllTags(ProjectView projectView) throws IntegrationException {
+    public List<TagView> getAllTags(ProjectView projectView) throws IntegrationException {
         return blackDuckService.getAllResponses(projectView, ProjectView.TAGS_LINK_RESPONSE);
     }
 
