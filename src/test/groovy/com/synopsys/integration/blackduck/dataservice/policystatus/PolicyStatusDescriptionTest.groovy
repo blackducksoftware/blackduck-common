@@ -1,11 +1,11 @@
 package com.synopsys.integration.blackduck.dataservice.policystatus
 
 import com.synopsys.integration.blackduck.TimingExtension
-import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,9 +27,9 @@ class PolicyStatusDescriptionTest {
         int expectedMajorSeverity = 0
         int actualInViolationOverall = test.getCountOfStatus(PolicyStatusType.IN_VIOLATION)
         int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusType.NOT_IN_VIOLATION)
-        int actualBlockerSeverity = test.getCountOfSeverity(PolicySeverityType.BLOCKER)
-        int actualTrivialSeverity = test.getCountOfSeverity(PolicySeverityType.TRIVIAL)
-        int actualMajorSeverity = test.getCountOfSeverity(PolicySeverityType.MAJOR)
+        int actualBlockerSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.BLOCKER)
+        int actualTrivialSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.TRIVIAL)
+        int actualMajorSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.MAJOR)
 
         assertEquals(expectedInViolationOverall, actualInViolationOverall)
         assertEquals(expectedNotInViolationOverall, actualNotInViolationOverall)
@@ -43,17 +43,17 @@ class PolicyStatusDescriptionTest {
         ProjectVersionPolicyStatusView policyStatusItem = createProjectVersionPolicyStatusView();
         final PolicyStatusDescription policyStatusDescription = new PolicyStatusDescription(policyStatusItem)
         String message = policyStatusDescription.getPolicyStatusMessage()
-        assertEquals("Black Duck found: 4 components in violation (Policy Severity counts: 3 matches have a severity level of BLOCKER, 1 match has a severity level of TRIVIAL), 0 components in violation, but overridden, and 1 component not in violation.", message)
+        assertEquals("Black Duck found: 4 components in violation (Policy Severity counts: 1 match has a severity level of TRIVIAL, 3 matches have a severity level of BLOCKER), 0 components in violation, but overridden, and 1 component not in violation.", message)
         assertNotNull(message)
     }
 
     private ProjectVersionPolicyStatusView createProjectVersionPolicyStatusView() {
         final NameValuePairView blockerViolation = new NameValuePairView()
-        blockerViolation.name = PolicySeverityType.BLOCKER
+        blockerViolation.name = PolicyRuleSeverityType.BLOCKER
         blockerViolation.value = 3
 
         final NameValuePairView trivialViolation = new NameValuePairView()
-        trivialViolation.name = PolicySeverityType.TRIVIAL
+        trivialViolation.name = PolicyRuleSeverityType.TRIVIAL
         trivialViolation.value = 1
 
         def violations = []

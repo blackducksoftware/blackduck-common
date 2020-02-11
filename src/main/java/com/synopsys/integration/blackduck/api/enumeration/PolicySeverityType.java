@@ -22,12 +22,17 @@
  */
 package com.synopsys.integration.blackduck.api.enumeration;
 
+@Deprecated
+/**
+ * We should be using PolicyRuleSeverityType
+ * @deprecated 46.0.0
+ */
 public enum PolicySeverityType {
     BLOCKER,
     CRITICAL,
     MAJOR,
     MINOR,
     TRIVIAL,
-    UNSPECIFIED;
+    UNSPECIFIED
 
 }
