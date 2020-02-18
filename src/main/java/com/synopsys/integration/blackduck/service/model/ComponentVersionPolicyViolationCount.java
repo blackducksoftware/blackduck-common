@@ -28,26 +28,26 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.synopsys.integration.blackduck.api.enumeration.PolicySeverityType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
 import com.synopsys.integration.util.Stringable;
 
 public class ComponentVersionPolicyViolationCount extends Stringable {
-    public PolicySeverityType name;
+    public PolicyRuleSeverityType name;
     public int value;
 
     public ComponentVersionPolicyViolationCount() {
     }
 
-    public ComponentVersionPolicyViolationCount(final NameValuePairView nameValuePair) {
-        final Set<PolicySeverityType> policySeverityTypes = EnumSet.allOf(PolicySeverityType.class);
-        final Set<String> policyStatusTypeValues = policySeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
+    public ComponentVersionPolicyViolationCount(NameValuePairView nameValuePair) {
+        Set<PolicyRuleSeverityType> policyRuleSeverityTypes = EnumSet.allOf(PolicyRuleSeverityType.class);
+        Set<String> policyStatusTypeValues = policyRuleSeverityTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.getName())) {
-            name = PolicySeverityType.valueOf(nameValuePair.getName());
+            name = PolicyRuleSeverityType.valueOf(nameValuePair.getName());
         }
 
         if (nameValuePair.getValue() != null) {
-            final String valueString = nameValuePair.getValue().toString();
+            String valueString = nameValuePair.getValue().toString();
             if (NumberUtils.isCreatable(valueString)) {
                 value = NumberUtils.createNumber(valueString).intValue();
             }
