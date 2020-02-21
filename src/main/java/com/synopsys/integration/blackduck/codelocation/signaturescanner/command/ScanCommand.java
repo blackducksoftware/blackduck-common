@@ -159,7 +159,7 @@ public class ScanCommand {
                 cmd.add("--insecure");
             }
 
-            if (snippetMatching || snippetMatchingOnly) {
+            if (snippetMatching || snippetMatchingOnly || licenseSearch) {
                 if (snippetMatching) {
                     cmd.add("--snippet-matching");
                 } else {
