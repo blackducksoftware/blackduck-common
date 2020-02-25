@@ -117,7 +117,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
             builderStatus.addErrorMessage("Must provide proxy info.");
         }
 
-        if (uploadSource && snippetMatching == null) {
+        if (uploadSource && snippetMatching == null && !licenseSearch ) {
             builderStatus.addErrorMessage("Snippet matching is required if upload source is enabled.");
         }
     }
