@@ -49,7 +49,7 @@ public class ScanCommand {
     private final boolean runInsecure;
     private final String name;
     private final BlackDuckOnlineProperties blackDuckOnlineProperties;
-    private final String individualFileMatching;
+    private final IndividualFileMatching individualFileMatching;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
     private final String targetPath;
@@ -60,7 +60,7 @@ public class ScanCommand {
 
     public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
             final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, final String individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.installDirectory = installDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -200,7 +200,7 @@ public class ScanCommand {
             }
         }
 
-        if (StringUtils.isNotBlank(individualFileMatching)) {
+        if (null != individualFileMatching) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
 
@@ -292,7 +292,7 @@ public class ScanCommand {
         return blackDuckOnlineProperties.isLicenseSearch();
     }
 
-    public String getIndividualFileMatching() {
+    public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
     }
 

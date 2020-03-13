@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
@@ -56,7 +57,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean uploadSource;
 
     private boolean licenseSearch;
-    private String individualFileMatching;
+    private IndividualFileMatching individualFileMatching;
 
     private URL blackDuckUrl;
     private String blackDuckUsername;
@@ -278,11 +279,11 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         this.licenseSearch = licenseSearch;
     }
   
-    public String getIndividualFileMatching() {
+    public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
     }
 
-    public void individualFileMatching(final String individualFileMatching) {
+    public void individualFileMatching(final IndividualFileMatching individualFileMatching) {
         this.individualFileMatching = individualFileMatching;
     }
 
