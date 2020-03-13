@@ -61,14 +61,4 @@ public class ScanBatchBuilderTest {
         assertTrue(builder.isValid());
     }
 
-    @Test
-    public void testUploadSourceWithoutSnippetFails() throws Exception {
-        ScanBatchBuilder builder = new ScanBatchBuilder();
-
-        builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
-        builder.uploadSource(null, true);
-
-        assertFalse(builder.isValid());
-    }
-
 }

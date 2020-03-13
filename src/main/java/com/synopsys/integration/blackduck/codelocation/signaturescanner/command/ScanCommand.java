@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.log.IntLogger;
@@ -47,11 +48,7 @@ public class ScanCommand {
     private final int port;
     private final boolean runInsecure;
     private final String name;
-    private final boolean snippetMatching;
-    private final boolean snippetMatchingOnly;
-    private final boolean fullSnippetScan;
-    private final boolean uploadSource;
-    private final boolean licenseSearch;
+    private final BlackDuckOnlineProperties blackDuckOnlineProperties;
     private final String individualFileMatching;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
@@ -78,11 +75,7 @@ public class ScanCommand {
         this.port = port;
         this.runInsecure = runInsecure;
         this.name = name;
-        this.snippetMatching = snippetMatching;
-        this.snippetMatchingOnly = snippetMatchingOnly;
-        this.fullSnippetScan = fullSnippetScan;
-        this.uploadSource = uploadSource;
-        this.licenseSearch = licenseSearch;
+        this.blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, snippetMatchingOnly, fullSnippetScan, uploadSource, licenseSearch);
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
         this.additionalArguments = additionalArguments;
@@ -159,26 +152,10 @@ public class ScanCommand {
                 cmd.add("--insecure");
             }
 
-            if (snippetMatching || snippetMatchingOnly || licenseSearch) {
-                if (snippetMatching) {
-                    cmd.add("--snippet-matching");
-                } else {
-                    cmd.add("--snippet-matching-only");
-                }
-
-                if (fullSnippetScan) {
-                    cmd.add("--full-snippet-scan");
-                }
-
-                if (uploadSource) {
-                    cmd.add("--upload-source");
-                }
-            }
+            blackDuckOnlineProperties.addOnlineCommands(cmd);
         } else {
             logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
-            if (snippetMatching || snippetMatchingOnly || fullSnippetScan || uploadSource) {
-                logger.warn("No snippet functionality is supported when running a dry run signature scan.");
-            }
+            blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn);
 
             // The dryRunWriteDir is the same as the log directory path
             // The CLI will create a subdirectory for the json files
@@ -222,11 +199,7 @@ public class ScanCommand {
                 }
             }
         }
-      
-        if (licenseSearch) {
-            cmd.add("--license-search");
-        }
-      
+
         if (StringUtils.isNotBlank(individualFileMatching)) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
@@ -300,23 +273,23 @@ public class ScanCommand {
     }
 
     public boolean isSnippetMatching() {
-        return snippetMatching;
+        return blackDuckOnlineProperties.isSnippetMatching();
     }
 
     public boolean isSnippetMatchingOnly() {
-        return snippetMatchingOnly;
+        return blackDuckOnlineProperties.isSnippetMatchingOnly();
     }
 
     public boolean isFullSnippetScan() {
-        return fullSnippetScan;
+        return blackDuckOnlineProperties.isFullSnippetScan();
     }
 
     public boolean isUploadSource() {
-        return uploadSource;
+        return blackDuckOnlineProperties.isUploadSource();
     }
 
     public boolean isLicenseSearch() {
-        return licenseSearch;
+        return blackDuckOnlineProperties.isLicenseSearch();
     }
 
     public String getIndividualFileMatching() {
