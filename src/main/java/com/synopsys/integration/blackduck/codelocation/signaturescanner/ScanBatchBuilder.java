@@ -116,10 +116,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         if (blackDuckUrl != null && proxyInfo == null) {
             builderStatus.addErrorMessage("Must provide proxy info.");
         }
-
-        if (uploadSource && snippetMatching == null && !licenseSearch ) {
-            builderStatus.addErrorMessage("Snippet matching is required if upload source is enabled.");
-        }
     }
 
     /**

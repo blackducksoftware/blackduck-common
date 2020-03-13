@@ -52,6 +52,7 @@ public class ScanCommand {
     private final boolean fullSnippetScan;
     private final boolean uploadSource;
     private final boolean licenseSearch;
+    private final UploadSourceProperties uploadSourceProperties;
     private final String individualFileMatching;
     private final Set<String> excludePatterns;
     private final String additionalArguments;
@@ -82,6 +83,7 @@ public class ScanCommand {
         this.snippetMatchingOnly = snippetMatchingOnly;
         this.fullSnippetScan = fullSnippetScan;
         this.uploadSource = uploadSource;
+        this.uploadSourceProperties = new UploadSourceProperties(snippetMatching, snippetMatchingOnly, uploadSource, licenseSearch);
         this.licenseSearch = licenseSearch;
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
@@ -159,7 +161,7 @@ public class ScanCommand {
                 cmd.add("--insecure");
             }
 
-            if (snippetMatching || snippetMatchingOnly || licenseSearch) {
+            if (snippetMatching || snippetMatchingOnly) {
                 if (snippetMatching) {
                     cmd.add("--snippet-matching");
                 } else {
@@ -169,15 +171,19 @@ public class ScanCommand {
                 if (fullSnippetScan) {
                     cmd.add("--full-snippet-scan");
                 }
+            }
 
-                if (uploadSource) {
-                    cmd.add("--upload-source");
-                }
+            if (licenseSearch) {
+                cmd.add("--license-search");
+            }
+
+            if (uploadSourceProperties.isUploadSource()) {
+                cmd.add("--upload-source");
             }
         } else {
             logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
-            if (snippetMatching || snippetMatchingOnly || fullSnippetScan || uploadSource) {
-                logger.warn("No snippet functionality is supported when running a dry run signature scan.");
+            if (snippetMatching || snippetMatchingOnly || fullSnippetScan || uploadSource || licenseSearch) {
+                logger.warn("No snippet functionality, license search, or uploading of source is supported when running a dry run signature scan.");
             }
 
             // The dryRunWriteDir is the same as the log directory path
@@ -222,11 +228,7 @@ public class ScanCommand {
                 }
             }
         }
-      
-        if (licenseSearch) {
-            cmd.add("--license-search");
-        }
-      
+
         if (StringUtils.isNotBlank(individualFileMatching)) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
