@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import com.synopsys.integration.log.BufferedIntLogger;
 import org.apache.commons.io.FileUtils;
@@ -159,7 +160,21 @@ public class ScanCommandTest {
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, false, false);
         assertLicenseSearch(commandList, false);
-        assertUploadSource(commandList, false);
+        assertUploadSource(commandList, true);
+    }
+
+    @Test
+    public void testIndividualFileMatchingNotSet() throws BlackDuckIntegrationException {
+        scanBatchBuilder.individualFileMatching(null);
+        List<String> commandList = createCommandList();
+        assertIndividualFileMatching(commandList, null);
+    }
+
+    @Test
+    public void testIndividualFileMatchingValidValue() throws BlackDuckIntegrationException {
+        scanBatchBuilder.individualFileMatching(IndividualFileMatching.BINARY);
+        List<String> commandList = createCommandList();
+        assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
     }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
@@ -208,6 +223,18 @@ public class ScanCommandTest {
 
     private void assertUploadSource(List<String> commandList, boolean uploadSource) {
         assertEquals(uploadSource, commandList.contains("--upload-source"));
+    }
+
+    private void assertIndividualFileMatching(List<String> commandList, IndividualFileMatching individualFileMatching) {
+        Optional<String> isIndividualFileMatching = commandList
+                .stream()
+                .filter(s -> s.contains("individualFileMatching"))
+                .findAny();
+        if (null == individualFileMatching) {
+            assertFalse(isIndividualFileMatching.isPresent());
+        } else {
+            assertEquals("--individualFileMatching=" + individualFileMatching, isIndividualFileMatching.get());
+        }
     }
 
 }
