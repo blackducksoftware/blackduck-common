@@ -45,6 +45,9 @@ import com.synopsys.integration.rest.request.Response;
  * @deprecated BlackDuckServerConfig should be used to verify a Black Duck server.
  */
 public class BlackDuckServerVerifier {
+
+    public static final String INVALID_BLACK_DUCK_SERVER_URL = "The Url does not appear to be a Black Duck server :";
+
     public void verifyIsBlackDuckServer(URL blackDuckUrl, ProxyInfo blackDuckProxyInfo, boolean alwaysTrustServerCertificate, int timeoutSeconds) throws IntegrationException {
         IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
         ProxyInfo proxyInfo = blackDuckProxyInfo != null ? blackDuckProxyInfo : ProxyInfo.NO_PROXY_INFO;
@@ -74,14 +77,14 @@ public class BlackDuckServerVerifier {
             try (Response response = intHttpClient.execute(request)) {
                 response.throwExceptionForError();
             } catch (IntegrationRestException e) {
-                throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
+                throw new BlackDuckIntegrationException(INVALID_BLACK_DUCK_SERVER_URL + downloadUri + ", because: " + e.getHttpStatusCode() + " : " + e.getHttpStatusMessage(), e);
             } catch (IntegrationException e) {
-                throw new BlackDuckIntegrationException("The Url does not appear to be a Black Duck server :" + downloadUri + ", because: " + e.getMessage(), e);
+                throw new BlackDuckIntegrationException(INVALID_BLACK_DUCK_SERVER_URL + downloadUri + ", because: " + e.getMessage(), e);
             } catch (IOException e) {
                 throw new IntegrationException(e.getMessage(), e);
             }
         } catch (URISyntaxException e) {
-            throw new IntegrationException("The Url does not appear to be a Black Duck server :" + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
+            throw new IntegrationException(INVALID_BLACK_DUCK_SERVER_URL + blackDuckUrl.toString() + ", because: " + e.getMessage(), e);
         }
     }
 

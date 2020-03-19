@@ -46,6 +46,8 @@ import com.synopsys.integration.pdf.StringManager;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 
 public class RiskReportPdfWriter {
+    public static final String BASIC_RED = "#b52b24";
+    public static final String SALMON_RED = "#eca4a0";
 
     private final String HIGH_RISK = "High Risk";
     private final String MED_RISK = "Medium Risk";
@@ -150,8 +152,8 @@ public class RiskReportPdfWriter {
     private PDRectangle writeSummaryTable(final float centerX, final float y, final String title, final int highCount, final int mediumCount, final int lowCount, final int noneCount, final int totalCount) throws IOException {
         PDRectangle rectangle = pdfManager.writeTextCentered(centerX, y, title, boldFont, 14, Color.BLACK);
 
-        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, HIGH_RISK, highCount, totalCount, decode("#b52b24"));
-        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, MED_RISK, mediumCount, totalCount, decode("#eca4a0"));
+        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, HIGH_RISK, highCount, totalCount, decode(BASIC_RED));
+        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, MED_RISK, mediumCount, totalCount, decode(SALMON_RED));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, LOW_RISK, lowCount, totalCount, new Color(153, 153, 153));
         return writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, NO_RISK, noneCount, totalCount, new Color(221, 221, 221));
     }
@@ -278,10 +280,10 @@ public class RiskReportPdfWriter {
         risk.riskColor = noColor;
         if (component.getLicenseRiskHighCount() > 0) {
             risk.riskShortString = "H";
-            risk.riskColor = decode("#b52b24");
+            risk.riskColor = decode(BASIC_RED);
         } else if (component.getLicenseRiskMediumCount() > 0) {
             risk.riskShortString = "M";
-            risk.riskColor = decode("#eca4a0");
+            risk.riskColor = decode(SALMON_RED);
         } else if (component.getLicenseRiskLowCount() > 0) {
             risk.riskShortString = "L";
             risk.riskColor = new Color(153, 153, 153);
@@ -295,10 +297,10 @@ public class RiskReportPdfWriter {
         risk.riskColor = noColor;
         if (component.getOperationalRiskHighCount() > 0) {
             risk.riskShortString = "H";
-            risk.riskColor = decode("#b52b24");
+            risk.riskColor = decode(BASIC_RED);
         } else if (component.getOperationalRiskMediumCount() > 0) {
             risk.riskShortString = "M";
-            risk.riskColor = decode("#eca4a0");
+            risk.riskColor = decode(SALMON_RED);
         } else if (component.getOperationalRiskLowCount() > 0) {
             risk.riskShortString = "L";
             risk.riskColor = new Color(153, 153, 153);
