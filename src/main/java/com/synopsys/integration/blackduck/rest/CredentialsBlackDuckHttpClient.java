@@ -42,7 +42,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
@@ -80,7 +80,7 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
 
     @Override
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
-        if (response.isStatusCodeOkay()) {
+        if (response.isStatusCodeSuccess()) {
             CloseableHttpResponse actualResponse = response.getActualResponse();
             Header csrfHeader = actualResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
             String csrfHeaderValue = csrfHeader.getValue();

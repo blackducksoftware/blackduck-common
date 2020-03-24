@@ -33,7 +33,7 @@ import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;

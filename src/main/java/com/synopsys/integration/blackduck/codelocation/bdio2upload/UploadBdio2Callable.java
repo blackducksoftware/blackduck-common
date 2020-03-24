@@ -30,7 +30,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
