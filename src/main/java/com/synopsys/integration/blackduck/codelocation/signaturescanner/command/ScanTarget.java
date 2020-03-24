@@ -22,6 +22,10 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
 import java.util.Set;
 
 public class ScanTarget {
@@ -69,6 +73,21 @@ public class ScanTarget {
 
     public boolean isOutputDirectoryPathAbsolute() {
         return outputDirectoryPathAbsolute;
+    }
+
+    public File determineCommandOutputDirectory(ScanPathsUtility scanPathsUtility, File outputDirectory) throws BlackDuckIntegrationException {
+        if (StringUtils.isNotBlank(getOutputDirectoryPath())) {
+            File commandOutputDirectory;
+            if (isOutputDirectoryPathAbsolute()) {
+                commandOutputDirectory = new File(getOutputDirectoryPath());
+            } else {
+                commandOutputDirectory = new File(outputDirectory, getOutputDirectoryPath());
+            }
+            commandOutputDirectory.mkdirs();
+            return commandOutputDirectory;
+        } else {
+            return scanPathsUtility.createSpecificRunOutputDirectory(outputDirectory);
+        }
     }
 
     public static class Builder {

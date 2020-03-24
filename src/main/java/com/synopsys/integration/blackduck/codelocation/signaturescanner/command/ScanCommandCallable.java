@@ -60,7 +60,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     public ScanCommandOutput call() {
         String commandToExecute = "command_not_yet_configured";
         try {
-            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
+            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getSignatureScannerInstallDirectory());
 
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
             cmd.add(scanCommand.getTargetPath());
@@ -75,10 +75,10 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
                 if (!scanCommand.isDryRun()) {
-                    if (!StringUtils.isEmpty(scanCommand.getApiToken())) {
-                        processBuilder.environment().put("BD_HUB_TOKEN", scanCommand.getApiToken());
+                    if (!StringUtils.isEmpty(scanCommand.getBlackDuckApiToken())) {
+                        processBuilder.environment().put("BD_HUB_TOKEN", scanCommand.getBlackDuckApiToken());
                     } else {
-                        processBuilder.environment().put("BD_HUB_PASSWORD", scanCommand.getPassword());
+                        processBuilder.environment().put("BD_HUB_PASSWORD", scanCommand.getBlackDuckPassword());
                     }
                 }
                 processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");

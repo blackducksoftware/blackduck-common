@@ -34,34 +34,36 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanCommand {
-    private final File installDirectory;
-    private final File outputDirectory;
-    private final boolean dryRun;
-    private final ProxyInfo proxyInfo;
-    private final String scanCliOpts;
-    private final int scanMemoryInMegabytes;
     private final String scheme;
     private final String host;
-    private final String apiToken;
-    private final String username;
-    private final String password;
     private final int port;
-    private final boolean runInsecure;
-    private final String name;
-    private final BlackDuckOnlineProperties blackDuckOnlineProperties;
-    private final IndividualFileMatching individualFileMatching;
-    private final Set<String> excludePatterns;
-    private final String additionalArguments;
+
     private final String targetPath;
-    private final boolean verbose;
-    private final boolean debug;
+    private final String name;
+    private final Set<String> excludePatterns;
+    private final BlackDuckOnlineProperties blackDuckOnlineProperties;
+
+    private final String blackDuckUsername;
+    private final String blackDuckPassword;
+    private final String blackDuckApiToken;
+    private final File signatureScannerInstallDirectory;
+    private final File outputDirectory;
+    private final int scanMemoryInMegabytes;
+    private final String scanCliOpts;
+    private final String additionalScanArguments;
+    private final boolean runInsecure;
+    private final boolean dryRun;
+    private final ProxyInfo proxyInfo;
     private final String projectName;
     private final String versionName;
+    private final IndividualFileMatching individualFileMatching;
+    private final boolean debug;
+    private final boolean verbose;
 
-    public ScanCommand(final File installDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-            final String host, final String apiToken, final String username, final String password, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
-        this.installDirectory = installDirectory;
+    public ScanCommand(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
+            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
+            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalScanArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+        this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
         this.proxyInfo = proxyInfo;
@@ -69,16 +71,16 @@ public class ScanCommand {
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
         this.scheme = scheme;
         this.host = host;
-        this.apiToken = apiToken;
-        this.username = username;
-        this.password = password;
+        this.blackDuckApiToken = blackDuckApiToken;
+        this.blackDuckUsername = blackDuckUsername;
+        this.blackDuckPassword = blackDuckPassword;
         this.port = port;
         this.runInsecure = runInsecure;
         this.name = name;
         this.blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, snippetMatchingOnly, fullSnippetScan, uploadSource, licenseSearch);
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
-        this.additionalArguments = additionalArguments;
+        this.additionalScanArguments = additionalScanArguments;
         this.targetPath = targetPath;
         this.verbose = verbose;
         this.debug = debug;
@@ -144,7 +146,6 @@ public class ScanCommand {
     }
 
     private void populateAdditionalScanArguments(List<String> cmd) {
-        final String additionalScanArguments = additionalArguments;
         if (StringUtils.isNotBlank(additionalScanArguments)) {
             for (final String additionalArgument : additionalScanArguments.split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
@@ -191,9 +192,9 @@ public class ScanCommand {
         cmd.add(host);
         logger.debug("Using the Black Duck hostname : '" + host + "'");
 
-        if (StringUtils.isEmpty(apiToken)) {
+        if (StringUtils.isEmpty(blackDuckApiToken)) {
             cmd.add("--username");
-            cmd.add(username);
+            cmd.add(blackDuckUsername);
         }
 
         final int blackDuckPort = port;
@@ -247,8 +248,8 @@ public class ScanCommand {
         }
     }
 
-    public File getInstallDirectory() {
-        return installDirectory;
+    public File getSignatureScannerInstallDirectory() {
+        return signatureScannerInstallDirectory;
     }
 
     public File getOutputDirectory() {
@@ -279,16 +280,16 @@ public class ScanCommand {
         return host;
     }
 
-    public String getApiToken() {
-        return apiToken;
+    public String getBlackDuckApiToken() {
+        return blackDuckApiToken;
     }
 
-    public String getUsername() {
-        return username;
+    public String getBlackDuckUsername() {
+        return blackDuckUsername;
     }
 
-    public String getPassword() {
-        return password;
+    public String getBlackDuckPassword() {
+        return blackDuckPassword;
     }
 
     public int getPort() {
@@ -331,8 +332,8 @@ public class ScanCommand {
         return excludePatterns;
     }
 
-    public String getAdditionalArguments() {
-        return additionalArguments;
+    public String getAdditionalScanArguments() {
+        return additionalScanArguments;
     }
 
     public String getTargetPath() {
