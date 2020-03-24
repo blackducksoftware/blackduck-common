@@ -91,76 +91,22 @@ public class ScanCommand {
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
+
         if (proxyInfo.shouldUseProxy()) {
-            final ProxyInfo blackDuckProxyInfo = proxyInfo;
-            final String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
-            final int proxyPort = blackDuckProxyInfo.getPort();
-            final String proxyUsername = blackDuckProxyInfo.getUsername().orElse(null);
-            final String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
-            final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
-            final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
-            cmd.add("-Dhttp.proxyHost=" + proxyHost);
-            cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
-            if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-                cmd.add("-Dhttp.proxyUser=" + proxyUsername);
-                cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
-            } else {
-                // CLI will ignore the proxy host and port if there are no credentials
-                cmd.add("-Dhttp.proxyUser=user");
-                cmd.add("-Dhttp.proxyPassword=password");
-            }
-            if (StringUtils.isNotBlank(proxyNtlmDomain)) {
-                cmd.add("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
-            }
-            if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
-                cmd.add("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
-            }
+            populateProxyDetails(cmd);
         }
-        if (StringUtils.isNotBlank(scanCliOpts)) {
-            for (final String scanOpt : scanCliOpts.split(" ")) {
-                if (StringUtils.isNotBlank(scanOpt)) {
-                    cmd.add(scanOpt);
-                }
-            }
-        }
+
+        populateScanCliOpts(cmd);
+
         cmd.add("-Xmx" + scanMemoryInMegabytes + "m");
         scannerPaths.addScanExecutableArguments(cmd);
 
         cmd.add("--no-prompt");
 
         if (!dryRun) {
-            cmd.add("--scheme");
-            cmd.add(scheme);
-            cmd.add("--host");
-            cmd.add(host);
-            logger.debug("Using the Black Duck hostname : '" + host + "'");
-
-            if (StringUtils.isEmpty(apiToken)) {
-                cmd.add("--username");
-                cmd.add(username);
-            }
-
-            final int blackDuckPort = port;
-            if (blackDuckPort > 0) {
-                cmd.add("--port");
-                cmd.add(Integer.toString(blackDuckPort));
-            } else {
-                logger.warn("Could not find a port to use for the Server.");
-            }
-
-            if (runInsecure) {
-                cmd.add("--insecure");
-            }
-
-            blackDuckOnlineProperties.addOnlineCommands(cmd);
+            populateOnlineProperties(logger, cmd);
         } else {
-            logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
-            blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn);
-
-            // The dryRunWriteDir is the same as the log directory path
-            // The CLI will create a subdirectory for the json files
-            cmd.add("--dryRunWriteDir");
-            cmd.add(specificRunOutputDirectoryPath);
+            populateOfflineProperties(logger, specificRunOutputDirectoryPath, cmd);
         }
 
         if (verbose) {
@@ -179,31 +125,25 @@ public class ScanCommand {
         cmd.add("--statusWriteDir");
         cmd.add(specificRunOutputDirectoryPath);
 
-        if (StringUtils.isNotBlank(projectName) && StringUtils.isNotBlank(versionName)) {
-            cmd.add("--project");
-            cmd.add(projectName);
-            cmd.add("--release");
-            cmd.add(versionName);
-        }
+        populateProjectAndVersion(cmd);
 
         if (StringUtils.isNotBlank(name)) {
             cmd.add("--name");
             cmd.add(name);
         }
 
-        if (excludePatterns != null) {
-            for (final String exclusionPattern : excludePatterns) {
-                if (StringUtils.isNotBlank(exclusionPattern)) {
-                    cmd.add("--exclude");
-                    cmd.add(exclusionPattern);
-                }
-            }
-        }
+        populateExcludePatterns(cmd);
 
         if (null != individualFileMatching) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
 
+        populateAdditionalScanArguments(cmd);
+
+        return cmd;
+    }
+
+    private void populateAdditionalScanArguments(List<String> cmd) {
         final String additionalScanArguments = additionalArguments;
         if (StringUtils.isNotBlank(additionalScanArguments)) {
             for (final String additionalArgument : additionalScanArguments.split(" ")) {
@@ -212,8 +152,99 @@ public class ScanCommand {
                 }
             }
         }
+    }
 
-        return cmd;
+    private void populateExcludePatterns(List<String> cmd) {
+        if (excludePatterns != null) {
+            for (final String exclusionPattern : excludePatterns) {
+                if (StringUtils.isNotBlank(exclusionPattern)) {
+                    cmd.add("--exclude");
+                    cmd.add(exclusionPattern);
+                }
+            }
+        }
+    }
+
+    private void populateProjectAndVersion(List<String> cmd) {
+        if (StringUtils.isNotBlank(projectName) && StringUtils.isNotBlank(versionName)) {
+            cmd.add("--project");
+            cmd.add(projectName);
+            cmd.add("--release");
+            cmd.add(versionName);
+        }
+    }
+
+    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, List<String> cmd) {
+        logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
+        blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn);
+
+        // The dryRunWriteDir is the same as the log directory path
+        // The CLI will create a subdirectory for the json files
+        cmd.add("--dryRunWriteDir");
+        cmd.add(specificRunOutputDirectoryPath);
+    }
+
+    private void populateOnlineProperties(IntLogger logger, List<String> cmd) {
+        cmd.add("--scheme");
+        cmd.add(scheme);
+        cmd.add("--host");
+        cmd.add(host);
+        logger.debug("Using the Black Duck hostname : '" + host + "'");
+
+        if (StringUtils.isEmpty(apiToken)) {
+            cmd.add("--username");
+            cmd.add(username);
+        }
+
+        final int blackDuckPort = port;
+        if (blackDuckPort > 0) {
+            cmd.add("--port");
+            cmd.add(Integer.toString(blackDuckPort));
+        } else {
+            logger.warn("Could not find a port to use for the Server.");
+        }
+
+        if (runInsecure) {
+            cmd.add("--insecure");
+        }
+
+        blackDuckOnlineProperties.addOnlineCommands(cmd);
+    }
+
+    private void populateScanCliOpts(List<String> cmd) {
+        if (StringUtils.isNotBlank(scanCliOpts)) {
+            for (final String scanOpt : scanCliOpts.split(" ")) {
+                if (StringUtils.isNotBlank(scanOpt)) {
+                    cmd.add(scanOpt);
+                }
+            }
+        }
+    }
+
+    private void populateProxyDetails(List<String> cmd) {
+        final ProxyInfo blackDuckProxyInfo = proxyInfo;
+        final String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
+        final int proxyPort = blackDuckProxyInfo.getPort();
+        final String proxyUsername = blackDuckProxyInfo.getUsername().orElse(null);
+        final String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
+        final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
+        final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
+        cmd.add("-Dhttp.proxyHost=" + proxyHost);
+        cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
+        if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
+            cmd.add("-Dhttp.proxyUser=" + proxyUsername);
+            cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
+        } else {
+            // CLI will ignore the proxy host and port if there are no credentials
+            cmd.add("-Dhttp.proxyUser=user");
+            cmd.add("-Dhttp.proxyPassword=password");
+        }
+        if (StringUtils.isNotBlank(proxyNtlmDomain)) {
+            cmd.add("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
+        }
+        if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
+            cmd.add("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
+        }
     }
 
     public File getInstallDirectory() {
