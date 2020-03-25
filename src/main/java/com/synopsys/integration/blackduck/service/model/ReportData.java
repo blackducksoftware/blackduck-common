@@ -23,6 +23,8 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -36,17 +38,13 @@ public class ReportData {
     private String distribution;
     private List<BomComponent> components;
     private int totalComponents;
-    private int vulnerabilityRiskHighCount;
-    private int vulnerabilityRiskMediumCount;
-    private int vulnerabilityRiskLowCount;
+
+    private BomRiskCounts securityRiskCounts = new BomRiskCounts();
+    private BomRiskCounts licenseRiskCounts = new BomRiskCounts();
+    private BomRiskCounts operationalRiskCounts = new BomRiskCounts();
+
     private int vulnerabilityRiskNoneCount;
-    private int licenseRiskHighCount;
-    private int licenseRiskMediumCount;
-    private int licenseRiskLowCount;
     private int licenseRiskNoneCount;
-    private int operationalRiskHighCount;
-    private int operationalRiskMediumCount;
-    private int operationalRiskLowCount;
     private int operationalRiskNoneCount;
 
     public String htmlEscape(final String valueToEscape) {
@@ -109,15 +107,15 @@ public class ReportData {
     }
 
     public int getVulnerabilityRiskHighCount() {
-        return vulnerabilityRiskHighCount;
+        return securityRiskCounts.getHigh();
     }
 
     public int getVulnerabilityRiskMediumCount() {
-        return vulnerabilityRiskMediumCount;
+        return securityRiskCounts.getMedium();
     }
 
     public int getVulnerabilityRiskLowCount() {
-        return vulnerabilityRiskLowCount;
+        return securityRiskCounts.getLow();
     }
 
     public int getVulnerabilityRiskNoneCount() {
@@ -125,15 +123,15 @@ public class ReportData {
     }
 
     public int getLicenseRiskHighCount() {
-        return licenseRiskHighCount;
+        return licenseRiskCounts.getHigh();
     }
 
     public int getLicenseRiskMediumCount() {
-        return licenseRiskMediumCount;
+        return licenseRiskCounts.getMedium();
     }
 
     public int getLicenseRiskLowCount() {
-        return licenseRiskLowCount;
+        return licenseRiskCounts.getLow();
     }
 
     public int getLicenseRiskNoneCount() {
@@ -141,15 +139,15 @@ public class ReportData {
     }
 
     public int getOperationalRiskHighCount() {
-        return operationalRiskHighCount;
+        return operationalRiskCounts.getHigh();
     }
 
     public int getOperationalRiskMediumCount() {
-        return operationalRiskMediumCount;
+        return operationalRiskCounts.getMedium();
     }
 
     public int getOperationalRiskLowCount() {
-        return operationalRiskLowCount;
+        return operationalRiskCounts.getLow();
     }
 
     public int getOperationalRiskNoneCount() {
@@ -163,48 +161,17 @@ public class ReportData {
     public void setComponents(final List<BomComponent> components) {
         this.components = components;
 
-        vulnerabilityRiskHighCount = 0;
-        vulnerabilityRiskMediumCount = 0;
-        vulnerabilityRiskLowCount = 0;
-
-        licenseRiskHighCount = 0;
-        licenseRiskMediumCount = 0;
-        licenseRiskLowCount = 0;
-
-        operationalRiskHighCount = 0;
-        operationalRiskMediumCount = 0;
-        operationalRiskLowCount = 0;
-
         for (final BomComponent component : components) {
-            if (component != null) {
-                if (component.getSecurityRiskHighCount() > 0) {
-                    vulnerabilityRiskHighCount++;
-                } else if (component.getSecurityRiskMediumCount() > 0) {
-                    vulnerabilityRiskMediumCount++;
-                } else if (component.getSecurityRiskLowCount() > 0) {
-                    vulnerabilityRiskLowCount++;
-                }
-                if (component.getLicenseRiskHighCount() > 0) {
-                    licenseRiskHighCount++;
-                } else if (component.getLicenseRiskMediumCount() > 0) {
-                    licenseRiskMediumCount++;
-                } else if (component.getLicenseRiskLowCount() > 0) {
-                    licenseRiskLowCount++;
-                }
-                if (component.getOperationalRiskHighCount() > 0) {
-                    operationalRiskHighCount++;
-                } else if (component.getOperationalRiskMediumCount() > 0) {
-                    operationalRiskMediumCount++;
-                } else if (component.getOperationalRiskLowCount() > 0) {
-                    operationalRiskLowCount++;
-                }
-            }
+            securityRiskCounts.add(component.getSecurityRiskCounts());
+            licenseRiskCounts.add(component.getLicenseRiskCounts());
+            operationalRiskCounts.add(component.getOperationalRiskCounts());
         }
+
         totalComponents = components.size();
 
-        vulnerabilityRiskNoneCount = totalComponents - vulnerabilityRiskHighCount - vulnerabilityRiskMediumCount - vulnerabilityRiskLowCount;
-        licenseRiskNoneCount = totalComponents - licenseRiskHighCount - licenseRiskMediumCount - licenseRiskLowCount;
-        operationalRiskNoneCount = totalComponents - operationalRiskHighCount - operationalRiskMediumCount - operationalRiskLowCount;
+        vulnerabilityRiskNoneCount = totalComponents - getVulnerabilityRiskHighCount() - getVulnerabilityRiskMediumCount() - getVulnerabilityRiskLowCount();
+        licenseRiskNoneCount = totalComponents - getLicenseRiskHighCount() - getLicenseRiskMediumCount() - getLicenseRiskLowCount();
+        operationalRiskNoneCount = totalComponents - getOperationalRiskHighCount() - getOperationalRiskMediumCount() - getOperationalRiskLowCount();
     }
 
 }
