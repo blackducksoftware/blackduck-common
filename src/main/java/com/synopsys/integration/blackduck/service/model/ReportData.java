@@ -39,9 +39,9 @@ public class ReportData {
     private List<BomComponent> components;
     private int totalComponents;
 
-    private BomRiskCounts securityRiskCounts;
-    private BomRiskCounts licenseRiskCounts;
-    private BomRiskCounts operationalRiskCounts;
+    private BomRiskCounts securityRiskCounts = new BomRiskCounts();
+    private BomRiskCounts licenseRiskCounts = new BomRiskCounts();
+    private BomRiskCounts operationalRiskCounts = new BomRiskCounts();
 
     private int vulnerabilityRiskNoneCount;
     private int licenseRiskNoneCount;
