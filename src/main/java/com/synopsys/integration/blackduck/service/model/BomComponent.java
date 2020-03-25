@@ -22,6 +22,9 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 
 public class BomComponent {
@@ -32,15 +35,32 @@ public class BomComponent {
     private String componentVersion;
     private String componentVersionURL;
     private String license;
-    private int securityRiskHighCount;
-    private int securityRiskMediumCount;
-    private int securityRiskLowCount;
-    private int licenseRiskHighCount;
-    private int licenseRiskMediumCount;
-    private int licenseRiskLowCount;
-    private int operationalRiskHighCount;
-    private int operationalRiskMediumCount;
-    private int operationalRiskLowCount;
+    private BomRiskCounts securityRiskCounts;
+    private BomRiskCounts licenseRiskCounts;
+    private BomRiskCounts operationalRiskCounts;
+
+    public void addSecurityRiskProfile(RiskProfileView securityRiskProfile) {
+        addRiskProfile(securityRiskProfile, securityRiskCounts);
+    }
+
+    public void addLicenseRiskProfile(RiskProfileView licenseRiskProfile) {
+        addRiskProfile(licenseRiskProfile, licenseRiskCounts);
+    }
+
+    public void addOperationalRiskProfile(RiskProfileView operationalRiskProfile) {
+        addRiskProfile(operationalRiskProfile, operationalRiskCounts);
+    }
+
+    private void addRiskProfile(RiskProfileView riskProfileView, BomRiskCounts bomRiskCounts) {
+        if (null == riskProfileView || CollectionUtils.isEmpty(riskProfileView.getCounts())) {
+            return;
+        }
+
+        riskProfileView
+                .getCounts()
+                .stream()
+                .forEach(bomRiskCounts::add);
+    }
 
     public String getPolicyStatus() {
         return policyStatus;
@@ -99,75 +119,51 @@ public class BomComponent {
     }
 
     public int getSecurityRiskHighCount() {
-        return securityRiskHighCount;
-    }
-
-    public void setSecurityRiskHighCount(final int securityRiskHighCount) {
-        this.securityRiskHighCount = securityRiskHighCount;
+        return securityRiskCounts.getHigh();
     }
 
     public int getSecurityRiskMediumCount() {
-        return securityRiskMediumCount;
-    }
-
-    public void setSecurityRiskMediumCount(final int securityRiskMediumCount) {
-        this.securityRiskMediumCount = securityRiskMediumCount;
+        return securityRiskCounts.getMedium();
     }
 
     public int getSecurityRiskLowCount() {
-        return securityRiskLowCount;
-    }
-
-    public void setSecurityRiskLowCount(final int securityRiskLowCount) {
-        this.securityRiskLowCount = securityRiskLowCount;
+        return securityRiskCounts.getLow();
     }
 
     public int getLicenseRiskHighCount() {
-        return licenseRiskHighCount;
-    }
-
-    public void setLicenseRiskHighCount(final int licenseRiskHighCount) {
-        this.licenseRiskHighCount = licenseRiskHighCount;
+        return licenseRiskCounts.getHigh();
     }
 
     public int getLicenseRiskMediumCount() {
-        return licenseRiskMediumCount;
-    }
-
-    public void setLicenseRiskMediumCount(final int licenseRiskMediumCount) {
-        this.licenseRiskMediumCount = licenseRiskMediumCount;
+        return licenseRiskCounts.getMedium();
     }
 
     public int getLicenseRiskLowCount() {
-        return licenseRiskLowCount;
-    }
-
-    public void setLicenseRiskLowCount(final int licenseRiskLowCount) {
-        this.licenseRiskLowCount = licenseRiskLowCount;
+        return licenseRiskCounts.getLow();
     }
 
     public int getOperationalRiskHighCount() {
-        return operationalRiskHighCount;
-    }
-
-    public void setOperationalRiskHighCount(final int operationalRiskHighCount) {
-        this.operationalRiskHighCount = operationalRiskHighCount;
+        return operationalRiskCounts.getHigh();
     }
 
     public int getOperationalRiskMediumCount() {
-        return operationalRiskMediumCount;
-    }
-
-    public void setOperationalRiskMediumCount(final int operationalRiskMediumCount) {
-        this.operationalRiskMediumCount = operationalRiskMediumCount;
+        return operationalRiskCounts.getMedium();
     }
 
     public int getOperationalRiskLowCount() {
-        return operationalRiskLowCount;
+        return operationalRiskCounts.getLow();
     }
 
-    public void setOperationalRiskLowCount(final int operationalRiskLowCount) {
-        this.operationalRiskLowCount = operationalRiskLowCount;
+    public BomRiskCounts getSecurityRiskCounts() {
+        return securityRiskCounts;
+    }
+
+    public BomRiskCounts getLicenseRiskCounts() {
+        return licenseRiskCounts;
+    }
+
+    public BomRiskCounts getOperationalRiskCounts() {
+        return operationalRiskCounts;
     }
 
 }
