@@ -29,40 +29,41 @@ import java.math.BigDecimal;
 import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType.*;
 
 public class BomRiskCounts {
-    private BigDecimal high = BigDecimal.ZERO;
-    private BigDecimal medium = BigDecimal.ZERO;
-    private BigDecimal low = BigDecimal.ZERO;
+    private int high;
+    private int medium;
+    private int low;
 
     public void add(ComponentVersionRiskProfileRiskDataCountsView countsView) {
+        int count = countsView.getCount().intValue();
         if (HIGH == countsView.getCountType()) {
-            high = high.add(countsView.getCount());
+            high += count;
         } else if (MEDIUM == countsView.getCountType()) {
-            medium = medium.add(countsView.getCount());
+            medium += count;
         } else if (LOW == countsView.getCountType()) {
-            low = low.add(countsView.getCount());
+            low += count;
         }
     }
 
     public void add(BomRiskCounts bomRiskCounts) {
         if (bomRiskCounts.getHigh() > 0) {
-            high = high.add(BigDecimal.ONE);
+            high++;
         } else if (bomRiskCounts.getMedium() > 0) {
-            medium = medium.add(BigDecimal.ONE);
+            medium++;
         } else if (bomRiskCounts.getLow() > 0) {
-            low = low.add(BigDecimal.ONE);
+            low++;
         }
     }
 
     public int getHigh() {
-        return high.intValue();
+        return high;
     }
 
     public int getMedium() {
-        return medium.intValue();
+        return medium;
     }
 
     public int getLow() {
-        return low.intValue();
+        return low;
     }
 
 }
