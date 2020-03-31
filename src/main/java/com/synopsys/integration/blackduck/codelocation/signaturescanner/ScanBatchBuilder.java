@@ -82,7 +82,9 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         if (scanTargets == null || scanTargets.size() < 1) {
             builderStatus.addErrorMessage("At least one target path must be provided.");
         } else {
-            validateScanTargets(builderStatus);
+            for (final ScanTarget scanTarget : scanTargets) {
+                validateScanTarget(builderStatus, scanTarget);
+            }
         }
 
         if (blackDuckUrl != null) {
@@ -112,21 +114,15 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         }
     }
 
-    private void validateScanTargets(BuilderStatus builderStatus) {
-        for (final ScanTarget scanTarget : scanTargets) {
-            try {
-                new File(scanTarget.getPath()).getCanonicalPath();
-            } catch (final IOException e) {
-                builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
-            }
-            if (scanTarget.getExclusionPatterns() != null && scanTarget.getExclusionPatterns().size() > 0) {
-                for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
-                    if (StringUtils.isNotBlank(exclusionPattern)) {
-                        if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
-                            builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
-                        }
-                    }
-                }
+    private void validateScanTarget(BuilderStatus builderStatus, ScanTarget scanTarget) {
+        try {
+            new File(scanTarget.getPath()).getCanonicalPath();
+        } catch (final IOException e) {
+            builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
+        }
+        for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
+            if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
+                builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
             }
         }
     }
