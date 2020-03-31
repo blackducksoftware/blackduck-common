@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -82,28 +82,11 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         if (scanTargets == null || scanTargets.size() < 1) {
             builderStatus.addErrorMessage("At least one target path must be provided.");
         } else {
-            for (final ScanTarget scanTarget : scanTargets) {
-                try {
-                    new File(scanTarget.getPath()).getCanonicalPath();
-                } catch (final IOException e) {
-                    builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
-                }
-                if (scanTarget.getExclusionPatterns() != null && scanTarget.getExclusionPatterns().size() > 0) {
-                    for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
-                        if (StringUtils.isNotBlank(exclusionPattern)) {
-                            if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
-                                builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
-                            }
-                        }
-                    }
-                }
-            }
+            validateScanTargets(builderStatus);
         }
 
         if (blackDuckUrl != null) {
-            if (StringUtils.isBlank(blackDuckApiToken) && (StringUtils.isBlank(blackDuckUsername) || StringUtils.isBlank(blackDuckPassword))) {
-                builderStatus.addErrorMessage("Either an api token or a username and password is required.");
-            }
+            validateBlackDuckCredentials(builderStatus);
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
@@ -116,6 +99,35 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
         if (blackDuckUrl != null && proxyInfo == null) {
             builderStatus.addErrorMessage("Must provide proxy info.");
+        }
+    }
+
+    private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
+        if (StringUtils.isNotBlank(blackDuckApiToken)) {
+            return;
+        }
+
+        if (StringUtils.isAnyBlank(blackDuckUsername, blackDuckPassword)) {
+            builderStatus.addErrorMessage("Either an api token or a username and password is required.");
+        }
+    }
+
+    private void validateScanTargets(BuilderStatus builderStatus) {
+        for (final ScanTarget scanTarget : scanTargets) {
+            try {
+                new File(scanTarget.getPath()).getCanonicalPath();
+            } catch (final IOException e) {
+                builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
+            }
+            if (scanTarget.getExclusionPatterns() != null && scanTarget.getExclusionPatterns().size() > 0) {
+                for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
+                    if (StringUtils.isNotBlank(exclusionPattern)) {
+                        if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
+                            builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -270,7 +282,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         this.uploadSource = uploadSource;
         return this;
     }
-  
+
     public boolean isLicenseSearch() {
         return licenseSearch;
     }
@@ -278,7 +290,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public void licenseSearch(final boolean licenseSearch) {
         this.licenseSearch = licenseSearch;
     }
-  
+
     public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
     }
