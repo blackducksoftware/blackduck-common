@@ -155,15 +155,6 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testOnlyUploadSource() throws BlackDuckIntegrationException {
-        scanBatchBuilder.uploadSource(true);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, false, false);
-        assertLicenseSearch(commandList, false);
-        assertUploadSource(commandList, true);
-    }
-
-    @Test
     public void testIndividualFileMatchingNotSet() throws BlackDuckIntegrationException {
         scanBatchBuilder.individualFileMatching(null);
         List<String> commandList = createCommandList();
