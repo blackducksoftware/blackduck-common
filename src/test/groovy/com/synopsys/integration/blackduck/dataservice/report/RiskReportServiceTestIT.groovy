@@ -111,6 +111,7 @@ class RiskReportServiceTestIT {
     }
 
     @Test
+    @Disabled
     public void createReportFilesManually() {
         // fill these values in with your particulars
         final String projectName = 'ek-test-risk-report'
