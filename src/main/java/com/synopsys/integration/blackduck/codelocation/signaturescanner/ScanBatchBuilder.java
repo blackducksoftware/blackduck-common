@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,6 +40,8 @@ import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
+    public static final String UPLOAD_SOURCE_ALONE = "As of 2020.2.0, Black Duck does not support upload-source by itself. Please ensure you are using the property correctly by reviewing 'Using the Signature Scanner' in your Black Duck server's Help documentation.";
+
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -55,7 +58,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
-
     private boolean licenseSearch;
     private IndividualFileMatching individualFileMatching;
 
@@ -73,7 +75,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, licenseSearch, individualFileMatching, blackDuckUrl, blackDuckUsername,
+        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch);
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -101,6 +104,10 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
         if (blackDuckUrl != null && proxyInfo == null) {
             builderStatus.addErrorMessage("Must provide proxy info.");
+        }
+
+        if (uploadSource && null == snippetMatching && !licenseSearch) {
+            builderStatus.addErrorMessage(UPLOAD_SOURCE_ALONE);
         }
     }
 

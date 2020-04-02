@@ -28,33 +28,37 @@ import java.util.function.Consumer;
 public class BlackDuckOnlineProperties {
     public static final String ONLINE_CAPABILITY_NEEDED_WARNING = "No snippet functionality, license search, or uploading of source is supported when running a dry run signature scan.";
 
-    private final boolean snippetMatching;
-    private final boolean snippetMatchingOnly;
-    private final boolean fullSnippetScan;
+    private final SnippetMatching snippetMatchingMode;
     private final boolean uploadSource;
     private final boolean licenseSearch;
 
-    public BlackDuckOnlineProperties(boolean snippetMatching, boolean snippetMatchingOnly, boolean fullSnippetScan, boolean uploadSource, boolean licenseSearch) {
-        this.snippetMatching = snippetMatching;
-        this.snippetMatchingOnly = snippetMatchingOnly;
-        this.fullSnippetScan = fullSnippetScan;
+    private final boolean snippetMatchingFlag;
+    private final boolean snippetMatchingOnlyFlag;
+    private final boolean fullSnippetScanFlag;
+
+    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch) {
+        this.snippetMatchingMode = snippetMatchingMode;
         this.uploadSource = uploadSource;
         this.licenseSearch = licenseSearch;
+
+        snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
+        snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
+        fullSnippetScanFlag = SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
     }
 
     public boolean isOnlineCapabilityNeeded() {
-        return snippetMatching || snippetMatchingOnly || uploadSource || licenseSearch;
+        return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch;
     }
 
     public void addOnlineCommands(List<String> cmd) {
-        if (snippetMatching || snippetMatchingOnly) {
-            if (snippetMatching) {
+        if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
+            if (snippetMatchingFlag) {
                 cmd.add("--snippet-matching");
             } else {
                 cmd.add("--snippet-matching-only");
             }
 
-            if (fullSnippetScan) {
+            if (fullSnippetScanFlag) {
                 cmd.add("--full-snippet-scan");
             }
         }
@@ -74,16 +78,20 @@ public class BlackDuckOnlineProperties {
         }
     }
 
+    public SnippetMatching getSnippetMatchingMode() {
+        return snippetMatchingMode;
+    }
+
     public boolean isSnippetMatching() {
-        return snippetMatching;
+        return snippetMatchingFlag;
     }
 
     public boolean isSnippetMatchingOnly() {
-        return snippetMatchingOnly;
+        return snippetMatchingOnlyFlag;
     }
 
     public boolean isFullSnippetScan() {
-        return fullSnippetScan;
+        return fullSnippetScanFlag;
     }
 
     public boolean isUploadSource() {

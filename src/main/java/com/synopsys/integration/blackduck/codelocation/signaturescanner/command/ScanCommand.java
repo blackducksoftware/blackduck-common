@@ -61,8 +61,8 @@ public class ScanCommand {
     private final boolean verbose;
 
     public ScanCommand(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final boolean snippetMatching, final boolean snippetMatchingOnly,
-            final boolean fullSnippetScan, final boolean uploadSource, final boolean licenseSearch, final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalScanArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final BlackDuckOnlineProperties blackDuckOnlineProperties,
+            final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalScanArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -77,7 +77,7 @@ public class ScanCommand {
         this.port = port;
         this.runInsecure = runInsecure;
         this.name = name;
-        this.blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, snippetMatchingOnly, fullSnippetScan, uploadSource, licenseSearch);
+        this.blackDuckOnlineProperties = blackDuckOnlineProperties;
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
         this.additionalScanArguments = additionalScanArguments;
