@@ -88,7 +88,7 @@ public class BlackDuckBucket {
         bucket.put(uri, new BlackDuckBucketItem<>(uri, e));
     }
 
-    public Boolean hasAnyErrors() {
+    public boolean hasAnyErrors() {
         return bucket.values()
                    .stream()
                    .filter(BlackDuckBucketItem::hasException)
