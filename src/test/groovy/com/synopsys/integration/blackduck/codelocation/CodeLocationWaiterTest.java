@@ -130,6 +130,7 @@ public class CodeLocationWaiterTest {
         long testStart = System.currentTimeMillis();
         CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 20);
         long testEnd = System.currentTimeMillis();
+        System.out.println((testEnd - testStart) / 1000);
         assertEquals(20, (testEnd - testStart) / 1000);
 
         assertEquals(CodeLocationWaitResult.Status.PARTIAL, codeLocationWaitResult.getStatus());
