@@ -14,4 +14,3 @@ You can download the latest release from Maven Central.
 
 ## Documentation ##
 All documentation for blackduck-common can be found on the base project:  https://github.com/blackducksoftware/blackduck-common/wiki
-trigger build?
