@@ -68,7 +68,7 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 
 public class ReportService extends DataService {
@@ -224,39 +224,10 @@ public class ReportService extends DataService {
         component.setComponentVersion(bomEntry.getComponentVersionName());
         component.setComponentVersionURL(bomEntry.getComponentVersion());
         component.setLicense(bomEntry.getLicenses().get(0).getLicenseDisplay());
-        if (bomEntry.getSecurityRiskProfile() != null && bomEntry.getSecurityRiskProfile().getCounts() != null && !bomEntry.getSecurityRiskProfile().getCounts().isEmpty()) {
-            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getSecurityRiskProfile().getCounts()) {
-                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
-                    component.setSecurityRiskHighCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
-                    component.setSecurityRiskMediumCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
-                    component.setSecurityRiskLowCount(count.getCount().intValue());
-                }
-            }
-        }
-        if (bomEntry.getLicenseRiskProfile() != null && bomEntry.getLicenseRiskProfile().getCounts() != null && !bomEntry.getLicenseRiskProfile().getCounts().isEmpty()) {
-            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getLicenseRiskProfile().getCounts()) {
-                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
-                    component.setLicenseRiskHighCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
-                    component.setLicenseRiskMediumCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
-                    component.setLicenseRiskLowCount(count.getCount().intValue());
-                }
-            }
-        }
-        if (bomEntry.getOperationalRiskProfile() != null && bomEntry.getOperationalRiskProfile().getCounts() != null && !bomEntry.getOperationalRiskProfile().getCounts().isEmpty()) {
-            for (ComponentVersionRiskProfileRiskDataCountsView count : bomEntry.getOperationalRiskProfile().getCounts()) {
-                if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH && count.getCount().intValue() > 0) {
-                    component.setOperationalRiskHighCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM && count.getCount().intValue() > 0) {
-                    component.setOperationalRiskMediumCount(count.getCount().intValue());
-                } else if (count.getCountType() == ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW && count.getCount().intValue() > 0) {
-                    component.setOperationalRiskLowCount(count.getCount().intValue());
-                }
-            }
-        }
+        component.addSecurityRiskProfile(bomEntry.getSecurityRiskProfile());
+        component.addLicenseRiskProfile(bomEntry.getLicenseRiskProfile());
+        component.addOperationalRiskProfile(bomEntry.getOperationalRiskProfile());
+
         return component;
     }
 

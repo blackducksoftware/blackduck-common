@@ -142,31 +142,20 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     @Override
     protected void validate(BuilderStatus builderStatus) {
-        if (StringUtils.isBlank(getUrl())) {
-            builderStatus.addErrorMessage("The Black Duck url must be specified.");
-        } else {
-            try {
-                URL blackDuckURL = new URL(getUrl());
-                blackDuckURL.toURI();
-            } catch (MalformedURLException | URISyntaxException e) {
-                builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", getUrl()));
-            }
-        }
+        validateBlackDuckURL(builderStatus);
 
         if (StringUtils.isBlank(getApiToken())) {
-            CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
-            credentialsBuilder.setUsername(getUsername());
-            credentialsBuilder.setPassword(getPassword());
-            BuilderStatus credentialsBuilderStatus = credentialsBuilder.validateAndGetBuilderStatus();
-            if (!credentialsBuilderStatus.isValid()) {
-                builderStatus.addAllErrorMessages(credentialsBuilderStatus.getErrorMessages());
-            } else {
-                Credentials credentials = credentialsBuilder.build();
-                if (credentials.isBlank()) {
-                    builderStatus.addErrorMessage("Either an API token or a username/password must be specified.");
-                }
-            }
+            validateBlackDuckCredentials(builderStatus);
         }
+
+        validateProxyDetails(builderStatus);
+
+        if (getTimemoutInSeconds() <= 0) {
+            builderStatus.addErrorMessage("The timeout must be greater than zero.");
+        }
+    }
+
+    private void validateProxyDetails(BuilderStatus builderStatus) {
         CredentialsBuilder proxyCredentialsBuilder = new CredentialsBuilder();
         proxyCredentialsBuilder.setUsername(getProxyUsername());
         proxyCredentialsBuilder.setPassword(getProxyPassword());
@@ -187,9 +176,33 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
                 builderStatus.addAllErrorMessages(proxyInfoBuilderStatus.getErrorMessages());
             }
         }
+    }
 
-        if (getTimemoutInSeconds() <= 0) {
-            builderStatus.addErrorMessage("The timeout must be greater than zero.");
+    private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
+        CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
+        credentialsBuilder.setUsername(getUsername());
+        credentialsBuilder.setPassword(getPassword());
+        BuilderStatus credentialsBuilderStatus = credentialsBuilder.validateAndGetBuilderStatus();
+        if (!credentialsBuilderStatus.isValid()) {
+            builderStatus.addAllErrorMessages(credentialsBuilderStatus.getErrorMessages());
+        } else {
+            Credentials credentials = credentialsBuilder.build();
+            if (credentials.isBlank()) {
+                builderStatus.addErrorMessage("Either an API token or a username/password must be specified.");
+            }
+        }
+    }
+
+    private void validateBlackDuckURL(BuilderStatus builderStatus) {
+        if (StringUtils.isBlank(getUrl())) {
+            builderStatus.addErrorMessage("The Black Duck url must be specified.");
+        } else {
+            try {
+                URL blackDuckURL = new URL(getUrl());
+                blackDuckURL.toURI();
+            } catch (MalformedURLException | URISyntaxException e) {
+                builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", getUrl()));
+            }
         }
     }
 

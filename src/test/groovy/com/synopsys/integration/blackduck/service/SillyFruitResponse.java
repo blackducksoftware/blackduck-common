@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
-public class FruitTest extends BlackDuckResponse {
+public class SillyFruitResponse extends BlackDuckResponse {
     public String name;
     public FruitCollection fruits;
 
@@ -22,4 +22,5 @@ public class FruitTest extends BlackDuckResponse {
         public List<PossibleFruits> possibleFruits;
         public List<Fruits> nestedList;
     }
+
 }

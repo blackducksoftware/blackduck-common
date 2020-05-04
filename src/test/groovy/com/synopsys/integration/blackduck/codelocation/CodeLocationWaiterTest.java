@@ -16,6 +16,8 @@ import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.log.LogLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -114,8 +116,12 @@ public class CodeLocationWaiterTest {
         assertTrue(codeLocationWaitResult.getErrorMessage().isPresent());
     }
 
-    @Test
-    public void testTimoutIsObeyed() throws IntegrationException, InterruptedException {
+    @ParameterizedTest
+    @CsvSource({
+            "20, 30",
+            "12, 22"
+    })
+    public void testTimoutIsObeyed(int timeout, int potentialMaxWait) throws IntegrationException, InterruptedException {
         BufferedIntLogger logger = new BufferedIntLogger();
         CodeLocationService mockCodeLocationService = Mockito.mock(CodeLocationService.class);
         Mockito.when(mockCodeLocationService.getCodeLocationByName(Mockito.anyString())).thenReturn(Optional.empty());
@@ -128,14 +134,16 @@ public class CodeLocationWaiterTest {
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationService, mockNotificationService);
         long testStart = System.currentTimeMillis();
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, 20);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, codeLocationNames, 2, timeout);
         long testEnd = System.currentTimeMillis();
-        assertEquals(20, (testEnd - testStart) / 1000);
+        System.out.println((testEnd - testStart) / 1000);
+        // it should not timeout BEFORE the timeout, but might take a tiny bit longer.
+        assertTrue(timeout <= (testEnd - testStart) / 1000);
+        assertTrue(potentialMaxWait > (testEnd - testStart) / 1000);
 
         assertEquals(CodeLocationWaitResult.Status.PARTIAL, codeLocationWaitResult.getStatus());
         assertNull(logger.getOutputString(LogLevel.ERROR));
         assertNull(logger.getOutputString(LogLevel.WARN));
-        System.out.println(logger.getOutputString(LogLevel.INFO));
     }
 
     private NotificationTaskRange createTestRange() {

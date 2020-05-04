@@ -46,6 +46,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private final ScanPathsUtility scanPathsUtility;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScanCommand scanCommand;
+    private final boolean onlineScan;
     private final boolean cleanupOutput;
 
     public ScanCommandCallable(final IntLogger logger, final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables, final ScanCommand scanCommand, final boolean cleanupOutput) {
@@ -53,6 +54,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         this.scanPathsUtility = scanPathsUtility;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanCommand = scanCommand;
+        onlineScan = !scanCommand.isDryRun();
         this.cleanupOutput = cleanupOutput;
     }
 
@@ -60,7 +62,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     public ScanCommandOutput call() {
         String commandToExecute = "command_not_yet_configured";
         try {
-            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getInstallDirectory());
+            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getSignatureScannerInstallDirectory());
 
             final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
             cmd.add(scanCommand.getTargetPath());
@@ -74,12 +76,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 final ProcessBuilder processBuilder = new ProcessBuilder(cmd);
                 processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
-                if (!scanCommand.isDryRun()) {
-                    if (!StringUtils.isEmpty(scanCommand.getApiToken())) {
-                        processBuilder.environment().put("BD_HUB_TOKEN", scanCommand.getApiToken());
-                    } else {
-                        processBuilder.environment().put("BD_HUB_PASSWORD", scanCommand.getPassword());
-                    }
+                if (onlineScan) {
+                    prepareEnvironmentWithCredentials(processBuilder);
                 }
                 processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
                 processBuilder.redirectErrorStream(true);
@@ -90,21 +88,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 final StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getInputStream(), splitOutputStream);
                 redirectThread.start();
 
-                int returnCode = -1;
-                try {
-                    returnCode = blackDuckCliProcess.waitFor();
-
-                    // the join method on the redirect thread will wait until the thread is dead
-                    // the thread will die when it reaches the end of stream and the run method is finished
-                    redirectThread.join();
-                } finally {
-                    if (blackDuckCliProcess.isAlive()) {
-                        blackDuckCliProcess.destroy();
-                    }
-                    if (redirectThread.isAlive()) {
-                        redirectThread.interrupt();
-                    }
-                }
+                int returnCode = executeScanProcess(blackDuckCliProcess, redirectThread);
 
                 splitOutputStream.flush();
 
@@ -122,9 +106,42 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
-        if (!scanCommand.isDryRun() && cleanupOutput) {
+        deleteFilesIfNeeded();
+
+        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand, commandToExecute);
+    }
+
+    private int executeScanProcess(Process blackDuckCliProcess, StreamRedirectThread redirectThread) throws InterruptedException {
+        int returnCode = -1;
+        try {
+            returnCode = blackDuckCliProcess.waitFor();
+
+            // the join method on the redirect thread will wait until the thread is dead
+            // the thread will die when it reaches the end of stream and the run method is finished
+            redirectThread.join();
+        } finally {
+            if (blackDuckCliProcess.isAlive()) {
+                blackDuckCliProcess.destroy();
+            }
+            if (redirectThread.isAlive()) {
+                redirectThread.interrupt();
+            }
+        }
+        return returnCode;
+    }
+
+    private void prepareEnvironmentWithCredentials(ProcessBuilder processBuilder) {
+        if (!StringUtils.isEmpty(scanCommand.getBlackDuckApiToken())) {
+            processBuilder.environment().put("BD_HUB_TOKEN", scanCommand.getBlackDuckApiToken());
+        } else {
+            processBuilder.environment().put("BD_HUB_PASSWORD", scanCommand.getBlackDuckPassword());
+        }
+    }
+
+    private void deleteFilesIfNeeded() {
+        if (onlineScan && cleanupOutput) {
             FileUtils.deleteQuietly(scanCommand.getOutputDirectory());
-        } else if (scanCommand.isDryRun() && cleanupOutput) {
+        } else if (cleanupOutput) {
             // delete everything except dry run files
             final File[] outputFiles = scanCommand.getOutputDirectory().listFiles();
             for (final File outputFile : outputFiles) {
@@ -133,8 +150,6 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 }
             }
         }
-
-        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand, commandToExecute);
     }
 
     /**

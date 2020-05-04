@@ -36,6 +36,8 @@ import com.synopsys.integration.log.IntLogger;
  */
 @Deprecated
 public class BinaryScannerService extends DataService {
+    public static final String RESPONSE = "Response: ";
+
     public BinaryScannerService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
     }
@@ -45,10 +47,10 @@ public class BinaryScannerService extends DataService {
         BinaryScanCallable binaryScanCallable = new BinaryScanCallable(blackDuckService, binaryScan);
         BinaryScanOutput binaryScanOutput = binaryScanCallable.call();
 
-        logger.debug("Response: " + binaryScanOutput.getResponse());
-        logger.debug("Response: " + binaryScanOutput.getStatusMessage());
-        logger.debug("Response: " + binaryScanOutput.getStatusCode());
-        logger.debug("Response: " + binaryScanOutput.getContentString());
+        logger.debug(String.format("%s%s", RESPONSE, binaryScanOutput.getResponse()));
+        logger.debug(String.format("%s%s", RESPONSE, binaryScanOutput.getStatusMessage()));
+        logger.debug(String.format("%s%s", RESPONSE, binaryScanOutput.getStatusCode()));
+        logger.debug(String.format("%s%s", RESPONSE, binaryScanOutput.getContentString()));
         if (binaryScanOutput.getStatusCode() >= 200 && binaryScanOutput.getStatusCode() < 300) {
             logger.info("Status code OK");
         } else {

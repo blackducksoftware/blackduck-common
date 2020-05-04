@@ -25,7 +25,7 @@ import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -48,7 +48,7 @@ public class BlackDuckHttpClientTestIT {
         assertTrue(validConfig.canConnect());
         BlackDuckHttpClient blackDuckHttpClient = validConfig.createBlackDuckHttpClient(new SilentIntLogger());
         try (Response response = blackDuckHttpClient.attemptAuthentication()) {
-            assertTrue(response.isStatusCodeOkay());
+            assertTrue(response.isStatusCodeSuccess());
             assertFalse(response.isStatusCodeError());
         }
 
@@ -59,7 +59,7 @@ public class BlackDuckHttpClientTestIT {
         assertFalse(invalidUrlConfig.canConnect());
         blackDuckHttpClient = invalidUrlConfig.createBlackDuckHttpClient(new SilentIntLogger());
         try (Response response = blackDuckHttpClient.attemptAuthentication()) {
-            assertFalse(response.isStatusCodeOkay());
+            assertFalse(response.isStatusCodeSuccess());
             assertTrue(response.isStatusCodeError());
         }
 
@@ -70,7 +70,7 @@ public class BlackDuckHttpClientTestIT {
         assertFalse(invalidPasswordConfig.canConnect());
         blackDuckHttpClient = invalidPasswordConfig.createBlackDuckHttpClient(new SilentIntLogger());
         try (Response response = blackDuckHttpClient.attemptAuthentication()) {
-            assertFalse(response.isStatusCodeOkay());
+            assertFalse(response.isStatusCodeSuccess());
             assertTrue(response.isStatusCodeError());
         }
     }

@@ -87,18 +87,18 @@ public class BlackDuckJsonTransformerTest {
     public void testArbitraryJsonDifference() throws Exception {
         InputStream jsonInputStream = getClass().getResourceAsStream("/complex.json");
         String json = IOUtils.toString(jsonInputStream, StandardCharsets.UTF_8);
-        FruitTest fruitTest = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, FruitTest.class);
+        SillyFruitResponse sillyFruitResponse = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.getResponseAs(json, SillyFruitResponse.class);
 
-        assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.APPLE));
-        assertTrue(fruitTest.fruits.possibleFruits.contains(FruitTest.PossibleFruits.BANANA));
-        assertTrue(fruitTest.fruits.nestedList.get(0).apple);
-        assertFalse(fruitTest.fruits.nestedList.get(0).banana);
-        assertFalse(fruitTest.fruits.nestedList.get(1).apple);
-        assertFalse(fruitTest.fruits.nestedList.get(1).banana);
-        assertTrue(fruitTest.fruits.nestedList.get(2).apple);
-        assertTrue(fruitTest.fruits.nestedList.get(2).banana);
+        assertTrue(sillyFruitResponse.fruits.possibleFruits.contains(SillyFruitResponse.PossibleFruits.APPLE));
+        assertTrue(sillyFruitResponse.fruits.possibleFruits.contains(SillyFruitResponse.PossibleFruits.BANANA));
+        assertTrue(sillyFruitResponse.fruits.nestedList.get(0).apple);
+        assertFalse(sillyFruitResponse.fruits.nestedList.get(0).banana);
+        assertFalse(sillyFruitResponse.fruits.nestedList.get(1).apple);
+        assertFalse(sillyFruitResponse.fruits.nestedList.get(1).banana);
+        assertTrue(sillyFruitResponse.fruits.nestedList.get(2).apple);
+        assertTrue(sillyFruitResponse.fruits.nestedList.get(2).banana);
 
-        String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(fruitTest);
+        String patchedJson = BlackDuckJsonTransformerTest.blackDuckJsonTransformer.producePatchedJson(sillyFruitResponse);
         assertJsonStringsEqual(json, patchedJson);
     }
 

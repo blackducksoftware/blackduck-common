@@ -4,8 +4,11 @@
     "spdx:name": "hub-notification-data-test-project/hub-notification-data-test/1.0.0 gradle/bom",
     "@id": "uuid:b00f764c-9f4d-4121-b053-d973f4ac5b08",
     "@type": "BillOfMaterials",
-    "customData": {
-      "detectVersion": "3.0.1"
+    "creationInfo": {
+      "spdx:creator": [
+        "Tool: Black Duck Common"
+      ],
+      "spdx:created": "2020-03-13T16:56:46.213Z"
     },
     "relationship": []
   },

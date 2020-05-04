@@ -49,6 +49,7 @@ import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 import com.synopsys.integration.util.NoThreadExecutorService;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class BlackDuckServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -270,7 +271,7 @@ public class BlackDuckServicesFactory {
 
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.toString(this, RecursiveToStringStyle.JSON_STYLE);
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.JSON_STYLE);
     }
 
 }

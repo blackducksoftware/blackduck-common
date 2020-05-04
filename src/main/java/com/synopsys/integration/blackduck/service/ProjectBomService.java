@@ -43,7 +43,7 @@ import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;

@@ -25,7 +25,7 @@ package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.request.Response;
+import com.synopsys.integration.rest.response.Response;
 
 public class BinaryScanOutput extends CodeLocationOutput {
     private final String response;
@@ -51,7 +51,7 @@ public class BinaryScanOutput extends CodeLocationOutput {
 
         Result result = Result.SUCCESS;
         String errorMessage = null;
-        if (!response.isStatusCodeOkay()) {
+        if (!response.isStatusCodeSuccess()) {
             result = Result.FAILURE;
             errorMessage = "Unknown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage();
         } else if (null != contentStringException) {

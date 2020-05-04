@@ -28,6 +28,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
@@ -38,6 +40,8 @@ import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
+    public static final String UPLOAD_SOURCE_ALONE = "As of 2020.2.0, Black Duck does not support upload-source by itself. Please ensure you are using the property correctly by reviewing 'Using the Signature Scanner' in your Black Duck server's Help documentation.";
+
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -54,9 +58,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
-
     private boolean licenseSearch;
-    private String individualFileMatching;
+    private IndividualFileMatching individualFileMatching;
 
     private URL blackDuckUrl;
     private String blackDuckUsername;
@@ -72,7 +75,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, snippetMatching, uploadSource, licenseSearch, individualFileMatching, blackDuckUrl, blackDuckUsername,
+        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch);
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -82,27 +86,12 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
             builderStatus.addErrorMessage("At least one target path must be provided.");
         } else {
             for (final ScanTarget scanTarget : scanTargets) {
-                try {
-                    new File(scanTarget.getPath()).getCanonicalPath();
-                } catch (final IOException e) {
-                    builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
-                }
-                if (scanTarget.getExclusionPatterns() != null && scanTarget.getExclusionPatterns().size() > 0) {
-                    for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
-                        if (StringUtils.isNotBlank(exclusionPattern)) {
-                            if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
-                                builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
-                            }
-                        }
-                    }
-                }
+                validateScanTarget(builderStatus, scanTarget);
             }
         }
 
         if (blackDuckUrl != null) {
-            if (StringUtils.isBlank(blackDuckApiToken) && (StringUtils.isBlank(blackDuckUsername) || StringUtils.isBlank(blackDuckPassword))) {
-                builderStatus.addErrorMessage("Either an api token or a username and password is required.");
-            }
+            validateBlackDuckCredentials(builderStatus);
         }
 
         if (scanMemoryInMegabytes < MINIMUM_MEMORY_IN_MEGABYTES) {
@@ -117,8 +106,31 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
             builderStatus.addErrorMessage("Must provide proxy info.");
         }
 
-        if (uploadSource && snippetMatching == null && !licenseSearch ) {
-            builderStatus.addErrorMessage("Snippet matching is required if upload source is enabled.");
+        if (uploadSource && null == snippetMatching && !licenseSearch) {
+            builderStatus.addErrorMessage(UPLOAD_SOURCE_ALONE);
+        }
+    }
+
+    private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
+        if (StringUtils.isNotBlank(blackDuckApiToken)) {
+            return;
+        }
+
+        if (StringUtils.isAnyBlank(blackDuckUsername, blackDuckPassword)) {
+            builderStatus.addErrorMessage("Either an api token or a username and password is required.");
+        }
+    }
+
+    private void validateScanTarget(BuilderStatus builderStatus, ScanTarget scanTarget) {
+        try {
+            new File(scanTarget.getPath()).getCanonicalPath();
+        } catch (final IOException e) {
+            builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
+        }
+        for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
+            if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
+                builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
+            }
         }
     }
 
@@ -273,7 +285,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         this.uploadSource = uploadSource;
         return this;
     }
-  
+
     public boolean isLicenseSearch() {
         return licenseSearch;
     }
@@ -281,12 +293,12 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public void licenseSearch(final boolean licenseSearch) {
         this.licenseSearch = licenseSearch;
     }
-  
-    public String getIndividualFileMatching() {
+
+    public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
     }
 
-    public void individualFileMatching(final String individualFileMatching) {
+    public void individualFileMatching(final IndividualFileMatching individualFileMatching) {
         this.individualFileMatching = individualFileMatching;
     }
 

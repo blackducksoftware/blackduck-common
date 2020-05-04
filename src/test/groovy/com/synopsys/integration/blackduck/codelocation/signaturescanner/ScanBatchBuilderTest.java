@@ -1,11 +1,12 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
+import com.synopsys.integration.builder.BuilderStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -13,27 +14,32 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(TimingExtension.class)
 public class ScanBatchBuilderTest {
     @Test
-    public void testValidBlackDuckScanConfig() throws Exception {
-        ScanBatchBuilder builder = new ScanBatchBuilder();
-        builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
+    public void testValidBlackDuckScanConfig() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
         assertTrue(builder.isValid());
     }
 
     @Test
-    public void testInvalidBlackDuckScanConfig() throws Exception {
+    public void testInvalidBlackDuckScanConfig() {
         ScanBatchBuilder builder = new ScanBatchBuilder();
 
         assertFalse(builder.isValid());
     }
 
     @Test
-    public void testInvalidProxy() throws Exception {
-        ScanBatchBuilder builder = new ScanBatchBuilder();
-        builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
-        builder.blackDuckUrl(new URL("http://www.google.com"));
+    public void testInvalidProxy() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
+        try {
+            builder.blackDuckUrl(new URL("http://www.google.com"));
+        } catch (MalformedURLException e) {
+            fail("The test URL was bad.", e);
+        }
+
         builder.blackDuckApiToken("apitoken");
         builder.proxyInfo(null);
         assertFalse(builder.isValid());
@@ -43,10 +49,13 @@ public class ScanBatchBuilderTest {
     }
 
     @Test
-    public void testCredentials() throws Exception {
-        ScanBatchBuilder builder = new ScanBatchBuilder();
-        builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
-        builder.blackDuckUrl(new URL("http://www.google.com"));
+    public void testCredentials() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
+        try {
+            builder.blackDuckUrl(new URL("http://www.google.com"));
+        } catch (MalformedURLException e) {
+            fail("The test URL was bad.", e);
+        }
         builder.proxyInfo(ProxyInfo.NO_PROXY_INFO);
         assertFalse(builder.isValid());
 
@@ -62,13 +71,41 @@ public class ScanBatchBuilderTest {
     }
 
     @Test
-    public void testUploadSourceWithoutSnippetFails() throws Exception {
-        ScanBatchBuilder builder = new ScanBatchBuilder();
-
-        builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
-        builder.uploadSource(null, true);
+    public void testProvidingUploadSourceAlone() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
+        builder.uploadSource(true);
 
         assertFalse(builder.isValid());
+        BuilderStatus builderStatus = builder.validateAndGetBuilderStatus();
+        assertTrue(builderStatus.getErrorMessages().contains(ScanBatchBuilder.UPLOAD_SOURCE_ALONE));
+    }
+
+    @Test
+    public void testUploadSourceWithLicenseSearch() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
+        builder.uploadSource(true);
+        builder.licenseSearch(true);
+
+        assertTrue(builder.isValid());
+    }
+
+    @Test
+    public void testUploadSourceWithSnippetMatching() {
+        ScanBatchBuilder builder = createInitialValidBuilder();
+        builder.uploadSource(true);
+        builder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY);
+        assertTrue(builder.isValid());
+    }
+
+    private ScanBatchBuilder createInitialValidBuilder() {
+        ScanBatchBuilder builder = new ScanBatchBuilder();
+        try {
+            builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
+        } catch (IOException e) {
+            fail("Couldn't add the target", e);
+        }
+
+        return builder;
     }
 
 }

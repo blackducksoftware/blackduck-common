@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import com.synopsys.integration.log.BufferedIntLogger;
 import org.apache.commons.io.FileUtils;
@@ -83,7 +84,7 @@ public class ScanCommandTest {
         scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, true);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, true);
-        assertTrue(commandList.contains("--upload-source"));
+        assertUploadSource(commandList, true);
     }
 
     @Test
@@ -91,7 +92,7 @@ public class ScanCommandTest {
         scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, false);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, true);
-        assertFalse(commandList.contains("--upload-source"));
+        assertUploadSource(commandList, false);
     }
 
     @Test
@@ -101,19 +102,70 @@ public class ScanCommandTest {
         ScanBatch scanBatch = scanBatchBuilder.build();
         ScanCommand scanCommand = assertCommand(scanBatch);
 
-        BufferedIntLogger bufferedLogger = new BufferedIntLogger();
-        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
-        scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
-        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
+        assertLogging(scanCommand, 0);
+        BufferedIntLogger bufferedLogger;
 
         scanBatchBuilder.dryRun(true);
         scanBatch = scanBatchBuilder.build();
         scanCommand = assertCommand(scanBatch);
 
-        bufferedLogger = new BufferedIntLogger();
-        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
-        scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
-        assertEquals(1, bufferedLogger.getOutputList(LogLevel.WARN).size());
+        assertLogging(scanCommand, 1);
+    }
+
+    @Test
+    public void testWithoutLicenseSearch() throws BlackDuckIntegrationException {
+        scanBatchBuilder.licenseSearch(false);
+        List<String> commandList = createCommandList();
+        assertLicenseSearch(commandList, false);
+        assertUploadSource(commandList, false);
+    }
+
+    @Test
+    public void testLicenseSearch() throws BlackDuckIntegrationException {
+        scanBatchBuilder.licenseSearch(true);
+        List<String> commandList = createCommandList();
+        assertLicenseSearch(commandList, true);
+        assertUploadSource(commandList, false);
+    }
+
+    @Test
+    public void testLicenseSearchWithUploadSource() throws BlackDuckIntegrationException {
+        scanBatchBuilder.licenseSearch(true);
+        scanBatchBuilder.uploadSource(true);
+        List<String> commandList = createCommandList();
+        assertLicenseSearch(commandList, true);
+        assertUploadSource(commandList, true);
+    }
+
+    @Test
+    public void testLicenseSearchDryRun() throws BlackDuckIntegrationException {
+        scanBatchBuilder.licenseSearch(true);
+
+        ScanBatch scanBatch = scanBatchBuilder.build();
+        ScanCommand scanCommand = assertCommand(scanBatch);
+
+        assertLogging(scanCommand, 0);
+        BufferedIntLogger bufferedLogger;
+
+        scanBatchBuilder.dryRun(true);
+        scanBatch = scanBatchBuilder.build();
+        scanCommand = assertCommand(scanBatch);
+
+        assertLogging(scanCommand, 1);
+    }
+
+    @Test
+    public void testIndividualFileMatchingNotSet() throws BlackDuckIntegrationException {
+        scanBatchBuilder.individualFileMatching(null);
+        List<String> commandList = createCommandList();
+        assertIndividualFileMatching(commandList, null);
+    }
+
+    @Test
+    public void testIndividualFileMatchingValidValue() throws BlackDuckIntegrationException {
+        scanBatchBuilder.individualFileMatching(IndividualFileMatching.BINARY);
+        List<String> commandList = createCommandList();
+        assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
     }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
@@ -137,6 +189,13 @@ public class ScanCommandTest {
         return commandList;
     }
 
+    private void assertLogging(ScanCommand scanCommand, int expectedPostLogSize) {
+        BufferedIntLogger bufferedLogger = new BufferedIntLogger();
+        assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
+        scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
+        assertEquals(expectedPostLogSize, bufferedLogger.getOutputList(LogLevel.WARN).size());
+    }
+
     private ScanCommand assertCommand(ScanBatch scanBatch) throws BlackDuckIntegrationException {
         List<ScanCommand> scanCommands = scanBatch.createScanCommands(null, scanPathsUtility, intEnvironmentVariables);
         assertEquals(1, scanCommands.size());
@@ -147,6 +206,26 @@ public class ScanCommandTest {
         assertEquals(containsSnippetMatching, commandList.contains("--snippet-matching"));
         assertEquals(containsSnippetMatchingOnly, commandList.contains("--snippet-matching-only"));
         assertEquals(containsFullSnippetScan, commandList.contains("--full-snippet-scan"));
+    }
+
+    private void assertLicenseSearch(List<String> commandList, boolean licenseSearch) {
+        assertEquals(licenseSearch, commandList.contains("--license-search"));
+    }
+
+    private void assertUploadSource(List<String> commandList, boolean uploadSource) {
+        assertEquals(uploadSource, commandList.contains("--upload-source"));
+    }
+
+    private void assertIndividualFileMatching(List<String> commandList, IndividualFileMatching individualFileMatching) {
+        Optional<String> isIndividualFileMatching = commandList
+                .stream()
+                .filter(s -> s.contains("individualFileMatching"))
+                .findAny();
+        if (null == individualFileMatching) {
+            assertFalse(isIndividualFileMatching.isPresent());
+        } else {
+            assertEquals("--individualFileMatching=" + individualFileMatching, isIndividualFileMatching.get());
+        }
     }
 
 }
