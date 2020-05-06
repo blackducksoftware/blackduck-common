@@ -56,12 +56,13 @@ public class ScanCommand {
     private final ProxyInfo proxyInfo;
     private final String projectName;
     private final String versionName;
+    private final boolean copyrightSearch;
     private final IndividualFileMatching individualFileMatching;
     private final boolean debug;
     private final boolean verbose;
 
     public ScanCommand(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final BlackDuckOnlineProperties blackDuckOnlineProperties,
+            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final BlackDuckOnlineProperties blackDuckOnlineProperties, final boolean copyrightSearch,
             final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalScanArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -78,6 +79,7 @@ public class ScanCommand {
         this.runInsecure = runInsecure;
         this.name = name;
         this.blackDuckOnlineProperties = blackDuckOnlineProperties;
+        this.copyrightSearch = copyrightSearch;
         this.individualFileMatching = individualFileMatching;
         this.excludePatterns = excludePatterns;
         this.additionalScanArguments = additionalScanArguments;
@@ -135,6 +137,10 @@ public class ScanCommand {
         }
 
         populateExcludePatterns(cmd);
+
+        if (copyrightSearch) {
+            cmd.add("--copyrightSearch");
+        }
 
         if (null != individualFileMatching) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
