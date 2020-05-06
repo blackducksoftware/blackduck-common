@@ -19,7 +19,7 @@ apply plugin: 'com.synopsys.integration.library'
 dependencies {
     api 'com.synopsys.integration:blackduck-common-api:2019.12.0.8'
     api 'com.synopsys.integration:integration-reporting:1.0.2'
-    api 'com.synopsys.integration:integration-bdio:21.0.2-SNAPSHOT'
+    api 'com.synopsys.integration:integration-bdio:21.1.0'
     api 'com.synopsys.integration:phone-home-client:1.0.2'
 
     api 'com.blackducksoftware.bdio:bdio2:3.0.0-beta.47'
