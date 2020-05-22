@@ -59,6 +59,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
     private boolean licenseSearch;
+    private boolean copyrightSearch;
     private IndividualFileMatching individualFileMatching;
 
     private URL blackDuckUrl;
@@ -76,7 +77,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     @Override
     protected ScanBatch buildWithoutValidation() {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch);
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername,
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, blackDuckOnlineProperties, copyrightSearch, individualFileMatching, blackDuckUrl, blackDuckUsername,
                 blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
     }
 
@@ -293,6 +294,10 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public void licenseSearch(final boolean licenseSearch) {
         this.licenseSearch = licenseSearch;
     }
+
+    public boolean getCopyrightSearch() { return copyrightSearch; }
+
+    public void copyrightSearch(final boolean copyrightSearch) { this.copyrightSearch = copyrightSearch; }
 
     public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
