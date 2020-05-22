@@ -14,7 +14,7 @@
     "relationship": []
   },
   {
-    "name": "blackduck-alert",
+    "name": "blackduck-alert-junit",
     "revision": "6.1.0-SNAPSHOT",
     "@id": "http:maven/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT",
     "@type": "Project",

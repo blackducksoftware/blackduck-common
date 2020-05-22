@@ -1,8 +1,10 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
@@ -22,7 +24,9 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobTask;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.File;
 import java.time.temporal.ChronoUnit;
@@ -31,8 +35,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class CreateProjectWithBdioAndVerifyBOMTest {
-    public static final String PROJECT_NAME = "blackduck-alert";
+    public static final String PROJECT_NAME = "blackduck-alert-junit";
     public static final String PROJECT_VERSION_NAME = "6.1.0-SNAPSHOT";
 
     public static final int FIVE_MINUTES = 5 * 60;
@@ -71,6 +77,14 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[2], BDIO_FILE_NAMES[2]));
         expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
+
+        ProjectView projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME).get();
+        blackDuckServices.blackDuckService.delete(projectView);
+
+        for (String codeLocationName : CODE_LOCATION_NAMES) {
+            CodeLocationView codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).get();
+            blackDuckServices.blackDuckService.delete(codeLocationView);
+        }
     }
 
     private void uploadAndVerifyBdio(UploadBatch uploadBatch, Set<String> expectedCodeLocationNames) throws IntegrationException, InterruptedException {
