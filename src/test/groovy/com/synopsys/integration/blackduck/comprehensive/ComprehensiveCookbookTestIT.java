@@ -60,8 +60,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
-    private static final long FIVE_MINUTES = 5 * 60 * 1000;
-
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
     @Test
@@ -164,7 +162,7 @@ public class ComprehensiveCookbookTestIT {
         String groupId = "org.apache.poi";
         String artifact = "poi";
         CheckPolicyData checkPolicyData = new CheckPolicyData(projectName, projectVersionName, codeLocationName, policyRuleName, componentName, componentVersion, groupId, artifact);
-        BlackDuckServices blackDuckServices = new BlackDuckServices();
+        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
@@ -198,7 +196,7 @@ public class ComprehensiveCookbookTestIT {
         String groupId = "org.apache.ant";
         String artifact = "ant";
         CheckPolicyData checkPolicyData = new CheckPolicyData(projectName, projectVersionName, codeLocationName, policyRuleName, componentName, componentVersion, groupId, artifact);
-        BlackDuckServices blackDuckServices = new BlackDuckServices();
+        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
@@ -245,7 +243,7 @@ public class ComprehensiveCookbookTestIT {
     @Disabled
     //disabled because special config is needed to support /api/uploads (binary scan)
     public void testCodeLocationFromBinaryScanUpload() throws Exception {
-        BlackDuckServices blackDuckServices = new BlackDuckServices();
+        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
 
         String projectName = "binary_scan_project";
         String projectVersionName = "0.0.1";
@@ -421,36 +419,6 @@ public class ComprehensiveCookbookTestIT {
                        .stream()
                        .map(NotificationContentData::getContent)
                        .collect(Collectors.toList());
-    }
-
-    private class BlackDuckServices {
-        public IntLogger logger;
-        public BlackDuckServicesFactory blackDuckServicesFactory;
-        public BlackDuckServerConfig blackDuckServerConfig;
-        public ProjectService projectService;
-        public ProjectUsersService projectUsersService;
-        public ProjectBomService projectBomService;
-        public CodeLocationService codeLocationService;
-        public BlackDuckService blackDuckService;
-        public ComponentService componentService;
-        public PolicyRuleService policyRuleService;
-        public CodeLocationCreationService codeLocationCreationService;
-        public NotificationService notificationService;
-
-        public BlackDuckServices() throws IntegrationException {
-            logger = new PrintStreamIntLogger(System.out, LogLevel.OFF);
-            blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
-            blackDuckServerConfig = intHttpClientTestHelper.getBlackDuckServerConfig();
-            projectService = blackDuckServicesFactory.createProjectService();
-            projectUsersService = blackDuckServicesFactory.createProjectUsersService();
-            projectBomService = blackDuckServicesFactory.createProjectBomService();
-            codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-            blackDuckService = blackDuckServicesFactory.createBlackDuckService();
-            componentService = blackDuckServicesFactory.createComponentService();
-            policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
-            codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
-            notificationService = blackDuckServicesFactory.createNotificationService();
-        }
     }
 
     private class CheckPolicyData {
