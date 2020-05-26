@@ -42,6 +42,7 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -172,7 +173,7 @@ public class ComprehensiveCookbookTestIT {
 
         // import the bdio
         File file = intHttpClientTestHelper.getFile("bdio/mtglist_bdio.jsonld");
-        UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(codeLocationName, file));
+        UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(new NameVersion(projectName, projectVersionName), codeLocationName, file));
 
         BdioUploadService bdioUploadService = blackDuckServices.blackDuckServicesFactory.createBdioUploadService();
         UploadBatchOutput uploadBatchOutput = bdioUploadService.uploadBdioAndWait(uploadBatch, 15 * 60);

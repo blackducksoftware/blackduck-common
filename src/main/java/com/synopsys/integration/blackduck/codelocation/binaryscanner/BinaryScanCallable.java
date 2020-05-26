@@ -31,14 +31,19 @@ import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScanCallable implements Callable<BinaryScanOutput> {
     private final BlackDuckService blackDuckService;
     private final BinaryScan binaryScan;
+    private final NameVersion projectAndVersion;
+    private final String codeLocationName;
 
     public BinaryScanCallable(BlackDuckService blackDuckService, BinaryScan binaryScan) {
         this.blackDuckService = blackDuckService;
         this.binaryScan = binaryScan;
+        this.projectAndVersion = new NameVersion(binaryScan.getProjectName(), binaryScan.getProjectVersion());
+        this.codeLocationName = binaryScan.getCodeLocationName();
     }
 
     @Override
@@ -54,10 +59,11 @@ public class BinaryScanCallable implements Callable<BinaryScanOutput> {
 
             Request.Builder requestBuilder = RequestFactory.createCommonPostRequestBuilder(binaryParts, textParts);
             try (Response response = blackDuckService.execute(BlackDuckService.UPLOADS_PATH, requestBuilder)) {
-                return BinaryScanOutput.FROM_RESPONSE(binaryScan.getCodeLocationName(), response);
+                return BinaryScanOutput.FROM_RESPONSE(projectAndVersion, codeLocationName, response);
             }
         } catch (Exception e) {
-            return BinaryScanOutput.FAILURE(binaryScan.getCodeLocationName(), "Failed to upload binary file: " + binaryScan.getBinaryFile().getAbsolutePath() + " because " + e.getMessage(), e);
+            String errorMessage = String.format("Failed to upload binary file: %s because %s", binaryScan.getBinaryFile().getAbsolutePath(), e.getMessage());
+            return BinaryScanOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
         }
     }
 

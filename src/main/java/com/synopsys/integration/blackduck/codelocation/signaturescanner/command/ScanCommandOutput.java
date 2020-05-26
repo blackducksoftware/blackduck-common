@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.util.Optional;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FilenameUtils;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
@@ -40,20 +41,20 @@ public class ScanCommandOutput extends CodeLocationOutput {
     private final String executedScanCommand;
     private final Integer scanExitCode;
 
-    public static ScanCommandOutput SUCCESS(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand) {
+    public static ScanCommandOutput SUCCESS(NameVersion projectAndVersion, String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand) {
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.SUCCESS, logger, scanCommand, executedScanCommand, null, null, 0);
+        return new ScanCommandOutput(projectAndVersion, codeLocationName, expectedNotificationCount, Result.SUCCESS, logger, scanCommand, executedScanCommand, null, null, 0);
     }
 
-    public static ScanCommandOutput FAILURE(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception) {
+    public static ScanCommandOutput FAILURE(NameVersion projectAndVersion, String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception) {
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, exception, null);
+        return new ScanCommandOutput(projectAndVersion, codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, exception, null);
     }
 
-    public static ScanCommandOutput FAILURE(String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, int scanExitCode) {
+    public static ScanCommandOutput FAILURE(NameVersion projectAndVersion, String codeLocationName, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, int scanExitCode) {
         String errorMessage = String.format("The scan failed with return code: %d", scanExitCode);
         int expectedNotificationCount = calculateExpectedNotificationCount(scanCommand);
-        return new ScanCommandOutput(codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
+        return new ScanCommandOutput(projectAndVersion, codeLocationName, expectedNotificationCount, Result.FAILURE, logger, scanCommand, executedScanCommand, errorMessage, null, Integer.valueOf(scanExitCode));
     }
 
     private static int calculateExpectedNotificationCount(ScanCommand scanCommand) {
@@ -64,8 +65,8 @@ public class ScanCommandOutput extends CodeLocationOutput {
         }
     }
 
-    private ScanCommandOutput(String codeLocationName, int expectedNotificationCount, Result result, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception, Integer scanExitCode) {
-        super(result, codeLocationName, expectedNotificationCount, errorMessage, exception);
+    private ScanCommandOutput(NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, Result result, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception, Integer scanExitCode) {
+        super(result, projectAndVersion, codeLocationName, expectedNotificationCount, errorMessage, exception);
         this.logger = logger;
         this.scanCommand = scanCommand;
         this.executedScanCommand = executedScanCommand;

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,9 @@ import com.synopsys.integration.rest.RestConstants;
 @ExtendWith(TimingExtension.class)
 public class BdioUploadRecipeTest extends BasicRecipe {
     private final String codeLocationName = "hub_common_27_0_0_SNAPSHOT_upload_recipe";
-    private final String uniqueProjectName = "hub-common_with_project_in_bdio";
+    private final String projectName = "hub-common_with_project_in_bdio";
+    private final String versionName = "27.0.0-SNAPSHOT";
+    private final NameVersion projectAndVersion = new NameVersion(projectName, versionName);
     private Optional<ProjectVersionWrapper> projectVersionWrapper;
 
     @AfterEach
@@ -53,12 +56,12 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         IntLogger logger = new BufferedIntLogger();
         UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService);
         UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
+        uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
 
         codeLocationCreationService.createCodeLocationsAndWait(scanRequest, 15 * 60);
 
-        projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, "27.0.0-SNAPSHOT");
+        projectVersionWrapper = projectService.getProjectVersion(projectAndVersion);
         assertTrue(projectVersionWrapper.isPresent());
         List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertEquals(1, versionCodeLocations.size());
@@ -74,7 +77,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService);
         UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(UploadTarget.createDefault(codeLocationName, file));
+        uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
 
         codeLocationCreationService.createCodeLocations(scanRequest);
@@ -93,9 +96,9 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         // then we map the code location to a version
         String versionName = "27.0.0-SNAPSHOT";
-        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(uniqueProjectName, versionName);
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectAndVersion);
         projectService.createProject(projectSyncModel.createProjectRequest());
-        projectVersionWrapper = projectService.getProjectVersion(uniqueProjectName, versionName);
+        projectVersionWrapper = projectService.getProjectVersion(projectAndVersion);
         List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertTrue(versionCodeLocations.isEmpty());
 
@@ -105,7 +108,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.get().getProjectVersionView());
 
-        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, new HashSet<>(Arrays.asList(codeLocationView.getName(), "pants")), 1, 3 * 60);
+        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, new HashSet<>(Arrays.asList(codeLocationView.getName(), "pants")), 1, 3 * 60);
         System.out.println("wait status: " + waitResult.getStatus());
         if (waitResult.getErrorMessage().isPresent()) {
             System.out.println(waitResult.getErrorMessage().get());

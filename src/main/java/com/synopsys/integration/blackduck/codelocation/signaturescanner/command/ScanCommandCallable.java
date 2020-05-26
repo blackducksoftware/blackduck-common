@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +47,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private final ScanPathsUtility scanPathsUtility;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final ScanCommand scanCommand;
+    private final NameVersion projectAndVersion;
+    private final String codeLocationName;
     private final boolean onlineScan;
     private final boolean cleanupOutput;
 
@@ -54,7 +57,9 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         this.scanPathsUtility = scanPathsUtility;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanCommand = scanCommand;
-        onlineScan = !scanCommand.isDryRun();
+        this.projectAndVersion = new NameVersion(scanCommand.getProjectName(), scanCommand.getVersionName());
+        this.codeLocationName = scanCommand.getName();
+        this.onlineScan = !scanCommand.isDryRun();
         this.cleanupOutput = cleanupOutput;
     }
 
@@ -98,17 +103,17 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
-                    return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, commandToExecute, returnCode);
+                    return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, returnCode);
                 }
             }
         } catch (final Exception e) {
             final String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
-            return ScanCommandOutput.FAILURE(scanCommand.getName(), logger, scanCommand, commandToExecute, errorMessage, e);
+            return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
         deleteFilesIfNeeded();
 
-        return ScanCommandOutput.SUCCESS(scanCommand.getName(), logger, scanCommand, commandToExecute);
+        return ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute);
     }
 
     private int executeScanProcess(Process blackDuckCliProcess, StreamRedirectThread redirectThread) throws InterruptedException {

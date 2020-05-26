@@ -36,6 +36,7 @@ import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
 
 public class CodeLocationCreationService extends DataService {
     private final CodeLocationWaiter codeLocationWaiter;
@@ -60,14 +61,14 @@ public class CodeLocationCreationService extends DataService {
         NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
         T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds);
+        waitForCodeLocations(notificationTaskRange, output.getProjectAndVersion(), output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds);
 
         return output;
     }
 
-    public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
+        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
     public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {

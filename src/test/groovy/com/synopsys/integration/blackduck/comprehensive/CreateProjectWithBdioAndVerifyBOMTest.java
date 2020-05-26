@@ -22,6 +22,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobTask;
 import org.junit.jupiter.api.Tag;
@@ -165,7 +166,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private UploadTarget createUploadTarget(String codeLocationName, String bdioFilename) {
         File bdioFile = intHttpClientTestHelper.getFile(bdioFilename);
-        return UploadTarget.createDefault(codeLocationName, bdioFile);
+        return UploadTarget.createDefault(new NameVersion(PROJECT_NAME, PROJECT_VERSION_NAME), codeLocationName, bdioFile);
     }
 
     private Set<String> getCodeLocationNames(UploadBatch uploadBatch) {

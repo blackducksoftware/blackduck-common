@@ -31,14 +31,19 @@ import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.util.NameVersion;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
     private final UploadTarget uploadTarget;
+    private final NameVersion projectAndVersion;
+    private final String codeLocationName;
 
     public UploadBdio2Callable(BlackDuckService blackDuckService, UploadTarget uploadTarget) {
         this.blackDuckService = blackDuckService;
         this.uploadTarget = uploadTarget;
+        this.projectAndVersion = uploadTarget.getProjectAndVersion();
+        this.codeLocationName = uploadTarget.getCodeLocationName();
     }
 
     @Override
@@ -48,12 +53,13 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
             Request request = RequestFactory.createCommonPostRequestBuilder(uploadTarget.getUploadFile()).uri(uri).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
-                return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
+                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
             } catch (IOException e) {
-                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), e.getMessage(), e);
+                return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
             }
         } catch (Exception e) {
-            return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
+            String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
+            return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
         }
     }
 

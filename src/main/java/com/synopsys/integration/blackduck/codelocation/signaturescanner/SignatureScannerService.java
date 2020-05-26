@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
 
 public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;
@@ -68,8 +69,8 @@ public class SignatureScannerService extends DataService {
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, final Set<String> codeLocationNames, int expectedNotificationCount, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
+    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, final Set<String> codeLocationNames, int expectedNotificationCount, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
 }
