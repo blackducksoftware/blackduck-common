@@ -58,7 +58,7 @@ public class CodeLocationWaiter {
         boolean allCompleted = codeLocationWaitJobTask.isComplete();
 
         if (!allCompleted) {
-            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), 5, codeLocationWaitJobTask);
+            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), 60, codeLocationWaitJobTask);
             allCompleted = waitJob.waitFor();
         }
 
