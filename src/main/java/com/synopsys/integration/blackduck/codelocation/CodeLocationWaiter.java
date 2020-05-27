@@ -59,7 +59,7 @@ public class CodeLocationWaiter {
 
         // waitInterval needs to be less than the timeout
         if (waitIntervalInSeconds > timeoutInSeconds) {
-            waitIntervalInSeconds = Long.valueOf(timeoutInSeconds).intValue();
+            waitIntervalInSeconds = (int)timeoutInSeconds;
         }
 
         if (!allCompleted) {
