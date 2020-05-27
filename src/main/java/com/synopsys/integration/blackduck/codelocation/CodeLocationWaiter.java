@@ -49,7 +49,7 @@ public class CodeLocationWaiter {
         this.notificationService = notificationService;
     }
 
-    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds)
+    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds, int waitIntervalInSeconds)
             throws IntegrationException, InterruptedException {
         CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckService, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount);
 
@@ -57,8 +57,13 @@ public class CodeLocationWaiter {
         // regardless of the timeout provided, we always want to check at least once
         boolean allCompleted = codeLocationWaitJobTask.isComplete();
 
+        // waitInterval needs to be less than the timeout
+        if (waitIntervalInSeconds > timeoutInSeconds) {
+            waitIntervalInSeconds = Long.valueOf(timeoutInSeconds).intValue();
+        }
+
         if (!allCompleted) {
-            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), 60, codeLocationWaitJobTask);
+            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds, codeLocationWaitJobTask);
             allCompleted = waitJob.waitFor();
         }
 

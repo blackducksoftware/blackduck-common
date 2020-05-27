@@ -51,7 +51,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 0);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 0, 5);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus(), "Status was not COMPLETE but was " + codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -92,7 +92,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7, 5);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("two"));
@@ -113,7 +113,7 @@ public class CodeLocationWaiterTest {
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7, 5);
         assertTrue(CodeLocationWaitResult.Status.PARTIAL == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
         assertTrue(codeLocationWaitResult.getErrorMessage().isPresent());
@@ -138,7 +138,7 @@ public class CodeLocationWaiterTest {
 
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, null, mockProjectService, mockNotificationService);
         long testStart = System.currentTimeMillis();
-        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, null, codeLocationNames, 2, timeout);
+        CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, null, codeLocationNames, 2, timeout, 5);
         long testEnd = System.currentTimeMillis();
         System.out.println((testEnd - testStart) / 1000);
         // it should not timeout BEFORE the timeout, but might take a tiny bit longer.

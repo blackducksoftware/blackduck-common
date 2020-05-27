@@ -39,6 +39,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 
 public class CodeLocationCreationService extends DataService {
+    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 60;
+
     private final CodeLocationWaiter codeLocationWaiter;
     private final NotificationService notificationService;
 
@@ -56,19 +58,27 @@ public class CodeLocationCreationService extends DataService {
     }
 
     public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return createCodeLocationsAndWait(codeLocationCreationRequest, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    }
+
+    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
         NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
         T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, output.getProjectAndVersion(), output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds);
+        waitForCodeLocations(notificationTaskRange, output.getProjectAndVersion(), output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds, waitIntervalInSeconds);
 
         return output;
     }
 
     public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    }
+
+    public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
+        return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds, waitIntervalInSeconds);
     }
 
     public NotificationTaskRange calculateCodeLocationRange() throws IntegrationException {
