@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,13 +21,6 @@
  * under the License.
  */
 package com.synopsys.integration.blackduck.phonehome;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -44,7 +37,12 @@ import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.enums.ProductIdEnum;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NoThreadExecutorService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
@@ -54,7 +52,7 @@ public class BlackDuckPhoneHomeHelper {
     private final IntEnvironmentVariables intEnvironmentVariables;
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
@@ -74,7 +72,7 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, BlackDuckService blackDuckService, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
-        IntEnvironmentVariables intEnvironmentVariables) {
+                                    IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;
