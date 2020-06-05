@@ -53,14 +53,6 @@ public class BlackDuckPhoneHomeHelper {
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
-        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
-    }
-
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
         BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();

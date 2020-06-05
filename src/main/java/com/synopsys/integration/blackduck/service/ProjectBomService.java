@@ -112,18 +112,6 @@ public class ProjectBomService extends DataService {
         return Optional.ofNullable(componentVersionUrl);
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public void addComponentToProjectVersion(String mediaType, String projectVersionComponentsUri, String componentVersionUrl) throws IntegrationException {
-        Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
-        try (Response response = blackDuckService.execute(request)) {
-        } catch (IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
     public void addProjectVersionToProjectVersion(ProjectVersionView projectVersionViewToAdd, ProjectVersionView targetProjectVersionView) throws IntegrationException {
         String toAdd = projectVersionViewToAdd.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView to add does not have an href.\n%s", projectVersionViewToAdd)));
         String target = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)

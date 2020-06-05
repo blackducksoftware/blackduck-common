@@ -36,15 +36,6 @@ import com.synopsys.integration.util.NoThreadExecutorService;
 public class BlackDuckBucketService extends DataService {
     private final ExecutorService executorService;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger) {
-        super(blackDuckService, logger);
-        executorService = new NoThreadExecutorService();
-    }
-
     public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger, final ExecutorService executorService) {
         super(blackDuckService, logger);
         this.executorService = executorService;

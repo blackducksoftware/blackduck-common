@@ -180,7 +180,6 @@ public class CodeLocationWaiterTest {
 
             mockBlackDuckService = Mockito.mock(BlackDuckService.class);
             Mockito.when(mockBlackDuckService.getAllResponses(mockProjectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(codeLocationViewsToReturn);
-
         }
     }
 

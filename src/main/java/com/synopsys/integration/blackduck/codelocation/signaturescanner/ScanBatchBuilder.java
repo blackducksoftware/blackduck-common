@@ -135,15 +135,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         }
     }
 
-    /**
-     * @deprecated Please use validateAndGetBuilderStatus.
-     */
-    @Deprecated
-    public String createErrorMessage() {
-        BuilderStatus builderStatus = validateAndGetBuilderStatus();
-        return builderStatus.getFullErrorMessage();
-    }
-
     public ScanBatchBuilder fromBlackDuckServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
         if (null == blackDuckServerConfig) {
             proxyInfo = ProxyInfo.NO_PROXY_INFO;

@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,39 +22,14 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.generated.view.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportFormatType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyStatusView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.ReportView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.view.*;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
@@ -66,10 +41,22 @@ import com.synopsys.integration.blackduck.service.model.pdf.RiskReportPdfWriter;
 import com.synopsys.integration.blackduck.service.model.pdf.RiskReportWriter;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ReportService extends DataService {
     public final static long DEFAULT_TIMEOUT = 1000L * 60 * 5;
@@ -145,7 +132,7 @@ public class ReportService extends DataService {
         for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
             String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
             if (StringUtils.isBlank(policyStatus)) {
-                String componentPolicyStatusURL = null;
+                HttpUrl componentPolicyStatusURL = null;
                 if (!StringUtils.isBlank(ProjectVersionComponentView.getComponentVersion())) {
                     componentPolicyStatusURL = getComponentPolicyURL(originalVersionUrl, ProjectVersionComponentView.getComponentVersion());
                 } else {
@@ -212,9 +199,9 @@ public class ReportService extends DataService {
         }
     }
 
-    private String getComponentPolicyURL(String versionURL, String componentURL) {
+    private HttpUrl getComponentPolicyURL(String versionURL, String componentURL) throws IntegrationException {
         String componentVersionSegments = componentURL.substring(componentURL.indexOf("components"));
-        return versionURL + "/" + componentVersionSegments + "/" + "policy-status";
+        return new HttpUrl(versionURL + "/" + componentVersionSegments + "/" + "policy-status");
     }
 
     private BomComponent createBomComponentFromBomComponentView(ProjectVersionComponentView bomEntry) {
@@ -233,8 +220,8 @@ public class ReportService extends DataService {
 
     public void populatePolicyRuleInfo(BomComponent component, ProjectVersionComponentView bomEntry) throws IntegrationException {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
-             PolicyStatusType status = bomEntry.getApprovalStatus();
-            if (status ==  PolicyStatusType.IN_VIOLATION) {
+            PolicyStatusType status = bomEntry.getApprovalStatus();
+            if (status == PolicyStatusType.IN_VIOLATION) {
                 List<ComponentPolicyRulesView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (ComponentPolicyRulesView policyRuleView : rules) {
@@ -283,19 +270,20 @@ public class ReportService extends DataService {
         if (version.hasLink(ProjectVersionView.LICENSEREPORTS_LINK)) {
             try {
                 logger.debug("Starting the Notices Report generation.");
-                String reportUrl = startGeneratingBlackDuckNoticesReport(version, reportFormat);
+                HttpUrl reportUrl = startGeneratingBlackDuckNoticesReport(version, reportFormat);
 
                 logger.debug("Waiting for the Notices Report to complete.");
                 ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
                 String contentLink = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
+                HttpUrl contentUrl = new HttpUrl(contentLink);
 
                 if (contentLink == null) {
                     throw new BlackDuckIntegrationException("Could not find content link for the report at : " + reportUrl);
                 }
 
                 logger.debug("Getting the Notices Report content.");
-                String noticesReport = getNoticesReportContent(contentLink);
+                String noticesReport = getNoticesReportContent(contentUrl);
                 logger.debug("Finished retrieving the Notices Report.");
                 logger.debug("Cleaning up the Notices Report on the server.");
                 deleteBlackDuckReport(reportUrl);
@@ -314,29 +302,30 @@ public class ReportService extends DataService {
         return null;
     }
 
-    public String startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws IntegrationException {
+    public HttpUrl startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws IntegrationException {
         String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
+        HttpUrl reportUrl = new HttpUrl(reportUri);
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("reportFormat", reportFormat.toString());
         jsonObject.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
         String json = blackDuckService.convertToJson(jsonObject);
-        Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(reportUri).build();
+        Request request = RequestFactory.createCommonPostRequestBuilder(reportUrl, json).build();
         return blackDuckService.executePostRequestAndRetrieveURL(request);
     }
 
     /**
      * Checks the report URL every 5 seconds until the report has a finished time available, then we know it is done being generated. Throws BlackDuckIntegrationException after 30 minutes if the report has not been generated yet.
      */
-    public ReportView isReportFinishedGenerating(String reportUri) throws InterruptedException, IntegrationException {
+    public ReportView isReportFinishedGenerating(HttpUrl reportUrl) throws InterruptedException, IntegrationException {
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
         Date timeFinished = null;
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = blackDuckService.getResponse(reportUri, ReportView.class);
+            reportInfo = blackDuckService.getResponse(reportUrl, ReportView.class);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;
@@ -352,12 +341,12 @@ public class ReportService extends DataService {
         return reportInfo;
     }
 
-    public String getNoticesReportContent(String reportContentUri) throws IntegrationException {
-        JsonElement fileContent = getReportContentJson(reportContentUri);
+    public String getNoticesReportContent(HttpUrl reportContentUrl) throws IntegrationException {
+        JsonElement fileContent = getReportContentJson(reportContentUrl);
         return fileContent.getAsString();
     }
 
-    private JsonElement getReportContentJson(String reportContentUri) throws IntegrationException {
+    private JsonElement getReportContentJson(HttpUrl reportContentUri) throws IntegrationException {
         try (Response response = blackDuckService.get(reportContentUri)) {
             String jsonResponse = response.getContentString();
 
@@ -371,7 +360,7 @@ public class ReportService extends DataService {
         }
     }
 
-    public void deleteBlackDuckReport(String reportUri) throws IntegrationException {
+    public void deleteBlackDuckReport(HttpUrl reportUri) throws IntegrationException {
         blackDuckService.delete(reportUri);
     }
 

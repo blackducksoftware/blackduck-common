@@ -38,16 +38,6 @@ public class UploadBatchRunner {
     private final BlackDuckService blackDuckService;
     private final ExecutorService executorService;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService) {
-        this.logger = logger;
-        this.blackDuckService = blackDuckService;
-        this.executorService = new NoThreadExecutorService();
-    }
-
     public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;

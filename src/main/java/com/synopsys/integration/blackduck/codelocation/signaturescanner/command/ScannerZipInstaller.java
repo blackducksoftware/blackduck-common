@@ -57,25 +57,6 @@ public class ScannerZipInstaller {
     private final String blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    /**
-     * @deprecated Please create the SignatureScannerService in BlackDuckServicesFactory
-     */
-    @Deprecated
-    public static ScannerZipInstaller defaultUtility(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig, IntEnvironmentVariables intEnvironmentVariables, OperatingSystemType operatingSystemType) {
-        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
-        return ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, scanPathsUtility, operatingSystemType);
-    }
-
-    /**
-     * @deprecated Please create the SignatureScannerService in BlackDuckServicesFactory
-     */
-    @Deprecated
-    public static ScannerZipInstaller defaultUtility(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig, ScanPathsUtility scanPathsUtility, OperatingSystemType operatingSystemType) {
-        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
-        CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        return new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckServerConfig.getBlackDuckUrl().toString(), operatingSystemType);
-    }
-
     public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, String blackDuckServerUrl,
             OperatingSystemType operatingSystemType) {
         if (StringUtils.isBlank(blackDuckServerUrl)) {

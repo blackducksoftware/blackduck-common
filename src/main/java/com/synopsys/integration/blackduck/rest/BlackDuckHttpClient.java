@@ -31,7 +31,10 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -60,6 +63,13 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
                 throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
             }
         }
+    }
+
+    @Override
+    public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
+        super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
+
+        httpClientBuilder.setRedirectStrategy(new IntRedirectStrategy());
     }
 
     @Override

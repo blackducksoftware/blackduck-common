@@ -267,27 +267,6 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    /**
-     * @deprecated Please use setProperties.
-     */
-    @Deprecated
-    public BlackDuckServerConfigBuilder setFromProperties(Map<String, String> properties) {
-        builderProperties.setProperties(properties.entrySet());
-        return this;
-    }
-
-    /**
-     * @deprecated Please use setProperties.
-     */
-    @Deprecated
-    public BlackDuckServerConfigBuilder setFromProperties(Properties properties) {
-        Map<String, String> propertiesMap = properties.stringPropertyNames()
-                                                .stream()
-                                                .collect(Collectors.toMap(name -> name, name -> properties.getProperty(name)));
-
-        return setFromProperties(propertiesMap);
-    }
-
     public IntLogger getLogger() {
         return logger;
     }
@@ -394,34 +373,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    /**
-     * @deprecated Please use getTimeoutInSeconds
-     */
-    @Deprecated
-    public int getTimemout() {
-        return getTimemoutInSeconds();
-    }
-
     public int getTimemoutInSeconds() {
         return NumberUtils.toInt(builderProperties.get(TIMEOUT_KEY), BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS);
-    }
-
-    /**
-     * @deprecated Please use setTimeoutInSeconds
-     */
-    @Deprecated
-    public BlackDuckServerConfigBuilder setTimeout(String timeout) {
-        builderProperties.set(TIMEOUT_KEY, timeout);
-        return this;
-    }
-
-    /**
-     * @deprecated Please use setTimeoutInSeconds
-     */
-    @Deprecated
-    public BlackDuckServerConfigBuilder setTimeout(int timeout) {
-        setTimeout(String.valueOf(timeout));
-        return this;
     }
 
     public BlackDuckServerConfigBuilder setTimeoutInSeconds(String timeout) {
@@ -514,4 +467,5 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public void setMediaTypeDiscovery(final MediaTypeDiscovery mediaTypeDiscovery) {
         this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
+
 }

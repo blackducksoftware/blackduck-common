@@ -73,30 +73,10 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, credentials, null, mediaTypeDiscovery);
     }
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    BlackDuckServerConfig(
-        URL url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
-        AuthenticationSupport authenticationSupport, MediaTypeDiscovery mediaTypeDiscovery) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, new NoThreadExecutorService(), credentials, null, mediaTypeDiscovery);
-    }
-
     BlackDuckServerConfig(
         URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, ExecutorService executorService, MediaTypeDiscovery mediaTypeDiscovery) {
         this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, null, apiToken, mediaTypeDiscovery);
-    }
-
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    BlackDuckServerConfig(
-        URL url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
-        AuthenticationSupport authenticationSupport, MediaTypeDiscovery mediaTypeDiscovery) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, new NoThreadExecutorService(), null, apiToken, mediaTypeDiscovery);
     }
 
     private BlackDuckServerConfig(URL url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
@@ -186,15 +166,6 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
         logger.info("A successful connection was made.");
         return ConnectionResult.SUCCESS(httpStatusCode);
-    }
-
-    /**
-     * @deprecated The gson and objectMapper instances don't need to be passed in - they should be set in the builder.
-     */
-    @Deprecated
-    public BlackDuckServicesFactory createBlackDuckServicesFactory(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
-        BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
-        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckRestConnection, logger, mediaTypeDiscovery);
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {

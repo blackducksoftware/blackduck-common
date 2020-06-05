@@ -56,18 +56,6 @@ public class BlackDuckResponsesTransformer {
         return getInternalResponses(pagedRequest, clazz, pagedRequest.getLimit());
     }
 
-    @Deprecated
-    /**
-     * @deprecated Please use the appropriate getAll or getSome method
-     */
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
-        int totalLimit = Integer.MAX_VALUE;
-        if (!getAll) {
-            totalLimit = pagedRequest.getLimit();
-        }
-        return getInternalResponses(pagedRequest, clazz, totalLimit);
-    }
-
     private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
