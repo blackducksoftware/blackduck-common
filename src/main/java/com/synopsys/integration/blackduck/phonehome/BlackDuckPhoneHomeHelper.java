@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,13 +21,6 @@
  * under the License.
  */
 package com.synopsys.integration.blackduck.phonehome;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -38,14 +31,25 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
-import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.enums.ProductIdEnum;
+import com.synopsys.integration.phonehome.request.BlackDuckPhoneHomeRequestFactory;
+import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
+import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+
+/**
+ * @deprecated Please use the example code here to adapt your own phone home solution to the new api of the client - this class is being deleted with the next release of the library.
+ */
+@Deprecated
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
@@ -82,7 +86,7 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, BlackDuckService blackDuckService, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
-        IntEnvironmentVariables intEnvironmentVariables) {
+                                    IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;
@@ -105,24 +109,20 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
-        BlackDuckPhoneHomeRequestBuilder blackDuckBuilder = new BlackDuckPhoneHomeRequestBuilder();
-        blackDuckBuilder.setIntegrationRepoName(integrationRepoName);
-        blackDuckBuilder.setIntegrationVersion(integrationVersion);
+        String registrationKey = getRegistrationKey();
+        String blackDuckUrl = getHostName();
+        String blackDuckVersion = getProductVersion();
 
-        blackDuckBuilder.setProduct(ProductIdEnum.BLACK_DUCK);
-        blackDuckBuilder.setProductVersion(getProductVersion());
+        BlackDuckPhoneHomeRequestFactory blackDuckPhoneHomeRequestFactory = new BlackDuckPhoneHomeRequestFactory(integrationRepoName);
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = blackDuckPhoneHomeRequestFactory.create(registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
+        phoneHomeRequestBodyBuilder.addArtifactModules(artifactModules);
 
-        blackDuckBuilder.setRegistrationKey(getRegistrationKey());
-        blackDuckBuilder.setCustomerDomainName(getHostName());
-
-        PhoneHomeRequestBody.Builder actualBuilder = blackDuckBuilder.getBuilder();
-        actualBuilder.setArtifactModules(artifactModules);
-        boolean metaDataSuccess = actualBuilder.addAllToMetaData(metaData);
+        boolean metaDataSuccess = phoneHomeRequestBodyBuilder.addAllToMetaData(metaData);
         if (!metaDataSuccess) {
             logger.debug("The metadata provided to phone-home exceeded its size limit. At least some metadata will be missing.");
         }
 
-        return actualBuilder.build();
+        return phoneHomeRequestBodyBuilder.build();
     }
 
     private Map<String, String> getEnvironmentVariables() {
@@ -139,7 +139,7 @@ public class BlackDuckPhoneHomeHelper {
             return currentVersion.getVersion();
         } catch (IntegrationException e) {
         }
-        return PhoneHomeRequestBody.Builder.UNKNOWN_ID;
+        return PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
     }
 
     private String getHostName() {
@@ -155,7 +155,7 @@ public class BlackDuckPhoneHomeHelper {
         }
         // We must check if the reg id is blank because of an edge case in which Black Duck can authenticate (while the webserver is coming up) without registration
         if (StringUtils.isBlank(registrationId)) {
-            registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
+            registrationId = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
         }
         return registrationId;
     }
