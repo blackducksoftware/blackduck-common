@@ -31,14 +31,15 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
-import com.synopsys.integration.phonehome.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.enums.ProductIdEnum;
+import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
+import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NoThreadExecutorService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -50,6 +51,10 @@ public class BlackDuckPhoneHomeHelper {
     private final PhoneHomeService phoneHomeService;
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
+
+    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
+        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
+    }
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
         BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
@@ -95,24 +100,19 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
-        BlackDuckPhoneHomeRequestBuilder blackDuckBuilder = new BlackDuckPhoneHomeRequestBuilder();
-        blackDuckBuilder.setIntegrationRepoName(integrationRepoName);
-        blackDuckBuilder.setIntegrationVersion(integrationVersion);
+        String registrationKey = getRegistrationKey();
+        String blackDuckUrl = getHostName();
+        String blackDuckVersion = getProductVersion();
 
-        blackDuckBuilder.setProduct(ProductIdEnum.BLACK_DUCK);
-        blackDuckBuilder.setProductVersion(getProductVersion());
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBodyBuilder.createForBlackDuck(integrationRepoName, registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
+        phoneHomeRequestBodyBuilder.addArtifactModules(artifactModules);
 
-        blackDuckBuilder.setRegistrationKey(getRegistrationKey());
-        blackDuckBuilder.setCustomerDomainName(getHostName());
-
-        PhoneHomeRequestBody.Builder actualBuilder = blackDuckBuilder.getBuilder();
-        actualBuilder.setArtifactModules(artifactModules);
-        boolean metaDataSuccess = actualBuilder.addAllToMetaData(metaData);
+        boolean metaDataSuccess = phoneHomeRequestBodyBuilder.addAllToMetaData(metaData);
         if (!metaDataSuccess) {
             logger.debug("The metadata provided to phone-home exceeded its size limit. At least some metadata will be missing.");
         }
 
-        return actualBuilder.build();
+        return phoneHomeRequestBodyBuilder.build();
     }
 
     private Map<String, String> getEnvironmentVariables() {
@@ -129,11 +129,12 @@ public class BlackDuckPhoneHomeHelper {
             return currentVersion.getVersion();
         } catch (IntegrationException e) {
         }
-        return PhoneHomeRequestBody.Builder.UNKNOWN_ID;
+        return PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
     }
 
     private String getHostName() {
-        return blackDuckService.getBlackDuckBaseUrl().toString();
+        return "";
+//        return blackDuckService.getBlackDuckBaseUrl().toString();
     }
 
     private String getRegistrationKey() {
@@ -145,7 +146,7 @@ public class BlackDuckPhoneHomeHelper {
         }
         // We must check if the reg id is blank because of an edge case in which Black Duck can authenticate (while the webserver is coming up) without registration
         if (StringUtils.isBlank(registrationId)) {
-            registrationId = PhoneHomeRequestBody.Builder.UNKNOWN_ID;
+            registrationId = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
         }
         return registrationId;
     }
