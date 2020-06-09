@@ -33,7 +33,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.request.BlackDuckPhoneHomeRequestFactory;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
@@ -46,10 +45,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-/**
- * @deprecated Please use the example code here to adapt your own phone home solution to the new api of the client - this class is being deleted with the next release of the library.
- */
-@Deprecated
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
@@ -57,10 +52,6 @@ public class BlackDuckPhoneHomeHelper {
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
     public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
         return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
     }
@@ -113,8 +104,7 @@ public class BlackDuckPhoneHomeHelper {
         String blackDuckUrl = getHostName();
         String blackDuckVersion = getProductVersion();
 
-        BlackDuckPhoneHomeRequestFactory blackDuckPhoneHomeRequestFactory = new BlackDuckPhoneHomeRequestFactory(integrationRepoName);
-        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = blackDuckPhoneHomeRequestFactory.create(registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBodyBuilder.createForBlackDuck(integrationRepoName, registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
         phoneHomeRequestBodyBuilder.addArtifactModules(artifactModules);
 
         boolean metaDataSuccess = phoneHomeRequestBodyBuilder.addAllToMetaData(metaData);
