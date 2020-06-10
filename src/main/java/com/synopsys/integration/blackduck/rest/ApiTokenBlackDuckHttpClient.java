@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,22 +22,18 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-
 import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Connection to the Black Duck application which authenticates using the API token feature
@@ -47,7 +43,7 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     private final AuthenticationSupport authenticationSupport;
     private final String apiToken;
 
-    public ApiTokenBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, String baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken) {
+    public ApiTokenBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.gson = gson;
         this.authenticationSupport = authenticationSupport;
@@ -80,7 +76,7 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
         // https://github.com/blackducksoftware/blackduck-common/issues/268
-        headers.put("Content-Length", "0");
+//        headers.put("Content-Length", "0");
 
         return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
     }

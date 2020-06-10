@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,20 +22,6 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
@@ -44,17 +30,28 @@ import com.synopsys.integration.builder.BuilderProperties;
 import com.synopsys.integration.builder.BuilderPropertyKey;
 import com.synopsys.integration.builder.BuilderStatus;
 import com.synopsys.integration.builder.IntegrationBuilder;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
 import com.synopsys.integration.rest.exception.IntegrationCertificateException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
+import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
     public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
@@ -80,6 +77,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
     private ExecutorService executorService = new NoThreadExecutorService();
     private MediaTypeDiscovery mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery();
+    private UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -114,21 +112,15 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     @Override
     public BlackDuckServerConfig buildWithoutValidation() {
-        URL blackDuckURL = null;
+        HttpUrl blackDuckUrl = null;
         try {
-            String tempUrl = getUrl();
-            if (!tempUrl.endsWith("/")) {
-                blackDuckURL = new URL(tempUrl);
-            } else {
-                tempUrl = tempUrl.substring(0, tempUrl.length() - 1);
-                blackDuckURL = new URL(tempUrl);
-            }
-        } catch (MalformedURLException e) {
+            blackDuckUrl = new HttpUrl(getUrl());
+        } catch (IntegrationException e) {
         }
 
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery);
+            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery, urlSupport);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -136,13 +128,13 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckURL, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery);
+            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, mediaTypeDiscovery, urlSupport);
         }
     }
 
     @Override
     protected void validate(BuilderStatus builderStatus) {
-        validateBlackDuckURL(builderStatus);
+        validateBlackDucUrlL(builderStatus);
 
         if (StringUtils.isBlank(getApiToken())) {
             validateBlackDuckCredentials(builderStatus);
@@ -193,14 +185,13 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
-    private void validateBlackDuckURL(BuilderStatus builderStatus) {
+    private void validateBlackDucUrlL(BuilderStatus builderStatus) {
         if (StringUtils.isBlank(getUrl())) {
             builderStatus.addErrorMessage("The Black Duck url must be specified.");
         } else {
             try {
-                URL blackDuckURL = new URL(getUrl());
-                blackDuckURL.toURI();
-            } catch (MalformedURLException | URISyntaxException e) {
+                new HttpUrl(getUrl());
+            } catch (IntegrationException e) {
                 builderStatus.addErrorMessage(String.format("The provided Black Duck url (%s) is not a valid URL.", getUrl()));
             }
         }
@@ -222,11 +213,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return builderProperties.getProperties();
     }
 
-    public void setProperties(final Set<? extends Map.Entry<String, String>> propertyEntries) {
+    public void setProperties(Set<? extends Map.Entry<String, String>> propertyEntries) {
         builderProperties.setProperties(propertyEntries);
     }
 
-    public void setProperty(final String key, final String value) {
+    public void setProperty(String key, String value) {
         builderProperties.setProperty(key, value);
     }
 
@@ -337,6 +328,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     public BlackDuckServerConfigBuilder setUrl(String url) {
         builderProperties.set(URL_KEY, url);
+        return this;
+    }
+
+    public BlackDuckServerConfigBuilder setUrl(HttpUrl url) {
+        builderProperties.set(URL_KEY, url.string());
         return this;
     }
 
@@ -464,7 +460,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return mediaTypeDiscovery;
     }
 
-    public void setMediaTypeDiscovery(final MediaTypeDiscovery mediaTypeDiscovery) {
+    public void setMediaTypeDiscovery(MediaTypeDiscovery mediaTypeDiscovery) {
         this.mediaTypeDiscovery = mediaTypeDiscovery;
     }
 

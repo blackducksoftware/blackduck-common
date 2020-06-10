@@ -1,18 +1,5 @@
 package com.synopsys.integration.blackduck.rest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
@@ -24,8 +11,21 @@ import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.rest.support.UrlSupport;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -35,6 +35,8 @@ public class BlackDuckHttpClientTestIT {
     private static final String API_TOKEN_NAME = "blackDuckHttpClientTest";
     private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
+
+    private UrlSupport urlSupport = new UrlSupport();
 
     @Test
     public void testCredentials() throws IntegrationException, IOException {
@@ -117,10 +119,10 @@ public class BlackDuckHttpClientTestIT {
     // ******************************
     // WARNING!!!!
     private ApiTokenView getApiToken(String tokenName) throws IntegrationException, IOException {
-        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().createBlackDuckService();
+        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
 
-        URL blackDuckServerUrl = new URL(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
-        String createApiTokenUrl = new URL(blackDuckServerUrl, BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath()).toString();
+        HttpUrl blackDuckServerUrl = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
+        HttpUrl createApiTokenUrl = urlSupport.appendRelativeUrl(blackDuckServerUrl, BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
 
         ApiTokenRequest apiTokenRequest = new ApiTokenRequest();
         apiTokenRequest.name = tokenName;
@@ -129,7 +131,7 @@ public class BlackDuckHttpClientTestIT {
 
         ApiTokenView apiTokenView;
         String json = blackDuckService.convertToJson(apiTokenRequest);
-        Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(createApiTokenUrl).build();
+        Request request = RequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, json).build();
         try (Response response = blackDuckService.execute(request)) {
             apiTokenView = blackDuckService.transformResponse(response, ApiTokenView.class);
         }
@@ -138,7 +140,7 @@ public class BlackDuckHttpClientTestIT {
     }
 
     private void deleteByName(String name) throws IntegrationException {
-        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().createBlackDuckService();
+        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
         List<ApiTokenView> apiTokens = blackDuckService.getAllResponses(BlackDuckHttpClientTestIT.API_TOKEN_LINK_RESPONSE);
         for (ApiTokenView apiTokenView : apiTokens) {
             if (apiTokenView.name.equals(name)) {

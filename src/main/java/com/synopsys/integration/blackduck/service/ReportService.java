@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- * <p>
+ *
  * Copyright (c) 2020 Synopsys, Inc.
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -64,14 +64,14 @@ public class ReportService extends DataService {
     private final ProjectService projectDataService;
     private final IntegrationEscapeUtil escapeUtil;
     private final long timeoutInMilliseconds;
-    private final String blackDuckBaseUrl;
+    private final HttpUrl blackDuckBaseUrl;
     private final Gson gson;
 
-    public ReportService(Gson gson, String blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
+    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
         this(gson, blackDuckBaseUrl, blackDuckService, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
     }
 
-    public ReportService(Gson gson, String blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
+    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
         super(blackDuckService, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;

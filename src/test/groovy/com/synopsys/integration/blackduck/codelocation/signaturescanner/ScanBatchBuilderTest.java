@@ -1,18 +1,17 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.builder.BuilderStatus;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
+import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,8 +34,8 @@ public class ScanBatchBuilderTest {
     public void testInvalidProxy() {
         ScanBatchBuilder builder = createInitialValidBuilder();
         try {
-            builder.blackDuckUrl(new URL("http://www.google.com"));
-        } catch (MalformedURLException e) {
+            builder.blackDuckUrl(new HttpUrl("http://www.google.com"));
+        } catch (IntegrationException e) {
             fail("The test URL was bad.", e);
         }
 
@@ -52,8 +51,8 @@ public class ScanBatchBuilderTest {
     public void testCredentials() {
         ScanBatchBuilder builder = createInitialValidBuilder();
         try {
-            builder.blackDuckUrl(new URL("http://www.google.com"));
-        } catch (MalformedURLException e) {
+            builder.blackDuckUrl(new HttpUrl("http://www.google.com"));
+        } catch (IntegrationException e) {
             fail("The test URL was bad.", e);
         }
         builder.proxyInfo(ProxyInfo.NO_PROXY_INFO);

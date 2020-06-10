@@ -1,30 +1,35 @@
 package com.synopsys.integration.blackduck.configuration;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.net.URL;
-
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.client.ConnectionResult;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.rest.TestingPropertyKey;
-import com.synopsys.integration.log.SilentIntLogger;
+import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServerConfigBuilderTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
-    private static final String URL = BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
+    private final HttpUrl URL = BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private static final String USERNAME = BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private static final String PASSWORD = BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
     private static final String PROXY_PASSTHROUGH_HOST = BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getProperty(TestingPropertyKey.TEST_PROXY_HOST_PASSTHROUGH);
     private static final int PROXY_PASSTHROUGH_PORT = NumberUtils.toInt(BlackDuckServerConfigBuilderTestIT.INT_HTTP_CLIENT_TEST_HELPER.getProperty(TestingPropertyKey.TEST_PROXY_PORT_PASSTHROUGH));
     private static final int TIMEOUT = 120;
+
+    public BlackDuckServerConfigBuilderTestIT() throws IntegrationException {
+
+    }
 
     @Test
     public void testValidConfigWithProxies() throws Exception {
@@ -33,8 +38,8 @@ public class BlackDuckServerConfigBuilderTestIT {
         setBuilderProxyDefaults(builder);
         BlackDuckServerConfig config = builder.build();
 
-        String blackDuckServer = BlackDuckServerConfigBuilderTestIT.URL;
-        assertEquals(new URL(blackDuckServer).getHost(), config.getBlackDuckUrl().getHost());
+        HttpUrl blackDuckServer = URL;
+        assertEquals(new URL(blackDuckServer.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals("User", config.getCredentials().get().getUsername().get());
         assertEquals("Pass", config.getCredentials().get().getPassword().get());
         assertEquals(BlackDuckServerConfigBuilderTestIT.PROXY_PASSTHROUGH_HOST, config.getProxyInfo().getHost().get());
@@ -55,7 +60,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         builder.setProxyPassword(null);
         BlackDuckServerConfig config = builder.build();
 
-        assertEquals(new URL(BlackDuckServerConfigBuilderTestIT.URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals("User", config.getCredentials().get().getUsername().get());
         assertEquals("Pass", config.getCredentials().get().getPassword().get());
 
@@ -116,7 +121,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         setValidDefaults(builder);
         BlackDuckServerConfig config = builder.build();
-        assertEquals(new URL(BlackDuckServerConfigBuilderTestIT.URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals(BlackDuckServerConfigBuilderTestIT.TIMEOUT, config.getTimeout());
         assertEquals(BlackDuckServerConfigBuilderTestIT.USERNAME, config.getCredentials().get().getUsername().get());
         assertEquals(BlackDuckServerConfigBuilderTestIT.PASSWORD, config.getCredentials().get().getPassword().get());
@@ -127,7 +132,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         setValidDefaults(builder);
         BlackDuckServerConfig config = builder.build();
-        assertEquals(new URL(BlackDuckServerConfigBuilderTestIT.URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals(120, config.getTimeout());
         assertEquals(BlackDuckServerConfigBuilderTestIT.USERNAME, config.getCredentials().get().getUsername().get());
         assertEquals(BlackDuckServerConfigBuilderTestIT.PASSWORD, config.getCredentials().get().getPassword().get());
@@ -141,7 +146,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         builder.setProxyPort(BlackDuckServerConfigBuilderTestIT.PROXY_PASSTHROUGH_PORT);
         BlackDuckServerConfig config = builder.build();
 
-        assertEquals(new URL(BlackDuckServerConfigBuilderTestIT.URL).getHost(), config.getBlackDuckUrl().getHost());
+        assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals(BlackDuckServerConfigBuilderTestIT.TIMEOUT, config.getTimeout());
         assertEquals(BlackDuckServerConfigBuilderTestIT.USERNAME, config.getCredentials().get().getUsername().get());
         assertEquals(BlackDuckServerConfigBuilderTestIT.PASSWORD, config.getCredentials().get().getPassword().get());
@@ -155,9 +160,9 @@ public class BlackDuckServerConfigBuilderTestIT {
         setValidDefaults(builder);
         BlackDuckServerConfig config = builder.build();
         assertFalse(config.getBlackDuckUrl().toString().endsWith("/"));
-        assertEquals("https", config.getBlackDuckUrl().getProtocol());
-        assertEquals(new URL(BlackDuckServerConfigBuilderTestIT.URL).getHost(), config.getBlackDuckUrl().getHost());
-        assertEquals(-1, config.getBlackDuckUrl().getPort());
+        assertEquals("https", config.getBlackDuckUrl().url().getProtocol());
+        assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
+        assertEquals(-1, config.getBlackDuckUrl().url().getPort());
     }
 
     @Test
@@ -185,7 +190,7 @@ public class BlackDuckServerConfigBuilderTestIT {
     }
 
     private void setValidDefaults(BlackDuckServerConfigBuilder builder) {
-        builder.setUrl(BlackDuckServerConfigBuilderTestIT.URL);
+        builder.setUrl(URL);
         builder.setUsername(BlackDuckServerConfigBuilderTestIT.USERNAME);
         builder.setPassword(BlackDuckServerConfigBuilderTestIT.PASSWORD);
         builder.setTrustCert(true);
@@ -193,7 +198,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     private void setBuilderDefaults(BlackDuckServerConfigBuilder builder) {
         setValidDefaults(builder);
-        builder.setTimeout("100");
+        builder.setTimeoutInSeconds("100");
         builder.setUsername("User");
         builder.setPassword("Pass");
     }

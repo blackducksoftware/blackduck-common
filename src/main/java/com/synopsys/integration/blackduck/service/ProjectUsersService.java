@@ -22,25 +22,21 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserGroupRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedUserGroupView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.AssignedUserRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedUserGroupView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;
@@ -61,7 +57,8 @@ public class ProjectUsersService extends DataService {
 
         List<UserView> resolvedUserViews = new ArrayList<>();
         for (AssignedUserView assigned : assignedUsers) {
-            UserView userView = blackDuckService.getResponse(assigned.getUser(), UserView.class);
+            HttpUrl userUrl = new HttpUrl(assigned.getUser());
+            UserView userView = blackDuckService.getResponse(userUrl, UserView.class);
             if (userView != null) {
                 resolvedUserViews.add(userView);
             }
@@ -80,7 +77,8 @@ public class ProjectUsersService extends DataService {
 
         List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (AssignedUserGroupView assigned : assignedGroups) {
-            UserGroupView groupView = blackDuckService.getResponse(assigned.getGroup(), UserGroupView.class);
+            HttpUrl groupUrl = new HttpUrl(assigned.getGroup());
+            UserGroupView groupView = blackDuckService.getResponse(groupUrl, UserGroupView.class);
             if (groupView != null) {
                 resolvedGroupViews.add(groupView);
             }
@@ -97,7 +95,8 @@ public class ProjectUsersService extends DataService {
         List<AssignedUserGroupView> assignedGroups = getAssignedGroupsToProject(projectView);
         for (AssignedUserGroupView assignedUserGroupView : assignedGroups) {
             if (assignedUserGroupView.getActive()) {
-                UserGroupView userGroupView = blackDuckService.getResponse(assignedUserGroupView.getGroup(), UserGroupView.class);
+                HttpUrl groupUrl = new HttpUrl(assignedUserGroupView.getGroup());
+                UserGroupView userGroupView = blackDuckService.getResponse(groupUrl, UserGroupView.class);
                 if (userGroupView.getActive()) {
                     List<UserView> groupUsers = blackDuckService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
                     users.addAll(groupUsers);
@@ -107,14 +106,15 @@ public class ProjectUsersService extends DataService {
 
         List<AssignedUserView> assignedUsers = getAssignedUsersToProject(projectView);
         for (AssignedUserView assignedUser : assignedUsers) {
-            UserView userView = blackDuckService.getResponse(assignedUser.getUser(), UserView.class);
+            HttpUrl userUrl = new HttpUrl(assignedUser.getUser());
+            UserView userView = blackDuckService.getResponse(userUrl, UserView.class);
             users.add(userView);
         }
 
         return users
-                   .stream()
-                   .filter(userView -> userView.getActive())
-                   .collect(Collectors.toSet());
+                .stream()
+                .filter(userView -> userView.getActive())
+                .collect(Collectors.toSet());
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
@@ -131,16 +131,17 @@ public class ProjectUsersService extends DataService {
 
         Optional<String> projectUserGroupsLinkOptional = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
         String createUserGroupLink = projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
+        HttpUrl createUrl = new HttpUrl(createUserGroupLink);
 
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
         userGroupRequest.setGroup(userGroupHref);
-        blackDuckService.post(createUserGroupLink, userGroupRequest);
+        blackDuckService.post(createUrl, userGroupRequest);
     }
 
     public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
-        final List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         UserView userView = null;
-        for (final UserView user : allUsers) {
+        for (UserView user : allUsers) {
             if (user.getUserName().equalsIgnoreCase(username)) {
                 userView = user;
             }
@@ -152,19 +153,20 @@ public class ProjectUsersService extends DataService {
     }
 
     public void addUserToProject(ProjectView projectView, UserView userView) throws IntegrationException {
-        final List<UserView> currentUsers = getUsersForProject(projectView);
+        List<UserView> currentUsers = getUsersForProject(projectView);
         if (currentUsers.contains(userView)) {
             logger.info(String.format("The supplied project (%s) already contained the user (%s).", projectView.getName(), userView.getUserName()));
             return;
         }
 
-        final AssignedUserRequest assignedUserRequest = new AssignedUserRequest();
+        AssignedUserRequest assignedUserRequest = new AssignedUserRequest();
         assignedUserRequest.setUser(userView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The user %s does not have an href so it can not be added to a project.", userView.getUserName()))));
 
-        final Optional<String> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
+        Optional<String> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
         String addUserLink = projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
+        HttpUrl addUserUrl = new HttpUrl(addUserLink);
 
-        blackDuckService.post(addUserLink, assignedUserRequest);
+        blackDuckService.post(addUserUrl, assignedUserRequest);
     }
 
 }

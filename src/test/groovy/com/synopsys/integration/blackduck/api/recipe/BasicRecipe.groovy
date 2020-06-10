@@ -70,7 +70,7 @@ class BasicRecipe {
         mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery()
 
         blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger, mediaTypeDiscovery)
-        blackDuckService = blackDuckServicesFactory.createBlackDuckService()
+        blackDuckService = blackDuckServicesFactory.getBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
         projectUsersService = blackDuckServicesFactory.createProjectUsersService()

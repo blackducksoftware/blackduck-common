@@ -1,30 +1,30 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.LogLevel;
+import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.OperatingSystemType;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ScanCommandTest {
     Path tempDirectory;
@@ -170,9 +170,9 @@ public class ScanCommandTest {
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
-            scanBatchBuilder.blackDuckUrl(new URL("http://fakeserver.com"));
+            scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
             scanBatchBuilder.blackDuckApiToken("fake_token");
-        } catch (MalformedURLException e) {
+        } catch (IntegrationException e) {
             e.printStackTrace();
         }
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path"));

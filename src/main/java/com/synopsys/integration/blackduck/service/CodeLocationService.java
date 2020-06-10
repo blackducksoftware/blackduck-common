@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 import java.util.List;
@@ -87,7 +88,8 @@ public class CodeLocationService extends DataService {
 
     public ScanSummaryView getScanSummaryViewById(String scanSummaryId) throws IntegrationException {
         String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
-        return blackDuckService.getResponse(uri, ScanSummaryView.class);
+        HttpUrl url = new HttpUrl(uri);
+        return blackDuckService.getResponse(url, ScanSummaryView.class);
     }
 
 }

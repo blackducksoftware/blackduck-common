@@ -1,25 +1,26 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.*;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.*;
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScan;
@@ -32,16 +33,15 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.*;
+import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -62,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+    private BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(new Gson(), new ObjectMapper(), new SilentIntLogger());
 
     @Test
     public void createProjectVersion() throws Exception {
@@ -69,7 +70,7 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
@@ -114,7 +115,7 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
@@ -286,7 +287,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-            BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+            BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
 
             List<ProjectView> allProjects = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
             System.out.println(String.format("project count: %d", allProjects.size()));
@@ -303,9 +304,12 @@ public class ComprehensiveCookbookTestIT {
 
     private <T extends BlackDuckResponse> void assertGettingAll(BlackDuckPathMultipleResponses<T> pathResponses, String labelForOutput) throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
 
-        BlackDuckPageResponse<T> pageResponse = blackDuckService.getPageResponses(pathResponses, true);
+        Request.Builder requestBuilder = new Request.Builder();
+        PagedRequest pagedRequest = new PagedRequest(requestBuilder);
+
+        BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, pathResponses.getResponseClass());
         if (pageResponse.getTotalCount() > 0) {
             assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
 
@@ -417,9 +421,9 @@ public class ComprehensiveCookbookTestIT {
 
     private List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationContentData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
         return notifications
-                       .stream()
-                       .map(NotificationContentData::getContent)
-                       .collect(Collectors.toList());
+                .stream()
+                .map(NotificationContentData::getContent)
+                .collect(Collectors.toList());
     }
 
     private class CheckPolicyData {
@@ -433,7 +437,7 @@ public class ComprehensiveCookbookTestIT {
         public String artifact;
 
         public CheckPolicyData(String projectName, String projectVersionName, String codeLocationName, String policyRuleName, String componentName, String componentVersion, String groupId,
-                String artifact) {
+                               String artifact) {
             this.projectName = projectName;
             this.projectVersionName = projectVersionName;
             this.codeLocationName = codeLocationName;

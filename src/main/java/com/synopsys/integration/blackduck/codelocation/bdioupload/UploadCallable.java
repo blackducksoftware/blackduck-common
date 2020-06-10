@@ -22,17 +22,17 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
-
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FileUtils;
 
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 
 public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
@@ -58,8 +58,8 @@ public class UploadCallable implements Callable<UploadOutput> {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
             }
 
-            String uri = blackDuckService.getUri(BlackDuckService.BOMIMPORT_PATH);
-            Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
+            HttpUrl url = blackDuckService.getUrl(BlackDuckService.BOMIMPORT_PATH);
+            Request request = RequestFactory.createCommonPostRequestBuilder(url, jsonPayload).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);

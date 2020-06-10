@@ -22,19 +22,17 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.io.File;
-import java.util.Map;
-import java.util.Optional;
-
-import com.synopsys.integration.rest.HttpUrl;
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.FileBodyContent;
 import com.synopsys.integration.rest.body.MapBodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Optional;
 
 public class RequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
@@ -132,8 +130,8 @@ public class RequestFactory {
         return new Request.Builder(url).method(HttpMethod.PUT).bodyContent(new StringBodyContent(bodyContent));
     }
 
-    public static Request.Builder createCommonPostRequestBuilder(HttpUrl url, Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
-        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+    public static Request.Builder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
+        return new Request.Builder().method(HttpMethod.POST).bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
     }
 
 }

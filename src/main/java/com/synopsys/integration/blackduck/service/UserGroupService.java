@@ -22,13 +22,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.UserProjectsView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -38,25 +31,28 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+
+import java.util.*;
 
 public class UserGroupService {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
 
-    public UserGroupService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public UserGroupService(BlackDuckService blackDuckService, IntLogger logger) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
     }
 
     public UserGroupView createUserGroup(UserGroupRequest userGroupRequest) throws IntegrationException {
-        String userGroupUrl = blackDuckService.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
+        HttpUrl userGroupUrl = blackDuckService.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
         UserGroupView userGroupView = blackDuckService.getResponse(userGroupUrl, UserGroupView.class);
         return userGroupView;
     }
 
-    public Optional<UserView> getUserByUsername(final String username) throws IntegrationException {
-        final List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
-        for (final UserView user : allUsers) {
+    public Optional<UserView> getUserByUsername(String username) throws IntegrationException {
+        List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        for (UserView user : allUsers) {
             if (user.getUserName().equalsIgnoreCase(username)) {
                 return Optional.of(user);
             }
@@ -65,21 +61,22 @@ public class UserGroupService {
         return Optional.empty();
     }
 
-    public List<ProjectView> getProjectsForUser(final String userName) throws IntegrationException {
-        final Optional<UserView> user = getUserByUsername(userName);
+    public List<ProjectView> getProjectsForUser(String userName) throws IntegrationException {
+        Optional<UserView> user = getUserByUsername(userName);
         if (!user.isPresent()) {
             return Collections.emptyList();
         }
         return getProjectsForUser(user.get());
     }
 
-    public List<ProjectView> getProjectsForUser(final UserView userView) throws IntegrationException {
+    public List<ProjectView> getProjectsForUser(UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
-        final List<UserProjectsView> assignedProjectViews = blackDuckService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
+        List<UserProjectsView> assignedProjectViews = blackDuckService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
-        final List<ProjectView> resolvedProjectViews = new ArrayList<>();
-        for (final UserProjectsView assigned : assignedProjectViews) {
-            final ProjectView project = blackDuckService.getResponse(assigned.getProject(), ProjectView.class);
+        List<ProjectView> resolvedProjectViews = new ArrayList<>();
+        for (UserProjectsView assigned : assignedProjectViews) {
+            HttpUrl projectUrl = new HttpUrl(assigned.getProject());
+            ProjectView project = blackDuckService.getResponse(projectUrl, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
@@ -88,48 +85,48 @@ public class UserGroupService {
         return resolvedProjectViews;
     }
 
-    public List<RoleAssignmentView> getRolesForUser(final String username) throws IntegrationException {
-        final Optional<UserView> user = getUserByUsername(username);
+    public List<RoleAssignmentView> getRolesForUser(String username) throws IntegrationException {
+        Optional<UserView> user = getUserByUsername(username);
         if (!user.isPresent()) {
             return Collections.emptyList();
         }
         return getRolesForUser(user.get());
     }
 
-    public List<RoleAssignmentView> getRolesForUser(final UserView userView) throws IntegrationException {
+    public List<RoleAssignmentView> getRolesForUser(UserView userView) throws IntegrationException {
         return blackDuckService.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
     }
 
-    public List<RoleAssignmentView> getInheritedRolesForUser(final String username) throws IntegrationException {
-        final Optional<UserView> user = getUserByUsername(username);
+    public List<RoleAssignmentView> getInheritedRolesForUser(String username) throws IntegrationException {
+        Optional<UserView> user = getUserByUsername(username);
         if (!user.isPresent()) {
             return Collections.emptyList();
         }
         return getInheritedRolesForUser(user.get());
     }
 
-    public List<RoleAssignmentView> getInheritedRolesForUser(final UserView userView) throws IntegrationException {
+    public List<RoleAssignmentView> getInheritedRolesForUser(UserView userView) throws IntegrationException {
         return blackDuckService.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
     }
 
-    public List<RoleAssignmentView> getAllRolesForUser(final String username) throws IntegrationException {
-        final Optional<UserView> user = getUserByUsername(username);
+    public List<RoleAssignmentView> getAllRolesForUser(String username) throws IntegrationException {
+        Optional<UserView> user = getUserByUsername(username);
         if (!user.isPresent()) {
             return Collections.emptyList();
         }
         return getAllRolesForUser(user.get());
     }
 
-    public List<RoleAssignmentView> getAllRolesForUser(final UserView userView) throws IntegrationException {
-        final Set<RoleAssignmentView> roleSet = new LinkedHashSet<>();
+    public List<RoleAssignmentView> getAllRolesForUser(UserView userView) throws IntegrationException {
+        Set<RoleAssignmentView> roleSet = new LinkedHashSet<>();
         roleSet.addAll(getRolesForUser(userView));
         roleSet.addAll(getInheritedRolesForUser(userView));
         return new ArrayList(roleSet);
     }
 
-    public Optional<UserGroupView> getGroupByName(final String groupName) throws IntegrationException {
-        final List<UserGroupView> allGroups = blackDuckService.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
-        for (final UserGroupView group : allGroups) {
+    public Optional<UserGroupView> getGroupByName(String groupName) throws IntegrationException {
+        List<UserGroupView> allGroups = blackDuckService.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
+        for (UserGroupView group : allGroups) {
             if (group.getName().equalsIgnoreCase(groupName)) {
                 return Optional.of(group);
             }

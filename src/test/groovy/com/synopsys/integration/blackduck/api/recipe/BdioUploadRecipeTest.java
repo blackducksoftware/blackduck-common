@@ -1,20 +1,5 @@
 package com.synopsys.integration.blackduck.api.recipe;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
-import com.synopsys.integration.util.NameVersion;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -23,6 +8,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCode
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -30,6 +16,20 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.util.NameVersion;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -54,7 +54,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         //in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
         IntLogger logger = new BufferedIntLogger();
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
@@ -75,7 +75,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         // in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
         IntLogger logger = new BufferedIntLogger();
 
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);

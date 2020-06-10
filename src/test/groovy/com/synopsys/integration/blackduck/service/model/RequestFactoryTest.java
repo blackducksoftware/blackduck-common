@@ -1,24 +1,25 @@
 package com.synopsys.integration.blackduck.service.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.request.Request;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.rest.request.Request;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(TimingExtension.class)
 public class RequestFactoryTest {
     @Test
-    public void testFilterWithMultipleValues() {
-        BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
-        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder("http://www.url.com/api/something", Optional.empty(), blackDuckRequestFilter, 1, 0);
+    public void testFilterWithMultipleValues() throws IntegrationException {
+        BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[]{"value1", "value2"}));
+        Request.Builder requestBuilder = RequestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

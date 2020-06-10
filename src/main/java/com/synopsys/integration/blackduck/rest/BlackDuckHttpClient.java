@@ -25,51 +25,36 @@ package com.synopsys.integration.blackduck.rest;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.client.AuthenticatingIntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.response.ErrorResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
+import com.synopsys.integration.rest.response.Response;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
 public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
-    private final String baseUrl;
+    private final HttpUrl baseUrl;
 
-    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, String baseUrl) {
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
         this.baseUrl = baseUrl;
 
-        if (StringUtils.isBlank(baseUrl)) {
+        if (null == baseUrl) {
             throw new IllegalArgumentException("No base url was provided.");
-        } else {
-            try {
-                URL url = new URL(baseUrl);
-                url.toURI();
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("The provided base url is not a valid java.net.URL.", e);
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("The provided base url is not a valid java.net.URI.", e);
-            }
         }
     }
 
     @Override
     public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
         super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
-
-        httpClientBuilder.setRedirectStrategy(new IntRedirectStrategy());
     }
 
     @Override
@@ -81,6 +66,7 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         }
     }
 
+    @Override
     public void throwExceptionForError(Response response) throws IntegrationException {
         try {
             response.throwExceptionForError();
@@ -89,7 +75,7 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         }
     }
 
-    public String getBaseUrl() {
+    public HttpUrl getBaseUrl() {
         return baseUrl;
     }
 

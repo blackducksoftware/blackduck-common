@@ -31,7 +31,7 @@ public class BlackDuckServices {
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();
         codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         componentService = blackDuckServicesFactory.createComponentService();
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
