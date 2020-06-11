@@ -63,6 +63,7 @@ public class BlackDuckHttpClientTest {
         allProjects.stream().map(ProjectView::getName).forEach(System.out::println);
     }
 
+    @Test
     public void testConnecting() throws IntegrationException {
 /**
  IntHttpClient intHttpClient = new IntHttpClient()

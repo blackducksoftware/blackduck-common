@@ -9,6 +9,7 @@ import com.synopsys.integration.blackduck.service.BlackDuckService
 import com.synopsys.integration.blackduck.service.ProjectService
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
+import com.synopsys.integration.rest.HttpUrl
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -35,7 +36,7 @@ class CreateDetailedProjectRecipeTest extends BasicRecipe {
         ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME)
         ProjectService projectService = blackDuckServicesFactory.createProjectService()
         ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectSyncModel.createProjectRequest())
-        String projectUrl = projectVersionWrapper.projectView.getHref().get()
+        HttpUrl projectUrl = new HttpUrl(projectVersionWrapper.projectView.getHref().get())
 
         /*
          * using the url of the created project, we can now verify that the
