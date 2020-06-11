@@ -103,7 +103,7 @@ public class ProjectBomService extends DataService {
             } else {
                 componentVersionUrl = componentSearchResultView.get().getVersion();
             }
-            addComponentToProjectVersion(new HttpUrl(projectVersionComponentsUrl), new HttpUrl(componentVersionUrl));
+            addComponentToProjectVersion(new HttpUrl(componentVersionUrl), new HttpUrl(projectVersionComponentsUrl));
         }
 
         return Optional.ofNullable(componentVersionUrl);

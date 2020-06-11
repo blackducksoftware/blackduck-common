@@ -41,7 +41,9 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -63,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(new Gson(), new ObjectMapper(), new SilentIntLogger());
+    private UrlSupport urlSupport = new UrlSupport();
 
     @Test
     public void createProjectVersion() throws Exception {
@@ -306,7 +309,9 @@ public class ComprehensiveCookbookTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
 
-        Request.Builder requestBuilder = new Request.Builder();
+        HttpUrl baseUrl = blackDuckServicesFactory.getBlackDuckHttpClient().getBaseUrl();
+        HttpUrl getUrl = urlSupport.appendRelativeUrl(baseUrl, pathResponses.getBlackDuckPath().getPath());
+        Request.Builder requestBuilder = new Request.Builder(getUrl);
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
 
         BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, pathResponses.getResponseClass());
