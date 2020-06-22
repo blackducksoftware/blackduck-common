@@ -26,6 +26,7 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScanOutput extends CodeLocationOutput {
     private final String response;
@@ -33,11 +34,11 @@ public class BinaryScanOutput extends CodeLocationOutput {
     private final int statusCode;
     private final String contentString;
 
-    public static BinaryScanOutput FAILURE(String codeLocationName, String errorMessage, Exception exception) {
-        return new BinaryScanOutput(Result.FAILURE, codeLocationName, errorMessage, exception, null, null, 0, null);
+    public static BinaryScanOutput FAILURE(NameVersion projectAndVersion, String codeLocationName, String errorMessage, Exception exception) {
+        return new BinaryScanOutput(Result.FAILURE, projectAndVersion, codeLocationName, errorMessage, exception, null, null, 0, null);
     }
 
-    public static BinaryScanOutput FROM_RESPONSE(String codeLocationName, Response response) {
+    public static BinaryScanOutput FROM_RESPONSE(NameVersion projectAndVersion, String codeLocationName, Response response) {
         String responseString = response.toString();
         String statusMessage = response.getStatusMessage();
         int statusCode = response.getStatusCode();
@@ -59,11 +60,11 @@ public class BinaryScanOutput extends CodeLocationOutput {
             errorMessage = contentStringException.getMessage();
         }
 
-        return new BinaryScanOutput(result, codeLocationName, errorMessage, contentStringException, responseString, statusMessage, statusCode, contentString);
+        return new BinaryScanOutput(result, projectAndVersion, codeLocationName, errorMessage, contentStringException, responseString, statusMessage, statusCode, contentString);
     }
 
-    private BinaryScanOutput(Result result, String codeLocationName, String errorMessage, Exception exception, String response, String statusMessage, int statusCode, String contentString) {
-        super(result, codeLocationName, 1, errorMessage, exception);
+    private BinaryScanOutput(Result result, NameVersion projectAndVersion, String codeLocationName, String errorMessage, Exception exception, String response, String statusMessage, int statusCode, String contentString) {
+        super(result, projectAndVersion, codeLocationName, 1, errorMessage, exception);
         this.response = response;
         this.statusMessage = statusMessage;
         this.statusCode = statusCode;

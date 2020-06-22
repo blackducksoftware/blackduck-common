@@ -169,9 +169,9 @@ public class BlackDuckServicesFactory {
 
     public CodeLocationCreationService createCodeLocationCreationService() {
         BlackDuckService blackDuckService = createBlackDuckService();
-        CodeLocationService codeLocationService = createCodeLocationService();
+        ProjectService projectService = createProjectService();
         NotificationService notificationService = createNotificationService();
-        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, codeLocationService, notificationService);
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, blackDuckService, projectService, notificationService);
 
         return new CodeLocationCreationService(blackDuckService, logger, codeLocationWaiter, notificationService);
     }

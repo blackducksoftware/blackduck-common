@@ -22,20 +22,21 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;
@@ -86,6 +87,10 @@ public class ProjectService extends DataService {
 
     public Optional<ProjectVersionView> getProjectVersion(ProjectView project, String projectVersionName) throws IntegrationException {
         return projectGetService.getProjectVersionViewByProjectVersionName(project, projectVersionName);
+    }
+
+    public Optional<ProjectVersionWrapper> getProjectVersion(NameVersion projectAndVersion) throws IntegrationException {
+        return getProjectVersion(projectAndVersion.getName(), projectAndVersion.getVersion());
     }
 
     public Optional<ProjectVersionWrapper> getProjectVersion(String projectName, String projectVersionName) throws IntegrationException {

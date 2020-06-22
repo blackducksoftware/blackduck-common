@@ -22,18 +22,18 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
+import com.synopsys.integration.util.NameVersion;
+
 import java.io.File;
 
 public class BinaryScan {
     private final File binaryFile;
-    private final String projectName;
-    private final String projectVersion;
+    private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
     public BinaryScan(File binaryFile, String projectName, String projectVersion, String codeLocationName) {
         this.binaryFile = binaryFile;
-        this.projectName = projectName;
-        this.projectVersion = projectVersion;
+        this.projectAndVersion = new NameVersion(projectName, projectVersion);
         this.codeLocationName = codeLocationName;
     }
 
@@ -41,12 +41,16 @@ public class BinaryScan {
         return binaryFile;
     }
 
+    public NameVersion getProjectAndVersion() {
+        return projectAndVersion;
+    }
+
     public String getProjectName() {
-        return projectName;
+        return projectAndVersion.getName();
     }
 
     public String getProjectVersion() {
-        return projectVersion;
+        return projectAndVersion.getVersion();
     }
 
     public String getCodeLocationName() {

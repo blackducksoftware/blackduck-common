@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
@@ -97,7 +98,11 @@ public class ProjectSyncModel {
     }
 
     public static ProjectSyncModel createWithDefaults(String projectName, String projectVersionName) {
-        ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName);
+        return createWithDefaults(new NameVersion(projectName, projectVersionName));
+    }
+
+    public static ProjectSyncModel createWithDefaults(NameVersion projectAndVersion) {
+        ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectAndVersion);
         projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL);
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         return projectSyncModel;
@@ -108,8 +113,12 @@ public class ProjectSyncModel {
     }
 
     public ProjectSyncModel(String projectName, String projectVersionName) {
-        setName(projectName);
-        setVersionName(projectVersionName);
+        this(new NameVersion(projectName, projectVersionName));
+    }
+
+    public ProjectSyncModel(NameVersion projectAndVersion) {
+        setName(projectAndVersion.getName());
+        setVersionName(projectAndVersion.getVersion());
     }
 
     public ProjectRequest createProjectRequest() {

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
@@ -47,6 +48,14 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
 
     public List<T> getOutputs() {
         return outputs;
+    }
+
+    public NameVersion getProjectAndVersion() {
+        return outputs
+                .stream()
+                .map(CodeLocationOutput::getProjectAndVersion)
+                .findFirst()
+                .get();
     }
 
     public Set<String> getSuccessfulCodeLocationNames() {

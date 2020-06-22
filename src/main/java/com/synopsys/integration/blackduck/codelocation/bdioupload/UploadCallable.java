@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FileUtils;
 
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -36,10 +37,14 @@ import com.synopsys.integration.rest.response.Response;
 public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
     private final UploadTarget uploadTarget;
+    private final NameVersion projectAndVersion;
+    private final String codeLocationName;
 
     public UploadCallable(BlackDuckService blackDuckService, UploadTarget uploadTarget) {
         this.blackDuckService = blackDuckService;
         this.uploadTarget = uploadTarget;
+        this.projectAndVersion = uploadTarget.getProjectAndVersion();
+        this.codeLocationName = uploadTarget.getCodeLocationName();
     }
 
     @Override
@@ -49,19 +54,21 @@ public class UploadCallable implements Callable<UploadOutput> {
             try {
                 jsonPayload = FileUtils.readFileToString(uploadTarget.getUploadFile(), StandardCharsets.UTF_8);
             } catch (IOException e) {
-                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to initially read file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
+                String errorMessage = String.format("Failed to initially read file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
+                return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
             }
 
             String uri = blackDuckService.getUri(BlackDuckService.BOMIMPORT_PATH);
             Request request = RequestFactory.createCommonPostRequestBuilder(jsonPayload).uri(uri).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
-                return UploadOutput.SUCCESS(uploadTarget.getCodeLocationName(), responseString);
+                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
             } catch (IOException e) {
-                return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), e.getMessage(), e);
+                return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
             }
         } catch (Exception e) {
-            return UploadOutput.FAILURE(uploadTarget.getCodeLocationName(), "Failed to upload file: " + uploadTarget.getUploadFile().getAbsolutePath() + " because " + e.getMessage(), e);
+            String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
+            return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
         }
     }
 

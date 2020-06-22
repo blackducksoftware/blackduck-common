@@ -31,6 +31,7 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScanUploadService extends DataService {
     private final BinaryScanBatchRunner binaryScanBatchRunner;
@@ -80,8 +81,8 @@ public class BinaryScanUploadService extends DataService {
         return uploadBinaryScanAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
+    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
 }

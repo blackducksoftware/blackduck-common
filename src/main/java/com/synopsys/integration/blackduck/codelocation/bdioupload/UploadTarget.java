@@ -24,29 +24,39 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.io.File;
 
+import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
 public class UploadTarget {
+    private final NameVersion projectAndVersion;
     private final String codeLocationName;
     private final File uploadFile;
     private final String mediaType;
 
-    public static UploadTarget createDefault(final String codeLocationName, final File uploadFile) {
-        return new UploadTarget(codeLocationName, uploadFile, "application/ld+json");
+    public static UploadTarget createDefault(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile) {
+        return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, "application/ld+json");
     }
 
-    public static UploadTarget createWithMediaType(final String codeLocationName, final File uploadFile, final String mediaType) {
-        return new UploadTarget(codeLocationName, uploadFile, mediaType);
+    public static UploadTarget createWithMediaType(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile, final String mediaType) {
+        return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, mediaType);
     }
 
-    private UploadTarget(final String codeLocationName, final File uploadFile, final String mediaType) throws IllegalArgumentException {
+    private UploadTarget(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile, final String mediaType) throws IllegalArgumentException {
+        if (StringUtils.isAnyBlank(projectAndVersion.getName(), projectAndVersion.getVersion())) {
+            throw new IllegalArgumentException("An UploadTarget must have a non-blank project and version.");
+        }
         if (StringUtils.isBlank(codeLocationName)) {
             throw new IllegalArgumentException("An UploadTarget must have a non-blank codeLocationName.");
         }
 
+        this.projectAndVersion = projectAndVersion;
         this.codeLocationName = codeLocationName;
         this.uploadFile = uploadFile;
         this.mediaType = mediaType;
+    }
+
+    public NameVersion getProjectAndVersion() {
+        return projectAndVersion;
     }
 
     public String getCodeLocationName() {

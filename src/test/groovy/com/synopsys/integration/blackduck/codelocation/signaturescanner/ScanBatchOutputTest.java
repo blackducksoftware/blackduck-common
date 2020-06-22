@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -27,14 +28,15 @@ public class ScanBatchOutputTest {
         ScanBatchBuilder scanBatchBuilder = createBuilder();
         scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING);
 
+        NameVersion projectAndVersion = extractProjectAndVersion(scanBatchBuilder);
         String[] codeLocationNames = extractCodeLocationNames(scanBatchBuilder);
         List<ScanCommand> scanCommands = createScanCommands(scanBatchBuilder);
 
         IntLogger silentLogger = new SilentIntLogger();
         List<ScanCommandOutput> scanCommandOutputs = new ArrayList<>();
-        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(codeLocationNames[0], silentLogger, scanCommands.get(0), ""));
-        scanCommandOutputs.add(ScanCommandOutput.FAILURE(codeLocationNames[1], silentLogger, scanCommands.get(1), "", 77));
-        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(codeLocationNames[2], silentLogger, scanCommands.get(2), ""));
+        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationNames[0], silentLogger, scanCommands.get(0), ""));
+        scanCommandOutputs.add(ScanCommandOutput.FAILURE(projectAndVersion, codeLocationNames[1], silentLogger, scanCommands.get(1), "", 77));
+        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationNames[2], silentLogger, scanCommands.get(2), ""));
 
         ScanBatchOutput scanBatchOutput = new ScanBatchOutput(scanCommandOutputs);
         assertEquals(new HashSet<>(Arrays.asList(codeLocationNames[0], codeLocationNames[2])), scanBatchOutput.getSuccessfulCodeLocationNames());
@@ -45,14 +47,15 @@ public class ScanBatchOutputTest {
     public void testCalculatingExpectedNotificationCountWithoutSnippets() throws Exception {
         ScanBatchBuilder scanBatchBuilder = createBuilder();
 
+        NameVersion projectAndVersion = extractProjectAndVersion(scanBatchBuilder);
         String[] codeLocationNames = extractCodeLocationNames(scanBatchBuilder);
         List<ScanCommand> scanCommands = createScanCommands(scanBatchBuilder);
 
         IntLogger silentLogger = new SilentIntLogger();
         List<ScanCommandOutput> scanCommandOutputs = new ArrayList<>();
-        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(codeLocationNames[0], silentLogger, scanCommands.get(0), ""));
-        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(codeLocationNames[1], silentLogger, scanCommands.get(1), ""));
-        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(codeLocationNames[2], silentLogger, scanCommands.get(2), ""));
+        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationNames[0], silentLogger, scanCommands.get(0), ""));
+        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationNames[1], silentLogger, scanCommands.get(1), ""));
+        scanCommandOutputs.add(ScanCommandOutput.SUCCESS(projectAndVersion, codeLocationNames[2], silentLogger, scanCommands.get(2), ""));
 
         ScanBatchOutput scanBatchOutput = new ScanBatchOutput(scanCommandOutputs);
         assertEquals(new HashSet<>(Arrays.asList(codeLocationNames)), scanBatchOutput.getSuccessfulCodeLocationNames());
@@ -85,6 +88,10 @@ public class ScanBatchOutputTest {
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget(targetPath3, targetPath3));
 
         return scanBatchBuilder;
+    }
+
+    private NameVersion extractProjectAndVersion(ScanBatchBuilder scanBatchBuilder) {
+        return new NameVersion(scanBatchBuilder.getProjectName(), scanBatchBuilder.getProjectVersionName());
     }
 
     private String[] extractCodeLocationNames(ScanBatchBuilder scanBatchBuilder) {
