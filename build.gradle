@@ -11,7 +11,7 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '48.1.0-SNAPSHOT'
+version = '49.0.0-SNAPSHOT'
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
 apply plugin: 'com.synopsys.integration.library'

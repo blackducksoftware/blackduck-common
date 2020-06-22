@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,11 +23,10 @@
 package com.synopsys.integration.blackduck.phonehome;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.service.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
@@ -38,7 +37,6 @@ import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 import java.util.Collections;
@@ -100,9 +98,18 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
-        String registrationKey = getRegistrationKey();
-        String blackDuckUrl = getHostName();
-        String blackDuckVersion = getProductVersion();
+        String registrationKey = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
+        String blackDuckUrl = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
+        String blackDuckVersion = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
+
+        try {
+            BlackDuckServerData blackDuckServerData = blackDuckRegistrationService.getBlackDuckServerData();
+            registrationKey = blackDuckServerData.getRegistrationKey().orElse(PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE);
+            blackDuckUrl = blackDuckServerData.getUrl().string();
+            blackDuckVersion = blackDuckServerData.getVersion();
+        } catch (IntegrationException e) {
+            logger.warn("Could not gather all Black Duck data: " + e.getMessage());
+        }
 
         PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBodyBuilder.createForBlackDuck(integrationRepoName, registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
         phoneHomeRequestBodyBuilder.addArtifactModules(artifactModules);
@@ -120,35 +127,6 @@ public class BlackDuckPhoneHomeHelper {
             return intEnvironmentVariables.getVariables();
         }
         return Collections.emptyMap();
-    }
-
-    private String getProductVersion() {
-        CurrentVersionView currentVersion;
-        try {
-            currentVersion = blackDuckService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-            return currentVersion.getVersion();
-        } catch (IntegrationException e) {
-        }
-        return PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
-    }
-
-    private String getHostName() {
-        return "";
-//        return blackDuckService.getBlackDuckBaseUrl().toString();
-    }
-
-    private String getRegistrationKey() {
-        String registrationId = null;
-        try {
-            // We need to wrap this because this will most likely fail unless they are running as an admin
-            registrationId = blackDuckRegistrationService.getRegistrationId();
-        } catch (IntegrationException e) {
-        }
-        // We must check if the reg id is blank because of an edge case in which Black Duck can authenticate (while the webserver is coming up) without registration
-        if (StringUtils.isBlank(registrationId)) {
-            registrationId = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
-        }
-        return registrationId;
     }
 
 }
