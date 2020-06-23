@@ -139,7 +139,7 @@ public class ScanCommand {
         populateExcludePatterns(cmd);
 
         if (copyrightSearch) {
-            cmd.add("--copyrightSearch");
+            cmd.add("--copyright-search");
         }
 
         if (null != individualFileMatching) {
