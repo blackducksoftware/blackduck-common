@@ -37,7 +37,7 @@ import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.util.Collections;
 import java.util.Map;

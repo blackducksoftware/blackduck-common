@@ -74,10 +74,10 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-    private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
+    private UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
+    private AuthenticationSupport authenticationSupport = new AuthenticationSupport(urlSupport);
     private ExecutorService executorService = new NoThreadExecutorService();
     private MediaTypeDiscovery mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery();
-    private UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();

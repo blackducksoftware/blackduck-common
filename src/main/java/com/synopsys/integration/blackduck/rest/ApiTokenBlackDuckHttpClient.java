@@ -30,7 +30,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.HashMap;
 import java.util.Map;
