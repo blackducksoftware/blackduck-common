@@ -60,13 +60,12 @@ public class ScanBatch extends Stringable implements Buildable {
     private final ProxyInfo proxyInfo;
     private final String projectName;
     private final String projectVersionName;
-    private final boolean copyrightSearch;
     private final IndividualFileMatching individualFileMatching;
     private final boolean debug;
     private final boolean verbose;
 
     public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
-            final String scanCliOpts, final String additionalScanArguments, final BlackDuckOnlineProperties blackDuckOnlineProperties, final boolean copyrightSearch, final IndividualFileMatching individualFileMatching, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
+            final String scanCliOpts, final String additionalScanArguments, final BlackDuckOnlineProperties blackDuckOnlineProperties, final IndividualFileMatching individualFileMatching, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
             final ProxyInfo proxyInfo, final boolean runInsecure, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -78,7 +77,6 @@ public class ScanBatch extends Stringable implements Buildable {
         this.scanCliOpts = scanCliOpts;
         this.additionalScanArguments = additionalScanArguments;
         this.blackDuckOnlineProperties = blackDuckOnlineProperties;
-        this.copyrightSearch = copyrightSearch;
         this.individualFileMatching = individualFileMatching;
         this.blackDuckUrl = blackDuckUrl;
         this.blackDuckUsername = blackDuckUsername;
@@ -130,7 +128,7 @@ public class ScanBatch extends Stringable implements Buildable {
             installDirectoryForCommand = defaultInstallDirectory;
         }
         final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
-                blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties, copyrightSearch,
+                blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
                 individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
         scanCommands.add(scanCommand);
     }

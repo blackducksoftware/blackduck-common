@@ -71,16 +71,6 @@ public class ScanBatchBuilderTest {
     }
 
     @Test
-    public void testProvidingUploadSourceAlone() {
-        ScanBatchBuilder builder = createInitialValidBuilder();
-        builder.uploadSource(true);
-
-        assertFalse(builder.isValid());
-        BuilderStatus builderStatus = builder.validateAndGetBuilderStatus();
-        assertTrue(builderStatus.getErrorMessages().contains(ScanBatchBuilder.UPLOAD_SOURCE_ALONE));
-    }
-
-    @Test
     public void testUploadSourceWithLicenseSearch() {
         ScanBatchBuilder builder = createInitialValidBuilder();
         builder.uploadSource(true);
