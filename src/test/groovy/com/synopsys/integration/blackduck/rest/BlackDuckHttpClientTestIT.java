@@ -5,12 +5,12 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
@@ -69,6 +71,7 @@ public class BlackDuckHttpClientTestIT {
             assertTrue(response.isStatusCodeSuccess());
             assertFalse(response.isStatusCodeError());
         }
+        testRequestRequiringAuthentication(validConfig);
 
         builder.setUrl("https://www.google.com");
         builder.setUsername(username);
@@ -105,6 +108,7 @@ public class BlackDuckHttpClientTestIT {
 
         BlackDuckServerConfig validConfig = builder.build();
         assertTrue(validConfig.canConnect());
+        testRequestRequiringAuthentication(validConfig);
 
         builder.setUrl("https://www.google.com");
         builder.setApiToken(apiTokenView.token);
@@ -141,8 +145,6 @@ public class BlackDuckHttpClientTestIT {
     }
 
     private void testRedirect(BlackDuckServerConfigBuilder blackDuckServerConfigBuilder) throws IntegrationException, IOException {
-        IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
-
         MockWebServer redirectingServer = new MockWebServer();
         MockWebServerUtil.setupRedirecting(redirectingServer, blackDuckUrl.string());
         redirectingServer.start();
@@ -151,13 +153,16 @@ public class BlackDuckHttpClientTestIT {
         blackDuckServerConfigBuilder.setUrl(redirectingServerUrl);
         blackDuckServerConfigBuilder.setProxyInfo(ProxyInfo.NO_PROXY_INFO);
 
-        BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
-        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
-        ProjectService projectService = blackDuckServicesFactory.createProjectService();
+        testRequestRequiringAuthentication(blackDuckServerConfigBuilder.build());
+    }
 
-        List<ProjectView> allProjects = projectService.getAllProjects();
-        assertTrue(allProjects.size() > 0);
-        allProjects.stream().map(ProjectView::getName).forEach(System.out::println);
+    private void testRequestRequiringAuthentication(BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
+        IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
+        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        assertNotNull(currentUser);
+        assertEquals(username, currentUser.getUserName());
     }
 
     @Test

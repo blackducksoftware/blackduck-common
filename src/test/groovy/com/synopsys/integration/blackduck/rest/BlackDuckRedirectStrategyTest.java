@@ -40,7 +40,7 @@ public class BlackDuckRedirectStrategyTest {
             public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
                 super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
                 httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());
-                //httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
+//                httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
             }
         };
 
