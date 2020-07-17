@@ -29,6 +29,8 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CodeLocationWaitJobTaskTest {
+    public static final String CODE_LOCATION_URL = "http://www.disney.com";
+
     @Test
     public void testMultipleNotificationsExpected() throws ParseException, IntegrationException {
         BlackDuckService mockBlackDuckService = Mockito.mock(BlackDuckService.class);
@@ -59,7 +61,8 @@ public class CodeLocationWaitJobTaskTest {
         CodeLocationView foundCodeLocationView = new CodeLocationView();
         foundCodeLocationView.setName(codeLocationName);
         ResourceMetadata resourceMetadata = new ResourceMetadata();
-        resourceMetadata.setHref(new HttpUrl("http://www.disney.com"));
+        resourceMetadata.setHref(new HttpUrl(CODE_LOCATION_URL));
+
         foundCodeLocationView.setMeta(resourceMetadata);
         Mockito.when(mockBlackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
 
@@ -69,17 +72,17 @@ public class CodeLocationWaitJobTaskTest {
     }
 
     private List<NotificationUserView> getExpectedNotifications() {
-        VersionBomCodeLocationBomComputedNotificationUserView view1 = new VersionBomCodeLocationBomComputedNotificationUserView();
-        VersionBomCodeLocationBomComputedNotificationContent content1 = new VersionBomCodeLocationBomComputedNotificationContent();
-        content1.setCodeLocation("http://www.disney.com");
-        view1.setContent(content1);
+        return Arrays.asList(createNotification(CODE_LOCATION_URL), createNotification(CODE_LOCATION_URL));
+    }
 
-        VersionBomCodeLocationBomComputedNotificationUserView view2 = new VersionBomCodeLocationBomComputedNotificationUserView();
-        VersionBomCodeLocationBomComputedNotificationContent content2 = new VersionBomCodeLocationBomComputedNotificationContent();
-        content2.setCodeLocation("http://www.disney.com");
-        view2.setContent(content2);
+    private NotificationUserView createNotification(String codeLocationUrl) {
+        VersionBomCodeLocationBomComputedNotificationContent content = new VersionBomCodeLocationBomComputedNotificationContent();
+        content.setCodeLocation(codeLocationUrl);
 
-        return Arrays.asList(view1, view2);
+        VersionBomCodeLocationBomComputedNotificationUserView view = new VersionBomCodeLocationBomComputedNotificationUserView();
+        view.setContent(content);
+
+        return view;
     }
 
 }
