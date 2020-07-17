@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -104,8 +104,8 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
                             Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
             logger.debug(String.format("There were %d notifications found.", notifications.size()));
 
-            Set<String> notificationCodeLocationUrls = getCodeLocationUrls(notifications);
-            for (String codeLocationUrl : notificationCodeLocationUrls) {
+            for (NotificationUserView notification : notifications) {
+                String codeLocationUrl = getCodeLocationUrl((VersionBomCodeLocationBomComputedNotificationUserView) notification);
                 if (foundCodeLocations.containsKey(codeLocationUrl)) {
                     String codeLocationName = foundCodeLocations.get(codeLocationUrl);
                     foundCodeLocationNames.add(codeLocationName);
@@ -124,6 +124,10 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
                 .map(VersionBomCodeLocationBomComputedNotificationUserView::getContent)
                 .map(VersionBomCodeLocationBomComputedNotificationContent::getCodeLocation)
                 .collect(Collectors.toSet());
+    }
+
+    private String getCodeLocationUrl(VersionBomCodeLocationBomComputedNotificationUserView notification) {
+        return notification.getContent().getCodeLocation();
     }
 
 }
