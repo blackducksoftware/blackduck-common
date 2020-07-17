@@ -21,6 +21,7 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
@@ -116,6 +117,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
                 .map(CodeLocationView::getHref)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .map(HttpUrl::string)
                 .collect(Collectors.toSet());
 
         boolean foundAllCodeLocationUrls = waitForNotifications(startDate, endDate, expectedCodeLocationUrls);

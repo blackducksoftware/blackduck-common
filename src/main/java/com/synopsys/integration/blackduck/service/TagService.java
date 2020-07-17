@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,7 +22,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.TagView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -57,8 +56,8 @@ public class TagService extends DataService {
         if (!projectView.hasLink(ProjectView.TAGS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a tag.", ProjectView.TAGS_LINK));
         }
-        String tagsLink = projectView.getFirstLink(ProjectView.TAGS_LINK).get();
-        HttpUrl tagLink = blackDuckService.post(new BlackDuckPath(tagsLink), tag);
+        HttpUrl tagsLink = projectView.getFirstLink(ProjectView.TAGS_LINK).get();
+        HttpUrl tagLink = blackDuckService.post(tagsLink, tag);
         return blackDuckService.getResponse(tagLink, TagView.class);
     }
 

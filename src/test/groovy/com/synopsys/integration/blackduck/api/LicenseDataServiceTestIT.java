@@ -1,25 +1,22 @@
 package com.synopsys.integration.blackduck.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Optional;
-
+import com.synopsys.integration.bdio.SimpleBdioFactory;
+import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.LicenseService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.bdio.SimpleBdioFactory;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseTypeType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
-import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.LicenseService;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -37,7 +34,7 @@ public class LicenseDataServiceTestIT {
         ProjectVersionLicenseView complexLicense = optionalComplexLicense.get();
 
         assertEquals("Apache License 2.0", complexLicense.getLicenseDisplay());
-        assertEquals(ProjectVersionLicenseTypeType.DISJUNCTIVE, complexLicense.getType());
+        assertEquals(ProjectVersionLicenseType.DISJUNCTIVE, complexLicense.getType());
         assertEquals(1, complexLicense.getLicenses().size());
 
         ProjectVersionLicenseLicensesView embeddedLicense = complexLicense.getLicenses().get(0);

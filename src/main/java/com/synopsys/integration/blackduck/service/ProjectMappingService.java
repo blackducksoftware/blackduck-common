@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,7 +23,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ProjectMappingView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -38,6 +38,7 @@ public class ProjectMappingService extends DataService {
 
     /**
      * Sets the applicationId for a project
+     *
      * @throws IntegrationException
      */
     public void populateApplicationId(ProjectView projectView, String applicationId) throws IntegrationException {
@@ -47,10 +48,10 @@ public class ProjectMappingService extends DataService {
             if (!projectView.hasLink(ProjectView.PROJECT_MAPPINGS_LINK)) {
                 throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a project mapping.", ProjectView.PROJECT_MAPPINGS_LINK));
             }
-            String projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK).get();
+            HttpUrl projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK).get();
             ProjectMappingView projectMappingView = new ProjectMappingView();
             projectMappingView.setApplicationId(applicationId);
-            blackDuckService.post(new HttpUrl(projectMappingsLink), projectMappingView);
+            blackDuckService.post(projectMappingsLink, projectMappingView);
         } else {
             // Currently there exists only one project-mapping which is the project's Application ID.
             // Eventually, this method would need to take in a namespace on which we will need to filter.

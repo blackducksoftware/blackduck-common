@@ -2,7 +2,7 @@ package com.synopsys.integration.blackduck.service;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ProjectMappingView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -73,4 +73,5 @@ class ProjectMappingServiceTest {
         List<ProjectMappingView> projectMappings = projectMappingService.getProjectMappings(projectView);
         assertEquals(0, projectMappings.size());
     }
+
 }

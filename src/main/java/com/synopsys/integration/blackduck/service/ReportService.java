@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -116,8 +116,8 @@ public class ReportService extends DataService {
     }
 
     public ReportData getRiskReportData(ProjectView project, ProjectVersionView version) throws IntegrationException {
-        String originalProjectUrl = project.getHref().orElse(null);
-        String originalVersionUrl = version.getHref().orElse(null);
+        HttpUrl originalProjectUrl = project.getHref().orElse(null);
+        HttpUrl originalVersionUrl = version.getHref().orElse(null);
         ReportData reportData = new ReportData();
         reportData.setProjectName(project.getName());
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
@@ -199,9 +199,9 @@ public class ReportService extends DataService {
         }
     }
 
-    private HttpUrl getComponentPolicyURL(String versionURL, String componentURL) throws IntegrationException {
+    private HttpUrl getComponentPolicyURL(HttpUrl versionURL, String componentURL) throws IntegrationException {
         String componentVersionSegments = componentURL.substring(componentURL.indexOf("components"));
-        return new HttpUrl(versionURL + "/" + componentVersionSegments + "/" + "policy-status");
+        return new HttpUrl(versionURL.string() + "/" + componentVersionSegments + "/" + "policy-status");
     }
 
     private BomComponent createBomComponentFromBomComponentView(ProjectVersionComponentView bomEntry) {
@@ -233,11 +233,11 @@ public class ReportService extends DataService {
         }
     }
 
-    private String getReportProjectUrl(String projectURL) {
+    private String getReportProjectUrl(HttpUrl projectURL) {
         if (projectURL == null) {
             return null;
         }
-        String projectId = projectURL.substring(projectURL.lastIndexOf("/") + 1);
+        String projectId = projectURL.string().substring(projectURL.string().lastIndexOf("/") + 1);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(blackDuckBaseUrl);
         urlBuilder.append("#");
@@ -247,11 +247,11 @@ public class ReportService extends DataService {
         return urlBuilder.toString();
     }
 
-    private String getReportVersionUrl(String versionURL, boolean isComponent) {
+    private String getReportVersionUrl(HttpUrl versionURL, boolean isComponent) {
         if (versionURL == null) {
             return null;
         }
-        String versionId = versionURL.substring(versionURL.lastIndexOf("/") + 1);
+        String versionId = versionURL.string().substring(versionURL.string().lastIndexOf("/") + 1);
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(blackDuckBaseUrl);
         urlBuilder.append("#");
@@ -275,10 +275,8 @@ public class ReportService extends DataService {
                 logger.debug("Waiting for the Notices Report to complete.");
                 ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-                String contentLink = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
-                HttpUrl contentUrl = new HttpUrl(contentLink);
-
-                if (contentLink == null) {
+                HttpUrl contentUrl = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
+                if (contentUrl == null) {
                     throw new BlackDuckIntegrationException("Could not find content link for the report at : " + reportUrl);
                 }
 
@@ -303,8 +301,7 @@ public class ReportService extends DataService {
     }
 
     public HttpUrl startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws IntegrationException {
-        String reportUri = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
-        HttpUrl reportUrl = new HttpUrl(reportUri);
+        HttpUrl reportUrl = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("reportFormat", reportFormat.toString());

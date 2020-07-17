@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,11 +23,21 @@
 package com.synopsys.integration.blackduck.service;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.*;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.response.LinkMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.service.json.BlackDuckJsonTransformer;
+import com.synopsys.integration.blackduck.service.json.BlackDuckPageResponse;
+import com.synopsys.integration.blackduck.service.json.BlackDuckResponseTransformer;
+import com.synopsys.integration.blackduck.service.json.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -38,7 +48,6 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.UrlSupport;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -134,11 +143,11 @@ public class BlackDuckService {
     }
 
     public <T extends BlackDuckResponse> Optional<T> getResponse(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        Optional<String> uri = blackDuckView.getFirstLink(linkSingleResponse.getLink());
-        if (!uri.isPresent() || StringUtils.isBlank(uri.get())) {
+        Optional<HttpUrl> uri = blackDuckView.getFirstLink(linkSingleResponse.getLink());
+        if (!uri.isPresent()) {
             return Optional.empty();
         }
-        HttpUrl url = new HttpUrl(uri.get());
+        HttpUrl url = uri.get();
         Request request = RequestFactory.createCommonGetRequest(url);
         return Optional.of(blackDuckResponseTransformer.getResponse(request, linkSingleResponse.getResponseClass()));
     }
@@ -173,12 +182,12 @@ public class BlackDuckService {
     }
 
     // ------------------------------------------------
-    // getting responses from a UriSingleResponse
+    // getting responses from a LinkSingleResponse
     // ------------------------------------------------
-    public <T extends BlackDuckResponse> T getResponse(UriSingleResponse<T> uriSingleResponse) throws IntegrationException {
-        HttpUrl url = new HttpUrl(uriSingleResponse.getUri());
+    public <T extends BlackDuckResponse> T getResponse(LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
+        HttpUrl url = new HttpUrl(linkSingleResponse.getLink());
         Request request = RequestFactory.createCommonGetRequest(url);
-        return blackDuckResponseTransformer.getResponse(request, uriSingleResponse.getResponseClass());
+        return blackDuckResponseTransformer.getResponse(request, linkSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------
@@ -200,7 +209,7 @@ public class BlackDuckService {
     // ------------------------------------------------
     public void delete(BlackDuckView blackDuckView) throws IntegrationException {
         if (blackDuckView.getHref().isPresent()) {
-            HttpUrl url = new HttpUrl(blackDuckView.getHref().get());
+            HttpUrl url = blackDuckView.getHref().get();
             delete(url);
         }
     }
@@ -218,8 +227,7 @@ public class BlackDuckService {
     // ------------------------------------------------
     public void put(BlackDuckView blackDuckView) throws IntegrationException {
         if (blackDuckView.getHref().isPresent()) {
-            String uri = blackDuckView.getHref().get();
-            HttpUrl url = new HttpUrl(uri);
+            HttpUrl url = blackDuckView.getHref().get();
             // add the 'missing' pieces back from view that could have been lost
             String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
             Request request = RequestFactory.createCommonPutRequestBuilder(url, json).build();
@@ -282,7 +290,7 @@ public class BlackDuckService {
     private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Request.Builder requestBuilder,
                                                                             ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
         HttpUrl url = pieceTogetherUri(blackDuckBaseUrl, blackDuckPathMultipleResponses.getBlackDuckPath().getPath());
-        return getSpecialResponses(() -> Optional.of(url.string()), blackDuckPathMultipleResponses.getResponseClass(), requestBuilder,
+        return getSpecialResponses(() -> Optional.of(url), blackDuckPathMultipleResponses.getResponseClass(), requestBuilder,
                 responsesTransformer);
     }
 
@@ -291,12 +299,12 @@ public class BlackDuckService {
         return getSpecialResponses(() -> blackDuckView.getFirstLink(linkMultipleResponses.getLink()), linkMultipleResponses.getResponseClass(), requestBuilder, responsesTransformer);
     }
 
-    private <T extends BlackDuckResponse> List<T> getSpecialResponses(ThrowingSupplier<Optional<String>, BlackDuckIntegrationException> urlSupplier, Class<T> responseClass, Request.Builder requestBuilder, ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
-        Optional<String> optionalUrl = urlSupplier.get();
-        if (!optionalUrl.isPresent() || StringUtils.isBlank(optionalUrl.get())) {
+    private <T extends BlackDuckResponse> List<T> getSpecialResponses(ThrowingSupplier<Optional<HttpUrl>, BlackDuckIntegrationException> urlSupplier, Class<T> responseClass, Request.Builder requestBuilder, ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+        Optional<HttpUrl> optionalUrl = urlSupplier.get();
+        if (!optionalUrl.isPresent()) {
             return Collections.emptyList();
         }
-        HttpUrl url = new HttpUrl(optionalUrl.get());
+        HttpUrl url = optionalUrl.get();
         requestBuilder.url(url);
         requestBuilder.mimeType(mediaTypeDiscovery.determineMediaType(url.string()));
         return responsesTransformer.apply(new PagedRequest(requestBuilder), responseClass).getItems();

@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -70,7 +70,7 @@ public class ProjectService extends DataService {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
         }
-        HttpUrl projectVersionUrl = blackDuckService.post(new HttpUrl(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get()), projectVersionRequest);
+        HttpUrl projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
         return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
     }
 
@@ -139,7 +139,7 @@ public class ProjectService extends DataService {
             logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
             projectSyncModel.populateProjectView(projectView);
             blackDuckService.put(projectView);
-            projectView = blackDuckService.getResponse(new HttpUrl(projectView.getHref().get()), ProjectView.class);
+            projectView = blackDuckService.getResponse(projectView.getHref().get(), ProjectView.class);
         }
         ProjectVersionView projectVersionView = null;
 
@@ -152,7 +152,7 @@ public class ProjectService extends DataService {
                     logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
                     projectSyncModel.populateProjectVersionView(projectVersionView);
                     blackDuckService.put(projectVersionView);
-                    projectVersionView = blackDuckService.getResponse(new HttpUrl(projectVersionView.getHref().get()), ProjectVersionView.class);
+                    projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
                 }
             } else {
                 logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));

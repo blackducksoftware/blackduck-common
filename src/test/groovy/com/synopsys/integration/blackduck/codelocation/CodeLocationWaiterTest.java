@@ -1,16 +1,14 @@
 package com.synopsys.integration.blackduck.codelocation;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.view.BomEditNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.CodeLocationService;
 import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -18,6 +16,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.LogLevel;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -194,7 +193,7 @@ public class CodeLocationWaiterTest {
         return new NotificationTaskRange(startTime, startDate, endDate);
     }
 
-    private CodeLocationView createTestView(String name) {
+    private CodeLocationView createTestView(String name) throws IntegrationException {
         ResourceMetadata meta = new ResourceMetadata();
         meta.setHref(hrefFromName(name));
 
@@ -205,9 +204,9 @@ public class CodeLocationWaiterTest {
         return codeLocationView;
     }
 
-    private NotificationUserView createTestNotification(String name) {
+    private NotificationUserView createTestNotification(String name) throws IntegrationException {
         VersionBomCodeLocationBomComputedNotificationContent content = new VersionBomCodeLocationBomComputedNotificationContent();
-        content.setCodeLocation(hrefFromName(name));
+        content.setCodeLocation(hrefFromName(name).string());
 
         VersionBomCodeLocationBomComputedNotificationUserView notificationView = new VersionBomCodeLocationBomComputedNotificationUserView();
         notificationView.setContent(content);
@@ -215,8 +214,8 @@ public class CodeLocationWaiterTest {
         return notificationView;
     }
 
-    private String hrefFromName(String name) {
-        return name + "href";
+    private HttpUrl hrefFromName(String name) throws IntegrationException {
+        return new HttpUrl("https://www.blackducksoftware.com/" + name);
     }
 
 }

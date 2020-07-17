@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -127,14 +127,13 @@ public class ProjectUsersService extends DataService {
             return;
         }
 
-        String userGroupHref = userGroupView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The %s user group does not have an href so it can not be added to a project.", groupName)));
+        HttpUrl userGroupUrl = userGroupView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The %s user group does not have an href so it can not be added to a project.", groupName)));
 
-        Optional<String> projectUserGroupsLinkOptional = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
-        String createUserGroupLink = projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
-        HttpUrl createUrl = new HttpUrl(createUserGroupLink);
+        Optional<HttpUrl> projectUserGroupsLinkOptional = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
+        HttpUrl createUrl = projectUserGroupsLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a user group.", ProjectView.USERGROUPS_LINK)));
 
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
-        userGroupRequest.setGroup(userGroupHref);
+        userGroupRequest.setGroup(userGroupUrl.string());
         blackDuckService.post(createUrl, userGroupRequest);
     }
 
@@ -160,11 +159,11 @@ public class ProjectUsersService extends DataService {
         }
 
         AssignedUserRequest assignedUserRequest = new AssignedUserRequest();
-        assignedUserRequest.setUser(userView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The user %s does not have an href so it can not be added to a project.", userView.getUserName()))));
+        HttpUrl userUrl = userView.getHref().orElseThrow(() -> new BlackDuckIntegrationException(String.format("The user %s does not have an href so it can not be added to a project.", userView.getUserName())));
+        assignedUserRequest.setUser(userUrl.string());
 
-        Optional<String> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
-        String addUserLink = projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
-        HttpUrl addUserUrl = new HttpUrl(addUserLink);
+        Optional<HttpUrl> projectUsersLinkOptional = projectView.getFirstLink(ProjectView.USERS_LINK);
+        HttpUrl addUserUrl = projectUsersLinkOptional.orElseThrow(() -> new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to add a user.", ProjectView.USERS_LINK)));
 
         blackDuckService.post(addUserUrl, assignedUserRequest);
     }
