@@ -58,12 +58,13 @@ public class CodeLocationWaitJobTaskTest {
 
         Mockito.when(mockProjectService.getProjectVersion(projectAndVersion)).thenReturn(Optional.of(projectVersionWrapper));
 
-        CodeLocationView foundCodeLocationView = new CodeLocationView();
-        foundCodeLocationView.setName(codeLocationName);
         ResourceMetadata resourceMetadata = new ResourceMetadata();
         resourceMetadata.setHref(new HttpUrl(CODE_LOCATION_URL));
 
+        CodeLocationView foundCodeLocationView = new CodeLocationView();
+        foundCodeLocationView.setName(codeLocationName);
         foundCodeLocationView.setMeta(resourceMetadata);
+
         Mockito.when(mockBlackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
 
         Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()))).thenReturn(getExpectedNotifications());
