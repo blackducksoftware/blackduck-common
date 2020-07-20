@@ -25,7 +25,6 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
@@ -99,13 +98,11 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
         int actualNotificationCount = 0;
         if (foundCodeLocations.size() > 0) {
             logger.debug("At least one code location has been found, now looking for notifications.");
-            List<NotificationUserView> notifications = notificationService
-                    .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                            Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+            List<VersionBomCodeLocationBomComputedNotificationUserView> notifications = getFilteredNotificationUserViews(userView, notificationTaskRange);
             logger.debug(String.format("There were %d notifications found.", notifications.size()));
 
-            Set<String> notificationCodeLocationUrls = getCodeLocationUrls(notifications);
-            for (String codeLocationUrl : notificationCodeLocationUrls) {
+            for (VersionBomCodeLocationBomComputedNotificationUserView notification : notifications) {
+                String codeLocationUrl = notification.getContent().getCodeLocation();
                 if (foundCodeLocations.containsKey(codeLocationUrl)) {
                     String codeLocationName = foundCodeLocations.get(codeLocationUrl);
                     foundCodeLocationNames.add(codeLocationName);
@@ -114,16 +111,21 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
                 }
             }
         }
+
         return actualNotificationCount;
     }
 
-    private Set<String> getCodeLocationUrls(List<NotificationUserView> notifications) {
-        return notifications
+    private List<VersionBomCodeLocationBomComputedNotificationUserView> getFilteredNotificationUserViews(UserView userView, NotificationTaskRange notificationTaskRange) throws IntegrationException {
+        List<NotificationUserView> notifications = notificationService
+                .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                        Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+
+        List<VersionBomCodeLocationBomComputedNotificationUserView> filteredNotifications = notifications
                 .stream()
                 .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                .map(VersionBomCodeLocationBomComputedNotificationUserView::getContent)
-                .map(VersionBomCodeLocationBomComputedNotificationContent::getCodeLocation)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+
+        return filteredNotifications;
     }
 
 }
