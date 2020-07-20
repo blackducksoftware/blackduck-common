@@ -31,15 +31,17 @@ public class BlackDuckOnlineProperties {
     private final SnippetMatching snippetMatchingMode;
     private final boolean uploadSource;
     private final boolean licenseSearch;
+    private final boolean copyrightSearch;
 
     private final boolean snippetMatchingFlag;
     private final boolean snippetMatchingOnlyFlag;
     private final boolean fullSnippetScanFlag;
 
-    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch) {
+    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch) {
         this.snippetMatchingMode = snippetMatchingMode;
         this.uploadSource = uploadSource;
         this.licenseSearch = licenseSearch;
+        this.copyrightSearch = copyrightSearch;
 
         snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
         snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
@@ -65,6 +67,10 @@ public class BlackDuckOnlineProperties {
 
         if (licenseSearch) {
             cmd.add("--license-search");
+        }
+
+        if (copyrightSearch) {
+            cmd.add("--copyright-search");
         }
 
         if (uploadSource) {
@@ -102,4 +108,7 @@ public class BlackDuckOnlineProperties {
         return licenseSearch;
     }
 
+    public boolean isCopyrightSearch() {
+        return copyrightSearch;
+    }
 }

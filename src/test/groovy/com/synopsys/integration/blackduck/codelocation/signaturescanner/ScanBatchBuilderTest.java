@@ -3,7 +3,6 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.synopsys.integration.builder.BuilderStatus;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -67,16 +66,6 @@ public class ScanBatchBuilderTest {
 
         builder.blackDuckPassword("password");
         assertTrue(builder.isValid());
-    }
-
-    @Test
-    public void testProvidingUploadSourceAlone() {
-        ScanBatchBuilder builder = createInitialValidBuilder();
-        builder.uploadSource(true);
-
-        assertFalse(builder.isValid());
-        BuilderStatus builderStatus = builder.validateAndGetBuilderStatus();
-        assertTrue(builderStatus.getErrorMessages().contains(ScanBatchBuilder.UPLOAD_SOURCE_ALONE));
     }
 
     @Test

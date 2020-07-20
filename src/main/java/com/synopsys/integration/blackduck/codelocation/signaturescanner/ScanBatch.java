@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -59,13 +59,12 @@ public class ScanBatch extends Stringable implements Buildable {
     private final ProxyInfo proxyInfo;
     private final String projectName;
     private final String projectVersionName;
-    private final boolean copyrightSearch;
     private final IndividualFileMatching individualFileMatching;
     private final boolean debug;
     private final boolean verbose;
 
     public ScanBatch(File signatureScannerInstallDirectory, File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
-                     String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, boolean copyrightSearch, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl, String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken,
+                     String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl, String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken,
                      ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName, List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -77,7 +76,6 @@ public class ScanBatch extends Stringable implements Buildable {
         this.scanCliOpts = scanCliOpts;
         this.additionalScanArguments = additionalScanArguments;
         this.blackDuckOnlineProperties = blackDuckOnlineProperties;
-        this.copyrightSearch = copyrightSearch;
         this.individualFileMatching = individualFileMatching;
         this.blackDuckUrl = blackDuckUrl;
         this.blackDuckUsername = blackDuckUsername;
@@ -129,7 +127,7 @@ public class ScanBatch extends Stringable implements Buildable {
             installDirectoryForCommand = defaultInstallDirectory;
         }
         ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
-                blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties, copyrightSearch,
+                blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
                 individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
         scanCommands.add(scanCommand);
     }
