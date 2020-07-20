@@ -1,6 +1,21 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.LogLevel;
+import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.OperatingSystemType;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,22 +25,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import com.synopsys.integration.log.BufferedIntLogger;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
-
+@ExtendWith(TimingExtension.class)
 public class ScanCommandTest {
     Path tempDirectory;
     ScanBatchBuilder scanBatchBuilder;

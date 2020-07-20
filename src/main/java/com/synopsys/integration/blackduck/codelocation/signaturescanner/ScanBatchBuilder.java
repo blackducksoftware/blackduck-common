@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,26 +22,23 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.builder.BuilderStatus;
 import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
-    public static final String UPLOAD_SOURCE_ALONE = "As of 2020.6.0, Black Duck does not support upload-source by itself. Please ensure you are using the property correctly by reviewing 'Using the Signature Scanner' in your Black Duck server's Help documentation.";
-
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
@@ -82,11 +79,11 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     }
 
     @Override
-    protected void validate(final BuilderStatus builderStatus) {
+    protected void validate(BuilderStatus builderStatus) {
         if (scanTargets == null || scanTargets.size() < 1) {
             builderStatus.addErrorMessage("At least one target path must be provided.");
         } else {
-            for (final ScanTarget scanTarget : scanTargets) {
+            for (ScanTarget scanTarget : scanTargets) {
                 validateScanTarget(builderStatus, scanTarget);
             }
         }
@@ -121,10 +118,10 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private void validateScanTarget(BuilderStatus builderStatus, ScanTarget scanTarget) {
         try {
             new File(scanTarget.getPath()).getCanonicalPath();
-        } catch (final IOException e) {
+        } catch (IOException e) {
             builderStatus.addErrorMessage(String.format("The target path: %s is not valid since its canonical path could not be determined: %s.", scanTarget.getPath(), e.getMessage()));
         }
-        for (final String exclusionPattern : scanTarget.getExclusionPatterns()) {
+        for (String exclusionPattern : scanTarget.getExclusionPatterns()) {
             if (!exclusionPattern.startsWith("/") || !exclusionPattern.endsWith("/") || exclusionPattern.contains("**")) {
                 builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
             }
@@ -140,7 +137,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return builderStatus.getFullErrorMessage();
     }
 
-    public ScanBatchBuilder fromBlackDuckServerConfig(final BlackDuckServerConfig blackDuckServerConfig) {
+    public ScanBatchBuilder fromBlackDuckServerConfig(BlackDuckServerConfig blackDuckServerConfig) {
         if (null == blackDuckServerConfig) {
             proxyInfo = ProxyInfo.NO_PROXY_INFO;
             blackDuckUrl = null;
@@ -162,17 +159,17 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
-    public ScanBatchBuilder addTarget(final ScanTarget scanTarget) {
+    public ScanBatchBuilder addTarget(ScanTarget scanTarget) {
         scanTargets.add(scanTarget);
         return this;
     }
 
-    public ScanBatchBuilder addTargets(final List<ScanTarget> scanTargets) {
+    public ScanBatchBuilder addTargets(List<ScanTarget> scanTargets) {
         this.scanTargets.addAll(scanTargets);
         return this;
     }
 
-    public ScanBatchBuilder projectAndVersionNames(final String projectName, final String projectVersionName) {
+    public ScanBatchBuilder projectAndVersionNames(String projectName, String projectVersionName) {
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
         return this;
@@ -182,7 +179,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return installDirectory;
     }
 
-    public ScanBatchBuilder installDirectory(final File installDirectory) {
+    public ScanBatchBuilder installDirectory(File installDirectory) {
         this.installDirectory = installDirectory;
         return this;
     }
@@ -191,7 +188,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return outputDirectory;
     }
 
-    public ScanBatchBuilder outputDirectory(final File outputDirectory) {
+    public ScanBatchBuilder outputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
         return this;
     }
@@ -200,7 +197,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return cleanupOutput;
     }
 
-    public ScanBatchBuilder cleanupOutput(final boolean cleanupOutput) {
+    public ScanBatchBuilder cleanupOutput(boolean cleanupOutput) {
         this.cleanupOutput = cleanupOutput;
         return this;
     }
@@ -209,7 +206,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return scanMemoryInMegabytes;
     }
 
-    public ScanBatchBuilder scanMemoryInMegabytes(final int scanMemoryInMegabytes) {
+    public ScanBatchBuilder scanMemoryInMegabytes(int scanMemoryInMegabytes) {
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
         return this;
     }
@@ -218,7 +215,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return dryRun;
     }
 
-    public ScanBatchBuilder dryRun(final boolean dryRun) {
+    public ScanBatchBuilder dryRun(boolean dryRun) {
         this.dryRun = dryRun;
         return this;
     }
@@ -227,7 +224,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return debug;
     }
 
-    public ScanBatchBuilder debug(final boolean debug) {
+    public ScanBatchBuilder debug(boolean debug) {
         this.debug = debug;
         return this;
     }
@@ -236,7 +233,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return verbose;
     }
 
-    public ScanBatchBuilder verbose(final boolean verbose) {
+    public ScanBatchBuilder verbose(boolean verbose) {
         this.verbose = verbose;
         return this;
     }
@@ -245,7 +242,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return scanCliOpts;
     }
 
-    public ScanBatchBuilder scanCliOpts(final String scanCliOpts) {
+    public ScanBatchBuilder scanCliOpts(String scanCliOpts) {
         this.scanCliOpts = scanCliOpts;
         return this;
     }
@@ -254,7 +251,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return additionalScanArguments;
     }
 
-    public ScanBatchBuilder additionalScanArguments(final String additionalScanArguments) {
+    public ScanBatchBuilder additionalScanArguments(String additionalScanArguments) {
         this.additionalScanArguments = additionalScanArguments;
         return this;
     }
@@ -263,7 +260,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return snippetMatching;
     }
 
-    public ScanBatchBuilder snippetMatching(final SnippetMatching snippetMatching) {
+    public ScanBatchBuilder snippetMatching(SnippetMatching snippetMatching) {
         this.snippetMatching = snippetMatching;
         return this;
     }
@@ -272,7 +269,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return uploadSource;
     }
 
-    public ScanBatchBuilder uploadSource(final SnippetMatching snippetMatching, boolean uploadSource) {
+    public ScanBatchBuilder uploadSource(SnippetMatching snippetMatching, boolean uploadSource) {
         snippetMatching(snippetMatching);
         this.uploadSource = uploadSource;
         return this;
@@ -287,19 +284,23 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return licenseSearch;
     }
 
-    public void licenseSearch(final boolean licenseSearch) {
+    public void licenseSearch(boolean licenseSearch) {
         this.licenseSearch = licenseSearch;
     }
 
-    public boolean getCopyrightSearch() { return copyrightSearch; }
+    public boolean getCopyrightSearch() {
+        return copyrightSearch;
+    }
 
-    public void copyrightSearch(final boolean copyrightSearch) { this.copyrightSearch = copyrightSearch; }
+    public void copyrightSearch(boolean copyrightSearch) {
+        this.copyrightSearch = copyrightSearch;
+    }
 
     public IndividualFileMatching getIndividualFileMatching() {
         return individualFileMatching;
     }
 
-    public void individualFileMatching(final IndividualFileMatching individualFileMatching) {
+    public void individualFileMatching(IndividualFileMatching individualFileMatching) {
         this.individualFileMatching = individualFileMatching;
     }
 
@@ -307,7 +308,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return blackDuckUrl;
     }
 
-    public ScanBatchBuilder blackDuckUrl(final URL blackDuckUrl) {
+    public ScanBatchBuilder blackDuckUrl(URL blackDuckUrl) {
         this.blackDuckUrl = blackDuckUrl;
         return this;
     }
@@ -316,7 +317,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return blackDuckUsername;
     }
 
-    public ScanBatchBuilder blackDuckUsername(final String blackDuckUsername) {
+    public ScanBatchBuilder blackDuckUsername(String blackDuckUsername) {
         this.blackDuckUsername = blackDuckUsername;
         return this;
     }
@@ -325,7 +326,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return blackDuckPassword;
     }
 
-    public ScanBatchBuilder blackDuckPassword(final String blackDuckPassword) {
+    public ScanBatchBuilder blackDuckPassword(String blackDuckPassword) {
         this.blackDuckPassword = blackDuckPassword;
         return this;
     }
@@ -334,7 +335,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return blackDuckApiToken;
     }
 
-    public ScanBatchBuilder blackDuckApiToken(final String blackDuckApiToken) {
+    public ScanBatchBuilder blackDuckApiToken(String blackDuckApiToken) {
         this.blackDuckApiToken = blackDuckApiToken;
         return this;
     }
@@ -343,7 +344,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return proxyInfo;
     }
 
-    public ScanBatchBuilder proxyInfo(final ProxyInfo proxyInfo) {
+    public ScanBatchBuilder proxyInfo(ProxyInfo proxyInfo) {
         this.proxyInfo = proxyInfo;
         return this;
     }
@@ -352,7 +353,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return alwaysTrustServerCertificate;
     }
 
-    public ScanBatchBuilder alwaysTrustServerCertificate(final boolean alwaysTrustServerCertificate) {
+    public ScanBatchBuilder alwaysTrustServerCertificate(boolean alwaysTrustServerCertificate) {
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
         return this;
     }
@@ -369,7 +370,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return scanTargets;
     }
 
-    public ScanBatchBuilder simpleScanTargets(final List<ScanTarget> scanTargets) {
+    public ScanBatchBuilder simpleScanTargets(List<ScanTarget> scanTargets) {
         this.scanTargets = scanTargets;
         return this;
     }

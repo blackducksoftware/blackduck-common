@@ -1,18 +1,16 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.synopsys.integration.builder.BuilderStatus;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
