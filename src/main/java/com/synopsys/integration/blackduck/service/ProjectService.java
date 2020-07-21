@@ -70,7 +70,7 @@ public class ProjectService extends DataService {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
         }
-        HttpUrl projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK).get(), projectVersionRequest);
+        HttpUrl projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK), projectVersionRequest);
         return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
     }
 
@@ -139,7 +139,7 @@ public class ProjectService extends DataService {
             logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
             projectSyncModel.populateProjectView(projectView);
             blackDuckService.put(projectView);
-            projectView = blackDuckService.getResponse(projectView.getHref().get(), ProjectView.class);
+            projectView = blackDuckService.getResponse(projectView.getHref(), ProjectView.class);
         }
         ProjectVersionView projectVersionView = null;
 
@@ -152,7 +152,7 @@ public class ProjectService extends DataService {
                     logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
                     projectSyncModel.populateProjectVersionView(projectVersionView);
                     blackDuckService.put(projectVersionView);
-                    projectVersionView = blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
+                    projectVersionView = blackDuckService.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
                 }
             } else {
                 logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));

@@ -76,7 +76,7 @@ public class LicenseService extends DataService {
     }
 
     public String getLicenseText(LicenseView licenseView) throws IntegrationException {
-        HttpUrl licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK).orElse(null);
+        HttpUrl licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK);
         try (Response response = blackDuckService.get(licenseTextUrl)) {
             return response.getContentString();
         } catch (IOException e) {

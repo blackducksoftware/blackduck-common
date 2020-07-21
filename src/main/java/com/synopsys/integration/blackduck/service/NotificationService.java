@@ -111,7 +111,7 @@ public class NotificationService extends DataService {
 
     private Request.Builder prepareUserNotificationsRequest(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        HttpUrl url = user.getFirstLink(UserView.NOTIFICATIONS_LINK).get();
+        HttpUrl url = user.getFirstLink(UserView.NOTIFICATIONS_LINK);
         requestBuilder.url(url);
 
         return requestBuilder;

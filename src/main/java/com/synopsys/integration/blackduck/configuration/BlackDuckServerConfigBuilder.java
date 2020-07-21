@@ -134,7 +134,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     @Override
     protected void validate(BuilderStatus builderStatus) {
-        validateBlackDucUrlL(builderStatus);
+        validateBlackDucUrl(builderStatus);
 
         if (StringUtils.isBlank(getApiToken())) {
             validateBlackDuckCredentials(builderStatus);
@@ -185,7 +185,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
-    private void validateBlackDucUrlL(BuilderStatus builderStatus) {
+    private void validateBlackDucUrl(BuilderStatus builderStatus) {
         if (StringUtils.isBlank(getUrl())) {
             builderStatus.addErrorMessage("The Black Duck url must be specified.");
         } else {

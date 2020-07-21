@@ -68,7 +68,7 @@ public class ProjectServiceTestIT {
         projectRequest.setName(testProjectName);
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
         ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
-        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
         System.out.println("projectUrl: " + projectUrl);
 
         ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
@@ -119,7 +119,7 @@ public class ProjectServiceTestIT {
         projectRequest.setDescription("Initial Description");
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
         ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
-        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
 
         assertEquals("InitialName", ProjectServiceTestIT.project.getName());
         assertTrue(2 == ProjectServiceTestIT.project.getProjectTier());
@@ -162,7 +162,7 @@ public class ProjectServiceTestIT {
         projectVersionView.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         ProjectServiceTestIT.blackDuckService.put(projectVersionView);
 
-        projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
+        projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
@@ -220,8 +220,8 @@ public class ProjectServiceTestIT {
         assertNotNull(ProjectServiceTestIT.project);
         assertNotNull(projectVersionView);
 
-        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref().get();
-        HttpUrl projectVersionUrl = projectVersionView.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
+        HttpUrl projectVersionUrl = projectVersionView.getHref();
 
         List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());

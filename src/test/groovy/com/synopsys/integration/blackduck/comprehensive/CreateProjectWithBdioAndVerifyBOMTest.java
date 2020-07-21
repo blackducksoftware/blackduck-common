@@ -115,8 +115,6 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         Set<String> expectedCodeLocationUrls = codeLocationViews
                 .stream()
                 .map(CodeLocationView::getHref)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .map(HttpUrl::string)
                 .collect(Collectors.toSet());
 
@@ -140,7 +138,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
             System.out.println("found code location names:");
             codeLocationViews
                     .stream()
-                    .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref().get()))
+                    .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref()))
                     .sorted()
                     .forEach(System.out::println);
 

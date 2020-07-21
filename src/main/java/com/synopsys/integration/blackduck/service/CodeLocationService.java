@@ -58,9 +58,7 @@ public class CodeLocationService extends DataService {
     }
 
     public void mapCodeLocation(CodeLocationView codeLocationView, ProjectVersionView version) throws IntegrationException {
-        if (version.getHref().isPresent()) {
-            mapCodeLocation(codeLocationView, version.getHref().get());
-        }
+        mapCodeLocation(codeLocationView, version.getHref());
     }
 
     public void mapCodeLocation(CodeLocationView codeLocationView, HttpUrl versionUrl) throws IntegrationException {

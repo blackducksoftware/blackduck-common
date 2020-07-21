@@ -48,7 +48,7 @@ public class ProjectMappingService extends DataService {
             if (!projectView.hasLink(ProjectView.PROJECT_MAPPINGS_LINK)) {
                 throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a project mapping.", ProjectView.PROJECT_MAPPINGS_LINK));
             }
-            HttpUrl projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK).get();
+            HttpUrl projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK);
             ProjectMappingView projectMappingView = new ProjectMappingView();
             projectMappingView.setApplicationId(applicationId);
             blackDuckService.post(projectMappingsLink, projectMappingView);

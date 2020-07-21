@@ -49,19 +49,19 @@ public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
 
     public void addProjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ProjectView projectView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref());
     }
 
     public void addComponentVersionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ComponentVersionView componentVersionView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref());
     }
 
     public void addComponentCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ComponentView componentView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref());
     }
 
     public void addLicenseCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, LicenseView licenseView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref());
     }
 
     public void addReviewStatusCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ReviewStatusType reviewType) throws BlackDuckIntegrationException {

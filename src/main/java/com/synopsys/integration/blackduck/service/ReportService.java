@@ -116,8 +116,8 @@ public class ReportService extends DataService {
     }
 
     public ReportData getRiskReportData(ProjectView project, ProjectVersionView version) throws IntegrationException {
-        HttpUrl originalProjectUrl = project.getHref().orElse(null);
-        HttpUrl originalVersionUrl = version.getHref().orElse(null);
+        HttpUrl originalProjectUrl = project.getHref();
+        HttpUrl originalVersionUrl = version.getHref();
         ReportData reportData = new ReportData();
         reportData.setProjectName(project.getName());
         reportData.setProjectURL(getReportProjectUrl(originalProjectUrl));
@@ -275,7 +275,7 @@ public class ReportService extends DataService {
                 logger.debug("Waiting for the Notices Report to complete.");
                 ReportView reportInfo = isReportFinishedGenerating(reportUrl);
 
-                HttpUrl contentUrl = reportInfo.getFirstLink(ReportView.CONTENT_LINK).orElse(null);
+                HttpUrl contentUrl = reportInfo.getFirstLink(ReportView.CONTENT_LINK);
                 if (contentUrl == null) {
                     throw new BlackDuckIntegrationException("Could not find content link for the report at : " + reportUrl);
                 }
@@ -301,7 +301,7 @@ public class ReportService extends DataService {
     }
 
     public HttpUrl startGeneratingBlackDuckNoticesReport(ProjectVersionView version, ReportFormatType reportFormat) throws IntegrationException {
-        HttpUrl reportUrl = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK).orElse(null);
+        HttpUrl reportUrl = version.getFirstLink(ProjectVersionView.LICENSEREPORTS_LINK);
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("reportFormat", reportFormat.toString());

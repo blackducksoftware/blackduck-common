@@ -93,8 +93,7 @@ public class ProjectBomService extends DataService {
 
     //TODO investigate what variant is
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
-        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
+        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
         Optional<ComponentsView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
         String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
@@ -110,17 +109,15 @@ public class ProjectBomService extends DataService {
     }
 
     public void addProjectVersionToProjectVersion(ProjectVersionView projectVersionViewToAdd, ProjectVersionView targetProjectVersionView) throws IntegrationException {
-        HttpUrl toAddUrl = projectVersionViewToAdd.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView to add does not have an href.\n%s", projectVersionViewToAdd)));
-        HttpUrl targetUrl = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                .orElseThrow(() -> new IntegrationException(String.format("The target ProjectVersionView does not have a '%' link.\n%s", ProjectVersionView.COMPONENTS_LINK, targetProjectVersionView)));
+        HttpUrl toAddUrl = projectVersionViewToAdd.getHref();
+        HttpUrl targetUrl = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
 
         addComponentToProjectVersion(toAddUrl, targetUrl);
     }
 
     public void addComponentToProjectVersion(ComponentVersionView componentVersionView, ProjectVersionView projectVersionView) throws IntegrationException {
-        HttpUrl componentVersionUrl = componentVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ComponentVersionView does not have an href.\n%s", componentVersionView)));
-        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
+        HttpUrl componentVersionUrl = componentVersionView.getHref();
+        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
 
         addComponentToProjectVersion(componentVersionUrl, projectVersionComponentsUrl);
     }

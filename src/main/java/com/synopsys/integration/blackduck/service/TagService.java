@@ -56,7 +56,7 @@ public class TagService extends DataService {
         if (!projectView.hasLink(ProjectView.TAGS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a tag.", ProjectView.TAGS_LINK));
         }
-        HttpUrl tagsLink = projectView.getFirstLink(ProjectView.TAGS_LINK).get();
+        HttpUrl tagsLink = projectView.getFirstLink(ProjectView.TAGS_LINK);
         HttpUrl tagLink = blackDuckService.post(tagsLink, tag);
         return blackDuckService.getResponse(tagLink, TagView.class);
     }

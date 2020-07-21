@@ -75,8 +75,6 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     public final Response attemptAuthentication() throws IntegrationException {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
-        // https://github.com/blackducksoftware/blackduck-common/issues/268
-//        headers.put("Content-Length", "0");
 
         return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
     }

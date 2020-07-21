@@ -115,11 +115,7 @@ public class ComponentService extends DataService {
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
     public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
-        if (!componentVersionView.getHref().isPresent()) {
-            return Optional.empty();
-        }
-
-        String remediatingUrl = componentVersionView.getHref().get() + "/" + ComponentService.REMEDIATING_LINK;
+        String remediatingUrl = componentVersionView.getHref() + "/" + ComponentService.REMEDIATING_LINK;
         LinkSingleResponse<ComponentVersionRemediatingView> linkSingleResponse = new LinkSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
         return Optional.ofNullable(blackDuckService.getResponse(linkSingleResponse));
     }

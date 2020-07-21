@@ -36,7 +36,7 @@ public class CreateDetailedProjectRecipeTest extends BasicRecipe {
         ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME);
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectVersionWrapper projectVersionWrapper = projectService.createProject(projectSyncModel.createProjectRequest());
-        HttpUrl projectUrl = projectVersionWrapper.getProjectView().getHref().get();
+        HttpUrl projectUrl = projectVersionWrapper.getProjectView().getHref();
 
         /*
          * using the url of the created project, we can now verify that the

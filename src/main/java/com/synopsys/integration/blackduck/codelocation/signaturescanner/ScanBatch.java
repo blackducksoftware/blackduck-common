@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,6 +32,7 @@ import com.synopsys.integration.util.Stringable;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,12 +105,13 @@ public class ScanBatch extends Stringable implements Buildable {
         String commandHost = null;
         int commandPort = 0;
         if (!commandDryRun) {
-            commandScheme = blackDuckUrl.url().getProtocol();
-            commandHost = blackDuckUrl.url().getHost();
-            if (blackDuckUrl.url().getPort() > 0) {
-                commandPort = blackDuckUrl.url().getPort();
-            } else if (blackDuckUrl.url().getDefaultPort() > 0) {
-                commandPort = blackDuckUrl.url().getDefaultPort();
+            URL url = blackDuckUrl.url();
+            commandScheme = url.getProtocol();
+            commandHost = url.getHost();
+            if (url.getPort() > 0) {
+                commandPort = url.getPort();
+            } else if (url.getDefaultPort() > 0) {
+                commandPort = url.getDefaultPort();
             }
         }
         List<ScanCommand> scanCommands = new ArrayList<>();
