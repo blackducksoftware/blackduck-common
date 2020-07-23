@@ -37,7 +37,7 @@ public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOut
     public void throwExceptionForError(IntLogger logger) throws BlackDuckIntegrationException {
         for (BinaryScanOutput binaryScanOutput : this) {
             if (binaryScanOutput.getResult() == Result.FAILURE) {
-                String uploadErrorMessage = "Error when uploading binary scan: %s" + binaryScanOutput.getErrorMessage().get();
+                String uploadErrorMessage = "Error when uploading binary scan: %s" + binaryScanOutput.getErrorMessage().orElse(binaryScanOutput.getStatusMessage());
                 logger.error(uploadErrorMessage);
                 throw new BlackDuckIntegrationException(uploadErrorMessage);
             }
