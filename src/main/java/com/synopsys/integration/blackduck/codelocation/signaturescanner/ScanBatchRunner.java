@@ -48,28 +48,6 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final File defaultInstallDirectory;
 
-    /**
-     * @deprecated Please use the createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables) method instead.
-     */
-    @Deprecated
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig) {
-        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
-        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
-        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables);
-    }
-
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables) {
-        OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
-        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
-        ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility, new NoThreadExecutorService());
-
-        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
-    }
-
     public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService) {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);

@@ -22,45 +22,46 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleComponentUsageValueSetType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
 import com.synopsys.integration.blackduck.api.enumeration.ReviewStatusType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
+import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
 
     public void addProjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ProjectView projectView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, projectView.getHref());
     }
 
     public void addComponentVersionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ComponentVersionView componentVersionView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentVersionView.getHref());
     }
 
     public void addComponentCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ComponentView componentView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_VERSION, componentView.getHref());
     }
 
     public void addLicenseCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, LicenseView licenseView) throws BlackDuckIntegrationException {
-        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref().orElse(null));
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.SINGLE_LICENSE, licenseView.getHref());
     }
 
     public void addReviewStatusCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, ReviewStatusType reviewType) throws BlackDuckIntegrationException {
@@ -119,6 +120,10 @@ public class PolicyRuleExpressionSetBuilder {
             values.add(object.toString());
         }
         addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
+    }
+
+    public void addSingleCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, HttpUrl httpUrl) throws BlackDuckIntegrationException {
+        addSingleCondition(policyRuleConditionOperator, policyRuleConditionType, httpUrl.string());
     }
 
     public void addSingleCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, String value) throws BlackDuckIntegrationException {

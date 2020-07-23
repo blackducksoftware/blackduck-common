@@ -22,18 +22,17 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.io.File;
-import java.util.Map;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.FileBodyContent;
 import com.synopsys.integration.rest.body.MapBodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Optional;
 
 public class RequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
@@ -48,8 +47,8 @@ public class RequestFactory {
         return RequestFactory.createCommonGetRequestBuilder(null, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+    public static Request.Builder createCommonGetRequestBuilder(HttpUrl url) {
+        return RequestFactory.createCommonGetRequestBuilder(url, Optional.empty(), RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(Optional<BlackDuckQuery> blackDuckQuery) {
@@ -60,27 +59,24 @@ public class RequestFactory {
         return RequestFactory.createCommonGetRequestBuilder(null, Optional.empty(), limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
+    public static Request.Builder createCommonGetRequestBuilder(HttpUrl url, Optional<BlackDuckQuery> blackDuckQuery) {
+        return RequestFactory.createCommonGetRequestBuilder(url, blackDuckQuery, RequestFactory.DEFAULT_LIMIT, RequestFactory.DEFAULT_OFFSET);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, Optional.empty(), limit, offset);
+    public static Request.Builder createCommonGetRequestBuilder(HttpUrl url, int limit, int offset) {
+        return RequestFactory.createCommonGetRequestBuilder(url, Optional.empty(), limit, offset);
     }
 
     public static Request.Builder createCommonGetRequestBuilder(Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
         return RequestFactory.createCommonGetRequestBuilder(null, blackDuckQuery, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
-        return RequestFactory.createCommonGetRequestBuilder(uri, blackDuckQuery, null, limit, offset);
+    public static Request.Builder createCommonGetRequestBuilder(HttpUrl url, Optional<BlackDuckQuery> blackDuckQuery, int limit, int offset) {
+        return RequestFactory.createCommonGetRequestBuilder(url, blackDuckQuery, null, limit, offset);
     }
 
-    public static Request.Builder createCommonGetRequestBuilder(String uri, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
-        Request.Builder requestBuilder = new Request.Builder();
-        if (StringUtils.isNotBlank(uri)) {
-            requestBuilder.uri(uri);
-        }
+    public static Request.Builder createCommonGetRequestBuilder(HttpUrl url, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
+        Request.Builder requestBuilder = new Request.Builder(url);
         RequestFactory.addBlackDuckQuery(requestBuilder, blackDuckQuery);
         RequestFactory.addBlackDuckFilter(requestBuilder, blackDuckRequestFilter);
         RequestFactory.addLimit(requestBuilder, limit);
@@ -88,8 +84,8 @@ public class RequestFactory {
         return requestBuilder;
     }
 
-    public static Request createCommonGetRequest(String uri) {
-        return RequestFactory.createCommonGetRequestBuilder(uri).build();
+    public static Request createCommonGetRequest(HttpUrl url) {
+        return RequestFactory.createCommonGetRequestBuilder(url).build();
     }
 
     public static Request.Builder addLimit(Request.Builder requestBuilder, int limit) {
@@ -118,20 +114,20 @@ public class RequestFactory {
         return requestBuilder;
     }
 
-    public static Request.Builder createCommonPostRequestBuilder(File bodyContentFile) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new FileBodyContent(bodyContentFile));
+    public static Request.Builder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {
+        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new FileBodyContent(bodyContentFile));
     }
 
-    public static Request.Builder createCommonPostRequestBuilder(Map<String, String> bodyContentMap) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new MapBodyContent(bodyContentMap));
+    public static Request.Builder createCommonPostRequestBuilder(HttpUrl url, Map<String, String> bodyContentMap) {
+        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new MapBodyContent(bodyContentMap));
     }
 
-    public static Request.Builder createCommonPostRequestBuilder(String bodyContent) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new StringBodyContent(bodyContent));
+    public static Request.Builder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
+        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new StringBodyContent(bodyContent));
     }
 
-    public static Request.Builder createCommonPutRequestBuilder(String bodyContent) {
-        return new Request.Builder().method(HttpMethod.PUT).bodyContent(new StringBodyContent(bodyContent));
+    public static Request.Builder createCommonPutRequestBuilder(HttpUrl url, String bodyContent) {
+        return new Request.Builder(url).method(HttpMethod.PUT).bodyContent(new StringBodyContent(bodyContent));
     }
 
     public static Request.Builder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {

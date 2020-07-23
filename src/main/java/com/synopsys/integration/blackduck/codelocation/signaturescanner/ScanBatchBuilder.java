@@ -29,12 +29,12 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.builder.BuilderStatus;
 import com.synopsys.integration.builder.IntegrationBuilder;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean copyrightSearch;
     private IndividualFileMatching individualFileMatching;
 
-    private URL blackDuckUrl;
+    private HttpUrl blackDuckUrl;
     private String blackDuckUsername;
     private String blackDuckPassword;
     private String blackDuckApiToken;
@@ -126,15 +126,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
                 builderStatus.addErrorMessage("The exclusion pattern: " + exclusionPattern + " is not valid. An exclusion pattern must start and end with a forward slash (/) and may not contain double asterisks (**).");
             }
         }
-    }
-
-    /**
-     * @deprecated Please use validateAndGetBuilderStatus.
-     */
-    @Deprecated
-    public String createErrorMessage() {
-        BuilderStatus builderStatus = validateAndGetBuilderStatus();
-        return builderStatus.getFullErrorMessage();
     }
 
     public ScanBatchBuilder fromBlackDuckServerConfig(BlackDuckServerConfig blackDuckServerConfig) {
@@ -304,11 +295,11 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         this.individualFileMatching = individualFileMatching;
     }
 
-    public URL getBlackDuckUrl() {
+    public HttpUrl getBlackDuckUrl() {
         return blackDuckUrl;
     }
 
-    public ScanBatchBuilder blackDuckUrl(URL blackDuckUrl) {
+    public ScanBatchBuilder blackDuckUrl(HttpUrl blackDuckUrl) {
         this.blackDuckUrl = blackDuckUrl;
         return this;
     }

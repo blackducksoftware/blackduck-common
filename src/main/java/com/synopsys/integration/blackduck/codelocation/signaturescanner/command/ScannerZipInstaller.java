@@ -22,25 +22,21 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
+import org.apache.commons.compress.archivers.ArchiveException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 public class ScannerZipInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";
@@ -54,31 +50,12 @@ public class ScannerZipInstaller {
     private final IntHttpClient intHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
-    private final String blackDuckServerUrl;
+    private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    /**
-     * @deprecated Please create the SignatureScannerService in BlackDuckServicesFactory
-     */
-    @Deprecated
-    public static ScannerZipInstaller defaultUtility(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig, IntEnvironmentVariables intEnvironmentVariables, OperatingSystemType operatingSystemType) {
-        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
-        return ScannerZipInstaller.defaultUtility(logger, blackDuckServerConfig, scanPathsUtility, operatingSystemType);
-    }
-
-    /**
-     * @deprecated Please create the SignatureScannerService in BlackDuckServicesFactory
-     */
-    @Deprecated
-    public static ScannerZipInstaller defaultUtility(IntLogger logger, BlackDuckServerConfig blackDuckServerConfig, ScanPathsUtility scanPathsUtility, OperatingSystemType operatingSystemType) {
-        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
-        CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        return new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckServerConfig.getBlackDuckUrl().toString(), operatingSystemType);
-    }
-
-    public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, String blackDuckServerUrl,
-            OperatingSystemType operatingSystemType) {
-        if (StringUtils.isBlank(blackDuckServerUrl)) {
+    public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl,
+                               OperatingSystemType operatingSystemType) {
+        if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
 
@@ -108,7 +85,7 @@ public class ScannerZipInstaller {
             throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage(), e);
         }
 
-        String downloadUrl = getDownloadUrl();
+        HttpUrl downloadUrl = getDownloadUrl();
         try {
             downloadIfModified(scannerExpansionDirectory, versionFile, downloadUrl);
         } catch (Exception e) {
@@ -129,9 +106,9 @@ public class ScannerZipInstaller {
         return versionFile;
     }
 
-    private String getDownloadUrl() {
-        StringBuilder url = new StringBuilder(blackDuckServerUrl);
-        if (!blackDuckServerUrl.endsWith("/")) {
+    private HttpUrl getDownloadUrl() throws BlackDuckIntegrationException {
+        StringBuilder url = new StringBuilder(blackDuckServerUrl.string());
+        if (!blackDuckServerUrl.string().endsWith("/")) {
             url.append("/");
         }
 
@@ -143,10 +120,14 @@ public class ScannerZipInstaller {
             url.append(ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
         }
 
-        return url.toString();
+        try {
+            return new HttpUrl(url.toString());
+        } catch (IntegrationException e) {
+            throw new BlackDuckIntegrationException(String.format("The Black Duck Signature Scanner url (%s) is not valid.", url.toString()));
+        }
     }
 
-    private void downloadIfModified(File scannerExpansionDirectory, File versionFile, String downloadUrl) throws IOException, IntegrationException, ArchiveException {
+    private void downloadIfModified(File scannerExpansionDirectory, File versionFile, HttpUrl downloadUrl) throws IOException, IntegrationException, ArchiveException {
         long lastTimeDownloaded = versionFile.lastModified();
         logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
 

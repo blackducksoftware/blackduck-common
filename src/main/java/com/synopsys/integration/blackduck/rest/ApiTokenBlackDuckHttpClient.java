@@ -22,18 +22,18 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpUriRequest;
-
 import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Connection to the Black Duck application which authenticates using the API token feature
@@ -43,7 +43,7 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     private final AuthenticationSupport authenticationSupport;
     private final String apiToken;
 
-    public ApiTokenBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, String baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken) {
+    public ApiTokenBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.gson = gson;
         this.authenticationSupport = authenticationSupport;
@@ -75,8 +75,6 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     public final Response attemptAuthentication() throws IntegrationException {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
-        // https://github.com/blackducksoftware/blackduck-common/issues/268
-        headers.put("Content-Length", "0");
 
         return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
     }

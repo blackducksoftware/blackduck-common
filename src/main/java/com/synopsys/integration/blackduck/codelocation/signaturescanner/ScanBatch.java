@@ -22,19 +22,19 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.builder.Buildable;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.Stringable;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.builder.Buildable;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.Stringable;
 
 public class ScanBatch extends Stringable implements Buildable {
     public static ScanBatchBuilder newBuilder() {
@@ -42,7 +42,7 @@ public class ScanBatch extends Stringable implements Buildable {
     }
 
     private final boolean cleanupOutput;
-    private final URL blackDuckUrl;
+    private final HttpUrl blackDuckUrl;
 
     private final BlackDuckOnlineProperties blackDuckOnlineProperties;
     private final List<ScanTarget> scanTargets;
@@ -64,9 +64,9 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean debug;
     private final boolean verbose;
 
-    public ScanBatch(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean cleanupOutput, final int scanMemoryInMegabytes, final boolean dryRun, final boolean debug, final boolean verbose,
-            final String scanCliOpts, final String additionalScanArguments, final BlackDuckOnlineProperties blackDuckOnlineProperties, final IndividualFileMatching individualFileMatching, final URL blackDuckUrl, final String blackDuckUsername, final String blackDuckPassword, final String blackDuckApiToken,
-            final ProxyInfo proxyInfo, final boolean runInsecure, final String projectName, final String projectVersionName, final List<ScanTarget> scanTargets) {
+    public ScanBatch(File signatureScannerInstallDirectory, File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
+                     String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl, String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken,
+                     ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName, List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
@@ -92,29 +92,30 @@ public class ScanBatch extends Stringable implements Buildable {
     /**
      * The default install directory will be used if the batch does not already have an install directory.
      */
-    public List<ScanCommand> createScanCommands(final File defaultInstallDirectory, final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables) throws BlackDuckIntegrationException {
+    public List<ScanCommand> createScanCommands(File defaultInstallDirectory, ScanPathsUtility scanPathsUtility, IntEnvironmentVariables intEnvironmentVariables) throws BlackDuckIntegrationException {
         String scanCliOptsToUse = scanCliOpts;
         if (null != intEnvironmentVariables && StringUtils.isBlank(scanCliOptsToUse)) {
-            final String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
+            String scanCliOptsEnvironment = intEnvironmentVariables.getValue("SCAN_CLI_OPTS");
             if (StringUtils.isNotBlank(scanCliOptsEnvironment)) {
                 scanCliOptsToUse = scanCliOptsEnvironment;
             }
         }
-        final boolean commandDryRun = blackDuckUrl == null || dryRun;
+        boolean commandDryRun = blackDuckUrl == null || dryRun;
         String commandScheme = null;
         String commandHost = null;
         int commandPort = 0;
         if (!commandDryRun) {
-            commandScheme = blackDuckUrl.getProtocol();
-            commandHost = blackDuckUrl.getHost();
-            if (blackDuckUrl.getPort() > 0) {
-                commandPort = blackDuckUrl.getPort();
-            } else if (blackDuckUrl.getDefaultPort() > 0) {
-                commandPort = blackDuckUrl.getDefaultPort();
+            URL url = blackDuckUrl.url();
+            commandScheme = url.getProtocol();
+            commandHost = url.getHost();
+            if (url.getPort() > 0) {
+                commandPort = url.getPort();
+            } else if (url.getDefaultPort() > 0) {
+                commandPort = url.getDefaultPort();
             }
         }
-        final List<ScanCommand> scanCommands = new ArrayList<>();
-        for (final ScanTarget scanTarget : scanTargets) {
+        List<ScanCommand> scanCommands = new ArrayList<>();
+        for (ScanTarget scanTarget : scanTargets) {
             addToScanCommands(defaultInstallDirectory, scanPathsUtility, scanCliOptsToUse, commandDryRun, blackDuckOnlineProperties, commandScheme, commandHost, commandPort, scanCommands, scanTarget);
         }
 
@@ -127,7 +128,7 @@ public class ScanBatch extends Stringable implements Buildable {
         if (null == installDirectoryForCommand && null != defaultInstallDirectory) {
             installDirectoryForCommand = defaultInstallDirectory;
         }
-        final ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
+        ScanCommand scanCommand = new ScanCommand(installDirectoryForCommand, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
                 blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
                 individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName);
         scanCommands.add(scanCommand);
@@ -185,7 +186,7 @@ public class ScanBatch extends Stringable implements Buildable {
         return individualFileMatching;
     }
 
-    public URL getBlackDuckUrl() {
+    public HttpUrl getBlackDuckUrl() {
         return blackDuckUrl;
     }
 

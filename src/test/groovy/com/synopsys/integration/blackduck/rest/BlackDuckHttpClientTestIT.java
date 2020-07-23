@@ -1,31 +1,41 @@
 package com.synopsys.integration.blackduck.rest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.LogLevel;
+import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.rest.support.UrlSupport;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckPathMultipleResponses;
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -36,13 +46,23 @@ public class BlackDuckHttpClientTestIT {
     private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
 
+    private UrlSupport urlSupport = new UrlSupport();
+    private HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
+    private String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
+    private String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
+    private BlackDuckService blackDuckService = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
+
+    public BlackDuckHttpClientTestIT() throws IntegrationException {
+
+    }
+
     @Test
     public void testCredentials() throws IntegrationException, IOException {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
-        builder.setUrl(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
-        builder.setUsername(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
-        builder.setPassword(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestPassword());
+        builder.setUrl(blackDuckUrl);
+        builder.setUsername(username);
+        builder.setPassword(password);
 
         BlackDuckServerConfig validConfig = builder.build();
         assertTrue(validConfig.canConnect());
@@ -51,10 +71,11 @@ public class BlackDuckHttpClientTestIT {
             assertTrue(response.isStatusCodeSuccess());
             assertFalse(response.isStatusCodeError());
         }
+        testRequestRequiringAuthentication(validConfig);
 
         builder.setUrl("https://www.google.com");
-        builder.setUsername(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
-        builder.setPassword(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestPassword());
+        builder.setUsername(username);
+        builder.setPassword(password);
         BlackDuckServerConfig invalidUrlConfig = builder.build();
         assertFalse(invalidUrlConfig.canConnect());
         blackDuckHttpClient = invalidUrlConfig.createBlackDuckHttpClient(new SilentIntLogger());
@@ -63,8 +84,8 @@ public class BlackDuckHttpClientTestIT {
             assertTrue(response.isStatusCodeError());
         }
 
-        builder.setUrl(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
-        builder.setUsername(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
+        builder.setUrl(blackDuckUrl);
+        builder.setUsername(username);
         builder.setPassword("this is not the password");
         BlackDuckServerConfig invalidPasswordConfig = builder.build();
         assertFalse(invalidPasswordConfig.canConnect());
@@ -82,21 +103,66 @@ public class BlackDuckHttpClientTestIT {
 
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setTrustCert(true);
-        builder.setUrl(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
+        builder.setUrl(blackDuckUrl);
         builder.setApiToken(apiTokenView.token);
 
         BlackDuckServerConfig validConfig = builder.build();
         assertTrue(validConfig.canConnect());
+        testRequestRequiringAuthentication(validConfig);
 
         builder.setUrl("https://www.google.com");
         builder.setApiToken(apiTokenView.token);
         BlackDuckServerConfig invalidUrlConfig = builder.build();
         assertFalse(invalidUrlConfig.canConnect());
 
-        builder.setUrl(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
+        builder.setUrl(blackDuckUrl);
         builder.setApiToken("for serious, this is not an api token");
         BlackDuckServerConfig invalidPasswordConfig = builder.build();
         assertFalse(invalidPasswordConfig.canConnect());
+    }
+
+    @Test
+    public void testBlackDuckRedirectWithCredentials() throws IntegrationException, IOException {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        blackDuckServerConfigBuilder.setUsername(username);
+        blackDuckServerConfigBuilder.setPassword(password);
+
+        testRedirect(blackDuckServerConfigBuilder);
+    }
+
+    @Test
+    public void testBlackDuckRedirectWithApiToken() throws IntegrationException, IOException {
+        String tokenName = "redirect-test";
+        ApiTokenView apiTokenView = getApiToken(tokenName);
+        try {
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+            blackDuckServerConfigBuilder.setApiToken(apiTokenView.token);
+
+            testRedirect(blackDuckServerConfigBuilder);
+        } finally {
+            deleteByName(tokenName);
+        }
+    }
+
+    private void testRedirect(BlackDuckServerConfigBuilder blackDuckServerConfigBuilder) throws IntegrationException, IOException {
+        MockWebServer redirectingServer = new MockWebServer();
+        MockWebServerUtil.setupRedirecting(redirectingServer, blackDuckUrl.string());
+        redirectingServer.start();
+        String redirectingServerUrl = redirectingServer.url("/").toString();
+
+        blackDuckServerConfigBuilder.setUrl(redirectingServerUrl);
+        blackDuckServerConfigBuilder.setProxyInfo(ProxyInfo.NO_PROXY_INFO);
+
+        testRequestRequiringAuthentication(blackDuckServerConfigBuilder.build());
+    }
+
+    private void testRequestRequiringAuthentication(BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
+        IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
+        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        assertNotNull(currentUser);
+        assertEquals(username, currentUser.getUserName());
     }
 
     @Test
@@ -117,10 +183,8 @@ public class BlackDuckHttpClientTestIT {
     // ******************************
     // WARNING!!!!
     private ApiTokenView getApiToken(String tokenName) throws IntegrationException, IOException {
-        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().createBlackDuckService();
-
-        URL blackDuckServerUrl = new URL(BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl());
-        String createApiTokenUrl = new URL(blackDuckServerUrl, BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath()).toString();
+        HttpUrl blackDuckServerUrl = blackDuckUrl;
+        HttpUrl createApiTokenUrl = urlSupport.appendRelativeUrl(blackDuckServerUrl, BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
 
         ApiTokenRequest apiTokenRequest = new ApiTokenRequest();
         apiTokenRequest.name = tokenName;
@@ -129,7 +193,7 @@ public class BlackDuckHttpClientTestIT {
 
         ApiTokenView apiTokenView;
         String json = blackDuckService.convertToJson(apiTokenRequest);
-        Request request = RequestFactory.createCommonPostRequestBuilder(json).uri(createApiTokenUrl).build();
+        Request request = RequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, json).build();
         try (Response response = blackDuckService.execute(request)) {
             apiTokenView = blackDuckService.transformResponse(response, ApiTokenView.class);
         }
@@ -138,7 +202,6 @@ public class BlackDuckHttpClientTestIT {
     }
 
     private void deleteByName(String name) throws IntegrationException {
-        BlackDuckService blackDuckService = BlackDuckHttpClientTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().createBlackDuckService();
         List<ApiTokenView> apiTokens = blackDuckService.getAllResponses(BlackDuckHttpClientTestIT.API_TOKEN_LINK_RESPONSE);
         for (ApiTokenView apiTokenView : apiTokens) {
             if (apiTokenView.name.equals(name)) {

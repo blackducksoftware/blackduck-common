@@ -88,12 +88,9 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
         if (!projectVersionWrapper.isPresent()) {
             return 0;
         }
+        ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
 
-        List<CodeLocationView> codeLocationViews = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
-        Map<String, String> foundCodeLocations = codeLocationViews
-                .stream()
-                .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))
-                .collect(Collectors.toMap(codeLocationView -> codeLocationView.getHref().get(), CodeLocationView::getName));
+        Map<String, String> foundCodeLocations = retrieveCodeLocations(projectVersionView);
 
         int actualNotificationCount = 0;
         if (foundCodeLocations.size() > 0) {
@@ -113,6 +110,14 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
         }
 
         return actualNotificationCount;
+    }
+
+    private Map<String, String> retrieveCodeLocations(ProjectVersionView projectVersionView) throws IntegrationException {
+        List<CodeLocationView> codeLocationViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        return codeLocationViews
+                .stream()
+                .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))
+                .collect(Collectors.toMap(codeLocationView -> codeLocationView.getHref().string(), CodeLocationView::getName));
     }
 
     private List<VersionBomCodeLocationBomComputedNotificationUserView> getFilteredNotificationUserViews(UserView userView, NotificationTaskRange notificationTaskRange) throws IntegrationException {

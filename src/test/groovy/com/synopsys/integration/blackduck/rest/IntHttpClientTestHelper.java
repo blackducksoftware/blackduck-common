@@ -1,17 +1,5 @@
 package com.synopsys.integration.blackduck.rest;
 
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.http.client.HttpClient;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
@@ -26,7 +14,21 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import org.apache.http.client.HttpClient;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.fail;
 
 public class IntHttpClientTestHelper {
     private static Properties testProperties;
@@ -81,14 +83,14 @@ public class IntHttpClientTestHelper {
         builder.setUrl(blackDuckServerUrl);
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
-        builder.setTimeout(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
+        builder.setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
         builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder.build();
     }
 
-    public String getIntegrationBlackDuckServerUrl() {
-        return getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
+    public HttpUrl getIntegrationBlackDuckServerUrl() throws IntegrationException {
+        return new HttpUrl(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL));
     }
 
     public String getTestUsername() {
@@ -121,9 +123,11 @@ public class IntHttpClientTestHelper {
         IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         MediaTypeDiscovery mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery();
+        UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
 
-        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger, mediaTypeDiscovery);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, mediaTypeDiscovery, urlSupport);
         return blackDuckServicesFactory;
     }
 

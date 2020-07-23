@@ -20,18 +20,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.service;
-
-import java.util.List;
+package com.synopsys.integration.blackduck.service.json;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+
+import java.util.List;
 
 public class BlackDuckPageResponse<T extends BlackDuckResponse> extends BlackDuckComponent {
     private int totalCount;
     private List<T> items;
 
-    public BlackDuckPageResponse(final int totalCount, final List<T> items) {
+    public BlackDuckPageResponse(int totalCount, List<T> items) {
         this.totalCount = totalCount;
         this.items = items;
     }
@@ -40,7 +40,7 @@ public class BlackDuckPageResponse<T extends BlackDuckResponse> extends BlackDuc
         return totalCount;
     }
 
-    public void setTotalCount(final int totalCount) {
+    public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
     }
 
@@ -48,7 +48,7 @@ public class BlackDuckPageResponse<T extends BlackDuckResponse> extends BlackDuc
         return items;
     }
 
-    public void setItems(final List<T> items) {
+    public void setItems(List<T> items) {
         this.items = items;
     }
 

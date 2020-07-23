@@ -1,25 +1,24 @@
 package com.synopsys.integration.blackduck.api.project;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import java.util.Date;
-import java.util.List;
-
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
+import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.exception.IntegrationException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.exception.IntegrationException;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -36,7 +35,7 @@ public class ProjectAssignmentServiceTestIT {
     @AfterAll
     public static void tearDownAfterClass() throws Exception {
         if (ProjectAssignmentServiceTestIT.project != null) {
-            ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createBlackDuckService().delete(ProjectAssignmentServiceTestIT.project);
+            ProjectAssignmentServiceTestIT.blackDuckServicesFactory.getBlackDuckService().delete(ProjectAssignmentServiceTestIT.project);
         }
     }
 
@@ -49,7 +48,7 @@ public class ProjectAssignmentServiceTestIT {
         projectRequest.setName(testProjectName);
         ProjectVersionWrapper projectVersionWrapper = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectService().createProject(projectRequest);
         ProjectAssignmentServiceTestIT.project = projectVersionWrapper.getProjectView();
-        System.out.println("projectUrl: " + ProjectAssignmentServiceTestIT.project.getHref().get());
+        System.out.println("projectUrl: " + ProjectAssignmentServiceTestIT.project.getHref());
 
         List<AssignedUserView> assignedUsers = ProjectAssignmentServiceTestIT.blackDuckServicesFactory.createProjectUsersService().getAssignedUsersToProject(ProjectAssignmentServiceTestIT.project);
         assertFalse(assignedUsers.isEmpty());

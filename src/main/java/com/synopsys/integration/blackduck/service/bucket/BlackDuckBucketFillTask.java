@@ -22,38 +22,38 @@
  */
 package com.synopsys.integration.blackduck.service.bucket;
 
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+
 import java.util.Optional;
 import java.util.concurrent.Callable;
-
-import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
 
 public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Callable<Optional<T>> {
     private final BlackDuckService blackDuckService;
     private final BlackDuckBucket blackDuckBucket;
-    private final UriSingleResponse<T> uriSingleResponse;
+    private final LinkSingleResponse<T> linkSingleResponse;
 
-    public BlackDuckBucketFillTask(final BlackDuckService blackDuckService, final BlackDuckBucket blackDuckBucket, final UriSingleResponse<T> uriSingleResponse) {
+    public BlackDuckBucketFillTask(BlackDuckService blackDuckService, BlackDuckBucket blackDuckBucket, LinkSingleResponse<T> linkSingleResponse) {
         this.blackDuckService = blackDuckService;
         this.blackDuckBucket = blackDuckBucket;
-        this.uriSingleResponse = uriSingleResponse;
+        this.linkSingleResponse = linkSingleResponse;
     }
 
     @Override
     public Optional<T> call() {
-        if (!blackDuckBucket.contains(uriSingleResponse.getUri())) {
+        if (!blackDuckBucket.contains(linkSingleResponse.getLink())) {
             try {
-                final T blackDuckResponse = blackDuckService.getResponse(uriSingleResponse);
-                blackDuckBucket.addValid(uriSingleResponse.getUri(), blackDuckResponse);
+                T blackDuckResponse = blackDuckService.getResponse(linkSingleResponse);
+                blackDuckBucket.addValid(linkSingleResponse.getLink(), blackDuckResponse);
                 return Optional.of(blackDuckResponse);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 // it is up to the consumer of the bucket to log or handle any/all Exceptions
-                blackDuckBucket.addError(uriSingleResponse.getUri(), e);
+                blackDuckBucket.addError(linkSingleResponse.getLink(), e);
                 return Optional.empty();
             }
         }
-        return Optional.ofNullable(blackDuckBucket.get(uriSingleResponse.getUri(), uriSingleResponse.getResponseClass()));
+        return Optional.ofNullable(blackDuckBucket.get(linkSingleResponse.getLink(), linkSingleResponse.getResponseClass()));
     }
 
 }

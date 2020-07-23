@@ -22,13 +22,14 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.List;
-
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+
+import java.util.List;
 
 public class ProjectMappingService extends DataService {
     public ProjectMappingService(BlackDuckService blackDuckService, IntLogger logger) {
@@ -37,6 +38,7 @@ public class ProjectMappingService extends DataService {
 
     /**
      * Sets the applicationId for a project
+     *
      * @throws IntegrationException
      */
     public void populateApplicationId(ProjectView projectView, String applicationId) throws IntegrationException {
@@ -46,7 +48,7 @@ public class ProjectMappingService extends DataService {
             if (!projectView.hasLink(ProjectView.PROJECT_MAPPINGS_LINK)) {
                 throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a project mapping.", ProjectView.PROJECT_MAPPINGS_LINK));
             }
-            String projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK).get();
+            HttpUrl projectMappingsLink = projectView.getFirstLink(ProjectView.PROJECT_MAPPINGS_LINK);
             ProjectMappingView projectMappingView = new ProjectMappingView();
             projectMappingView.setApplicationId(applicationId);
             blackDuckService.post(projectMappingsLink, projectMappingView);

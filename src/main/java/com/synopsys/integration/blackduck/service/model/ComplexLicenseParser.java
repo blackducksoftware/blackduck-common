@@ -22,14 +22,14 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseTypeType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 
 public class ComplexLicenseParser {
     private final ProjectVersionLicenseLicensesView complexLicense;
     private String licenseString;
 
-    public ComplexLicenseParser(final ProjectVersionLicenseLicensesView complexLicense) {
+    public ComplexLicenseParser(ProjectVersionLicenseLicensesView complexLicense) {
         this.complexLicense = complexLicense;
     }
 
@@ -40,14 +40,14 @@ public class ComplexLicenseParser {
         return licenseString;
     }
 
-    private String parse(final ProjectVersionLicenseLicensesView complexLicense) {
+    private String parse(ProjectVersionLicenseLicensesView complexLicense) {
         if (complexLicense.getLicenses() != null && complexLicense.getLicenses().isEmpty()) {
             return complexLicense.getName();
         } else {
-            final String operator = complexLicense.getType() == ProjectVersionLicenseTypeType.CONJUNCTIVE ? " AND " : " OR ";
-            final StringBuilder licenseText = new StringBuilder();
+            String operator = complexLicense.getType() == ProjectVersionLicenseType.CONJUNCTIVE ? " AND " : " OR ";
+            StringBuilder licenseText = new StringBuilder();
             int i = 1;
-            for (final ProjectVersionLicenseLicensesView childLicense : complexLicense.getLicenses()) {
+            for (ProjectVersionLicenseLicensesView childLicense : complexLicense.getLicenses()) {
                 licenseText.append(parse(childLicense));
                 if (i < complexLicense.getLicenses().size()) {
                     licenseText.append(operator);

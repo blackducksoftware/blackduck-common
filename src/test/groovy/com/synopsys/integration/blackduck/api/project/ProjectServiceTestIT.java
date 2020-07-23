@@ -1,27 +1,13 @@
 package com.synopsys.integration.blackduck.api.project;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -30,7 +16,21 @@ import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -44,7 +44,7 @@ public class ProjectServiceTestIT {
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         ProjectServiceTestIT.blackDuckServicesFactory = ProjectServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
-        ProjectServiceTestIT.blackDuckService = ProjectServiceTestIT.blackDuckServicesFactory.createBlackDuckService();
+        ProjectServiceTestIT.blackDuckService = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckService();
         ProjectServiceTestIT.projectService = ProjectServiceTestIT.blackDuckServicesFactory.createProjectService();
     }
 
@@ -68,7 +68,7 @@ public class ProjectServiceTestIT {
         projectRequest.setName(testProjectName);
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
         ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
-        String projectUrl = ProjectServiceTestIT.project.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
         System.out.println("projectUrl: " + projectUrl);
 
         ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
@@ -119,7 +119,7 @@ public class ProjectServiceTestIT {
         projectRequest.setDescription("Initial Description");
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
         ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
-        String projectUrl = ProjectServiceTestIT.project.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
 
         assertEquals("InitialName", ProjectServiceTestIT.project.getName());
         assertTrue(2 == ProjectServiceTestIT.project.getProjectTier());
@@ -162,7 +162,7 @@ public class ProjectServiceTestIT {
         projectVersionView.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
         ProjectServiceTestIT.blackDuckService.put(projectVersionView);
 
-        projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref().get(), ProjectVersionView.class);
+        projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
@@ -220,8 +220,8 @@ public class ProjectServiceTestIT {
         assertNotNull(ProjectServiceTestIT.project);
         assertNotNull(projectVersionView);
 
-        String projectUrl = ProjectServiceTestIT.project.getHref().get();
-        String projectVersionUrl = projectVersionView.getHref().get();
+        HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
+        HttpUrl projectVersionUrl = projectVersionView.getHref();
 
         List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
@@ -230,7 +230,7 @@ public class ProjectServiceTestIT {
         ProjectServiceTestIT.blackDuckService.put(ProjectServiceTestIT.project);
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.setCloneFromReleaseUrl(projectVersionUrl);
+        projectVersionRequest.setCloneFromReleaseUrl(projectVersionUrl.string());
         projectVersionRequest.setVersionName("1.0.0-clone");
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE);

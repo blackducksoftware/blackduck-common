@@ -17,8 +17,11 @@ import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.log.BufferedIntLogger
 import com.synopsys.integration.log.IntLogger
+import com.synopsys.integration.rest.support.UrlSupport
 import com.synopsys.integration.util.IntEnvironmentVariables
 import org.junit.jupiter.api.BeforeEach
+
+import java.util.concurrent.ExecutorService
 
 class BasicRecipe {
     public static final String PROJECT_NAME = 'My Recipe Project'
@@ -27,6 +30,7 @@ class BasicRecipe {
 
     protected Gson gson
     protected ObjectMapper objectMapper
+    protected ExecutorService executorService
 
     protected IntLogger logger
     protected BlackDuckServicesFactory blackDuckServicesFactory
@@ -41,6 +45,7 @@ class BasicRecipe {
     protected PolicyRuleService policyRuleService
     protected UploadBatchRunner uploadRunner
     protected MediaTypeDiscovery mediaTypeDiscovery
+    protected UrlSupport urlSupport
 
     @BeforeEach
     void startRecipe() {
@@ -67,10 +72,12 @@ class BasicRecipe {
         IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
+        executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE
         mediaTypeDiscovery = BlackDuckServicesFactory.createDefaultMediaTypeDiscovery()
+        urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport()
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, blackDuckHttpClient, logger, mediaTypeDiscovery)
-        blackDuckService = blackDuckServicesFactory.createBlackDuckService()
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, mediaTypeDiscovery, urlSupport)
+        blackDuckService = blackDuckServicesFactory.getBlackDuckService()
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService()
         projectService = blackDuckServicesFactory.createProjectService()
         projectUsersService = blackDuckServicesFactory.createProjectUsersService()
@@ -80,7 +87,7 @@ class BasicRecipe {
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService()
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService()
 
-        uploadRunner = new UploadBatchRunner(logger, blackDuckService)
+        uploadRunner = new UploadBatchRunner(logger, blackDuckService, executorService)
     }
 
     ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {

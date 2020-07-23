@@ -22,25 +22,26 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.contract.NotificationViewData;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.service.model.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.request.Request;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NotificationService extends DataService {
     // ejk - to get all notifications:
@@ -108,10 +109,10 @@ public class NotificationService extends DataService {
         }
     }
 
-    private Request.Builder prepareUserNotificationsRequest(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) {
+    private Request.Builder prepareUserNotificationsRequest(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         Request.Builder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        String userNotificationsUri = user.getFirstLink(UserView.NOTIFICATIONS_LINK).orElse(null);
-        requestBuilder.uri(userNotificationsUri);
+        HttpUrl url = user.getFirstLink(UserView.NOTIFICATIONS_LINK);
+        requestBuilder.url(url);
 
         return requestBuilder;
     }
@@ -156,9 +157,9 @@ public class NotificationService extends DataService {
     */
     private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
         return notifications
-                       .stream()
-                       .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
-                       .collect(Collectors.toList());
+                .stream()
+                .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
+                .collect(Collectors.toList());
     }
 
 }

@@ -22,16 +22,8 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.LinkSingleResponse;
+import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
@@ -45,19 +37,26 @@ import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerab
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
     public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-                                                                                                                       .filter(notEmptyList -> notEmptyList.size() > 0)
-                                                                                                                       .map(notEmptyList -> notEmptyList.get(0));
+            .filter(notEmptyList -> notEmptyList.size() > 0)
+            .map(notEmptyList -> notEmptyList.get(0));
 
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-                                                                                                                        .filter(notEmptyList -> notEmptyList.size() == 1)
-                                                                                                                        .map(listOfSingleElement -> listOfSingleElement.get(0));
+            .filter(notEmptyList -> notEmptyList.size() == 1)
+            .map(listOfSingleElement -> listOfSingleElement.get(0));
 
     public ComponentService(BlackDuckService blackDuckService, IntLogger logger) {
         super(blackDuckService, logger);
@@ -92,7 +91,8 @@ public class ComponentService extends DataService {
 
     public Optional<ComponentVersionView> getComponentVersionView(ComponentsView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
-            return Optional.ofNullable(blackDuckService.getResponse(searchResult.getVersion(), ComponentVersionView.class));
+            HttpUrl url = new HttpUrl(searchResult.getVersion());
+            return Optional.ofNullable(blackDuckService.getResponse(url, ComponentVersionView.class));
         } else {
             return Optional.empty();
         }
@@ -100,7 +100,8 @@ public class ComponentService extends DataService {
 
     public Optional<ComponentView> getComponentView(ComponentsView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
-            return Optional.ofNullable(blackDuckService.getResponse(searchResult.getComponent(), ComponentView.class));
+            HttpUrl url = new HttpUrl(searchResult.getVersion());
+            return Optional.ofNullable(blackDuckService.getResponse(url, ComponentView.class));
         } else {
             return Optional.empty();
         }
@@ -114,13 +115,9 @@ public class ComponentService extends DataService {
 
     // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
     public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
-        if (!componentVersionView.getHref().isPresent()) {
-            return Optional.empty();
-        }
-
-        String remediatingUrl = componentVersionView.getHref().get() + "/" + ComponentService.REMEDIATING_LINK;
-        UriSingleResponse<ComponentVersionRemediatingView> uriSingleResponse = new UriSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
-        return Optional.ofNullable(blackDuckService.getResponse(uriSingleResponse));
+        String remediatingUrl = componentVersionView.getHref() + "/" + ComponentService.REMEDIATING_LINK;
+        LinkSingleResponse<ComponentVersionRemediatingView> linkSingleResponse = new LinkSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
+        return Optional.ofNullable(blackDuckService.getResponse(linkSingleResponse));
     }
 
 }

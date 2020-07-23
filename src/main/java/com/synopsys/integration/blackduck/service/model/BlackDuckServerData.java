@@ -20,31 +20,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.api;
+package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.LinkResponse;
+import com.synopsys.integration.rest.HttpUrl;
 
-public class UriSingleResponse<T extends BlackDuckResponse> extends LinkResponse {
-    private final String uri;
-    private final Class<T> responseClass;
+import java.util.Optional;
 
-    public UriSingleResponse(final String uri, final Class<T> responseClass) {
-        this.uri = uri;
-        this.responseClass = responseClass;
+public class BlackDuckServerData {
+    private final HttpUrl url;
+    private final String version;
+    private final String registrationKey;
+
+    public BlackDuckServerData(HttpUrl url, String version, String registrationKey) {
+        this.url = url;
+        this.version = version;
+        this.registrationKey = registrationKey;
     }
 
-    @Override
-    public String toString() {
-        return uri;
+    public HttpUrl getUrl() {
+        return url;
     }
 
-    public String getUri() {
-        return uri;
+    public String getVersion() {
+        return version;
     }
 
-    public Class<T> getResponseClass() {
-        return responseClass;
+    public Optional<String> getRegistrationKey() {
+        return Optional.ofNullable(registrationKey);
     }
 
 }

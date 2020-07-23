@@ -22,9 +22,6 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
@@ -35,6 +32,10 @@ import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
+
+import java.util.List;
+import java.util.Optional;
 
 public class PolicyRuleService {
     private final BlackDuckService blackDuckService;
@@ -57,14 +58,14 @@ public class PolicyRuleService {
         return Optional.empty();
     }
 
-    public String createPolicyRule(PolicyRuleView policyRuleView) throws IntegrationException {
+    public HttpUrl createPolicyRule(PolicyRuleView policyRuleView) throws IntegrationException {
         return blackDuckService.post(ApiDiscovery.POLICY_RULES_LINK, policyRuleView);
     }
 
     /**
      * This will create a policy rule that will be violated by the existence of a matching external id in the project's BOM.
      */
-    public String createPolicyRuleForExternalId(ComponentService componentService, ExternalId externalId, String policyName) throws IntegrationException {
+    public HttpUrl createPolicyRuleForExternalId(ComponentService componentService, ExternalId externalId, String policyName) throws IntegrationException {
         Optional<ComponentsView> componentSearchResult = componentService.getSingleOrEmptyResult(externalId);
         if (!componentSearchResult.isPresent()) {
             throw new BlackDuckIntegrationException(String.format("The external id (%s) provided could not be found, so no policy can be created for it.", externalId.createExternalId()));

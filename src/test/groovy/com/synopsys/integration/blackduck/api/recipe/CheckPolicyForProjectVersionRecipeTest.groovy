@@ -6,14 +6,15 @@ import com.synopsys.integration.blackduck.TimingExtension
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.ComponentSearchResultView
 import com.synopsys.integration.blackduck.service.ComponentService
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper
+import com.synopsys.integration.rest.HttpUrl
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
@@ -44,7 +45,7 @@ class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         /*
          * To create a Policy Rule we can construct a PolicyRuleView and create it to Black Duck.
          */
-        String policyRuleUrl = policyRuleService.createPolicyRule(policyRuleView)
+        HttpUrl policyRuleUrl = policyRuleService.createPolicyRule(policyRuleView)
         policyRuleView = blackDuckService.getResponse(policyRuleUrl, PolicyRuleView.class)
     }
 

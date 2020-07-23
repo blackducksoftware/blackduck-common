@@ -1,31 +1,25 @@
 package com.synopsys.integration.blackduck.api.user;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserRequest;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserRequest;
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.ProjectService;
-import com.synopsys.integration.blackduck.service.ProjectUsersService;
-import com.synopsys.integration.blackduck.service.UserGroupService;
+import com.synopsys.integration.blackduck.service.*;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -52,7 +46,7 @@ public class UserServiceTestIT {
     public void testAddingGroupToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         UserGroupService userGroupService = blackDuckServicesFactory.createUserGroupService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
@@ -102,7 +96,7 @@ public class UserServiceTestIT {
     public void testAddingUserToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
 
@@ -125,7 +119,7 @@ public class UserServiceTestIT {
             userRequest.setEmail("noreply@synopsys.com");
             userRequest.setPassword("blackduck");
 
-            String userUrl = blackDuckService.post(ApiDiscovery.USERS_LINK, userRequest);
+            HttpUrl userUrl = blackDuckService.post(ApiDiscovery.USERS_LINK, userRequest);
             userView = blackDuckService.getResponse(userUrl, UserView.class);
 
             List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);

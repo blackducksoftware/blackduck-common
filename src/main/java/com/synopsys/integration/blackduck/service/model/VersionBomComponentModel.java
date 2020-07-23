@@ -22,27 +22,23 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileActivityDataView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComparisonItemsComponentMatchTypesType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.*;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentView component;
     private final List<MatchedFilesModel> matchedFiles;
 
-    public VersionBomComponentModel(final ProjectVersionComponentView component, final List<ComponentMatchedFilesView> matchedFiles) {
+    public VersionBomComponentModel(ProjectVersionComponentView component, List<ComponentMatchedFilesView> matchedFiles) {
         this.component = component;
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
@@ -143,19 +139,20 @@ public class VersionBomComponentModel {
         return matchedFiles;
     }
 
-    private boolean hasRisk(final RiskProfileCounts counts) {
-        if (counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountTypeType.LOW).intValue() + counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountTypeType.MEDIUM).intValue() + counts.getCount(
-            ComponentVersionRiskProfileRiskDataCountsCountTypeType.HIGH).intValue() > 0) {
+    private boolean hasRisk(RiskProfileCounts counts) {
+        if (counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.LOW).intValue() + counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.MEDIUM).intValue() + counts.getCount(
+                ComponentVersionRiskProfileRiskDataCountsCountType.HIGH).intValue() > 0) {
             return true;
         }
         return false;
     }
 
-    private List<MatchedFilesModel> getMatchedFilesModel(final List<ComponentMatchedFilesView> matchedFiles) {
-        final List<MatchedFilesModel> matchedFileModels = new ArrayList<>(matchedFiles.size());
-        for (final ComponentMatchedFilesView matchedFile : matchedFiles) {
+    private List<MatchedFilesModel> getMatchedFilesModel(List<ComponentMatchedFilesView> matchedFiles) {
+        List<MatchedFilesModel> matchedFileModels = new ArrayList<>(matchedFiles.size());
+        for (ComponentMatchedFilesView matchedFile : matchedFiles) {
             matchedFileModels.add(new MatchedFilesModel(matchedFile));
         }
         return matchedFileModels;
     }
+
 }

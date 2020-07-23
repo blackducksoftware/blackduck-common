@@ -24,9 +24,7 @@ package com.synopsys.integration.blackduck.service.model;
 
 import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
 
-import java.math.BigDecimal;
-
-import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType.*;
+import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType.*;
 
 public class BomRiskCounts {
     private int high;

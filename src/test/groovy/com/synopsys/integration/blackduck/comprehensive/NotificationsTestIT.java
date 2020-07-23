@@ -2,10 +2,10 @@ package com.synopsys.integration.blackduck.comprehensive;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
@@ -40,7 +40,7 @@ public class NotificationsTestIT {
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
 
@@ -64,7 +64,7 @@ public class NotificationsTestIT {
 
         // two project version create
         // one project version delete, one project delete
-        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE"+projectVersionName, "CREATE"+projectVersion2Name, "DELETE"+projectName, "DELETE"+projectVersion2Name  ));
+        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName, "CREATE" + projectVersion2Name, "DELETE" + projectName, "DELETE" + projectVersion2Name));
 
         Set<String> foundKeys = new HashSet<>();
         long start = System.currentTimeMillis();

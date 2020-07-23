@@ -1,10 +1,10 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
@@ -17,6 +17,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -57,11 +58,13 @@ public class CodeLocationWaitJobTaskTest {
 
         Mockito.when(mockProjectService.getProjectVersion(projectAndVersion)).thenReturn(Optional.of(projectVersionWrapper));
 
+        ResourceMetadata resourceMetadata = new ResourceMetadata();
+        resourceMetadata.setHref(new HttpUrl(CODE_LOCATION_URL));
+
         CodeLocationView foundCodeLocationView = new CodeLocationView();
         foundCodeLocationView.setName(codeLocationName);
-        ResourceMetadata resourceMetadata = new ResourceMetadata();
-        resourceMetadata.setHref(CODE_LOCATION_URL);
         foundCodeLocationView.setMeta(resourceMetadata);
+
         Mockito.when(mockBlackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
 
         Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()))).thenReturn(getExpectedNotifications());

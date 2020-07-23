@@ -1,6 +1,11 @@
 package com.synopsys.integration.blackduck.configuration;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.rest.credentials.Credentials;
+import com.synopsys.integration.rest.credentials.CredentialsBuilder;
+import com.synopsys.integration.util.NoThreadExecutorService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -8,35 +13,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.credentials.CredentialsBuilder;
-import com.synopsys.integration.util.NoThreadExecutorService;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServerConfigBuilderTest {
-    @Test
-    void testSettingFromPropertiesMap() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("BLACKDUCK_URL", "test url");
-        properties.put("BLACKDUCK_USERNAME", "user");
-        properties.put("BLACKDUCK_PASSWORD", "password");
-
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        assertNull(blackDuckServerConfigBuilder.getUrl());
-        assertNull(blackDuckServerConfigBuilder.getUsername());
-        assertNull(blackDuckServerConfigBuilder.getPassword());
-
-        blackDuckServerConfigBuilder.setFromProperties(properties);
-
-        assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
-        assertEquals("user", blackDuckServerConfigBuilder.getUsername());
-        assertEquals("password", blackDuckServerConfigBuilder.getPassword());
-    }
-
     @Test
     void testSettingFromPropertiesMapWithMixed() {
         Map<String, String> properties = new HashMap<>();
@@ -65,7 +45,7 @@ public class BlackDuckServerConfigBuilderTest {
     @Test
     public void testNullUrlInvalid() {
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        blackDuckServerConfigBuilder.setUrl(null);
+        blackDuckServerConfigBuilder.setUrl((String) null);
         blackDuckServerConfigBuilder.setUsername("fakeUser");
         blackDuckServerConfigBuilder.setPassword("fakePassword");
         assertFalse(blackDuckServerConfigBuilder.isValid());
@@ -135,7 +115,7 @@ public class BlackDuckServerConfigBuilderTest {
 
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
-        blackDuckServerConfigBuilder.setTimeout(0);
+        blackDuckServerConfigBuilder.setTimeoutInSeconds(0);
         assertFalse(blackDuckServerConfigBuilder.isValid());
     }
 

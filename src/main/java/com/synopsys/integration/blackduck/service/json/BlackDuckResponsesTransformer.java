@@ -20,12 +20,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.service;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
+package com.synopsys.integration.blackduck.service.json;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -34,6 +29,11 @@ import com.synopsys.integration.blackduck.service.model.PagedRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlackDuckResponsesTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -54,18 +54,6 @@ public class BlackDuckResponsesTransformer {
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
         return getInternalResponses(pagedRequest, clazz, pagedRequest.getLimit());
-    }
-
-    @Deprecated
-    /**
-     * @deprecated Please use the appropriate getAll or getSome method
-     */
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getResponses(PagedRequest pagedRequest, Class<T> clazz, boolean getAll) throws IntegrationException {
-        int totalLimit = Integer.MAX_VALUE;
-        if (!getAll) {
-            totalLimit = pagedRequest.getLimit();
-        }
-        return getInternalResponses(pagedRequest, clazz, totalLimit);
     }
 
     private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {

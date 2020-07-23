@@ -23,7 +23,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.service.model.BlackDuckQuery;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 import java.util.List;
@@ -53,17 +54,15 @@ public class CodeLocationService extends DataService {
     }
 
     public void unmapCodeLocation(CodeLocationView codeLocationView) throws IntegrationException {
-        mapCodeLocation(codeLocationView, "");
+        mapCodeLocation(codeLocationView, (HttpUrl) null);
     }
 
     public void mapCodeLocation(CodeLocationView codeLocationView, ProjectVersionView version) throws IntegrationException {
-        if (version.getHref().isPresent()) {
-            mapCodeLocation(codeLocationView, version.getHref().get());
-        }
+        mapCodeLocation(codeLocationView, version.getHref());
     }
 
-    public void mapCodeLocation(CodeLocationView codeLocationView, String versionUrl) throws IntegrationException {
-        codeLocationView.setMappedProjectVersion(versionUrl);
+    public void mapCodeLocation(CodeLocationView codeLocationView, HttpUrl versionUrl) throws IntegrationException {
+        codeLocationView.setMappedProjectVersion(null == versionUrl ? "" : versionUrl.string());
         blackDuckService.put(codeLocationView);
     }
 
@@ -87,7 +86,8 @@ public class CodeLocationService extends DataService {
 
     public ScanSummaryView getScanSummaryViewById(String scanSummaryId) throws IntegrationException {
         String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
-        return blackDuckService.getResponse(uri, ScanSummaryView.class);
+        HttpUrl url = new HttpUrl(uri);
+        return blackDuckService.getResponse(url, ScanSummaryView.class);
     }
 
 }

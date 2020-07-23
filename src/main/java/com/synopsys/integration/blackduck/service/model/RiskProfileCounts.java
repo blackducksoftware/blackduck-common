@@ -22,30 +22,31 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType;
+import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountTypeType;
-import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
-
 public class RiskProfileCounts {
-    private final Map<ComponentVersionRiskProfileRiskDataCountsCountTypeType, BigDecimal> countsMap;
+    private final Map<ComponentVersionRiskProfileRiskDataCountsCountType, BigDecimal> countsMap;
 
-    public RiskProfileCounts(final RiskProfileView view) {
+    public RiskProfileCounts(RiskProfileView view) {
         countsMap = new HashMap<>();
-        for (final ComponentVersionRiskProfileRiskDataCountsCountTypeType value : ComponentVersionRiskProfileRiskDataCountsCountTypeType.values()) {
+        for (ComponentVersionRiskProfileRiskDataCountsCountType value : ComponentVersionRiskProfileRiskDataCountsCountType.values()) {
             countsMap.put(value, new BigDecimal(0));
         }
         if (view != null) {
-            for (final ComponentVersionRiskProfileRiskDataCountsView count : view.getCounts()) {
+            for (ComponentVersionRiskProfileRiskDataCountsView count : view.getCounts()) {
                 countsMap.put(count.getCountType(), count.getCount());
             }
         }
     }
 
-    public BigDecimal getCount(final ComponentVersionRiskProfileRiskDataCountsCountTypeType level) {
+    public BigDecimal getCount(ComponentVersionRiskProfileRiskDataCountsCountType level) {
         return countsMap.get(level);
     }
+
 }

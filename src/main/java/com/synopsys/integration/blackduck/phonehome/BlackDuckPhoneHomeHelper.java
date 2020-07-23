@@ -23,33 +23,26 @@
 package com.synopsys.integration.blackduck.phonehome;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.service.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.request.BlackDuckPhoneHomeRequestFactory;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-/**
- * @deprecated Please use the example code here to adapt your own phone home solution to the new api of the client - this class is being deleted with the next release of the library.
- */
-@Deprecated
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
@@ -57,16 +50,12 @@ public class BlackDuckPhoneHomeHelper {
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
     public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
         return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
     }
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
@@ -109,12 +98,20 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
-        String registrationKey = getRegistrationKey();
-        String blackDuckUrl = getHostName();
-        String blackDuckVersion = getProductVersion();
+        String registrationKey = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
+        String blackDuckUrl = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
+        String blackDuckVersion = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
 
-        BlackDuckPhoneHomeRequestFactory blackDuckPhoneHomeRequestFactory = new BlackDuckPhoneHomeRequestFactory(integrationRepoName);
-        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = blackDuckPhoneHomeRequestFactory.create(registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
+        try {
+            BlackDuckServerData blackDuckServerData = blackDuckRegistrationService.getBlackDuckServerData();
+            registrationKey = blackDuckServerData.getRegistrationKey().orElse(PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE);
+            blackDuckUrl = blackDuckServerData.getUrl().string();
+            blackDuckVersion = blackDuckServerData.getVersion();
+        } catch (IntegrationException e) {
+            logger.warn("Could not gather all Black Duck data: " + e.getMessage());
+        }
+
+        PhoneHomeRequestBodyBuilder phoneHomeRequestBodyBuilder = PhoneHomeRequestBodyBuilder.createForBlackDuck(integrationRepoName, registrationKey, blackDuckUrl, integrationVersion, blackDuckVersion);
         phoneHomeRequestBodyBuilder.addArtifactModules(artifactModules);
 
         boolean metaDataSuccess = phoneHomeRequestBodyBuilder.addAllToMetaData(metaData);
@@ -130,34 +127,6 @@ public class BlackDuckPhoneHomeHelper {
             return intEnvironmentVariables.getVariables();
         }
         return Collections.emptyMap();
-    }
-
-    private String getProductVersion() {
-        CurrentVersionView currentVersion;
-        try {
-            currentVersion = blackDuckService.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
-            return currentVersion.getVersion();
-        } catch (IntegrationException e) {
-        }
-        return PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
-    }
-
-    private String getHostName() {
-        return blackDuckService.getBlackDuckBaseUrl().toString();
-    }
-
-    private String getRegistrationKey() {
-        String registrationId = null;
-        try {
-            // We need to wrap this because this will most likely fail unless they are running as an admin
-            registrationId = blackDuckRegistrationService.getRegistrationId();
-        } catch (IntegrationException e) {
-        }
-        // We must check if the reg id is blank because of an edge case in which Black Duck can authenticate (while the webserver is coming up) without registration
-        if (StringUtils.isBlank(registrationId)) {
-            registrationId = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
-        }
-        return registrationId;
     }
 
 }

@@ -22,9 +22,14 @@
  */
 package com.synopsys.integration.blackduck.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.rest.credentials.Credentials;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.rest.support.AuthenticationSupport;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.Header;
 import org.apache.http.NameValuePair;
@@ -37,20 +42,15 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.rest.support.AuthenticationSupport;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     private final Credentials credentials;
     private final AuthenticationSupport authenticationSupport;
 
     public CredentialsBlackDuckHttpClient(
-            IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, String baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials) {
+            IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
         this.credentials = credentials;
         this.authenticationSupport = authenticationSupport;
@@ -62,6 +62,7 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
 
     @Override
     public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
+        super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
         httpClientBuilder.setDefaultCookieStore(new BasicCookieStore());
         defaultRequestConfigBuilder.setCookieSpec(CookieSpecs.DEFAULT);
     }

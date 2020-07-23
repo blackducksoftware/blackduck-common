@@ -31,7 +31,7 @@ public class ProjectBomServiceTestIT {
         String projectVersionName = "1.0.0";
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectBomService projectBomService = blackDuckServicesFactory.createProjectBomService();
         IntLogger logger = blackDuckServicesFactory.getLogger();
@@ -63,7 +63,7 @@ public class ProjectBomServiceTestIT {
         String projectVersionNameToAdd = "to_add_project_version";
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.createBlackDuckService();
+        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectBomService projectBomService = blackDuckServicesFactory.createProjectBomService();
         IntLogger logger = blackDuckServicesFactory.getLogger();

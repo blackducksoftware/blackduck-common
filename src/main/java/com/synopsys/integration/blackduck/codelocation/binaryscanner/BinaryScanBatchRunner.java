@@ -38,16 +38,6 @@ public class BinaryScanBatchRunner {
     private final BlackDuckService blackDuckService;
     private final ExecutorService executorService;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public BinaryScanBatchRunner(IntLogger logger, BlackDuckService blackDuckService) {
-        this.logger = logger;
-        this.blackDuckService = blackDuckService;
-        executorService = new NoThreadExecutorService();
-    }
-
     public BinaryScanBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;

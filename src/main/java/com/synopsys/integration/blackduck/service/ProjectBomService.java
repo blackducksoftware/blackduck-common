@@ -22,28 +22,24 @@
  */
 package com.synopsys.integration.blackduck.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.*;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.VulnerableComponentView;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;
@@ -66,9 +62,10 @@ public class ProjectBomService extends DataService {
     public List<ComponentVersionVulnerabilities> getComponentVersionVulnerabilities(ProjectVersionView projectVersionView) throws IntegrationException {
         List<ProjectVersionComponentView> ProjectVersionComponentViews = getComponentsForProjectVersion(projectVersionView);
         List<ComponentVersionView> componentVersionViews = new ArrayList<>();
-        for (ProjectVersionComponentView ProjectVersionComponentView : ProjectVersionComponentViews) {
-            if (StringUtils.isNotBlank(ProjectVersionComponentView.getComponentVersion())) {
-                ComponentVersionView componentVersionView = blackDuckService.getResponse(ProjectVersionComponentView.getComponentVersion(), ComponentVersionView.class);
+        for (ProjectVersionComponentView projectVersionComponentView : ProjectVersionComponentViews) {
+            if (StringUtils.isNotBlank(projectVersionComponentView.getComponentVersion())) {
+                HttpUrl projectVersionComponentUrl = new HttpUrl(projectVersionComponentView.getComponentVersion());
+                ComponentVersionView componentVersionView = blackDuckService.getResponse(projectVersionComponentUrl, ComponentVersionView.class);
                 componentVersionViews.add(componentVersionView);
             }
         }
@@ -96,8 +93,7 @@ public class ProjectBomService extends DataService {
 
     //TODO investigate what variant is
     public Optional<String> addComponentToProjectVersion(ExternalId componentExternalId, ProjectVersionView projectVersionView) throws IntegrationException {
-        String projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                                                 .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
+        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
         Optional<ComponentsView> componentSearchResultView = componentService.getFirstOrEmptyResult(componentExternalId);
         String componentVersionUrl = null;
         if (componentSearchResultView.isPresent()) {
@@ -106,42 +102,28 @@ public class ProjectBomService extends DataService {
             } else {
                 componentVersionUrl = componentSearchResultView.get().getVersion();
             }
-            addComponentToProjectVersion("application/json", projectVersionComponentsUrl, componentVersionUrl);
+            addComponentToProjectVersion(new HttpUrl(componentVersionUrl), projectVersionComponentsUrl);
         }
 
         return Optional.ofNullable(componentVersionUrl);
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public void addComponentToProjectVersion(String mediaType, String projectVersionComponentsUri, String componentVersionUrl) throws IntegrationException {
-        Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).mimeType(mediaType).build();
-        try (Response response = blackDuckService.execute(request)) {
-        } catch (IOException e) {
-            throw new IntegrationException(e.getMessage(), e);
-        }
-    }
-
     public void addProjectVersionToProjectVersion(ProjectVersionView projectVersionViewToAdd, ProjectVersionView targetProjectVersionView) throws IntegrationException {
-        String toAdd = projectVersionViewToAdd.getHref().orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView to add does not have an href.\n%s", projectVersionViewToAdd)));
-        String target = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                            .orElseThrow(() -> new IntegrationException(String.format("The target ProjectVersionView does not have a '%' link.\n%s", ProjectVersionView.COMPONENTS_LINK, targetProjectVersionView)));
+        HttpUrl toAddUrl = projectVersionViewToAdd.getHref();
+        HttpUrl targetUrl = targetProjectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
 
-        addComponentToProjectVersion(toAdd, target);
+        addComponentToProjectVersion(toAddUrl, targetUrl);
     }
 
     public void addComponentToProjectVersion(ComponentVersionView componentVersionView, ProjectVersionView projectVersionView) throws IntegrationException {
-        String componentVersionUrl = componentVersionView.getHref().orElseThrow(() -> new IntegrationException(String.format("The ComponentVersionView does not have an href.\n%s", componentVersionView)));
-        String projectVersionComponentsUri = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK)
-                                                 .orElseThrow(() -> new IntegrationException(String.format("The ProjectVersionView does not have a components link.\n%s", projectVersionView)));
+        HttpUrl componentVersionUrl = componentVersionView.getHref();
+        HttpUrl projectVersionComponentsUrl = projectVersionView.getFirstLink(ProjectVersionView.COMPONENTS_LINK);
 
-        addComponentToProjectVersion(componentVersionUrl, projectVersionComponentsUri);
+        addComponentToProjectVersion(componentVersionUrl, projectVersionComponentsUrl);
     }
 
-    public void addComponentToProjectVersion(String componentVersionUrl, String projectVersionComponentsUri) throws IntegrationException {
-        Request request = RequestFactory.createCommonPostRequestBuilder("{\"component\": \"" + componentVersionUrl + "\"}").uri(projectVersionComponentsUri).build();
+    public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
+        Request request = RequestFactory.createCommonPostRequestBuilder(projectVersionComponentsUrl, "{\"component\": \"" + componentVersionUrl.string() + "\"}").build();
         try (Response response = blackDuckService.execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

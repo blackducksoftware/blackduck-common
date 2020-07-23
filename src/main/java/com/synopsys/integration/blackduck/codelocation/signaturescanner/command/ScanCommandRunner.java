@@ -39,14 +39,6 @@ public class ScanCommandRunner {
     private final ScanPathsUtility scanPathsUtility;
     private final ExecutorService executorService;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility) {
-        this(logger, intEnvironmentVariables, scanPathsUtility, new NoThreadExecutorService());
-    }
-
     public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;

@@ -22,37 +22,27 @@
  */
 package com.synopsys.integration.blackduck.service.bucket;
 
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.log.IntLogger;
+
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import com.synopsys.integration.blackduck.api.UriSingleResponse;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NoThreadExecutorService;
-
 public class BlackDuckBucketService extends DataService {
     private final ExecutorService executorService;
 
-    /**
-     * @deprecated Please provide an ExecutorService - for no change, you can provide an instance of NoThreadExecutorService
-     */
-    @Deprecated
-    public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger) {
-        super(blackDuckService, logger);
-        executorService = new NoThreadExecutorService();
-    }
-
-    public BlackDuckBucketService(final BlackDuckService blackDuckService, final IntLogger logger, final ExecutorService executorService) {
+    public BlackDuckBucketService(BlackDuckService blackDuckService, IntLogger logger, ExecutorService executorService) {
         super(blackDuckService, logger);
         this.executorService = executorService;
     }
 
-    public <T extends BlackDuckResponse> Future<Optional<T>> addToTheBucket(final BlackDuckBucket blackDuckBucket, final String uri, final Class<T> responseClass) {
-        UriSingleResponse<? extends BlackDuckResponse> uriSingleResponse = new UriSingleResponse<>(uri, responseClass);
-        BlackDuckBucketFillTask blackDuckBucketFillTask = new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, uriSingleResponse);
+    public <T extends BlackDuckResponse> Future<Optional<T>> addToTheBucket(BlackDuckBucket blackDuckBucket, String uri, Class<T> responseClass) {
+        LinkSingleResponse<? extends BlackDuckResponse> linkSingleResponse = new LinkSingleResponse<>(uri, responseClass);
+        BlackDuckBucketFillTask blackDuckBucketFillTask = new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, linkSingleResponse);
         return executorService.submit(blackDuckBucketFillTask);
     }
 

@@ -22,16 +22,17 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2upload;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
-
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
+
+import java.io.IOException;
+import java.util.concurrent.Callable;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
@@ -49,8 +50,8 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     @Override
     public UploadOutput call() {
         try {
-            String uri = blackDuckService.getUri(BlackDuckService.SCAN_DATA_PATH);
-            Request request = RequestFactory.createCommonPostRequestBuilder(uploadTarget.getUploadFile()).uri(uri).mimeType(uploadTarget.getMediaType()).build();
+            HttpUrl url = blackDuckService.getUrl(BlackDuckService.SCAN_DATA_PATH);
+            Request request = RequestFactory.createCommonPostRequestBuilder(url, uploadTarget.getUploadFile()).mimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
