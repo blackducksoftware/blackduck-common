@@ -51,6 +51,7 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.NameVersion;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -250,7 +251,7 @@ public class ComprehensiveCookbookTestIT {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     //disabled because special config is needed to support /api/uploads (binary scan)
     public void testCodeLocationFromBinaryScanUpload() throws Exception {
         BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
