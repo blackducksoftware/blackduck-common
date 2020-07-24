@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,12 +22,12 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
-import java.util.List;
-
 import com.synopsys.integration.blackduck.codelocation.CodeLocationBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+
+import java.util.List;
 
 public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOutput> {
     public BinaryScanBatchOutput(List<BinaryScanOutput> outputs) {
@@ -36,9 +36,10 @@ public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOut
 
     public void throwExceptionForError(IntLogger logger) throws BlackDuckIntegrationException {
         for (BinaryScanOutput binaryScanOutput : this) {
-            if (binaryScanOutput.getStatusCode() < 200 || binaryScanOutput.getStatusCode() >= 300) {
-                logger.error("Unknown status code: " + binaryScanOutput.getStatusCode());
-                throw new BlackDuckIntegrationException("Unknown status code when uploading binary scan: " + binaryScanOutput.getStatusCode() + ", " + binaryScanOutput.getStatusMessage());
+            if (binaryScanOutput.getResult() == Result.FAILURE) {
+                String uploadErrorMessage = "Error when uploading binary scan: %s" + binaryScanOutput.getErrorMessage().orElse(binaryScanOutput.getStatusMessage());
+                logger.error(uploadErrorMessage);
+                throw new BlackDuckIntegrationException(uploadErrorMessage);
             }
         }
     }
