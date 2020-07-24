@@ -11,22 +11,11 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.*;
-import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.*;
-import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScan;
-import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanBatchOutput;
-import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanOutput;
-import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
@@ -36,7 +25,6 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.NotificationService;
 import com.synopsys.integration.blackduck.service.ProjectService;
 import com.synopsys.integration.blackduck.service.json.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.service.json.BlackDuckPageResponse;
@@ -51,18 +39,14 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.NameVersion;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.File;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -191,7 +175,7 @@ public class ComprehensiveCookbookTestIT {
             assertEquals(Result.SUCCESS, uploadOutput.getResult());
         }
 
-        checkNotifications(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
+        VerifyNotifications.verify(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
     }
@@ -245,36 +229,9 @@ public class ComprehensiveCookbookTestIT {
             assertNotNull(scanCommandOutput.getDryRunFile());
         }
 
-        checkNotifications(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
+        VerifyNotifications.verify(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
-    }
-
-    @Test
-    @Disabled
-    //disabled because special config is needed to support /api/uploads (binary scan)
-    public void testCodeLocationFromBinaryScanUpload() throws Exception {
-        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
-
-        String projectName = "binary_scan_project";
-        String projectVersionName = "0.0.1";
-        String codeLocationName = "binary scan test code location";
-
-        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-        Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
-        Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
-
-        // upload the binary scan
-        File file = new File("/Users/ekerwin/Downloads/Interview.java");
-        BinaryScan binaryScan = new BinaryScan(file, projectName, projectVersionName, codeLocationName);
-
-        BinaryScanUploadService binaryScanUploadService = blackDuckServices.blackDuckServicesFactory.createBinaryScanUploadService();
-        BinaryScanBatchOutput binaryScanBatchOutput = binaryScanUploadService.uploadBinaryScanAndWait(binaryScan, 15 * 60);
-        for (BinaryScanOutput uploadOutput : binaryScanBatchOutput) {
-            assertEquals(Result.SUCCESS, uploadOutput.getResult());
-        }
-
-        checkNotifications(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
     }
 
     @Test
@@ -398,43 +355,6 @@ public class ComprehensiveCookbookTestIT {
         }
         policyRuleView = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         assertFalse(policyRuleView.isPresent());
-    }
-
-    private void checkNotifications(UserView currentUser, NotificationService notificationService, Date userStartDate, Date systemStartDate) throws IntegrationException {
-        Date endDate = Date.from(new Date().toInstant().plus(7, ChronoUnit.DAYS));
-
-        List<NotificationView> allNotifications = notificationService.getAllNotifications(systemStartDate, endDate);
-        List<NotificationUserView> allUserNotifications = notificationService.getAllUserNotifications(currentUser, userStartDate, endDate);
-        List<NotificationView> filteredNotifications = notificationService.getFilteredNotifications(systemStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
-        List<NotificationUserView> filteredUserNotifications = notificationService.getFilteredUserNotifications(currentUser, userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
-
-        assertFalse(allNotifications.isEmpty());
-        assertFalse(allUserNotifications.isEmpty());
-        assertFalse(filteredNotifications.isEmpty());
-        assertFalse(filteredUserNotifications.isEmpty());
-
-        List<VersionBomCodeLocationBomComputedNotificationView> bomComputedNotifications =
-                filteredNotifications
-                        .stream()
-                        .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationView) notificationView)
-                        .collect(Collectors.toList());
-
-        List<VersionBomCodeLocationBomComputedNotificationUserView> bomComputedUserNotifications =
-                filteredUserNotifications
-                        .stream()
-                        .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                        .collect(Collectors.toList());
-
-        assertTrue(allNotifications.containsAll(bomComputedNotifications));
-        assertTrue(allUserNotifications.containsAll(bomComputedUserNotifications));
-        assertEquals(getContents(bomComputedNotifications), getContents(bomComputedUserNotifications));
-    }
-
-    private List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationContentData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
-        return notifications
-                .stream()
-                .map(NotificationContentData::getContent)
-                .collect(Collectors.toList());
     }
 
     private class CheckPolicyData {

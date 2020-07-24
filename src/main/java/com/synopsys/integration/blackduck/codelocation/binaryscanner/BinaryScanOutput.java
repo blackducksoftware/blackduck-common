@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
@@ -35,7 +36,11 @@ public class BinaryScanOutput extends CodeLocationOutput {
     private final String contentString;
 
     public static BinaryScanOutput FAILURE(NameVersion projectAndVersion, String codeLocationName, String errorMessage, Exception exception) {
-        return new BinaryScanOutput(Result.FAILURE, projectAndVersion, codeLocationName, errorMessage, exception, null, null, 0, null);
+        return new BinaryScanOutput(Result.FAILURE, projectAndVersion, codeLocationName, errorMessage, exception, null, null, -1, null);
+    }
+
+    public static BinaryScanOutput FROM_INTEGRATION_REST_EXCEPTION(NameVersion projectAndVersion, String codeLocationName, IntegrationRestException e) {
+        return new BinaryScanOutput(Result.FAILURE, projectAndVersion, codeLocationName, e.getMessage(), e, e.getHttpResponseContent(), e.getHttpStatusMessage(), e.getHttpStatusCode(), null);
     }
 
     public static BinaryScanOutput FROM_RESPONSE(NameVersion projectAndVersion, String codeLocationName, Response response) {
@@ -54,7 +59,7 @@ public class BinaryScanOutput extends CodeLocationOutput {
         String errorMessage = null;
         if (!response.isStatusCodeSuccess()) {
             result = Result.FAILURE;
-            errorMessage = "Unknown status code when uploading binary scan: " + response.getStatusCode() + ", " + response.getStatusMessage();
+            errorMessage = "Binary scan upload failure - status code: " + response.getStatusCode() + ", " + response.getStatusMessage();
         } else if (null != contentStringException) {
             result = Result.FAILURE;
             errorMessage = contentStringException.getMessage();
