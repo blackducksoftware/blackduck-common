@@ -1,6 +1,7 @@
 package com.synopsys.integration.blackduck.rest;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.http.client.BlackDuckRedirectStrategy;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
@@ -37,10 +38,9 @@ public class BlackDuckRedirectStrategyTest {
         IntLogger testLogger = new BufferedIntLogger();
         IntHttpClient redirectingClient = new IntHttpClient(testLogger, 120, false, ProxyInfo.NO_PROXY_INFO) {
             @Override
-            public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
-                super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
+            public void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
+                super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
                 httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());
-//                httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
             }
         };
 

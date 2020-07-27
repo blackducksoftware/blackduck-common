@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,14 +20,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.service.model;
+package com.synopsys.integration.blackduck.http;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Some requests to Black Duck can be filtered. There can be one more more filter keys each with one or more values.
@@ -37,23 +32,23 @@ import java.util.Set;
 public class BlackDuckRequestFilter {
     private final Map<String, Set<String>> filterKeysToValues = new HashMap<>();
 
-    public static BlackDuckRequestFilter createFilterWithMultipleValues(final String key, final List<String> values) {
-        final BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
+    public static BlackDuckRequestFilter createFilterWithMultipleValues(String key, List<String> values) {
+        BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
         blackDuckRequestFilter.addFilter(key, values);
         return blackDuckRequestFilter;
     }
 
-    public static BlackDuckRequestFilter createFilterWithSingleValue(final String key, final String value) {
-        final BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
+    public static BlackDuckRequestFilter createFilterWithSingleValue(String key, String value) {
+        BlackDuckRequestFilter blackDuckRequestFilter = new BlackDuckRequestFilter();
         blackDuckRequestFilter.addFilter(key, value);
         return blackDuckRequestFilter;
     }
 
-    public void addFilter(final String key, final String value) {
+    public void addFilter(String key, String value) {
         filterKeysToValues.computeIfAbsent(key, k -> new HashSet<>()).add(value);
     }
 
-    public void addFilter(final String key, final List<String> values) {
+    public void addFilter(String key, List<String> values) {
         filterKeysToValues.computeIfAbsent(key, k -> new HashSet<>()).addAll(values);
     }
 
@@ -61,10 +56,10 @@ public class BlackDuckRequestFilter {
      * This will return the filter key/value pairs as Black Duck expects them: [key1:value1,key1:value2,key2:value3] etc
      */
     public List<String> getFilterParameters() {
-        final List<String> parameters = new ArrayList<>();
+        List<String> parameters = new ArrayList<>();
         filterKeysToValues.forEach((filterKey, filterValues) -> {
             filterValues.forEach(filterValue -> {
-                final String parameterString = String.format("%s:%s", filterKey, filterValue);
+                String parameterString = String.format("%s:%s", filterKey, filterValue);
                 parameters.add(parameterString);
             });
         });

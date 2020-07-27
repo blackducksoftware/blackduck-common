@@ -42,7 +42,7 @@ public class ScanCommandTest {
         System.out.println(tempDirectory.toString());
 
         logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-        intEnvironmentVariables = new IntEnvironmentVariables();
+        intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
         scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.determineFromSystem());
 
         scanBatchBuilder = ScanBatch.newBuilder();

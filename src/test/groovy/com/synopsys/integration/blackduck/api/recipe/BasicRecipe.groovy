@@ -10,7 +10,7 @@ import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumera
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig
-import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient
 import com.synopsys.integration.blackduck.rest.IntHttpClientTestHelper
 import com.synopsys.integration.blackduck.service.*
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService
@@ -69,7 +69,7 @@ class BasicRecipe {
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger)
-        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
         gson = BlackDuckServicesFactory.createDefaultGson()
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper()
         executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE

@@ -20,33 +20,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.service.model;
+package com.synopsys.integration.blackduck.http;
 
-import com.synopsys.integration.rest.HttpUrl;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 
-public class BlackDuckServerData {
-    private final HttpUrl url;
-    private final String version;
-    private final String registrationKey;
+public class BlackDuckQuery {
+    private final String q;
 
-    public BlackDuckServerData(HttpUrl url, String version, String registrationKey) {
-        this.url = url;
-        this.version = version;
-        this.registrationKey = registrationKey;
+    public static Optional<BlackDuckQuery> createQuery(String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new BlackDuckQuery(parameter));
+        }
+
+        return Optional.empty();
     }
 
-    public HttpUrl getUrl() {
-        return url;
+    public static Optional<BlackDuckQuery> createQuery(String prefix, String parameter) {
+        if (StringUtils.isNotBlank(parameter)) {
+            return Optional.of(new BlackDuckQuery(prefix + ":" + parameter));
+        }
+
+        return Optional.empty();
     }
 
-    public String getVersion() {
-        return version;
+    private BlackDuckQuery(String parameter) {
+        q = parameter;
     }
 
-    public Optional<String> getRegistrationKey() {
-        return Optional.ofNullable(registrationKey);
+    public String getParameter() {
+        return q;
     }
 
 }

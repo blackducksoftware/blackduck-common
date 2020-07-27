@@ -7,7 +7,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 public class ScannerZipInstallerTest {
     @Test
     public void testActualDownload() throws Exception {
-        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
 
         String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
         HttpUrl blackDuckUrl = new HttpUrl(intEnvironmentVariables.getValue("BLACKDUCK_URL"));
@@ -81,7 +81,7 @@ public class ScannerZipInstallerTest {
 
     @Test
     public void testInitialDownload() throws Exception {
-        IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+        IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
 
         InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
         Response mockResponse = Mockito.mock(Response.class);

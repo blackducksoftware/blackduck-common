@@ -1,6 +1,8 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;

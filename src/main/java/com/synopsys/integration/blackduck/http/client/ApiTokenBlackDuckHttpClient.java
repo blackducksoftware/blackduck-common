@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,7 +20,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.rest;
+package com.synopsys.integration.blackduck.http.client;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
@@ -67,16 +67,16 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     }
 
     @Override
-    protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
-        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, gson, this, "bearerToken");
-    }
-
-    @Override
     public final Response attemptAuthentication() throws IntegrationException {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
 
         return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
+    }
+
+    @Override
+    protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
+        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, gson, this, "bearerToken");
     }
 
 }

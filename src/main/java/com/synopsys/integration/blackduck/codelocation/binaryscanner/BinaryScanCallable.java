@@ -22,8 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;

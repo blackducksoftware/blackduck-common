@@ -2,12 +2,12 @@ package com.synopsys.integration.blackduck.service;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
-import com.synopsys.integration.blackduck.service.json.BlackDuckJsonTransformer;
-import com.synopsys.integration.blackduck.service.json.BlackDuckPageResponse;
-import com.synopsys.integration.blackduck.service.json.BlackDuckResponsesTransformer;
-import com.synopsys.integration.blackduck.service.model.PagedRequest;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
+import com.synopsys.integration.blackduck.http.PagedRequest;
+import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
+import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;

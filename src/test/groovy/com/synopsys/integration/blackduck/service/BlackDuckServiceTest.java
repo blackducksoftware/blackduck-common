@@ -7,10 +7,10 @@ import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDisco
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.rest.BlackDuckHttpClient;
-import com.synopsys.integration.blackduck.service.json.BlackDuckJsonTransformer;
-import com.synopsys.integration.blackduck.service.json.BlackDuckResponseTransformer;
-import com.synopsys.integration.blackduck.service.json.BlackDuckResponsesTransformer;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
+import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
+import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;

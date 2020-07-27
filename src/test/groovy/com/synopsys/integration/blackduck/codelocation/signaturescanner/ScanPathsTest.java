@@ -1,24 +1,5 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
@@ -26,13 +7,31 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(TimingExtension.class)
 public class ScanPathsTest {
     // Example ...BlackDuckScanOutput\2018-09-16_15-38-37-050_1
     private static final String DATE_AND_THREAD_SPECIFIC_NAME = ".*\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}-\\d{3}_\\S+";
 
-    private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+    private IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
 
     private final ScanPathsUtility macScanPathsUtility = new ScanPathsUtility(new BufferedIntLogger(), intEnvironmentVariables, OperatingSystemType.MAC);
     private final ScanPathsUtility windowsScanPathsUtility = new ScanPathsUtility(new BufferedIntLogger(), intEnvironmentVariables, OperatingSystemType.WINDOWS);
@@ -64,7 +63,7 @@ public class ScanPathsTest {
     public void deleteTempDirectory() {
         FileUtils.deleteQuietly(tempDirectory);
         FileUtils.deleteQuietly(bdsJavaHomeDirectory);
-        intEnvironmentVariables = new IntEnvironmentVariables();
+        intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
     }
 
     @Test

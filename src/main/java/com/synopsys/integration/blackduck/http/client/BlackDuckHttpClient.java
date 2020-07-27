@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- *
+ * <p>
  * Copyright (c) 2020 Synopsys, Inc.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,7 +20,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.synopsys.integration.blackduck.rest;
+package com.synopsys.integration.blackduck.http.client;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.exception.IntegrationException;
@@ -54,12 +54,6 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     }
 
     @Override
-    public void populateHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
-        super.populateHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
-        httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());
-    }
-
-    @Override
     public Response execute(HttpUriRequest request) throws IntegrationException {
         try {
             return super.execute(request);
@@ -79,6 +73,12 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
     public HttpUrl getBaseUrl() {
         return baseUrl;
+    }
+
+    @Override
+    protected void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
+        super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
+        httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());
     }
 
     private IntegrationException transformException(IntegrationRestException e) {

@@ -71,7 +71,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     private final BuilderProperties builderProperties;
     private IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-    private IntEnvironmentVariables intEnvironmentVariables = new IntEnvironmentVariables();
+    private IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
