@@ -25,9 +25,8 @@ package com.synopsys.integration.blackduck.codelocation;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.CodeLocationService;
-import com.synopsys.integration.blackduck.service.NotificationService;
-import com.synopsys.integration.blackduck.service.ProjectService;
+import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -59,7 +58,7 @@ public class CodeLocationWaiter {
 
         // waitInterval needs to be less than the timeout
         if (waitIntervalInSeconds > timeoutInSeconds) {
-            waitIntervalInSeconds = (int)timeoutInSeconds;
+            waitIntervalInSeconds = (int) timeoutInSeconds;
         }
 
         if (!allCompleted) {

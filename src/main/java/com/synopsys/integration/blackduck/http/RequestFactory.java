@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- * <p>
+ *
  * Copyright (c) 2020 Synopsys, Inc.
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -87,8 +87,7 @@ public class RequestFactory {
     }
 
     public BlackDuckRequestBuilder createCommonGetRequestBuilder(HttpUrl url, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder(mediaTypeDiscovery, new Request.Builder());
-        return blackDuckRequestBuilder
+        return createRequestBuilder()
                 .url(url)
                 .addBlackDuckQuery(blackDuckQuery)
                 .addBlackDuckFilter(blackDuckRequestFilter)
@@ -96,24 +95,42 @@ public class RequestFactory {
                 .addOffset(offset);
     }
 
-    public Request.Builder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {
-        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new FileBodyContent(bodyContentFile));
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {
+        return createRequestBuilder()
+                .url(url)
+                .method(HttpMethod.POST)
+                .bodyContent(new FileBodyContent(bodyContentFile));
     }
 
-    public Request.Builder createCommonPostRequestBuilder(HttpUrl url, Map<String, String> bodyContentMap) {
-        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new MapBodyContent(bodyContentMap));
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, Map<String, String> bodyContentMap) {
+        return createRequestBuilder()
+                .url(url)
+                .method(HttpMethod.POST)
+                .bodyContent(new MapBodyContent(bodyContentMap));
     }
 
-    public Request.Builder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
-        return new Request.Builder(url).method(HttpMethod.POST).bodyContent(new StringBodyContent(bodyContent));
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
+        return createRequestBuilder()
+                .url(url)
+                .method(HttpMethod.POST)
+                .bodyContent(new StringBodyContent(bodyContent));
     }
 
-    public Request.Builder createCommonPutRequestBuilder(HttpUrl url, String bodyContent) {
-        return new Request.Builder(url).method(HttpMethod.PUT).bodyContent(new StringBodyContent(bodyContent));
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
+        return createRequestBuilder()
+                .method(HttpMethod.POST)
+                .bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
     }
 
-    public Request.Builder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
-        return new Request.Builder().method(HttpMethod.POST).bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+    public BlackDuckRequestBuilder createCommonPutRequestBuilder(HttpUrl url, String bodyContent) {
+        return createRequestBuilder()
+                .url(url)
+                .method(HttpMethod.PUT)
+                .bodyContent(new StringBodyContent(bodyContent));
+    }
+
+    private BlackDuckRequestBuilder createRequestBuilder() {
+        return new BlackDuckRequestBuilder(mediaTypeDiscovery, new Request.Builder());
     }
 
 }

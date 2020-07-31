@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- * <p>
+ *
  * Copyright (c) 2020 Synopsys, Inc.
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,51 +25,37 @@ package com.synopsys.integration.blackduck.http.client;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import org.apache.commons.codec.Charsets;
-import org.apache.http.Header;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
+    public static final String SET_COOKIE = "Set-Cookie";
+    public static final String AUTHORIZATION_BEARER_PREFIX = "AUTHORIZATION_BEARER=";
+    public static final String HEADER_VALUE_SEPARATOR = ";";
+
     private final Credentials credentials;
-    private final AuthenticationSupport authenticationSupport;
 
     public CredentialsBlackDuckHttpClient(
             IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl);
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport);
         this.credentials = credentials;
-        this.authenticationSupport = authenticationSupport;
 
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials cannot be null.");
         }
-    }
-
-    @Override
-    public void handleErrorResponse(HttpUriRequest request, Response response) {
-        super.handleErrorResponse(request, response);
-
-        authenticationSupport.handleErrorResponse(this, request, response, RestConstants.X_CSRF_TOKEN);
-    }
-
-    @Override
-    public boolean isAlreadyAuthenticated(HttpUriRequest request) {
-        return request.containsHeader(RestConstants.X_CSRF_TOKEN);
     }
 
     @Override
@@ -83,24 +69,21 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     }
 
     @Override
-    protected void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
-        super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
-        httpClientBuilder.setDefaultCookieStore(new BasicCookieStore());
-        defaultRequestConfigBuilder.setCookieSpec(CookieSpecs.DEFAULT);
-    }
-
-    @Override
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
         if (response.isStatusCodeSuccess()) {
             CloseableHttpResponse actualResponse = response.getActualResponse();
-            Header csrfHeader = actualResponse.getFirstHeader(RestConstants.X_CSRF_TOKEN);
-            String csrfHeaderValue = csrfHeader.getValue();
-            if (null != csrfHeaderValue) {
-                authenticationSupport.addAuthenticationHeader(this, request, RestConstants.X_CSRF_TOKEN, csrfHeaderValue);
-            } else {
-                logger.error("No CSRF token found when authenticating.");
-            }
+            Optional<String> token = parseBearerToken(actualResponse);
+            authenticationSupport.addBearerToken(logger, request, this, token);
         }
+    }
+
+    private Optional<String> parseBearerToken(CloseableHttpResponse response) {
+        if (response.containsHeader(SET_COOKIE)) {
+            String setCookieHeader = response.getFirstHeader(SET_COOKIE).getValue();
+            return Optional.ofNullable(StringUtils.substringBetween(setCookieHeader, AUTHORIZATION_BEARER_PREFIX, HEADER_VALUE_SEPARATOR));
+        }
+
+        return Optional.empty();
     }
 
 }

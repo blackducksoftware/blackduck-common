@@ -22,10 +22,9 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
-import java.util.Set;
-
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -33,12 +32,14 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 
+import java.util.Set;
+
 public class BinaryScanUploadService extends DataService {
     private final BinaryScanBatchRunner binaryScanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public BinaryScanUploadService(BlackDuckService blackDuckService, IntLogger logger, BinaryScanBatchRunner binaryScanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckService, logger);
+    public BinaryScanUploadService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, BinaryScanBatchRunner binaryScanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckService, requestFactory, logger);
         this.binaryScanBatchRunner = binaryScanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

@@ -22,11 +22,10 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import java.util.Set;
-
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -34,42 +33,44 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 
+import java.util.Set;
+
 public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public SignatureScannerService(final BlackDuckService blackDuckService, final IntLogger logger,
-        final ScanBatchRunner scanBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckService, logger);
+    public SignatureScannerService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger,
+                                   ScanBatchRunner scanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckService, requestFactory, logger);
         this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
-    public SignatureScannerCodeLocationCreationRequest createScanRequest(final ScanBatch scanBatch) {
+    public SignatureScannerCodeLocationCreationRequest createScanRequest(ScanBatch scanBatch) {
         return new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
     }
 
-    public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(final SignatureScannerCodeLocationCreationRequest scanRequest) throws IntegrationException {
+    public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(SignatureScannerCodeLocationCreationRequest scanRequest) throws IntegrationException {
         return codeLocationCreationService.createCodeLocations(scanRequest);
     }
 
-    public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(final ScanBatch scanBatch) throws IntegrationException {
-        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
+    public CodeLocationCreationData<ScanBatchOutput> performSignatureScan(ScanBatch scanBatch) throws IntegrationException {
+        SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
 
         return performSignatureScan(scanRequest);
     }
 
-    public ScanBatchOutput performSignatureScanAndWait(final SignatureScannerCodeLocationCreationRequest scanRequest, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public ScanBatchOutput performSignatureScanAndWait(SignatureScannerCodeLocationCreationRequest scanRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return codeLocationCreationService.createCodeLocationsAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public ScanBatchOutput performSignatureScanAndWait(final ScanBatch scanBatch, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        final SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
+    public ScanBatchOutput performSignatureScanAndWait(ScanBatch scanBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        SignatureScannerCodeLocationCreationRequest scanRequest = new SignatureScannerCodeLocationCreationRequest(scanBatchRunner, scanBatch);
 
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public CodeLocationWaitResult waitForSignatureScan(final NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, final Set<String> codeLocationNames, int expectedNotificationCount, final long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult waitForSignatureScan(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 

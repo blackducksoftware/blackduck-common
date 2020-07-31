@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- * <p>
+ *
  * Copyright (c) 2020 Synopsys, Inc.
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,6 +31,7 @@ import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.rest.support.AuthenticationSupport;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -43,7 +44,9 @@ import java.util.Optional;
 public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final HttpUrl baseUrl;
 
-    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl) {
+    protected final AuthenticationSupport authenticationSupport;
+
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
 
         if (null == baseUrl) {
@@ -51,6 +54,7 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         }
 
         this.baseUrl = baseUrl;
+        this.authenticationSupport = authenticationSupport;
     }
 
     @Override
@@ -60,6 +64,18 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         } catch (IntegrationRestException e) {
             throw transformException(e);
         }
+    }
+
+    @Override
+    public boolean isAlreadyAuthenticated(HttpUriRequest request) {
+        return authenticationSupport.isTokenAlreadyAuthenticated(request);
+    }
+
+    @Override
+    public void handleErrorResponse(HttpUriRequest request, Response response) {
+        super.handleErrorResponse(request, response);
+
+        authenticationSupport.handleTokenErrorResponse(this, request, response);
     }
 
     @Override

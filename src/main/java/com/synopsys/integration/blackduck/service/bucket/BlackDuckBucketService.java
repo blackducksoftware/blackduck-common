@@ -24,6 +24,7 @@ package com.synopsys.integration.blackduck.service.bucket;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.log.IntLogger;
@@ -35,8 +36,8 @@ import java.util.concurrent.Future;
 public class BlackDuckBucketService extends DataService {
     private final ExecutorService executorService;
 
-    public BlackDuckBucketService(BlackDuckService blackDuckService, IntLogger logger, ExecutorService executorService) {
-        super(blackDuckService, logger);
+    public BlackDuckBucketService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ExecutorService executorService) {
+        super(blackDuckService, requestFactory, logger);
         this.executorService = executorService;
     }
 

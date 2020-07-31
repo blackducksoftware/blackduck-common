@@ -1,8 +1,8 @@
 /**
  * blackduck-common
- * <p>
+ *
  * Copyright (c) 2020 Synopsys, Inc.
- * <p>
+ *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -10,9 +10,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,12 +36,14 @@ import java.util.concurrent.Callable;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
+    private final RequestFactory requestFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadBdio2Callable(BlackDuckService blackDuckService, UploadTarget uploadTarget) {
+    public UploadBdio2Callable(BlackDuckService blackDuckService, RequestFactory requestFactory, UploadTarget uploadTarget) {
         this.blackDuckService = blackDuckService;
+        this.requestFactory = requestFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -51,7 +53,9 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     public UploadOutput call() {
         try {
             HttpUrl url = blackDuckService.getUrl(BlackDuckService.SCAN_DATA_PATH);
-            Request request = RequestFactory.createCommonPostRequestBuilder(url, uploadTarget.getUploadFile()).mimeType(uploadTarget.getMediaType()).build();
+            Request request = requestFactory
+                    .createCommonPostRequestBuilder(url, uploadTarget.getUploadFile())
+                    .acceptMimeType(uploadTarget.getMediaType()).build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
