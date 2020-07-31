@@ -10,16 +10,17 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
-import groovy.lang.Closure;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
 import java.io.File;
-import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -80,17 +81,10 @@ public class RiskReportServiceTestIT {
 
         File[] reportFiles = reportFolder.listFiles();
         Assertions.assertNotNull(reportFiles);
-        Assertions.assertTrue(DefaultGroovyMethods.size(reportFiles) > 0);
-        Map<String, File> reportFileMap = DefaultGroovyMethods.collectEntries(reportFiles, new Closure<List<Serializable>>(this, this) {
-            public List<Serializable> doCall(File it) {
-                return new ArrayList<>(Arrays.asList(it.getName(), it));
-            }
-
-            public List<Serializable> doCall() {
-                return doCall(null);
-            }
-
-        });
+        Assertions.assertTrue(reportFiles.length > 0);
+        Map<String, File> reportFileMap = Arrays
+                .stream(reportFiles)
+                .collect(Collectors.toMap(File::getName, Function.identity()));
         Assertions.assertNotNull(reportFileMap.get("js"));
         Assertions.assertNotNull(reportFileMap.get("css"));
         Assertions.assertNotNull(reportFileMap.get("images"));
