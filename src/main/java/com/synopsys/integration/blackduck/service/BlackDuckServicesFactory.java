@@ -62,7 +62,6 @@ public class BlackDuckServicesFactory {
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
     private final RequestFactory requestFactory;
-    private final UrlSupport urlSupport;
 
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
@@ -101,7 +100,6 @@ public class BlackDuckServicesFactory {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.logger = logger;
         this.requestFactory = requestFactory;
-        this.urlSupport = urlSupport;
 
         blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
