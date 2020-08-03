@@ -147,6 +147,8 @@ public class BlackDuckHttpClientTestIT {
     }
 
     private void testRedirect(BlackDuckServerConfigBuilder blackDuckServerConfigBuilder) throws IntegrationException, IOException {
+        blackDuckServerConfigBuilder.setTrustCert(true);
+
         MockWebServer redirectingServer = new MockWebServer();
         MockWebServerUtil.setupRedirecting(redirectingServer, blackDuckUrl.string());
         redirectingServer.start();

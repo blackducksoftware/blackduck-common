@@ -11,6 +11,7 @@ import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.LogLevel;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ public class BinaryScanUploadServiceTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
     @Test
-//    @Disabled
+    @Disabled
     //disabled because special config is needed to support /api/uploads (binary scan)
     public void testCodeLocationFromBinaryScanUpload() throws Exception {
         BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
@@ -43,7 +44,7 @@ public class BinaryScanUploadServiceTestIT {
     }
 
     @Test
-//    @Disabled
+    @Disabled
     //disabled because special config is needed to support /api/uploads (binary scan)
     public void testCodeLocationFromBinaryScanUploadWhenNotConfigured() throws Exception {
         BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
