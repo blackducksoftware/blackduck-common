@@ -40,7 +40,7 @@ public class ScannerZipInstallerTest {
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
 
         String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
-        HttpUrl blackDuckUrl = new HttpUrl(intEnvironmentVariables.getValue("BLACKDUCK_URL"));
+        String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_URL");
         String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_USERNAME");
         String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_PASSWORD");
         assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
@@ -65,7 +65,7 @@ public class ScannerZipInstallerTest {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckUrl, operatingSystemType);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl(blackDuckUrl), operatingSystemType);
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
 
