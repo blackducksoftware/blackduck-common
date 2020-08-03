@@ -22,8 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.model.RequestFactory;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
@@ -36,12 +36,14 @@ import java.util.concurrent.Callable;
 
 public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckService blackDuckService;
+    private final RequestFactory requestFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadCallable(BlackDuckService blackDuckService, UploadTarget uploadTarget) {
+    public UploadCallable(BlackDuckService blackDuckService, RequestFactory requestFactory, UploadTarget uploadTarget) {
         this.blackDuckService = blackDuckService;
+        this.requestFactory = requestFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -59,7 +61,10 @@ public class UploadCallable implements Callable<UploadOutput> {
             }
 
             HttpUrl url = blackDuckService.getUrl(BlackDuckService.BOMIMPORT_PATH);
-            Request request = RequestFactory.createCommonPostRequestBuilder(url, jsonPayload).mimeType(uploadTarget.getMediaType()).build();
+            Request request = requestFactory
+                    .createCommonPostRequestBuilder(url, jsonPayload)
+                    .acceptMimeType(uploadTarget.getMediaType())
+                    .build();
             try (Response response = blackDuckService.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);

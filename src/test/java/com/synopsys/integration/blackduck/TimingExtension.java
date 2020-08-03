@@ -1,0 +1,41 @@
+package com.synopsys.integration.blackduck;
+
+import com.synopsys.integration.rest.RestConstants;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.lang.reflect.Method;
+import java.util.Date;
+
+public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+    private static final String START_TIME = "start time";
+
+    @Override
+    public void beforeTestExecution(ExtensionContext context) throws Exception {
+        long currentTime = System.currentTimeMillis();
+        getStore(context).put(TimingExtension.START_TIME, currentTime);
+        Class<?> testClass = context.getRequiredTestClass();
+        Method testMethod = context.getRequiredTestMethod();
+        String currentTimeString = RestConstants.formatDate(new Date(currentTime));
+
+        System.out.println(String.format("%s - %s:%s starting...", currentTimeString, testClass.getSimpleName(), testMethod.getName()));
+    }
+
+    @Override
+    public void afterTestExecution(ExtensionContext context) throws Exception {
+        long currentTime = System.currentTimeMillis();
+        Class<?> testClass = context.getRequiredTestClass();
+        Method testMethod = context.getRequiredTestMethod();
+        String currentTimeString = RestConstants.formatDate(new Date(currentTime));
+        long startTime = getStore(context).remove(TimingExtension.START_TIME, long.class);
+        long duration = currentTime - startTime;
+
+        System.out.println(String.format("%s - %s:%s took %s ms.", currentTimeString, testClass.getSimpleName(), testMethod.getName(), duration));
+    }
+
+    private ExtensionContext.Store getStore(ExtensionContext context) {
+        return context.getStore(ExtensionContext.Namespace.create(getClass(), context.getRequiredTestMethod()));
+    }
+
+}

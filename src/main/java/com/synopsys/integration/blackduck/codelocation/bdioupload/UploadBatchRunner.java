@@ -22,25 +22,27 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.log.IntLogger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NoThreadExecutorService;
-
 public class UploadBatchRunner {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
+    private final RequestFactory requestFactory;
     private final ExecutorService executorService;
 
-    public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService, ExecutorService executorService) {
+    public UploadBatchRunner(IntLogger logger, BlackDuckService blackDuckService, RequestFactory requestFactory, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
+        this.requestFactory = requestFactory;
         this.executorService = executorService;
     }
 
@@ -74,9 +76,9 @@ public class UploadBatchRunner {
 
     private List<UploadCallable> createCallables(UploadBatch uploadBatch) {
         List<UploadCallable> callables = uploadBatch.getUploadTargets()
-                                                 .stream()
-                                                 .map(uploadTarget -> new UploadCallable(blackDuckService, uploadTarget))
-                                                 .collect(Collectors.toList());
+                .stream()
+                .map(uploadTarget -> new UploadCallable(blackDuckService, requestFactory, uploadTarget))
+                .collect(Collectors.toList());
 
         return callables;
     }

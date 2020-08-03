@@ -22,14 +22,17 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.log.IntLogger;
 
 public class DataService {
-    protected BlackDuckService blackDuckService;
-    protected IntLogger logger;
+    protected final BlackDuckService blackDuckService;
+    protected final RequestFactory requestFactory;
+    protected final IntLogger logger;
 
-    public DataService(final BlackDuckService blackDuckService, final IntLogger logger) {
+    public DataService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         this.blackDuckService = blackDuckService;
+        this.requestFactory = requestFactory;
         this.logger = logger;
     }
 

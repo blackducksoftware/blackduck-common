@@ -23,9 +23,9 @@
 package com.synopsys.integration.blackduck.phonehome;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.service.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;

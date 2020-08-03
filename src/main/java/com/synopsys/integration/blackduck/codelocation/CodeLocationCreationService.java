@@ -22,21 +22,22 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
+import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Set;
-
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
-import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.NotificationService;
-import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NameVersion;
 
 public class CodeLocationCreationService extends DataService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 60;
@@ -44,8 +45,8 @@ public class CodeLocationCreationService extends DataService {
     private final CodeLocationWaiter codeLocationWaiter;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(BlackDuckService blackDuckService, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService) {
-        super(blackDuckService, logger);
+    public CodeLocationCreationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService) {
+        super(blackDuckService, requestFactory, logger);
         this.codeLocationWaiter = codeLocationWaiter;
         this.notificationService = notificationService;
     }
