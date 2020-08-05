@@ -1,0 +1,13 @@
+{
+  "totalCount": 69,
+  "items": [],
+  "appliedFilters": [],
+  "_meta": {
+    "allow": [
+      "POST",
+      "GET"
+    ],
+    "href": "https://int-hub02.dc1.lan/api/projects",
+    "links": []
+  }
+}
