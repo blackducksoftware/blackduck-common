@@ -1,5 +1,19 @@
 package com.synopsys.integration.blackduck.http.transform;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -15,21 +29,52 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckResponsesTransformerTest {
+    @Test
+    public void danaHackTest() throws IOException, IntegrationException {
+        Map<String, String> offsetsToResults = new HashMap<>();
+        offsetsToResults.put("0", "projectViews_page_1_of_4.json");
+        offsetsToResults.put("20", "projectViews_page_2_of_4.json");
+        offsetsToResults.put("40", "projectViews_page_3_of_4.json");
+        offsetsToResults.put("60", "projectViews_page_4_of_4.json");
+
+        BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
+        mockClientBehavior(blackDuckHttpClient, offsetsToResults, 20);
+
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
+            new PrintStreamIntLogger(System.out, LogLevel.INFO));
+
+        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new MediaTypeDiscovery(), new Request.Builder());
+        requestBuilder
+            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
+            .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")
+            .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
+        PagedRequest pagedRequest = new PagedRequest(requestBuilder);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
+        assertEquals(69, allPagesResponse.getTotalCount());
+        assertEquals(69, allPagesResponse.getItems().size());
+
+        int i = 0;
+        int listCount = allPagesResponse.getItems().size();
+        while (i < listCount) {
+            String myTestUrl = allPagesResponse.getItems().get(i).getHref().string();
+            System.out.printf("Running test %d of %d testing %s%n", i, listCount - 1, myTestUrl);
+            
+            Predicate<ProjectView> predicate = httpUrl -> myTestUrl.equalsIgnoreCase(httpUrl.getHref().string());
+            BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getMatchingResponse(pagedRequest, ProjectView.class, predicate);
+
+            assertEquals(69, matchedResponse.getTotalCount());
+            assertEquals(1, matchedResponse.getItems().size());
+            assertEquals(myTestUrl, matchedResponse.getItems().get(0).getHref().string());
+            i++;
+        }
+
+    }
+
     @Test
     public void testGettingAllOnePageTotal() throws IOException, IntegrationException {
         Map<String, String> offsetsToResults = new HashMap<>();
@@ -38,13 +83,14 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 100);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(), new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
+            new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new MediaTypeDiscovery(), new Request.Builder());
         requestBuilder
-                .url(new HttpUrl("https://blackduckserver.com/api/projects"))
-                .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
-                .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
+            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
+            .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
+            .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
@@ -64,13 +110,14 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 20);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(), new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
+            new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new MediaTypeDiscovery(), new Request.Builder());
         requestBuilder
-                .url(new HttpUrl("https://blackduckserver.com/api/projects"))
-                .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")
-                .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
+            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
+            .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")
+            .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
@@ -87,13 +134,14 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 100);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(), new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
+            new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new MediaTypeDiscovery(), new Request.Builder());
         requestBuilder
-                .url(new HttpUrl("https://blackduckserver.com/api/projects"))
-                .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
-                .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
+            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
+            .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
+            .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
@@ -113,13 +161,14 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 20);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(), new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
+            new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new MediaTypeDiscovery(), new Request.Builder());
         requestBuilder
-                .url(new HttpUrl("https://blackduckserver.com/api/projects"))
-                .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")
-                .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
+            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
+            .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")
+            .addQueryParameter(RequestFactory.OFFSET_PARAMETER, "0");
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
