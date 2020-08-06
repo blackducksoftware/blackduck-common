@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class BlackDuckService {
     public static final BlackDuckPath BOMIMPORT_PATH = new BlackDuckPath("/api/bom-import");
@@ -94,6 +95,11 @@ public class BlackDuckService {
     // ------------------------------------------------
     // getting responses from a 'path', which we define as something that looks like '/api/codelocations'
     // ------------------------------------------------
+    public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
+        throws IntegrationException {
+        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit));
+    }
+
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
         return getAllResponses(blackDuckPathMultipleResponses, requestFactory.createCommonGetRequestBuilder());
     }
@@ -123,6 +129,11 @@ public class BlackDuckService {
     // ------------------------------------------------
     // getting responses from a BlackDuckView
     // ------------------------------------------------
+    public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
+        throws IntegrationException {
+        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit));
+    }
+
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
         return getAllResponses(blackDuckView, linkMultipleResponses, requestFactory.createCommonGetRequestBuilder());
     }
