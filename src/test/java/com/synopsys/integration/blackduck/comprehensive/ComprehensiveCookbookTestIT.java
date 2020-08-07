@@ -262,7 +262,7 @@ public class ComprehensiveCookbookTestIT {
             for (ProjectView projectItem : allProjects) {
                 List<ProjectVersionView> allProjectVersions = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
                 System.out.println(projectItem.toString());
-                System.out.printf("version count: %d", allProjectVersions.size());
+                System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (ProjectVersionView projectVersionItem : allProjectVersions) {
                     System.out.println(projectVersionItem.toString());
                 }
@@ -285,9 +285,9 @@ public class ComprehensiveCookbookTestIT {
             assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
 
             if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
-                System.out.printf("%s count: %d", labelForOutput, pageResponse.getTotalCount());
+                System.out.println(String.format("%s count: %d", labelForOutput, pageResponse.getTotalCount()));
                 for (BlackDuckResponse blackDuckResponse : pageResponse.getItems()) {
-                    System.out.printf("%s: %s", labelForOutput, blackDuckResponse.toString());
+                    System.out.println(String.format("%s: %s", labelForOutput, blackDuckResponse.toString()));
                 }
             }
         }

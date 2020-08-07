@@ -58,7 +58,7 @@ public class BlackDuckResponsesTransformerTest {
 
             Predicate<ProjectView> predicate = httpUrl -> myTestUrl.equalsIgnoreCase(httpUrl.getHref().string());
             BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, ProjectView.class, predicate, limit);
-            
+
             assertEquals(69, matchedResponse.getTotalCount(), String.format("%s total response retrieved", customErrorMessage));
             assertEquals(1, matchedResponse.getItems().size(), String.format("%s match count returned", customErrorMessage));
             assertEquals(myTestUrl, matchedResponse.getItems().get(0).getHref().string(), String.format("%s return url matches", customErrorMessage));
