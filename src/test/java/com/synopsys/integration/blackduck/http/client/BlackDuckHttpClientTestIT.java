@@ -6,7 +6,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
@@ -48,7 +48,7 @@ public class BlackDuckHttpClientTestIT {
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
 
     private UrlSupport urlSupport = new UrlSupport();
-    private RequestFactory requestFactory = new RequestFactory(new MediaTypeDiscovery());
+    private RequestFactory requestFactory = new RequestFactory(new BlackDuckMediaTypeDiscovery());
     private HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();

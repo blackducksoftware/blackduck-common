@@ -1,7 +1,7 @@
 package com.synopsys.integration.blackduck.http;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
@@ -20,7 +20,7 @@ public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() throws IntegrationException {
         BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[]{"value1", "value2"}));
-        RequestFactory requestFactory = new RequestFactory(new MediaTypeDiscovery());
+        RequestFactory requestFactory = new RequestFactory(new BlackDuckMediaTypeDiscovery());
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();
 

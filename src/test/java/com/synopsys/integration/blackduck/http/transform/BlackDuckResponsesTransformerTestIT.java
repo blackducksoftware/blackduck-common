@@ -2,7 +2,7 @@ package com.synopsys.integration.blackduck.http.transform;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.MediaTypeDiscovery;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -25,7 +25,7 @@ class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
     private final UrlSupport urlSupport = new UrlSupport();
-    private final RequestFactory requestFactory = new RequestFactory(new MediaTypeDiscovery());
+    private final RequestFactory requestFactory = new RequestFactory(new BlackDuckMediaTypeDiscovery());
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }
