@@ -35,6 +35,7 @@ import com.synopsys.integration.log.IntLogger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class ProjectGetService extends DataService {
     public ProjectGetService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
@@ -71,21 +72,11 @@ public class ProjectGetService extends DataService {
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(ProjectView projectView, String projectVersionName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        Predicate<ProjectVersionView> predicate = projectVersionView -> projectVersionName.equals(projectVersionView.getVersionName());
 
-        List<ProjectVersionView> allProjectVersionMatchingItems = blackDuckService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder);
-        Optional<ProjectVersionView> projectVersion = findMatchingProjectVersionView(allProjectVersionMatchingItems, projectVersionName);
-
-        return projectVersion;
-    }
-
-    public Optional<ProjectVersionView> findMatchingProjectVersionView(List<ProjectVersionView> projectVersions, String projectVersionName) {
-        for (ProjectVersionView version : projectVersions) {
-            if (projectVersionName.equals(version.getVersionName())) {
-                return Optional.of(version);
-            }
-        }
-
-        return Optional.empty();
+        return blackDuckService.getSomeMatchingResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
+                   .stream()
+                   .findFirst();
     }
 
 }
