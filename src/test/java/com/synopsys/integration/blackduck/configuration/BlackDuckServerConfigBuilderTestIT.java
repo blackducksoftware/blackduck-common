@@ -102,7 +102,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals(RestConstants.UNAUTHORIZED_401, connectionResult.getHttpStatusCode());
+        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getFailureMessage().get());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getFailureMessage().get());
+        assertEquals(RestConstants.UNAUTHORIZED_401, connectionResult.getHttpStatusCode());
     }
 
     @Test
