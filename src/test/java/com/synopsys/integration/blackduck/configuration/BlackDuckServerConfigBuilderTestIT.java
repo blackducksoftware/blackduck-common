@@ -6,6 +6,7 @@ import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.client.ConnectionResult;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Tag;
@@ -101,7 +102,7 @@ public class BlackDuckServerConfigBuilderTestIT {
         assertFalse(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
         assertFalse(connectionResult.isSuccess());
-        assertEquals("The connection was not successful for an unknown reason. If an api token is being used, it could be incorrect.", connectionResult.getFailureMessage().get());
+        assertEquals(RestConstants.UNAUTHORIZED_401, connectionResult.getHttpStatusCode());
     }
 
     @Test

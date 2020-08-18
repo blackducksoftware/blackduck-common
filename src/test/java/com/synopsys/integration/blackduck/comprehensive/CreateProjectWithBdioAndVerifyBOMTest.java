@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.io.File;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,6 +88,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
             CodeLocationView codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).get();
             blackDuckServices.blackDuckService.delete(codeLocationView);
         }
+
     }
 
     private void uploadAndVerifyBdio(UploadBatch uploadBatch, Set<String> expectedCodeLocationNames) throws IntegrationException, InterruptedException {
@@ -128,23 +130,28 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     }
 
     private boolean waitForCodeLocations(Set<String> expectedCodeLocationNames, ProjectVersionView projectVersionView) throws InterruptedException, IntegrationException {
+        Predicate<CodeLocationView> nameInSet = (codeLocationView) -> expectedCodeLocationNames.contains(codeLocationView.getName());
         WaitJobTask findAllCodeLocationNames = () -> {
-            List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+            List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getSomeMatchingResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, nameInSet, expectedCodeLocationNames.size());
             Set<String> foundCodeLocationNames = codeLocationViews
                     .stream()
                     .map(CodeLocationView::getName)
                     .collect(Collectors.toSet());
 
-            System.out.println("found code location names:");
-            codeLocationViews
-                    .stream()
-                    .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref()))
-                    .sorted()
-                    .forEach(System.out::println);
+            printOutCodeLocations(codeLocationViews);
 
             return expectedCodeLocationNames.equals(foundCodeLocationNames);
         };
         return WaitJob.createUsingSystemTimeWhenInvoked(waitLogger, TEN_MINUTES, THIRTY_SECONDS, "wait for code locations", findAllCodeLocationNames).waitFor();
+    }
+
+    private void printOutCodeLocations(List<CodeLocationView> codeLocationViews) {
+        System.out.println("found code location names:");
+        codeLocationViews
+                .stream()
+                .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref()))
+                .sorted()
+                .forEach(System.out::println);
     }
 
     private boolean waitForNotifications(Date userStartDate, Date endDate, Set<String> expectedCodeLocationUrls) throws InterruptedException, IntegrationException {
