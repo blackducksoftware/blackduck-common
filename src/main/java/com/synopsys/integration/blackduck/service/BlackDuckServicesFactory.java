@@ -22,6 +22,11 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.util.concurrent.ExecutorService;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,17 +47,27 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransforme
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
-import com.synopsys.integration.blackduck.service.dataservice.*;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
+import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
+import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
+import com.synopsys.integration.blackduck.service.dataservice.LicenseService;
+import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectBomService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectGetService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectMappingService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
+import com.synopsys.integration.blackduck.service.dataservice.ReportService;
+import com.synopsys.integration.blackduck.service.dataservice.TagService;
+import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
-import java.util.concurrent.ExecutorService;
 
 public class BlackDuckServicesFactory {
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -80,19 +95,19 @@ public class BlackDuckServicesFactory {
 
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
-                .setDateFormat(RestConstants.JSON_DATE_FORMAT);
+                   .setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
     public static RequestFactory createDefaultRequestFactory() {
         return new RequestFactory(new BlackDuckMediaTypeDiscovery());
     }
 
-    public static UrlSupport createDefaultUrlSupport() {
-        return new UrlSupport();
+    public static HttpUrl createHttpUrl(String input) throws IntegrationException {
+        return new HttpUrl(input);
     }
 
     public BlackDuckServicesFactory(
-            IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, RequestFactory requestFactory, UrlSupport urlSupport) {
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, RequestFactory requestFactory) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
@@ -105,7 +120,7 @@ public class BlackDuckServicesFactory {
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
-        blackDuckService = new BlackDuckService(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, requestFactory, urlSupport);
+        blackDuckService = new BlackDuckService(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, requestFactory);
     }
 
     public BdioUploadService createBdioUploadService() {
