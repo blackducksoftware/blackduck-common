@@ -287,7 +287,7 @@ public class ComprehensiveCookbookTestIT {
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
 
         HttpUrl baseUrl = blackDuckServicesFactory.getBlackDuckHttpClient().getBaseUrl();
-        HttpUrl getUrl = new HttpUrl(String.valueOf(baseUrl)).appendRelativeUrl(pathResponses.getBlackDuckPath().getPath());
+        HttpUrl getUrl = baseUrl.appendRelativeUrl(pathResponses.getBlackDuckPath().getPath());
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new BlackDuckMediaTypeDiscovery(), new Request.Builder());
         requestBuilder.url(getUrl);
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);

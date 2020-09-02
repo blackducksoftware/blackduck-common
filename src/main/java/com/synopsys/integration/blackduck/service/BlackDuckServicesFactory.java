@@ -61,9 +61,7 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersServic
 import com.synopsys.integration.blackduck.service.dataservice.ReportService;
 import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
@@ -100,10 +98,6 @@ public class BlackDuckServicesFactory {
 
     public static RequestFactory createDefaultRequestFactory() {
         return new RequestFactory(new BlackDuckMediaTypeDiscovery());
-    }
-
-    public static HttpUrl createHttpUrl(String input) throws IntegrationException {
-        return new HttpUrl(input);
     }
 
     public BlackDuckServicesFactory(

@@ -311,12 +311,8 @@ public class BlackDuckService {
         return responsesTransformer.apply(new PagedRequest(requestBuilder), responseClass).getItems();
     }
 
-    private HttpUrl pieceTogetherUri(String baseUrl, String spec) throws IntegrationException {
-        return BlackDuckServicesFactory.createHttpUrl(baseUrl).appendRelativeUrl(spec);
-    }
-
     private HttpUrl pieceTogetherUri(HttpUrl baseUrl, String spec) throws IntegrationException {
-        return BlackDuckServicesFactory.createHttpUrl(String.valueOf(baseUrl)).appendRelativeUrl(spec);
+        return baseUrl.appendRelativeUrl(spec);
     }
 
 }
