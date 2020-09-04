@@ -22,18 +22,21 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.body.BodyContent;
-import com.synopsys.integration.rest.request.Request;
+import static com.synopsys.integration.blackduck.http.RequestFactory.FILTER_PARAMETER;
+import static com.synopsys.integration.blackduck.http.RequestFactory.LIMIT_PARAMETER;
+import static com.synopsys.integration.blackduck.http.RequestFactory.OFFSET_PARAMETER;
+import static com.synopsys.integration.blackduck.http.RequestFactory.Q_PARAMETER;
 
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.synopsys.integration.blackduck.http.RequestFactory.*;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
+import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContent;
+import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckRequestBuilder {
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;

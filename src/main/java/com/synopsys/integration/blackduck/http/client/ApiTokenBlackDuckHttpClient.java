@@ -22,6 +22,12 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+
 import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -29,11 +35,6 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpUriRequest;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Connection to the Black Duck application which authenticates using the API token feature
