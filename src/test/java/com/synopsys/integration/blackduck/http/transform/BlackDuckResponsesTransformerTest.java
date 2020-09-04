@@ -16,7 +16,6 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -91,7 +90,7 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
             new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new BlackDuckMediaTypeDiscovery(), new Request.Builder());
+        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
         requestBuilder
             .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
@@ -126,7 +125,7 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
             new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new BlackDuckMediaTypeDiscovery(), new Request.Builder());
+        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
         requestBuilder
             .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "100")
@@ -212,7 +211,7 @@ public class BlackDuckResponsesTransformerTest {
             BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
                 new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-            BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new BlackDuckMediaTypeDiscovery(), new Request.Builder());
+            BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
             requestBuilder
                 .url(new HttpUrl("https://blackduckserver.com/api/projects"))
                 .addQueryParameter(RequestFactory.LIMIT_PARAMETER, "20")

@@ -130,7 +130,7 @@ public class RequestFactory {
     }
 
     private BlackDuckRequestBuilder createRequestBuilder() {
-        return new BlackDuckRequestBuilder(blackDuckMediaTypeDiscovery, new Request.Builder());
+        return new BlackDuckRequestBuilder(new Request.Builder());
     }
 
 }
