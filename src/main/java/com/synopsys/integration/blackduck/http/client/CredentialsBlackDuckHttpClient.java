@@ -34,11 +34,13 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 
@@ -50,8 +52,9 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     private final Credentials credentials;
 
     public CredentialsBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport);
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, Request.Builder requestBuilder) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery, requestBuilder);
         this.credentials = credentials;
 
         if (credentials == null) {

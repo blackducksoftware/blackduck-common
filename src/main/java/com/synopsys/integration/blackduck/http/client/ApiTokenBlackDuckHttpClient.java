@@ -29,10 +29,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 
@@ -43,8 +45,10 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     private final Gson gson;
     private final String apiToken;
 
-    public ApiTokenBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport);
+    public ApiTokenBlackDuckHttpClient(
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, Request.Builder requestBuilder) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery, requestBuilder);
         this.gson = gson;
         this.apiToken = apiToken;
 

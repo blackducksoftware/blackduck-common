@@ -32,18 +32,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
 import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckRequestBuilder {
-    private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
     private final Request.Builder requestBuilder;
 
-    public BlackDuckRequestBuilder(BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, Request.Builder requestBuilder) {
-        this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
+    public BlackDuckRequestBuilder(Request.Builder requestBuilder) {
         this.requestBuilder = requestBuilder;
     }
 
@@ -57,10 +54,6 @@ public class BlackDuckRequestBuilder {
 
     public BlackDuckRequestBuilder url(HttpUrl url) {
         requestBuilder.url(url);
-        if (null != url && (null == requestBuilder.getAcceptMimeType() || Request.DEFAULT_ACCEPT_MIME_TYPE.equals(requestBuilder.getAcceptMimeType()))) {
-            String acceptMimeType = blackDuckMediaTypeDiscovery.determineMediaType(url);
-            requestBuilder.acceptMimeType(acceptMimeType);
-        }
         return this;
     }
 
