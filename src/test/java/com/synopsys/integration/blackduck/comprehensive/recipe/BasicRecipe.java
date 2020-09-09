@@ -1,5 +1,10 @@
 package com.synopsys.integration.blackduck.comprehensive.recipe;
 
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+
+import org.junit.jupiter.api.BeforeEach;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
@@ -15,17 +20,17 @@ import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
-import com.synopsys.integration.blackduck.service.dataservice.*;
+import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
+import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectBomService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
+import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
-import org.junit.jupiter.api.BeforeEach;
-
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 public class BasicRecipe {
     public static final String PROJECT_NAME = "My Recipe Project";
@@ -48,7 +53,6 @@ public class BasicRecipe {
     protected PolicyRuleService policyRuleService;
     protected UploadBatchRunner uploadRunner;
     protected RequestFactory requestFactory;
-    protected UrlSupport urlSupport;
 
     @BeforeEach
     public void startRecipe() {
@@ -77,9 +81,8 @@ public class BasicRecipe {
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
-        urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory, urlSupport);
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory);
         blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService();
         projectService = blackDuckServicesFactory.createProjectService();
