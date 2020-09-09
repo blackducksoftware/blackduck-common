@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.FileBodyContent;
@@ -43,12 +42,6 @@ public class RequestFactory {
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;
-
-    private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
-
-    public RequestFactory(BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
-    }
 
     public Request createCommonGetRequest(HttpUrl url) {
         return createCommonGetRequestBuilder(url).getRequestBuilder().build();

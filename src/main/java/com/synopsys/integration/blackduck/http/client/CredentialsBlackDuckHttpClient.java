@@ -40,7 +40,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 
@@ -53,8 +52,8 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
 
     public CredentialsBlackDuckHttpClient(
         IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, Request.Builder requestBuilder) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery, requestBuilder);
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
 
         if (credentials == null) {

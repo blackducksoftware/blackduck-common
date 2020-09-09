@@ -48,10 +48,9 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final HttpUrl baseUrl;
     protected final AuthenticationSupport authenticationSupport;
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
-    private final Request.Builder requestBuilder;
 
-    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery,
-        Request.Builder requestBuilder) {
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
 
         if (null == baseUrl) {
@@ -61,17 +60,18 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         this.baseUrl = baseUrl;
         this.authenticationSupport = authenticationSupport;
         this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
-        this.requestBuilder = requestBuilder;
     }
 
     @Override
-    public Response execute(HttpUriRequest request) throws IntegrationException {
-        HttpUrl url = requestBuilder.getUrl();
+    public Response execute(Request request) throws IntegrationException {
+        Request.Builder requestBuilder = request.createBuilder();
+        HttpUrl httpUrl = requestBuilder.getUrl();
+        String mediaType = requestBuilder.getAcceptMimeType();
 
-        if (null != url && (null == requestBuilder.getAcceptMimeType() || Request.DEFAULT_ACCEPT_MIME_TYPE.equals(requestBuilder.getAcceptMimeType()))) {
-            String acceptMimeType = blackDuckMediaTypeDiscovery.determineMediaType(url);
-            requestBuilder.acceptMimeType(acceptMimeType);
-        }
+        String replacementMediaType = blackDuckMediaTypeDiscovery.determineMediaType(httpUrl, mediaType);
+        requestBuilder.acceptMimeType(replacementMediaType);
+
+        request = requestBuilder.build();
 
         try {
             return super.execute(request);
