@@ -1,27 +1,30 @@
 package com.synopsys.integration.blackduck.http.client;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.body.StringBodyContent;
-import com.synopsys.integration.rest.client.IntHttpClient;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpMethod;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.StringBodyContent;
+import com.synopsys.integration.rest.client.IntHttpClient;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.rest.response.Response;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckRedirectStrategyTest {
@@ -43,10 +46,10 @@ public class BlackDuckRedirectStrategyTest {
             }
         };
 
-        Request requestToRedirectingServer = new Request.Builder(new com.synopsys.integration.rest.HttpUrl(redirectingServerUrl))
-                .method(HttpMethod.POST)
-                .bodyContent(new StringBodyContent("the initial request payload"))
-                .build();
+        Request requestToRedirectingServer = new Request.Builder(new HttpUrl(redirectingServerUrl))
+                                                 .method(HttpMethod.POST)
+                                                 .bodyContent(new StringBodyContent("the initial request payload"))
+                                                 .build();
         Response response = redirectingClient.execute(requestToRedirectingServer);
 
         assertEquals("the final response body", response.getContentString());

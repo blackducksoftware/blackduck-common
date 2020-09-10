@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
 import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
@@ -97,7 +96,7 @@ public class BlackDuckServicesFactory {
     }
 
     public static RequestFactory createDefaultRequestFactory() {
-        return new RequestFactory(new BlackDuckMediaTypeDiscovery());
+        return new RequestFactory();
     }
 
     public BlackDuckServicesFactory(
