@@ -25,12 +25,12 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.util.Optional;
 
-import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FilenameUtils;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationOutput;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
 
 public class ScanCommandOutput extends CodeLocationOutput {
     public static final String DRY_RUN_RESULT_DIRECTORY = "data";
@@ -65,7 +65,8 @@ public class ScanCommandOutput extends CodeLocationOutput {
         }
     }
 
-    private ScanCommandOutput(NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, Result result, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage, Exception exception, Integer scanExitCode) {
+    private ScanCommandOutput(NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, Result result, IntLogger logger, ScanCommand scanCommand, String executedScanCommand, String errorMessage,
+        Exception exception, Integer scanExitCode) {
         super(result, projectAndVersion, codeLocationName, expectedNotificationCount, errorMessage, exception);
         this.logger = logger;
         this.scanCommand = scanCommand;
