@@ -28,5 +28,5 @@ public enum PolicyRuleConditionOperatorType {
     LT,
     GT,
     IN,
-    NOT_IN;
+    NOT_IN
 }
