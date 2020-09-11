@@ -22,6 +22,12 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -29,12 +35,6 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class BinaryScanCallable implements Callable<BinaryScanOutput> {
     private final BlackDuckService blackDuckService;
