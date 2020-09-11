@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
+
+import org.apache.commons.compress.archivers.ArchiveException;
+
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -31,12 +38,6 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
-import org.apache.commons.compress.archivers.ArchiveException;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 
 public class ScannerZipInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";
@@ -53,8 +54,7 @@ public class ScannerZipInstaller {
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl,
-                               OperatingSystemType operatingSystemType) {
+    public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl, OperatingSystemType operatingSystemType) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
@@ -138,7 +138,9 @@ public class ScannerZipInstaller {
             try {
                 logger.info("Downloading the Black Duck Signature Scanner.");
                 try (InputStream responseStream = response.getContent()) {
-                    logger.info(String.format("If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.", scannerExpansionDirectory.getAbsolutePath()));
+                    logger.info(String.format(
+                        "If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.",
+                        scannerExpansionDirectory.getAbsolutePath()));
                     cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
                 }
                 long lastModifiedOnServer = response.getLastModified();

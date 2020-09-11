@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +38,7 @@ import com.synopsys.integration.blackduck.service.model.ScannerSplitStream;
 import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NameVersion;
 
 public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private static final List<String> DRY_RUN_FILES_TO_KEEP = Arrays.asList("data");
@@ -52,7 +52,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private final boolean onlineScan;
     private final boolean cleanupOutput;
 
-    public ScanCommandCallable(final IntLogger logger, final ScanPathsUtility scanPathsUtility, final IntEnvironmentVariables intEnvironmentVariables, final ScanCommand scanCommand, final boolean cleanupOutput) {
+    public ScanCommandCallable(IntLogger logger, ScanPathsUtility scanPathsUtility, IntEnvironmentVariables intEnvironmentVariables, ScanCommand scanCommand, boolean cleanupOutput) {
         this.logger = logger;
         this.scanPathsUtility = scanPathsUtility;
         this.intEnvironmentVariables = intEnvironmentVariables;
@@ -67,18 +67,18 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     public ScanCommandOutput call() {
         String commandToExecute = "command_not_yet_configured";
         try {
-            final ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getSignatureScannerInstallDirectory());
+            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getSignatureScannerInstallDirectory());
 
-            final List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
+            List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
             cmd.add(scanCommand.getTargetPath());
 
             commandToExecute = createPrintableCommand(cmd);
             logger.info(String.format("Black Duck CLI command: %s", commandToExecute));
 
-            final File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
+            File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
             try (FileOutputStream outputFileStream = new FileOutputStream(standardOutFile)) {
-                final ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
-                final ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+                ScannerSplitStream splitOutputStream = new ScannerSplitStream(logger, outputFileStream);
+                ProcessBuilder processBuilder = new ProcessBuilder(cmd);
                 processBuilder.environment().putAll(intEnvironmentVariables.getVariables());
 
                 if (onlineScan) {
@@ -87,10 +87,10 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 processBuilder.environment().put("BD_HUB_NO_PROMPT", "true");
                 processBuilder.redirectErrorStream(true);
 
-                final Process blackDuckCliProcess = processBuilder.start();
+                Process blackDuckCliProcess = processBuilder.start();
 
                 // The cli logs go the error stream for some reason
-                final StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getInputStream(), splitOutputStream);
+                StreamRedirectThread redirectThread = new StreamRedirectThread(blackDuckCliProcess.getInputStream(), splitOutputStream);
                 redirectThread.start();
 
                 int returnCode = executeScanProcess(blackDuckCliProcess, redirectThread);
@@ -106,8 +106,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                     return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, returnCode);
                 }
             }
-        } catch (final Exception e) {
-            final String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
+        } catch (Exception e) {
+            String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
             return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
@@ -148,8 +148,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             FileUtils.deleteQuietly(scanCommand.getOutputDirectory());
         } else if (cleanupOutput) {
             // delete everything except dry run files
-            final File[] outputFiles = scanCommand.getOutputDirectory().listFiles();
-            for (final File outputFile : outputFiles) {
+            File[] outputFiles = scanCommand.getOutputDirectory().listFiles();
+            for (File outputFile : outputFiles) {
                 if (!DRY_RUN_FILES_TO_KEEP.contains(outputFile.getName())) {
                     FileUtils.deleteQuietly(outputFile);
                 }
@@ -160,8 +160,8 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     /**
      * Code to mask passwords in the logs
      */
-    private String createPrintableCommand(final List<String> cmd) {
-        final List<String> cmdToOutput = new ArrayList<>();
+    private String createPrintableCommand(List<String> cmd) {
+        List<String> cmdToOutput = new ArrayList<>();
         cmdToOutput.addAll(cmd);
 
         int passwordIndex = cmdToOutput.indexOf("--password");
@@ -172,7 +172,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
 
         int proxyPasswordIndex = -1;
         for (int commandIndex = 0; commandIndex < cmdToOutput.size(); commandIndex++) {
-            final String commandParameter = cmdToOutput.get(commandIndex);
+            String commandParameter = cmdToOutput.get(commandIndex);
             if (commandParameter.contains("-Dhttp.proxyPassword=")) {
                 proxyPasswordIndex = commandIndex;
             }
@@ -184,10 +184,10 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
         return StringUtils.join(cmdToOutput, " ");
     }
 
-    private void maskIndex(final List<String> cmd, final int indexToMask) {
+    private void maskIndex(List<String> cmd, int indexToMask) {
         if (indexToMask > -1) {
-            final String cmdToMask = cmd.get(indexToMask);
-            final String[] maskedArray = new String[cmdToMask.length()];
+            String cmdToMask = cmd.get(indexToMask);
+            String[] maskedArray = new String[cmdToMask.length()];
             Arrays.fill(maskedArray, "*");
             cmd.set(indexToMask, StringUtils.join(maskedArray));
         }

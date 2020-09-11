@@ -22,14 +22,15 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class ScanTarget {
     private final String path;
@@ -38,19 +39,19 @@ public class ScanTarget {
     private final String outputDirectoryPath;
     private final boolean outputDirectoryPathAbsolute;
 
-    public static ScanTarget createBasicTarget(final String path) {
+    public static ScanTarget createBasicTarget(String path) {
         return new ScanTarget(path, null, null, null, false);
     }
 
-    public static ScanTarget createBasicTarget(final String path, final String codeLocationName) {
+    public static ScanTarget createBasicTarget(String path, String codeLocationName) {
         return new ScanTarget(path, null, codeLocationName, null, false);
     }
 
-    public static ScanTarget createBasicTarget(final String path, final Set<String> exclusionPatterns, final String codeLocationName) {
+    public static ScanTarget createBasicTarget(String path, Set<String> exclusionPatterns, String codeLocationName) {
         return new ScanTarget(path, exclusionPatterns, codeLocationName, null, false);
     }
 
-    private ScanTarget(final String path, final Set<String> exclusionPatterns, final String codeLocationName, final String outputDirectoryPath, final boolean outputDirectoryPathAbsolute) {
+    private ScanTarget(String path, Set<String> exclusionPatterns, String codeLocationName, String outputDirectoryPath, boolean outputDirectoryPathAbsolute) {
         this.path = path;
         this.exclusionPatterns = exclusionPatterns;
         this.codeLocationName = codeLocationName;
@@ -64,9 +65,9 @@ public class ScanTarget {
 
     public Set<String> getExclusionPatterns() {
         return Optional.ofNullable(exclusionPatterns).orElse(Collections.emptySet())
-                .stream()
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toSet());
+                   .stream()
+                   .filter(StringUtils::isNotBlank)
+                   .collect(Collectors.toSet());
     }
 
     public String getCodeLocationName() {
@@ -103,7 +104,7 @@ public class ScanTarget {
         private String outputDirectoryPath;
         private boolean outputDirectoryPathAbsolute;
 
-        public Builder(final String path) {
+        public Builder(String path) {
             this.path = path;
         }
 
@@ -115,7 +116,7 @@ public class ScanTarget {
             return path;
         }
 
-        public Builder path(final String path) {
+        public Builder path(String path) {
             this.path = path;
             return this;
         }
@@ -124,7 +125,7 @@ public class ScanTarget {
             return exclusionPatterns;
         }
 
-        public Builder exclusionPatterns(final Set<String> exclusionPatterns) {
+        public Builder exclusionPatterns(Set<String> exclusionPatterns) {
             this.exclusionPatterns = exclusionPatterns;
             return this;
         }
@@ -133,7 +134,7 @@ public class ScanTarget {
             return codeLocationName;
         }
 
-        public Builder codeLocationName(final String codeLocationName) {
+        public Builder codeLocationName(String codeLocationName) {
             this.codeLocationName = codeLocationName;
             return this;
         }
@@ -142,7 +143,7 @@ public class ScanTarget {
             return outputDirectoryPath;
         }
 
-        public Builder outputDirectoryPath(final String outputDirectoryPath) {
+        public Builder outputDirectoryPath(String outputDirectoryPath) {
             this.outputDirectoryPath = outputDirectoryPath;
             return this;
         }
@@ -151,12 +152,12 @@ public class ScanTarget {
             return outputDirectoryPathAbsolute;
         }
 
-        public Builder outputDirectoryPathAbsolute(final boolean outputDirectoryPathAbsolute) {
+        public Builder outputDirectoryPathAbsolute(boolean outputDirectoryPathAbsolute) {
             this.outputDirectoryPathAbsolute = outputDirectoryPathAbsolute;
             return this;
         }
 
-        public Builder outputDirectoryPath(final String outputDirectoryPath, final boolean isAbsolute) {
+        public Builder outputDirectoryPath(String outputDirectoryPath, boolean isAbsolute) {
             this.outputDirectoryPath = outputDirectoryPath;
             outputDirectoryPathAbsolute = isAbsolute;
             return this;

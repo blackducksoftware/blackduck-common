@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.log.IntLogger;
@@ -60,9 +59,9 @@ public class ScanCommand {
     private final boolean debug;
     private final boolean verbose;
 
-    public ScanCommand(final File signatureScannerInstallDirectory, final File outputDirectory, final boolean dryRun, final ProxyInfo proxyInfo, final String scanCliOpts, final int scanMemoryInMegabytes, final String scheme,
-            final String host, final String blackDuckApiToken, final String blackDuckUsername, final String blackDuckPassword, final int port, final boolean runInsecure, final String name, final BlackDuckOnlineProperties blackDuckOnlineProperties,
-            final IndividualFileMatching individualFileMatching, final Set<String> excludePatterns, final String additionalScanArguments, final String targetPath, final boolean verbose, final boolean debug, final String projectName, final String versionName) {
+    public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
+        String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
+        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -88,8 +87,8 @@ public class ScanCommand {
         this.versionName = versionName;
     }
 
-    public List<String> createCommandForProcessBuilder(final IntLogger logger, final ScanPaths scannerPaths, final String specificRunOutputDirectoryPath) throws IllegalArgumentException {
-        final List<String> cmd = new ArrayList<>();
+    public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException {
+        List<String> cmd = new ArrayList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
@@ -147,7 +146,7 @@ public class ScanCommand {
 
     private void populateAdditionalScanArguments(List<String> cmd) {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
-            for (final String additionalArgument : additionalScanArguments.split(" ")) {
+            for (String additionalArgument : additionalScanArguments.split(" ")) {
                 if (StringUtils.isNotBlank(additionalArgument)) {
                     cmd.add(additionalArgument);
                 }
@@ -157,7 +156,7 @@ public class ScanCommand {
 
     private void populateExcludePatterns(List<String> cmd) {
         if (excludePatterns != null) {
-            for (final String exclusionPattern : excludePatterns) {
+            for (String exclusionPattern : excludePatterns) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
                     cmd.add("--exclude");
                     cmd.add(exclusionPattern);
@@ -197,7 +196,7 @@ public class ScanCommand {
             cmd.add(blackDuckUsername);
         }
 
-        final int blackDuckPort = port;
+        int blackDuckPort = port;
         if (blackDuckPort > 0) {
             cmd.add("--port");
             cmd.add(Integer.toString(blackDuckPort));
@@ -214,7 +213,7 @@ public class ScanCommand {
 
     private void populateScanCliOpts(List<String> cmd) {
         if (StringUtils.isNotBlank(scanCliOpts)) {
-            for (final String scanOpt : scanCliOpts.split(" ")) {
+            for (String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
                     cmd.add(scanOpt);
                 }
@@ -223,13 +222,13 @@ public class ScanCommand {
     }
 
     private void populateProxyDetails(List<String> cmd) {
-        final ProxyInfo blackDuckProxyInfo = proxyInfo;
-        final String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
-        final int proxyPort = blackDuckProxyInfo.getPort();
-        final String proxyUsername = blackDuckProxyInfo.getUsername().orElse(null);
-        final String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
-        final String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
-        final String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
+        ProxyInfo blackDuckProxyInfo = proxyInfo;
+        String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
+        int proxyPort = blackDuckProxyInfo.getPort();
+        String proxyUsername = blackDuckProxyInfo.getUsername().orElse(null);
+        String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
+        String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
+        String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
         cmd.add("-Dhttp.proxyHost=" + proxyHost);
         cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
         if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
