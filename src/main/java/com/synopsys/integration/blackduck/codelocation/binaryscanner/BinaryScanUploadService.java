@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.http.RequestFactory;
@@ -31,8 +33,6 @@ import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
-
-import java.util.Set;
 
 public class BinaryScanUploadService extends DataService {
     private final BinaryScanBatchRunner binaryScanBatchRunner;
@@ -82,7 +82,8 @@ public class BinaryScanUploadService extends DataService {
         return uploadBinaryScanAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public void waitForBinaryScanUpload(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds)
+        throws IntegrationException, InterruptedException {
         codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 

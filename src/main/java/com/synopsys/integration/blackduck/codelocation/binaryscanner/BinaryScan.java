@@ -22,9 +22,9 @@
  */
 package com.synopsys.integration.blackduck.codelocation.binaryscanner;
 
-import com.synopsys.integration.util.NameVersion;
-
 import java.io.File;
+
+import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScan {
     private final File binaryFile;
