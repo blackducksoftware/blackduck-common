@@ -24,5 +24,5 @@ package com.synopsys.integration.blackduck.api.enumeration;
 
 public enum ReviewStatusType {
     NOT_REVIEWED,
-    REVIEWED;
+    REVIEWED
 }

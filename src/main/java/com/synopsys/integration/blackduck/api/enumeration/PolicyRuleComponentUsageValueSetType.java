@@ -28,5 +28,5 @@ public enum PolicyRuleComponentUsageValueSetType {
     SOURCE_CODE,
     DEV_TOOL_EXCLUDED,
     SEPARATE_WORK,
-    IMPLEMENTATION_OF_STANDARD;
+    IMPLEMENTATION_OF_STANDARD
 }
