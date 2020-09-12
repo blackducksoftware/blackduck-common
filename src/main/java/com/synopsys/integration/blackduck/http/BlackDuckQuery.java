@@ -22,9 +22,9 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class BlackDuckQuery {
     private final String q;

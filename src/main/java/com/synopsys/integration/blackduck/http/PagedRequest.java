@@ -22,11 +22,12 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import com.synopsys.integration.rest.request.Request;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.lang3.math.NumberUtils;
+
+import com.synopsys.integration.rest.request.Request;
 
 public class PagedRequest {
     private final BlackDuckRequestBuilder requestBuilder;
