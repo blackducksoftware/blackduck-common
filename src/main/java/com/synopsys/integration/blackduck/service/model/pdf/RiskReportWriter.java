@@ -34,30 +34,30 @@ import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.service.model.ReportData;
 
 public class RiskReportWriter {
-    public void createHtmlReportFiles(final Gson gson, final File outputDirectory, final ReportData reportData) throws RiskReportException {
+    public void createHtmlReportFiles(Gson gson, File outputDirectory, ReportData reportData) throws RiskReportException {
         try {
-            final RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
+            RiskReportResourceCopier copier = new RiskReportResourceCopier(outputDirectory.getCanonicalPath());
             File htmlFile = null;
             try {
-                final List<File> writtenFiles = copier.copy();
-                for (final File file : writtenFiles) {
+                List<File> writtenFiles = copier.copy();
+                for (File file : writtenFiles) {
                     if (file.getName().equals(RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME)) {
                         htmlFile = file;
                         break;
                     }
                 }
-            } catch (final URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new RiskReportException("Couldn't create the report: " + e.getMessage(), e);
             }
             if (htmlFile == null) {
                 throw new RiskReportException("Could not find the file : " + RiskReportResourceCopier.RISK_REPORT_HTML_FILE_NAME
-                                                      + ", the report files must not have been copied into the report directory.");
+                                                  + ", the report files must not have been copied into the report directory.");
             }
             String htmlFileString = FileUtils.readFileToString(htmlFile, "UTF-8");
-            final String reportString = gson.toJson(reportData);
+            String reportString = gson.toJson(reportData);
             htmlFileString = htmlFileString.replace(RiskReportResourceCopier.JSON_TOKEN_TO_REPLACE, reportString);
             FileUtils.writeStringToFile(htmlFile, htmlFileString, "UTF-8");
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new RiskReportException("Couldn't create the report: " + e.getMessage(), e);
         }
     }
