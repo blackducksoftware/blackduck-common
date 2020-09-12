@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.http.transform;
 
+import java.io.IOException;
+
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -29,8 +31,6 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-
-import java.io.IOException;
 
 public class BlackDuckResponseTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;
