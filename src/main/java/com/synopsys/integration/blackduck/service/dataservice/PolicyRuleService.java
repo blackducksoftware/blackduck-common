@@ -22,6 +22,9 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
@@ -37,9 +40,6 @@ import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetB
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-
-import java.util.List;
-import java.util.Optional;
 
 public class PolicyRuleService extends DataService {
     public PolicyRuleService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
