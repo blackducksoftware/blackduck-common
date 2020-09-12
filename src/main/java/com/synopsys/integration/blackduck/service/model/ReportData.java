@@ -23,8 +23,6 @@
 package com.synopsys.integration.blackduck.service.model;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -47,7 +45,7 @@ public class ReportData {
     private int licenseRiskNoneCount;
     private int operationalRiskNoneCount;
 
-    public String htmlEscape(final String valueToEscape) {
+    public String htmlEscape(String valueToEscape) {
         if (StringUtils.isBlank(valueToEscape)) {
             return null;
         }
@@ -58,7 +56,7 @@ public class ReportData {
         return projectName;
     }
 
-    public void setProjectName(final String projectName) {
+    public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
@@ -66,7 +64,7 @@ public class ReportData {
         return projectURL;
     }
 
-    public void setProjectURL(final String projectURL) {
+    public void setProjectURL(String projectURL) {
         this.projectURL = projectURL;
     }
 
@@ -74,7 +72,7 @@ public class ReportData {
         return projectVersion;
     }
 
-    public void setProjectVersion(final String projectVersion) {
+    public void setProjectVersion(String projectVersion) {
         this.projectVersion = projectVersion;
     }
 
@@ -82,7 +80,7 @@ public class ReportData {
         return projectVersionURL;
     }
 
-    public void setProjectVersionURL(final String projectVersionURL) {
+    public void setProjectVersionURL(String projectVersionURL) {
         this.projectVersionURL = projectVersionURL;
     }
 
@@ -90,7 +88,7 @@ public class ReportData {
         return phase;
     }
 
-    public void setPhase(final String phase) {
+    public void setPhase(String phase) {
         this.phase = phase;
     }
 
@@ -98,7 +96,7 @@ public class ReportData {
         return distribution;
     }
 
-    public void setDistribution(final String distribution) {
+    public void setDistribution(String distribution) {
         this.distribution = distribution;
     }
 
@@ -158,10 +156,10 @@ public class ReportData {
         return components;
     }
 
-    public void setComponents(final List<BomComponent> components) {
+    public void setComponents(List<BomComponent> components) {
         this.components = components;
 
-        for (final BomComponent component : components) {
+        for (BomComponent component : components) {
             securityRiskCounts.add(component.getSecurityRiskCounts());
             licenseRiskCounts.add(component.getLicenseRiskCounts());
             operationalRiskCounts.add(component.getOperationalRiskCounts());

@@ -26,6 +26,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -71,7 +72,7 @@ public class ScannerSplitStream extends OutputStream {
 
     private int previousCodePoint = -1;
 
-    public ScannerSplitStream(final IntLogger logger, final OutputStream outputFileStream) {
+    public ScannerSplitStream(IntLogger logger, OutputStream outputFileStream) {
         this.outputFileStream = outputFileStream;
         this.logger = logger;
     }
@@ -85,7 +86,7 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     @Override
-    public void write(final int codePoint) throws IOException {
+    public void write(int codePoint) throws IOException {
         outputFileStream.write(codePoint);
 
         if (EOF == codePoint) {
@@ -111,13 +112,13 @@ public class ScannerSplitStream extends OutputStream {
             processLine(currentLine);
             currentLine = "";
         } else {
-            final String stringAscii = new String(Character.toChars(codePoint));
+            String stringAscii = new String(Character.toChars(codePoint));
             currentLine += stringAscii;
         }
     }
 
-    private Boolean isLoggableLine(final String line) {
-        final String trimmedLine = line.trim();
+    private Boolean isLoggableLine(String line) {
+        String trimmedLine = line.trim();
         if (trimmedLine.startsWith(ERROR)) {
             return true;
         }
@@ -136,13 +137,10 @@ public class ScannerSplitStream extends OutputStream {
         if (StringUtils.containsIgnoreCase(trimmedLine, EXCEPTION)) {
             return true;
         }
-        if (StringUtils.containsIgnoreCase(trimmedLine, FINISHED)) {
-            return true;
-        }
-        return false;
+        return StringUtils.containsIgnoreCase(trimmedLine, FINISHED);
     }
 
-    private void processLine(final String line) throws UnsupportedEncodingException {
+    private void processLine(String line) throws UnsupportedEncodingException {
         if (lineBuffer.length() == 0) {
             // First log line found, put it in the buffer
             lineBuffer = line;
@@ -158,7 +156,7 @@ public class ScannerSplitStream extends OutputStream {
             // line does not contain a log level it
             // must only be a piece of a log
             // needs to be added into the buffer
-            final StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             builder.append(lineBuffer);
 
             builder.append(LINE_SEPARATOR);
@@ -168,14 +166,14 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     @Override
-    public void write(final byte[] byteArray) throws IOException {
+    public void write(byte[] byteArray) throws IOException {
         outputFileStream.write(byteArray);
 
-        final String currentLine = new String(byteArray, "UTF-8");
+        String currentLine = new String(byteArray, StandardCharsets.UTF_8);
         if (currentLine.contains(LINE_SEPARATOR)) {
-            final String[] splitLines = currentLine.split(LINE_SEPARATOR);
+            String[] splitLines = currentLine.split(LINE_SEPARATOR);
 
-            for (final String line : splitLines) {
+            for (String line : splitLines) {
                 processLine(line);
             }
         } else {
@@ -184,14 +182,14 @@ public class ScannerSplitStream extends OutputStream {
     }
 
     @Override
-    public void write(final byte[] byteArray, final int offset, final int length) throws IOException {
+    public void write(byte[] byteArray, int offset, int length) throws IOException {
         outputFileStream.write(byteArray, offset, length);
 
-        final String currentLine = new String(byteArray, offset, length, "UTF-8");
+        String currentLine = new String(byteArray, offset, length, StandardCharsets.UTF_8);
         if (currentLine.contains(LINE_SEPARATOR)) {
-            final String[] splitLines = currentLine.split(LINE_SEPARATOR);
+            String[] splitLines = currentLine.split(LINE_SEPARATOR);
 
-            for (final String line : splitLines) {
+            for (String line : splitLines) {
                 processLine(line);
             }
         } else {
@@ -221,13 +219,13 @@ public class ScannerSplitStream extends OutputStream {
         // if you do
     }
 
-    private void writeToConsole(final String line) {
-        final String trimmedLine = line.trim();
+    private void writeToConsole(String line) {
+        String trimmedLine = line.trim();
         if (trimmedLine.startsWith(DEBUG) || trimmedLine.startsWith(TRACE)) {
             // We dont want to print Debug or Trace logs to the logger
             return;
         }
-        final StringBuilder outputBuilder = new StringBuilder();
+        StringBuilder outputBuilder = new StringBuilder();
         outputBuilder.append(output);
         if (trimmedLine.startsWith(ERROR)) {
             outputBuilder.append(trimmedLine);
