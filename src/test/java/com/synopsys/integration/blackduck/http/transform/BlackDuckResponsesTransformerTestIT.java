@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -24,7 +23,7 @@ import com.synopsys.integration.rest.HttpUrl;
 class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-    private final RequestFactory requestFactory = new RequestFactory(new BlackDuckMediaTypeDiscovery());
+    private final RequestFactory requestFactory = new RequestFactory();
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }

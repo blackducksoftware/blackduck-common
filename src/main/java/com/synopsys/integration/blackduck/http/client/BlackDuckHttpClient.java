@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
+import java.util.Optional;
+
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -29,24 +36,21 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.client.AuthenticatingIntHttpClient;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import java.util.Optional;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
 public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final HttpUrl baseUrl;
-
     protected final AuthenticationSupport authenticationSupport;
+    private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
 
-    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport) {
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
 
         if (null == baseUrl) {
@@ -55,10 +59,20 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
         this.baseUrl = baseUrl;
         this.authenticationSupport = authenticationSupport;
+        this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
     }
 
     @Override
-    public Response execute(HttpUriRequest request) throws IntegrationException {
+    public Response execute(Request request) throws IntegrationException {
+        Request.Builder requestBuilder = request.createBuilder();
+        HttpUrl httpUrl = requestBuilder.getUrl();
+        String mediaType = requestBuilder.getAcceptMimeType();
+
+        String replacementMediaType = blackDuckMediaTypeDiscovery.determineMediaType(httpUrl, mediaType);
+        requestBuilder.acceptMimeType(replacementMediaType);
+
+        request = requestBuilder.build();
+
         try {
             return super.execute(request);
         } catch (IntegrationRestException e) {

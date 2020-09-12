@@ -22,7 +22,10 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
+import java.io.File;
+import java.util.Map;
+import java.util.Optional;
+
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.FileBodyContent;
@@ -30,10 +33,6 @@ import com.synopsys.integration.rest.body.MapBodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
-
-import java.io.File;
-import java.util.Map;
-import java.util.Optional;
 
 public class RequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
@@ -43,12 +42,6 @@ public class RequestFactory {
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;
-
-    private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
-
-    public RequestFactory(BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
-    }
 
     public Request createCommonGetRequest(HttpUrl url) {
         return createCommonGetRequestBuilder(url).getRequestBuilder().build();
@@ -88,49 +81,49 @@ public class RequestFactory {
 
     public BlackDuckRequestBuilder createCommonGetRequestBuilder(HttpUrl url, Optional<BlackDuckQuery> blackDuckQuery, BlackDuckRequestFilter blackDuckRequestFilter, int limit, int offset) {
         return createRequestBuilder()
-                .url(url)
-                .addBlackDuckQuery(blackDuckQuery)
-                .addBlackDuckFilter(blackDuckRequestFilter)
-                .addLimit(limit)
-                .addOffset(offset);
+                   .url(url)
+                   .addBlackDuckQuery(blackDuckQuery)
+                   .addBlackDuckFilter(blackDuckRequestFilter)
+                   .addLimit(limit)
+                   .addOffset(offset);
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {
         return createRequestBuilder()
-                .url(url)
-                .method(HttpMethod.POST)
-                .bodyContent(new FileBodyContent(bodyContentFile));
+                   .url(url)
+                   .method(HttpMethod.POST)
+                   .bodyContent(new FileBodyContent(bodyContentFile));
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, Map<String, String> bodyContentMap) {
         return createRequestBuilder()
-                .url(url)
-                .method(HttpMethod.POST)
-                .bodyContent(new MapBodyContent(bodyContentMap));
+                   .url(url)
+                   .method(HttpMethod.POST)
+                   .bodyContent(new MapBodyContent(bodyContentMap));
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
         return createRequestBuilder()
-                .url(url)
-                .method(HttpMethod.POST)
-                .bodyContent(new StringBodyContent(bodyContent));
+                   .url(url)
+                   .method(HttpMethod.POST)
+                   .bodyContent(new StringBodyContent(bodyContent));
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
         return createRequestBuilder()
-                .method(HttpMethod.POST)
-                .bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+                   .method(HttpMethod.POST)
+                   .bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
     }
 
     public BlackDuckRequestBuilder createCommonPutRequestBuilder(HttpUrl url, String bodyContent) {
         return createRequestBuilder()
-                .url(url)
-                .method(HttpMethod.PUT)
-                .bodyContent(new StringBodyContent(bodyContent));
+                   .url(url)
+                   .method(HttpMethod.PUT)
+                   .bodyContent(new StringBodyContent(bodyContent));
     }
 
     private BlackDuckRequestBuilder createRequestBuilder() {
-        return new BlackDuckRequestBuilder(blackDuckMediaTypeDiscovery, new Request.Builder());
+        return new BlackDuckRequestBuilder(new Request.Builder());
     }
 
 }

@@ -22,7 +22,6 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -288,7 +287,7 @@ public class ComprehensiveCookbookTestIT {
 
         HttpUrl baseUrl = blackDuckServicesFactory.getBlackDuckHttpClient().getBaseUrl();
         HttpUrl getUrl = baseUrl.appendRelativeUrl(pathResponses.getBlackDuckPath().getPath());
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new BlackDuckMediaTypeDiscovery(), new Request.Builder());
+        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
         requestBuilder.url(getUrl);
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
 

@@ -22,13 +22,10 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.rest.support.AuthenticationSupport;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
@@ -37,9 +34,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.credentials.Credentials;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.rest.support.AuthenticationSupport;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     public static final String SET_COOKIE = "Set-Cookie";
@@ -49,8 +51,9 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     private final Credentials credentials;
 
     public CredentialsBlackDuckHttpClient(
-            IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport);
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
 
         if (credentials == null) {
