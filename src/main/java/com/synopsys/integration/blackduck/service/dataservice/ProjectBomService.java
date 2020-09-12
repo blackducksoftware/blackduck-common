@@ -22,9 +22,20 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.*;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.VulnerableComponentView;
 import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -36,12 +47,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;

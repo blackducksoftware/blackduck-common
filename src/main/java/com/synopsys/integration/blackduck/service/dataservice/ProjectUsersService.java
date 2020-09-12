@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
@@ -37,9 +44,6 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;
@@ -115,9 +119,9 @@ public class ProjectUsersService extends DataService {
         }
 
         return users
-                .stream()
-                .filter(userView -> userView.getActive())
-                .collect(Collectors.toSet());
+                   .stream()
+                   .filter(userView -> userView.getActive())
+                   .collect(Collectors.toSet());
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {

@@ -22,6 +22,10 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -36,10 +40,6 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 public class CodeLocationService extends DataService {
     public CodeLocationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {

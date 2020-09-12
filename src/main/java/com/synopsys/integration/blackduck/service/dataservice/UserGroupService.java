@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.UserProjectsView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -35,8 +42,6 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-
-import java.util.*;
 
 public class UserGroupService extends DataService {
     public UserGroupService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {

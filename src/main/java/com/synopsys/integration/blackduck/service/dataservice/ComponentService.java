@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -41,24 +48,18 @@ import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerab
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
     public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-            .filter(notEmptyList -> notEmptyList.size() > 0)
-            .map(notEmptyList -> notEmptyList.get(0));
+                                                                                                                       .filter(notEmptyList -> notEmptyList.size() > 0)
+                                                                                                                       .map(notEmptyList -> notEmptyList.get(0));
 
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-            .filter(notEmptyList -> notEmptyList.size() == 1)
-            .map(listOfSingleElement -> listOfSingleElement.get(0));
+                                                                                                                        .filter(notEmptyList -> notEmptyList.size() == 1)
+                                                                                                                        .map(listOfSingleElement -> listOfSingleElement.get(0));
 
     public ComponentService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         super(blackDuckService, requestFactory, logger);
@@ -111,7 +112,7 @@ public class ComponentService extends DataService {
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder()
-                .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
+                                                     .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
         List<VulnerabilityView> vulnerabilityList = blackDuckService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
