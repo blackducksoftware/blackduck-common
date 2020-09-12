@@ -230,7 +230,7 @@ public class ScanCommand {
         String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
         String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
         cmd.add("-Dhttp.proxyHost=" + proxyHost);
-        cmd.add("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
+        cmd.add("-Dhttp.proxyPort=" + proxyPort);
         if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
             cmd.add("-Dhttp.proxyUser=" + proxyUsername);
             cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
