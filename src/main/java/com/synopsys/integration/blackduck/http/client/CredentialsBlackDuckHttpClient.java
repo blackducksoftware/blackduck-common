@@ -62,7 +62,7 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     }
 
     @Override
-    public final Response attemptAuthentication() throws IntegrationException {
+    public Response attemptAuthentication() throws IntegrationException {
         List<NameValuePair> bodyValues = new ArrayList<>();
         bodyValues.add(new BasicNameValuePair("j_username", credentials.getUsername().orElse(null)));
         bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword().orElse(null)));
