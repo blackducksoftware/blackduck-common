@@ -79,15 +79,18 @@ public class IntHttpClientTestHelper {
     }
 
     public BlackDuckServerConfig getBlackDuckServerConfig() {
+        return getBlackDuckServerConfigBuilder().build();
+    }
+
+    public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl(blackDuckServerUrl);
-        //        builder.setApiToken("NjliOTU0N2ItOTJkMC00YjdmLTgwNTItMjJiZmE4ZWYzNGY4OjZjNzJhNzJhLWM5ZjYtNGQyOC05YzY0LTc4MGQzYzA1MmY1MQ==");
         builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
         builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
         builder.setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
         builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
-        return builder.build();
+        return builder;
     }
 
     public HttpUrl getIntegrationBlackDuckServerUrl() throws IntegrationException {
