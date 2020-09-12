@@ -29,8 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
+
+import com.synopsys.integration.util.NameVersion;
 
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
     private final Map<String, Integer> successfulCodeLocationNamesToExpectedNotificationCounts;
@@ -38,12 +39,12 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
 
     public CodeLocationBatchOutput(List<T> outputs) {
         successfulCodeLocationNamesToExpectedNotificationCounts =
-                outputs
-                        .stream()
-                        .peek(this.outputs::add)
-                        .filter(output -> Result.SUCCESS == output.getResult())
-                        .filter(output -> StringUtils.isNotBlank(output.getCodeLocationName()))
-                        .collect(Collectors.toMap(CodeLocationOutput::getCodeLocationName, CodeLocationOutput::getExpectedNotificationCount));
+            outputs
+                .stream()
+                .peek(this.outputs::add)
+                .filter(output -> Result.SUCCESS == output.getResult())
+                .filter(output -> StringUtils.isNotBlank(output.getCodeLocationName()))
+                .collect(Collectors.toMap(CodeLocationOutput::getCodeLocationName, CodeLocationOutput::getExpectedNotificationCount));
     }
 
     public List<T> getOutputs() {
@@ -52,10 +53,10 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
 
     public NameVersion getProjectAndVersion() {
         return outputs
-                .stream()
-                .map(CodeLocationOutput::getProjectAndVersion)
-                .findFirst()
-                .get();
+                   .stream()
+                   .map(CodeLocationOutput::getProjectAndVersion)
+                   .findFirst()
+                   .get();
     }
 
     public Set<String> getSuccessfulCodeLocationNames() {
@@ -64,17 +65,17 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
 
     public int getExpectedNotificationCount() {
         return successfulCodeLocationNamesToExpectedNotificationCounts
-                       .values()
-                       .stream()
-                       .mapToInt(Integer::intValue)
-                       .sum();
+                   .values()
+                   .stream()
+                   .mapToInt(Integer::intValue)
+                   .sum();
     }
 
     public boolean hasAnyFailures() {
         return outputs
-                .stream()
-                .map(CodeLocationOutput::getResult)
-                .anyMatch(Result.FAILURE::equals);
+                   .stream()
+                   .map(CodeLocationOutput::getResult)
+                   .anyMatch(Result.FAILURE::equals);
     }
 
     @Override

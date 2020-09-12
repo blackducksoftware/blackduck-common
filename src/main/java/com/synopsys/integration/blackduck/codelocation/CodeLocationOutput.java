@@ -22,9 +22,9 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
-import com.synopsys.integration.util.NameVersion;
-
 import java.util.Optional;
+
+import com.synopsys.integration.util.NameVersion;
 
 public abstract class CodeLocationOutput {
     private final Result result;
@@ -34,7 +34,7 @@ public abstract class CodeLocationOutput {
     private final String errorMessage;
     private final Exception exception;
 
-    public CodeLocationOutput(final Result result, NameVersion projectAndVersion, final String codeLocationName, int expectedNotificationCount, final String errorMessage, final Exception exception) {
+    public CodeLocationOutput(Result result, NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, String errorMessage, Exception exception) {
         this.result = result;
         this.projectAndVersion = projectAndVersion;
         this.codeLocationName = codeLocationName;
