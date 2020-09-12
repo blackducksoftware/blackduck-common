@@ -22,6 +22,13 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
@@ -31,12 +38,6 @@ import com.synopsys.integration.builder.BuilderStatus;
 import com.synopsys.integration.builder.IntegrationBuilder;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
@@ -74,8 +75,9 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     @Override
     protected ScanBatch buildWithoutValidation() {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments, blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername,
-                blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate, projectName, projectVersionName, scanTargets);
+        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
+            blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
+            projectName, projectVersionName, scanTargets);
     }
 
     @Override

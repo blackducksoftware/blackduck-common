@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
@@ -33,14 +35,12 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 
-import java.util.Set;
-
 public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
     public SignatureScannerService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger,
-                                   ScanBatchRunner scanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        ScanBatchRunner scanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckService, requestFactory, logger);
         this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
@@ -70,7 +70,8 @@ public class SignatureScannerService extends DataService {
         return performSignatureScanAndWait(scanRequest, timeoutInSeconds);
     }
 
-    public CodeLocationWaitResult waitForSignatureScan(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public CodeLocationWaitResult waitForSignatureScan(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames,
+        int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 
