@@ -54,7 +54,6 @@ public class BlackDuckHttpClientTestIT {
     private BlackDuckService blackDuckService = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
 
     public BlackDuckHttpClientTestIT() throws IntegrationException {
-
     }
 
     @Test
