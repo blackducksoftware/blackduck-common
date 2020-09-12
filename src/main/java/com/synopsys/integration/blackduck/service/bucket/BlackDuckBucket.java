@@ -22,13 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service.bucket;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 
 public class BlackDuckBucket {
     private final Map<String, BlackDuckBucketItem<BlackDuckResponse>> bucket = new ConcurrentHashMap<>();
@@ -90,10 +90,10 @@ public class BlackDuckBucket {
 
     public boolean hasAnyErrors() {
         return bucket.values()
-                .stream()
-                .filter(BlackDuckBucketItem::hasException)
-                .findFirst()
-                .isPresent();
+                   .stream()
+                   .filter(BlackDuckBucketItem::hasException)
+                   .findFirst()
+                   .isPresent();
     }
 
     public BlackDuckBucketItem<BlackDuckResponse> remove(String uri) {
