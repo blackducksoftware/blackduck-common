@@ -22,6 +22,14 @@
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
@@ -38,9 +46,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJobTask;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class CodeLocationWaitJobTask implements WaitJobTask {
     private final IntLogger logger;
     private final BlackDuckService blackDuckService;
@@ -55,7 +60,8 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
 
     private final Set<String> foundCodeLocationNames = new HashSet<>();
 
-    public CodeLocationWaitJobTask(IntLogger logger, BlackDuckService blackDuckService, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount) {
+    public CodeLocationWaitJobTask(IntLogger logger, BlackDuckService blackDuckService, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
+        NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         this.projectService = projectService;
@@ -115,20 +121,20 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
     private Map<String, String> retrieveCodeLocations(ProjectVersionView projectVersionView) throws IntegrationException {
         List<CodeLocationView> codeLocationViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         return codeLocationViews
-                .stream()
-                .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))
-                .collect(Collectors.toMap(codeLocationView -> codeLocationView.getHref().string(), CodeLocationView::getName));
+                   .stream()
+                   .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))
+                   .collect(Collectors.toMap(codeLocationView -> codeLocationView.getHref().string(), CodeLocationView::getName));
     }
 
     private List<VersionBomCodeLocationBomComputedNotificationUserView> getFilteredNotificationUserViews(UserView userView, NotificationTaskRange notificationTaskRange) throws IntegrationException {
         List<NotificationUserView> notifications = notificationService
-                .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                        Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+                                                       .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
+                                                           Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
 
         List<VersionBomCodeLocationBomComputedNotificationUserView> filteredNotifications = notifications
-                .stream()
-                .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                .collect(Collectors.toList());
+                                                                                                .stream()
+                                                                                                .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
+                                                                                                .collect(Collectors.toList());
 
         return filteredNotifications;
     }
