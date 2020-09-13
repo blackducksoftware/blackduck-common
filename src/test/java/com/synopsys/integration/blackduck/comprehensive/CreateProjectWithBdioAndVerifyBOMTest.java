@@ -1,5 +1,21 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.File;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -26,17 +42,6 @@ import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobTask;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.io.File;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -53,16 +58,16 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
     private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
 
-    public static final String[] CODE_LOCATION_NAMES = new String[]{
-            "blackduck-alert/6.1.0-SNAPSHOT/alert-common/blackduck-alert/alert-common/6.1.0-SNAPSHOT gradle/bom"
-            , "blackduck-alert/6.1.0-SNAPSHOT/alert-database/blackduck-alert/alert-database/6.1.0-SNAPSHOT gradle/bom"
-            , "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
+    public static final String[] CODE_LOCATION_NAMES = new String[] {
+        "blackduck-alert/6.1.0-SNAPSHOT/alert-common/blackduck-alert/alert-common/6.1.0-SNAPSHOT gradle/bom"
+        , "blackduck-alert/6.1.0-SNAPSHOT/alert-database/blackduck-alert/alert-database/6.1.0-SNAPSHOT gradle/bom"
+        , "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
     };
 
-    public static final String[] BDIO_FILE_NAMES = new String[]{
-            "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_common_blackduck_alert_alert_common_6_1_0_SNAPSHOT_gradle_bom.jsonld"
-            , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_database_blackduck_alert_alert_database_6_1_0_SNAPSHOT_gradle_bom.jsonld"
-            , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_synopsys_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
+    public static final String[] BDIO_FILE_NAMES = new String[] {
+        "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_common_blackduck_alert_alert_common_6_1_0_SNAPSHOT_gradle_bom.jsonld"
+        , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_database_blackduck_alert_alert_database_6_1_0_SNAPSHOT_gradle_bom.jsonld"
+        , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_synopsys_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
     };
 
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
@@ -115,10 +120,10 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
         List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         Set<String> expectedCodeLocationUrls = codeLocationViews
-                .stream()
-                .map(CodeLocationView::getHref)
-                .map(HttpUrl::string)
-                .collect(Collectors.toSet());
+                                                   .stream()
+                                                   .map(CodeLocationView::getHref)
+                                                   .map(HttpUrl::string)
+                                                   .collect(Collectors.toSet());
 
         boolean foundAllCodeLocationUrls = waitForNotifications(startDate, endDate, expectedCodeLocationUrls);
         assertTrue(foundAllCodeLocationUrls);
@@ -134,9 +139,9 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         WaitJobTask findAllCodeLocationNames = () -> {
             List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getSomeMatchingResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, nameInSet, expectedCodeLocationNames.size());
             Set<String> foundCodeLocationNames = codeLocationViews
-                    .stream()
-                    .map(CodeLocationView::getName)
-                    .collect(Collectors.toSet());
+                                                     .stream()
+                                                     .map(CodeLocationView::getName)
+                                                     .collect(Collectors.toSet());
 
             printOutCodeLocations(codeLocationViews);
 
@@ -148,21 +153,22 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private void printOutCodeLocations(List<CodeLocationView> codeLocationViews) {
         System.out.println("found code location names:");
         codeLocationViews
-                .stream()
-                .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref()))
-                .sorted()
-                .forEach(System.out::println);
+            .stream()
+            .map(codeLocationView -> String.format("%s (%s)", codeLocationView.getName(), codeLocationView.getHref()))
+            .sorted()
+            .forEach(System.out::println);
     }
 
     private boolean waitForNotifications(Date userStartDate, Date endDate, Set<String> expectedCodeLocationUrls) throws InterruptedException, IntegrationException {
         WaitJobTask findNotificationsForAllCodeLocationUrls = () -> {
-            List<NotificationUserView> filteredUserNotifications = blackDuckServices.notificationService.getFilteredUserNotifications(currentUser, userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+            List<NotificationUserView> filteredUserNotifications = blackDuckServices.notificationService
+                                                                       .getFilteredUserNotifications(currentUser, userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
             Set<String> foundCodeLocationUrls = filteredUserNotifications
-                    .stream()
-                    .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                    .map(VersionBomCodeLocationBomComputedNotificationUserView::getContent)
-                    .map(VersionBomCodeLocationBomComputedNotificationContent::getCodeLocation)
-                    .collect(Collectors.toSet());
+                                                    .stream()
+                                                    .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
+                                                    .map(VersionBomCodeLocationBomComputedNotificationUserView::getContent)
+                                                    .map(VersionBomCodeLocationBomComputedNotificationContent::getCodeLocation)
+                                                    .collect(Collectors.toSet());
             System.out.println("found code location urls:");
             foundCodeLocationUrls.forEach(System.out::println);
 
@@ -178,9 +184,9 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private Set<String> getCodeLocationNames(UploadBatch uploadBatch) {
         return uploadBatch.getUploadTargets()
-                .stream()
-                .map(UploadTarget::getCodeLocationName)
-                .collect(Collectors.toSet());
+                   .stream()
+                   .map(UploadTarget::getCodeLocationName)
+                   .collect(Collectors.toSet());
     }
 
 }
