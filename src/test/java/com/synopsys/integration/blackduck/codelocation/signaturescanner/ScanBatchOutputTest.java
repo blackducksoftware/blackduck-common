@@ -1,13 +1,6 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
-import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NameVersion;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,7 +8,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.SilentIntLogger;
+import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NameVersion;
 
 public class ScanBatchOutputTest {
     @Test
@@ -90,7 +95,7 @@ public class ScanBatchOutputTest {
     }
 
     private String[] extractCodeLocationNames(ScanBatchBuilder scanBatchBuilder) {
-        return new String[]{scanBatchBuilder.getScanTargets().get(0).getCodeLocationName(), scanBatchBuilder.getScanTargets().get(1).getCodeLocationName(), scanBatchBuilder.getScanTargets().get(2).getCodeLocationName()};
+        return new String[] { scanBatchBuilder.getScanTargets().get(0).getCodeLocationName(), scanBatchBuilder.getScanTargets().get(1).getCodeLocationName(), scanBatchBuilder.getScanTargets().get(2).getCodeLocationName() };
     }
 
 }
