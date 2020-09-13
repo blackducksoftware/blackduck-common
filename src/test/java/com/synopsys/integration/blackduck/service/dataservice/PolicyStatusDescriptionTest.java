@@ -1,5 +1,12 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
@@ -7,12 +14,6 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatus
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(TimingExtension.class)
 public class PolicyStatusDescriptionTest {
@@ -44,7 +45,9 @@ public class PolicyStatusDescriptionTest {
         ProjectVersionPolicyStatusView policyStatusItem = createProjectVersionPolicyStatusView();
         PolicyStatusDescription policyStatusDescription = new PolicyStatusDescription(policyStatusItem);
         String message = policyStatusDescription.getPolicyStatusMessage();
-        Assertions.assertEquals("Black Duck found: 4 components in violation (Policy Severity counts: 1 match has a severity level of TRIVIAL, 3 matches have a severity level of BLOCKER), 0 components in violation, but overridden, and 1 component not in violation.", message);
+        Assertions.assertEquals(
+            "Black Duck found: 4 components in violation (Policy Severity counts: 1 match has a severity level of TRIVIAL, 3 matches have a severity level of BLOCKER), 0 components in violation, but overridden, and 1 component not in violation.",
+            message);
         Assertions.assertNotNull(message);
     }
 
