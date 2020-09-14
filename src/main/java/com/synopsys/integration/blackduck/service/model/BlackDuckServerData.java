@@ -22,9 +22,9 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.rest.HttpUrl;
-
 import java.util.Optional;
+
+import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckServerData {
     private final HttpUrl url;

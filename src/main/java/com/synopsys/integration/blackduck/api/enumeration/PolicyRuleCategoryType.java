@@ -24,5 +24,5 @@ package com.synopsys.integration.blackduck.api.enumeration;
 
 public enum PolicyRuleCategoryType {
     PROJECT,
-    COMPONENT;
+    COMPONENT
 }

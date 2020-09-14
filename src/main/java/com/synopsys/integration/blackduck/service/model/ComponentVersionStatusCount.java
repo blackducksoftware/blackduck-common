@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
 import com.synopsys.integration.util.Stringable;
 
 public class ComponentVersionStatusCount extends Stringable {
@@ -39,15 +39,15 @@ public class ComponentVersionStatusCount extends Stringable {
     public ComponentVersionStatusCount() {
     }
 
-    public ComponentVersionStatusCount(final NameValuePairView nameValuePair) {
-        final Set<PolicyStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusType.class);
-        final Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
+    public ComponentVersionStatusCount(NameValuePairView nameValuePair) {
+        Set<PolicyStatusType> policyStatusTypes = EnumSet.allOf(PolicyStatusType.class);
+        Set<String> policyStatusTypeValues = policyStatusTypes.stream().map(Object::toString).collect(Collectors.toSet());
         if (policyStatusTypeValues.contains(nameValuePair.getName())) {
             name = PolicyStatusType.valueOf(nameValuePair.getName());
         }
 
         if (nameValuePair.getValue() != null) {
-            final String valueString = nameValuePair.getValue().toString();
+            String valueString = nameValuePair.getValue().toString();
             if (NumberUtils.isCreatable(valueString)) {
                 value = NumberUtils.createNumber(valueString).intValue();
             }

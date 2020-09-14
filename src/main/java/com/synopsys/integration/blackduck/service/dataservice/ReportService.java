@@ -22,13 +22,30 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
-import com.synopsys.integration.blackduck.api.generated.view.*;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
+import com.synopsys.integration.blackduck.api.generated.view.PolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
@@ -48,17 +65,6 @@ import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-
-import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ReportService extends DataService {
     public final static long DEFAULT_TIMEOUT = 1000L * 60 * 5;
@@ -73,7 +79,8 @@ public class ReportService extends DataService {
         this(gson, blackDuckBaseUrl, blackDuckService, requestFactory, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
     }
 
-    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
+    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ProjectService projectDataService,
+        IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
         super(blackDuckService, requestFactory, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;

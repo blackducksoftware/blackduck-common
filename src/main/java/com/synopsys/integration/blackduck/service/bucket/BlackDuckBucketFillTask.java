@@ -22,12 +22,12 @@
  */
 package com.synopsys.integration.blackduck.service.bucket;
 
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
-
-import java.util.Optional;
-import java.util.concurrent.Callable;
 
 public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Callable<Optional<T>> {
     private final BlackDuckService blackDuckService;

@@ -22,6 +22,10 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleComponentUsageValueSetType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionType;
@@ -40,10 +44,6 @@ import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumera
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
@@ -96,7 +96,8 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_PHASE, projectVersionPhaseTypes);
     }
 
-    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType> LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes) throws BlackDuckIntegrationException {
+    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType> LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes)
+        throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes);
     }
 

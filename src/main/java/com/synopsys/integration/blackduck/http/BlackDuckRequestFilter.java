@@ -22,7 +22,12 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Some requests to Black Duck can be filtered. There can be one more more filter keys each with one or more values.

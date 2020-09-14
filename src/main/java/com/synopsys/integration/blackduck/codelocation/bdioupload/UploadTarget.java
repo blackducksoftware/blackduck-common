@@ -24,8 +24,9 @@ package com.synopsys.integration.blackduck.codelocation.bdioupload;
 
 import java.io.File;
 
-import com.synopsys.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
+
+import com.synopsys.integration.util.NameVersion;
 
 public class UploadTarget {
     private final NameVersion projectAndVersion;
@@ -33,15 +34,15 @@ public class UploadTarget {
     private final File uploadFile;
     private final String mediaType;
 
-    public static UploadTarget createDefault(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile) {
+    public static UploadTarget createDefault(NameVersion projectAndVersion, String codeLocationName, File uploadFile) {
         return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, "application/ld+json");
     }
 
-    public static UploadTarget createWithMediaType(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile, final String mediaType) {
+    public static UploadTarget createWithMediaType(NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) {
         return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, mediaType);
     }
 
-    private UploadTarget(final NameVersion projectAndVersion, final String codeLocationName, final File uploadFile, final String mediaType) throws IllegalArgumentException {
+    private UploadTarget(NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) throws IllegalArgumentException {
         if (StringUtils.isAnyBlank(projectAndVersion.getName(), projectAndVersion.getVersion())) {
             throw new IllegalArgumentException("An UploadTarget must have a non-blank project and version.");
         }
