@@ -1,12 +1,13 @@
 package com.synopsys.integration.blackduck.util;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.service.model.ProjectNameVersionGuess;
-import com.synopsys.integration.blackduck.service.model.ProjectNameVersionGuesser;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.service.model.ProjectNameVersionGuess;
+import com.synopsys.integration.blackduck.service.model.ProjectNameVersionGuesser;
 
 @ExtendWith(TimingExtension.class)
 public class ProjectNameVersionGuesserTest {

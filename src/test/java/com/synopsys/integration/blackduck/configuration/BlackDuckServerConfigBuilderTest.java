@@ -1,11 +1,11 @@
 package com.synopsys.integration.blackduck.configuration;
 
-import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.credentials.CredentialsBuilder;
-import com.synopsys.integration.util.NoThreadExecutorService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -13,7 +13,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.rest.credentials.Credentials;
+import com.synopsys.integration.rest.credentials.CredentialsBuilder;
+import com.synopsys.integration.util.NoThreadExecutorService;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServerConfigBuilderTest {

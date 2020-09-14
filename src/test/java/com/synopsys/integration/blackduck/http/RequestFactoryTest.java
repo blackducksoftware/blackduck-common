@@ -19,7 +19,7 @@ import com.synopsys.integration.rest.request.Request;
 public class RequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() throws IntegrationException {
-        BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList(new String[] { "value1", "value2" }));
+        BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList("value1", "value2"));
         RequestFactory requestFactory = new RequestFactory();
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();

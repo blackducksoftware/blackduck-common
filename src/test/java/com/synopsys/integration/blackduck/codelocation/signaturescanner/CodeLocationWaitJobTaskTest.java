@@ -1,5 +1,19 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -19,14 +33,6 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CodeLocationWaitJobTaskTest {
     public static final String CODE_LOCATION_URL = "http://www.disney.com";
@@ -67,7 +73,8 @@ public class CodeLocationWaitJobTaskTest {
 
         Mockito.when(mockBlackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
 
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()))).thenReturn(getExpectedNotifications());
+        Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name())))
+            .thenReturn(getExpectedNotifications());
 
         assertTrue(codeLocationWaitJobTask.isComplete());
     }

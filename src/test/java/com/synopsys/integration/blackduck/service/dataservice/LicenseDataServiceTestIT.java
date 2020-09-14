@@ -1,5 +1,16 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
@@ -8,14 +19,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicen
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
