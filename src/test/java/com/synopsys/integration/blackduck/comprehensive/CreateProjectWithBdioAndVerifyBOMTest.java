@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,6 +75,31 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
     }
 
+    @BeforeEach
+    public void setUp() throws IntegrationException {
+        cleanBlackDuckTestElements();
+    }
+
+    @AfterEach
+    public void tearDown() throws IntegrationException {
+        cleanBlackDuckTestElements();
+    }
+
+    private void cleanBlackDuckTestElements() throws IntegrationException {
+        Optional<ProjectView> projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
+        if (projectView.isPresent()) {
+            blackDuckServices.blackDuckService.delete(projectView.get());
+        }
+
+        for (String codeLocationName : CODE_LOCATION_NAMES) {
+            Optional<CodeLocationView> codeLocationByName = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+
+            if (codeLocationByName.isPresent()) {
+                blackDuckServices.blackDuckService.delete(codeLocationByName.get());
+            }
+        }
+    }
+
     @Test
     public void testCreatingProject() throws IntegrationException, InterruptedException {
         UploadBatch uploadBatch = new UploadBatch();
@@ -85,15 +112,6 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[2], BDIO_FILE_NAMES[2]));
         expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
-
-        ProjectView projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME).get();
-        blackDuckServices.blackDuckService.delete(projectView);
-
-        for (String codeLocationName : CODE_LOCATION_NAMES) {
-            CodeLocationView codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).get();
-            blackDuckServices.blackDuckService.delete(codeLocationView);
-        }
-
     }
 
     private void uploadAndVerifyBdio(UploadBatch uploadBatch, Set<String> expectedCodeLocationNames) throws IntegrationException, InterruptedException {
@@ -110,13 +128,13 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private void assertCodeLocationsAddedToBOM(Set<String> expectedCodeLocationNames, Date startDate, Date endDate) throws InterruptedException, IntegrationException {
         boolean foundProject = waitForProject();
-        assertTrue(foundProject);
+        assertTrue(foundProject, "Project was not found");
 
         Optional<ProjectVersionWrapper> projectVersionWrapperOptional = blackDuckServices.projectService.getProjectVersion(PROJECT_NAME, PROJECT_VERSION_NAME);
         ProjectVersionView projectVersionView = projectVersionWrapperOptional.get().getProjectVersionView();
 
         boolean foundAllCodeLocations = waitForCodeLocations(expectedCodeLocationNames, projectVersionView);
-        assertTrue(foundAllCodeLocations);
+        assertTrue(foundAllCodeLocations, "All code locations were not found");
 
         List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         Set<String> expectedCodeLocationUrls = codeLocationViews
@@ -126,7 +144,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
                                                    .collect(Collectors.toSet());
 
         boolean foundAllCodeLocationUrls = waitForNotifications(startDate, endDate, expectedCodeLocationUrls);
-        assertTrue(foundAllCodeLocationUrls);
+        assertTrue(foundAllCodeLocationUrls, "All code location urls were not found");
     }
 
     private boolean waitForProject() throws InterruptedException, IntegrationException {
