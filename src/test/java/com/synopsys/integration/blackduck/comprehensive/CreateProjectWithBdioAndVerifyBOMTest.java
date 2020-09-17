@@ -33,6 +33,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -55,22 +56,23 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     public static final int TEN_MINUTES = FIVE_MINUTES * 2;
     public static final int THIRTY_SECONDS = 30;
 
-    private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
-    private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
-    private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-    private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
-
-    public static final String[] CODE_LOCATION_NAMES = new String[] {
+    public static final List<String> CODE_LOCATION_NAMES = Arrays.asList(
         "blackduck-alert/6.1.0-SNAPSHOT/alert-common/blackduck-alert/alert-common/6.1.0-SNAPSHOT gradle/bom"
         , "blackduck-alert/6.1.0-SNAPSHOT/alert-database/blackduck-alert/alert-database/6.1.0-SNAPSHOT gradle/bom"
         , "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
-    };
+    );
 
     public static final String[] BDIO_FILE_NAMES = new String[] {
         "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_common_blackduck_alert_alert_common_6_1_0_SNAPSHOT_gradle_bom.jsonld"
         , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_database_blackduck_alert_alert_database_6_1_0_SNAPSHOT_gradle_bom.jsonld"
         , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_synopsys_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
     };
+
+    private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+    private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
+    private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+    private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
+    private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
 
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
     }
@@ -91,25 +93,22 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
             blackDuckServices.blackDuckService.delete(projectView.get());
         }
 
-        for (String codeLocationName : CODE_LOCATION_NAMES) {
-            Optional<CodeLocationView> codeLocationByName = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-
-            if (codeLocationByName.isPresent()) {
-                blackDuckServices.blackDuckService.delete(codeLocationByName.get());
-            }
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, shouldDeleteCodeLocation, CODE_LOCATION_NAMES.size());
+        for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
+            blackDuckServices.blackDuckService.delete(codeLocationToDelete);
         }
     }
 
     @Test
     public void testCreatingProject() throws IntegrationException, InterruptedException {
         UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[0], BDIO_FILE_NAMES[0]));
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[1], BDIO_FILE_NAMES[1]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(0), BDIO_FILE_NAMES[0]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(1), BDIO_FILE_NAMES[1]));
         Set<String> expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
 
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
 
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[2], BDIO_FILE_NAMES[2]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(2), BDIO_FILE_NAMES[2]));
         expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
     }
