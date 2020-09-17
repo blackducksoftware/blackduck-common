@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -35,71 +36,110 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class CodeLocationServiceTestIT {
 
+    private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTestDANA";
+    private static final String CODE_LOCATION_NAME = BASE_ELEMENT_NAME + "__CodeLocation";
+    private static final String PROJECT_NAME = BASE_ELEMENT_NAME + "__ProjectName";
+    private static final String COMPONENT_NAME = BASE_ELEMENT_NAME + "__ComponentName";
+    private static final String VERSION = "3.13.39";
+    private static final String GROUP = "com.blackducksoftware.integration";
+
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+    private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
+    private final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
+    private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
+
+    public CodeLocationServiceTestIT() throws IntegrationException {}
 
     @Test
-    public void testCodeLocationByName() throws IOException, IntegrationException {
-        String codeLocationName = "CodeLocationByNameTest";
-        String projectName = "CodeLocationByNameTest_Project";
-        String componentName = "CodeLocationByNameTest_Component";
-        String version = "3.13.39";
-        String group = "com.blackducksoftware.integration";
+    public void testSingleCodeLocationByName() throws IntegrationException, IOException {
+        uploadAndVerifyBdio(1, 1);
+    }
 
-        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
-        SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
-        MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
+    @Test
+    public void testPagingCodeLocationByName() throws IntegrationException, IOException {
+        uploadAndVerifyBdio(101, 101);
+    }
 
-        File bdioFile = File.createTempFile("bdio", "jsonld");
-        bdioFile.deleteOnExit();
+    private void uploadAndVerifyBdio(Integer numberOfCodeLocations, Integer codeLocationToTest) throws IntegrationException, IOException {
+        String[] codeLocationNames = populateCodeLocationNames(numberOfCodeLocations);
+        String codeLocationToValidate = codeLocationNames[codeLocationToTest - 1];
 
         // Pre-clean test data
-        deleteProjectByName(blackDuckServices, projectName);
-        deleteCodeLocationByName(blackDuckServices, codeLocationName);
+        deleteCodeLocationByName(blackDuckServices, codeLocationNames);
+        deleteProjectByName(blackDuckServices);
 
         // Verify code location does not exist
-        assertEquals(Optional.empty(), blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName), "Confirm code location does not exist failed");
+        assertEquals(Optional.empty(), blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate), String.format("Code location %s should not exist", codeLocationToValidate));
 
-        // Create data and upload
-        Dependency bdioTestDependency = simpleBdioFactory.createDependency(componentName, version, simpleBdioFactory.getExternalIdFactory().createMavenExternalId(group, componentName, version));
-        mutableDependencyGraph.addChildrenToRoot(bdioTestDependency);
+        try {
+            createAndUploadSimpleBdioObject(codeLocationNames);
 
-        SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, projectName, version, simpleBdioFactory.createMavenExternalId(group, projectName, version), mutableDependencyGraph);
-        simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
+            // Verify code location now exists
+            assertTrue(blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).isPresent(), "Code location is empty after uploading.");
+            assertEquals(codeLocationToValidate, blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).get().getName(), String.format("Code location %s should exist", codeLocationToValidate));
+        } finally {
+            // Post-clean test data
+            deleteCodeLocationByName(blackDuckServices, codeLocationNames);
+            deleteProjectByName(blackDuckServices);
+        }
+    }
 
-        UploadBatch uploadBatch = new UploadBatch(UploadTarget.createDefault(new NameVersion(projectName, version), codeLocationName, bdioFile));
+    private String[] populateCodeLocationNames(Integer numberOfCodeLocations) {
+        String[] codeLocations = new String[numberOfCodeLocations];
+
+        IntStream.range(0, numberOfCodeLocations).forEach(num -> {
+                codeLocations[num] = CODE_LOCATION_NAME + num;
+            }
+        );
+
+        return codeLocations;
+    }
+
+    private void createAndUploadSimpleBdioObject(String[] codeLocationNames) throws IOException, IntegrationException {
+        UploadBatch uploadBatch = new UploadBatch();
+        File bdioFile;
+        Dependency bdioTestDependency;
+        SimpleBdioDocument simpleBdioDocument;
+
+        for (String codeLocationName : codeLocationNames) {
+            bdioFile = File.createTempFile("bdio", "jsonld");
+            bdioFile.deleteOnExit();
+
+            bdioTestDependency = simpleBdioFactory.createDependency(COMPONENT_NAME, VERSION, simpleBdioFactory.getExternalIdFactory().createMavenExternalId(GROUP, COMPONENT_NAME, VERSION));
+            mutableDependencyGraph.addChildrenToRoot(bdioTestDependency);
+
+            simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, simpleBdioFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
+            simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
+
+            uploadBatch.addUploadTarget(UploadTarget.createDefault(new NameVersion(PROJECT_NAME, VERSION), codeLocationName, bdioFile));
+        }
 
         BdioUploadService bdioUploadService = blackDuckServices.blackDuckServicesFactory.createBdioUploadService();
         BdioUploadCodeLocationCreationRequest uploadRequest = bdioUploadService.createUploadRequest(uploadBatch);
 
         UploadBatchOutput uploadBatchOutput = bdioUploadService.uploadBdio(uploadRequest).getOutput();
         for (UploadOutput uploadOutput : uploadBatchOutput) {
-            assertEquals(Result.SUCCESS, uploadOutput.getResult());
+            assertEquals(Result.SUCCESS, uploadOutput.getResult(), String.format("Upload result for %s was not successful", uploadOutput.getCodeLocationName()));
         }
-
-        // Verify code location now exists
-        assertTrue(blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).isPresent(), "Code location is empty after uploading.");
-        assertEquals(codeLocationName, blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).get().getName(), "Confirm code location does exist failed");
-
-        // Post-clean test data
-        deleteProjectByName(blackDuckServices, projectName);
-        deleteCodeLocationByName(blackDuckServices, codeLocationName);
     }
 
-    private void deleteProjectByName(BlackDuckServices blackDuckServices, String projectName) throws IntegrationException {
-        Optional<ProjectView> projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(projectName);
+    private void deleteProjectByName(BlackDuckServices blackDuckServices) throws IntegrationException {
+        Optional<ProjectView> projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
         if (projectThatShouldNotExist.isPresent()) {
             blackDuckServices.blackDuckService.delete(projectThatShouldNotExist.get());
-            projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(projectName);
+            projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
             assertFalse(projectThatShouldNotExist.isPresent(), "Project was not successfully deleted.");
         }
     }
 
-    private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, String codeLocationName) throws IntegrationException {
-        Optional<CodeLocationView> codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-        if (codeLocationView.isPresent()) {
-            blackDuckServices.blackDuckService.delete(codeLocationView.get());
-            codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-            assertFalse(codeLocationView.isPresent(), "CodeLocation was not successfully deleted.");
+    private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, String[] codeLocationNames) throws IntegrationException {
+        for (String codeLocationName : codeLocationNames) {
+            Optional<CodeLocationView> codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+            if (codeLocationView.isPresent()) {
+                blackDuckServices.blackDuckService.delete(codeLocationView.get());
+                codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+                assertFalse(codeLocationView.isPresent(), "CodeLocation was not successfully deleted.");
+            }
         }
     }
 
