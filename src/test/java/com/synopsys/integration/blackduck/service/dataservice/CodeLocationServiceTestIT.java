@@ -6,7 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Tag;
@@ -18,6 +22,7 @@ import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
 import com.synopsys.integration.bdio.model.SimpleBdioDocument;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.codelocation.Result;
@@ -28,6 +33,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOut
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.util.NameVersion;
@@ -35,7 +41,6 @@ import com.synopsys.integration.util.NameVersion;
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class CodeLocationServiceTestIT {
-
     private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTestDANA";
     private static final String CODE_LOCATION_NAME = BASE_ELEMENT_NAME + "__CodeLocation";
     private static final String PROJECT_NAME = BASE_ELEMENT_NAME + "__ProjectName";
@@ -52,17 +57,17 @@ public class CodeLocationServiceTestIT {
 
     @Test
     public void testSingleCodeLocationByName() throws IntegrationException, IOException {
-        uploadAndVerifyBdio(1, 1);
+        uploadAndVerifyCodeLocation(1, 1);
     }
 
     @Test
     public void testPagingCodeLocationByName() throws IntegrationException, IOException {
-        uploadAndVerifyBdio(101, 101);
+        uploadAndVerifyCodeLocation(101, 101);
     }
 
-    private void uploadAndVerifyBdio(Integer numberOfCodeLocations, Integer codeLocationToTest) throws IntegrationException, IOException {
-        String[] codeLocationNames = populateCodeLocationNames(numberOfCodeLocations);
-        String codeLocationToValidate = codeLocationNames[codeLocationToTest - 1];
+    private void uploadAndVerifyCodeLocation(Integer numberOfCodeLocations, Integer codeLocationToTest) throws IntegrationException, IOException {
+        List<String> codeLocationNames = populateCodeLocationNames(numberOfCodeLocations);
+        String codeLocationToValidate = codeLocationNames.get(codeLocationToTest - 1);
 
         // Pre-clean test data
         deleteCodeLocationByName(blackDuckServices, codeLocationNames);
@@ -84,31 +89,25 @@ public class CodeLocationServiceTestIT {
         }
     }
 
-    private String[] populateCodeLocationNames(Integer numberOfCodeLocations) {
-        String[] codeLocations = new String[numberOfCodeLocations];
-
-        IntStream.range(0, numberOfCodeLocations).forEach(num -> {
-                codeLocations[num] = CODE_LOCATION_NAME + num;
-            }
-        );
-
-        return codeLocations;
+    private List<String> populateCodeLocationNames(int numberOfCodeLocations) {
+        return IntStream
+            .range(0, numberOfCodeLocations)
+            .boxed()
+            .map(i -> CODE_LOCATION_NAME + i)
+            .collect(Collectors.toList());
     }
 
-    private void createAndUploadSimpleBdioObject(String[] codeLocationNames) throws IOException, IntegrationException {
+    private void createAndUploadSimpleBdioObject(List<String> codeLocationNames) throws IOException, IntegrationException {
         UploadBatch uploadBatch = new UploadBatch();
-        File bdioFile;
-        Dependency bdioTestDependency;
-        SimpleBdioDocument simpleBdioDocument;
 
         for (String codeLocationName : codeLocationNames) {
-            bdioFile = File.createTempFile("bdio", "jsonld");
+            File bdioFile = File.createTempFile("bdio", "jsonld");
             bdioFile.deleteOnExit();
 
-            bdioTestDependency = simpleBdioFactory.createDependency(COMPONENT_NAME, VERSION, simpleBdioFactory.getExternalIdFactory().createMavenExternalId(GROUP, COMPONENT_NAME, VERSION));
+            Dependency bdioTestDependency = simpleBdioFactory.createDependency(COMPONENT_NAME, VERSION, simpleBdioFactory.getExternalIdFactory().createMavenExternalId(GROUP, COMPONENT_NAME, VERSION));
             mutableDependencyGraph.addChildrenToRoot(bdioTestDependency);
 
-            simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, simpleBdioFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
+            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, simpleBdioFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
             simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
 
             uploadBatch.addUploadTarget(UploadTarget.createDefault(new NameVersion(PROJECT_NAME, VERSION), codeLocationName, bdioFile));
@@ -127,19 +126,15 @@ public class CodeLocationServiceTestIT {
         Optional<ProjectView> projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
         if (projectThatShouldNotExist.isPresent()) {
             blackDuckServices.blackDuckService.delete(projectThatShouldNotExist.get());
-            projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
-            assertFalse(projectThatShouldNotExist.isPresent(), "Project was not successfully deleted.");
         }
     }
 
-    private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, String[] codeLocationNames) throws IntegrationException {
-        for (String codeLocationName : codeLocationNames) {
-            Optional<CodeLocationView> codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-            if (codeLocationView.isPresent()) {
-                blackDuckServices.blackDuckService.delete(codeLocationView.get());
-                codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-                assertFalse(codeLocationView.isPresent(), "CodeLocation was not successfully deleted.");
-            }
+    private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, List<String> codeLocationNames) throws IntegrationException {
+        Predicate<CodeLocationView> toDelete = (codeLocationView -> codeLocationNames.contains(codeLocationView.getName()));
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, toDelete, codeLocationNames.size());
+
+        for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
+            blackDuckServices.blackDuckService.delete(codeLocationToDelete);
         }
     }
 
