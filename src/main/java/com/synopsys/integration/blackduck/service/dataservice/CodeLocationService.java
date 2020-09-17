@@ -24,6 +24,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,9 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class CodeLocationService extends DataService {
+    // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
+    public static final Function<String, Predicate<CodeLocationView>> NAME_MATCHER = (codeLocationName) -> (codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
+
     public CodeLocationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         super(blackDuckService, requestFactory, logger);
     }
@@ -86,8 +90,7 @@ public class CodeLocationService extends DataService {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
-        // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
-        Predicate<CodeLocationView> predicate = codeLocationView -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
+        Predicate<CodeLocationView> predicate = NAME_MATCHER.apply(codeLocationName);
 
         return blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
                    .stream()
