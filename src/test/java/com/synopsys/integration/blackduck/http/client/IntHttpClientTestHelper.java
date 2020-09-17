@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,8 +86,14 @@ public class IntHttpClientTestHelper {
     public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl(blackDuckServerUrl);
-        builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
-        builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
+        String apiToken = getProperty(TestingPropertyKey.TEST_API_TOKEN);
+        if (StringUtils.isNotBlank(apiToken)) {
+            builder.setApiToken(apiToken);
+        } else {
+            builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
+            builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
+        }
+
         builder.setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
         builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 

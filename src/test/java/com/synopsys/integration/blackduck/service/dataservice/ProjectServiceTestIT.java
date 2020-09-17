@@ -38,6 +38,10 @@ import com.synopsys.integration.rest.RestConstants;
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class ProjectServiceTestIT {
+    public static final String JAPANESE_PROJECT_NAME = "日本のプロジェクト名";
+    public static final String JAPANESE_VERSION_NAME = "日本語版名";
+    public static final String JAPANESE_CODE_LOCATION_NAME = "日本語コードの場所名";
+
     private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
     private static BlackDuckServicesFactory blackDuckServicesFactory;
     private static BlackDuckService blackDuckService;
@@ -280,6 +284,25 @@ public class ProjectServiceTestIT {
         assertEquals("original", secondUpdate.getProjectView().getDescription());
         assertEquals("honey badger", secondUpdate.getProjectVersionView().getNickname());
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, secondUpdate.getProjectVersionView().getPhase());
+    }
+
+    @Test
+    public void testJapaneseCharacterSupport() throws IntegrationException {
+        int initialProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(JAPANESE_PROJECT_NAME, JAPANESE_VERSION_NAME);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
+
+        ProjectServiceTestIT.projectService.createProject(projectRequest);
+        Optional<ProjectVersionWrapper> optionalProjectVersionWrapper = ProjectServiceTestIT.projectService.getProjectVersion(JAPANESE_PROJECT_NAME, JAPANESE_VERSION_NAME);
+        assertTrue(optionalProjectVersionWrapper.isPresent());
+
+        int currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        assertEquals(initialProjectCount + 1, currentProjectCount);
+
+        ProjectServiceTestIT.blackDuckService.delete(optionalProjectVersionWrapper.get().getProjectView());
+
+        currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        assertEquals(initialProjectCount, currentProjectCount);
     }
 
 }
