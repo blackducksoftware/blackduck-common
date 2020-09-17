@@ -73,10 +73,6 @@ public class CodeLocationService extends DataService {
         blackDuckService.put(codeLocationView);
     }
 
-    public Predicate<CodeLocationView> createNameMatchingPredicate(String codeLocationName) {
-        return (codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
-    }
-
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);

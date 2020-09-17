@@ -1,12 +1,10 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -34,6 +32,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.util.NameVersion;
@@ -41,7 +40,7 @@ import com.synopsys.integration.util.NameVersion;
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class CodeLocationServiceTestIT {
-    private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTestDANA";
+    private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTest";
     private static final String CODE_LOCATION_NAME = BASE_ELEMENT_NAME + "__CodeLocation";
     private static final String PROJECT_NAME = BASE_ELEMENT_NAME + "__ProjectName";
     private static final String COMPONENT_NAME = BASE_ELEMENT_NAME + "__ComponentName";
@@ -52,6 +51,7 @@ public class CodeLocationServiceTestIT {
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
+    private final RequestFactory requestFactory = new RequestFactory();
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 
@@ -62,10 +62,10 @@ public class CodeLocationServiceTestIT {
 
     @Test
     public void testPagingCodeLocationByName() throws IntegrationException, IOException {
-        uploadAndVerifyCodeLocation(101, 101);
+        uploadAndVerifyCodeLocation(10, 10);
     }
 
-    private void uploadAndVerifyCodeLocation(Integer numberOfCodeLocations, Integer codeLocationToTest) throws IntegrationException, IOException {
+    private void uploadAndVerifyCodeLocation(int numberOfCodeLocations, int codeLocationToTest) throws IntegrationException, IOException {
         List<String> codeLocationNames = populateCodeLocationNames(numberOfCodeLocations);
         String codeLocationToValidate = codeLocationNames.get(codeLocationToTest - 1);
 
@@ -79,9 +79,17 @@ public class CodeLocationServiceTestIT {
         try {
             createAndUploadSimpleBdioObject(codeLocationNames);
 
-            // Verify code location now exists
+            // Verify code location now exists using getSomeMatchingResponses()
+            Predicate<CodeLocationView> nameMatcherPredicate = CodeLocationService.NAME_MATCHER.apply(codeLocationToValidate);
+            BlackDuckRequestBuilder blackDuckRequestBuilder = requestFactory.createCommonGetRequestBuilder(2, 0);
+            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, blackDuckRequestBuilder, nameMatcherPredicate, 1);
+
+            assertEquals(1, foundCodeLocation.size(), String.format("Matching code locations should be 1 but is %d", foundCodeLocation.size()));
+            assertEquals(codeLocationToValidate, foundCodeLocation.get(0).getName(), "Found code location does not equal expected");
+
+            // Verify code location now exists using getCodeLocationByName()
             assertTrue(blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).isPresent(), "Code location is empty after uploading.");
-            assertEquals(codeLocationToValidate, blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).get().getName(), String.format("Code location %s should exist", codeLocationToValidate));
+            assertEquals(codeLocationToValidate, blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).get().getName(), "Found code location does not equal expected");
         } finally {
             // Post-clean test data
             deleteCodeLocationByName(blackDuckServices, codeLocationNames);
@@ -91,10 +99,10 @@ public class CodeLocationServiceTestIT {
 
     private List<String> populateCodeLocationNames(int numberOfCodeLocations) {
         return IntStream
-            .range(0, numberOfCodeLocations)
-            .boxed()
-            .map(i -> CODE_LOCATION_NAME + i)
-            .collect(Collectors.toList());
+                   .range(0, numberOfCodeLocations)
+                   .boxed()
+                   .map(i -> CODE_LOCATION_NAME + i)
+                   .collect(Collectors.toList());
     }
 
     private void createAndUploadSimpleBdioObject(List<String> codeLocationNames) throws IOException, IntegrationException {
