@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,7 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -53,16 +56,11 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     public static final int TEN_MINUTES = FIVE_MINUTES * 2;
     public static final int THIRTY_SECONDS = 30;
 
-    private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
-    private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
-    private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
-    private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
-
-    public static final String[] CODE_LOCATION_NAMES = new String[] {
+    public static final List<String> CODE_LOCATION_NAMES = Arrays.asList(
         "blackduck-alert/6.1.0-SNAPSHOT/alert-common/blackduck-alert/alert-common/6.1.0-SNAPSHOT gradle/bom"
         , "blackduck-alert/6.1.0-SNAPSHOT/alert-database/blackduck-alert/alert-database/6.1.0-SNAPSHOT gradle/bom"
         , "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
-    };
+    );
 
     public static final String[] BDIO_FILE_NAMES = new String[] {
         "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_common_blackduck_alert_alert_common_6_1_0_SNAPSHOT_gradle_bom.jsonld"
@@ -70,30 +68,49 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_synopsys_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
     };
 
+    private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+    private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
+    private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+    private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
+    private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
+
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
+    }
+
+    @BeforeEach
+    public void setUp() throws IntegrationException {
+        cleanBlackDuckTestElements();
+    }
+
+    @AfterEach
+    public void tearDown() throws IntegrationException {
+        cleanBlackDuckTestElements();
+    }
+
+    private void cleanBlackDuckTestElements() throws IntegrationException {
+        Optional<ProjectView> projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
+        if (projectView.isPresent()) {
+            blackDuckServices.blackDuckService.delete(projectView.get());
+        }
+
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, shouldDeleteCodeLocation, CODE_LOCATION_NAMES.size());
+        for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
+            blackDuckServices.blackDuckService.delete(codeLocationToDelete);
+        }
     }
 
     @Test
     public void testCreatingProject() throws IntegrationException, InterruptedException {
         UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[0], BDIO_FILE_NAMES[0]));
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[1], BDIO_FILE_NAMES[1]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(0), BDIO_FILE_NAMES[0]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(1), BDIO_FILE_NAMES[1]));
         Set<String> expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
 
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
 
-        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES[2], BDIO_FILE_NAMES[2]));
+        uploadBatch.addUploadTarget(createUploadTarget(CODE_LOCATION_NAMES.get(2), BDIO_FILE_NAMES[2]));
         expectedCodeLocationNames = getCodeLocationNames(uploadBatch);
         uploadAndVerifyBdio(uploadBatch, expectedCodeLocationNames);
-
-        ProjectView projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME).get();
-        blackDuckServices.blackDuckService.delete(projectView);
-
-        for (String codeLocationName : CODE_LOCATION_NAMES) {
-            CodeLocationView codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName).get();
-            blackDuckServices.blackDuckService.delete(codeLocationView);
-        }
-
     }
 
     private void uploadAndVerifyBdio(UploadBatch uploadBatch, Set<String> expectedCodeLocationNames) throws IntegrationException, InterruptedException {
@@ -110,13 +127,13 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private void assertCodeLocationsAddedToBOM(Set<String> expectedCodeLocationNames, Date startDate, Date endDate) throws InterruptedException, IntegrationException {
         boolean foundProject = waitForProject();
-        assertTrue(foundProject);
+        assertTrue(foundProject, "Project was not found");
 
         Optional<ProjectVersionWrapper> projectVersionWrapperOptional = blackDuckServices.projectService.getProjectVersion(PROJECT_NAME, PROJECT_VERSION_NAME);
         ProjectVersionView projectVersionView = projectVersionWrapperOptional.get().getProjectVersionView();
 
         boolean foundAllCodeLocations = waitForCodeLocations(expectedCodeLocationNames, projectVersionView);
-        assertTrue(foundAllCodeLocations);
+        assertTrue(foundAllCodeLocations, "All code locations were not found");
 
         List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         Set<String> expectedCodeLocationUrls = codeLocationViews
@@ -126,7 +143,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
                                                    .collect(Collectors.toSet());
 
         boolean foundAllCodeLocationUrls = waitForNotifications(startDate, endDate, expectedCodeLocationUrls);
-        assertTrue(foundAllCodeLocationUrls);
+        assertTrue(foundAllCodeLocationUrls, "All code location urls were not found");
     }
 
     private boolean waitForProject() throws InterruptedException, IntegrationException {
