@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -56,8 +59,18 @@ public class CodeLocationService extends DataService {
         }
     }
 
+    public void unmapCodeLocation(HttpUrl codeLocationUrl) throws IntegrationException {
+        CodeLocationView codeLocationView = createFakeCodeLocationView(codeLocationUrl);
+        mapCodeLocation(codeLocationView, (HttpUrl) null);
+    }
+
     public void unmapCodeLocation(CodeLocationView codeLocationView) throws IntegrationException {
         mapCodeLocation(codeLocationView, (HttpUrl) null);
+    }
+
+    public void mapCodeLocation(HttpUrl codeLocationUrl, ProjectVersionView projectVersionView) throws IntegrationException {
+        CodeLocationView codeLocationView = createFakeCodeLocationView(codeLocationUrl);
+        mapCodeLocation(codeLocationView, projectVersionView);
     }
 
     public void mapCodeLocation(CodeLocationView codeLocationView, ProjectVersionView version) throws IntegrationException {
@@ -91,6 +104,14 @@ public class CodeLocationService extends DataService {
         String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         HttpUrl url = new HttpUrl(uri);
         return blackDuckService.getResponse(url, ScanSummaryView.class);
+    }
+
+    private CodeLocationView createFakeCodeLocationView(final HttpUrl codeLocationUrl) {
+        ResourceMetadata resourceMetadata = new ResourceMetadata();
+        resourceMetadata.setHref(codeLocationUrl);
+        CodeLocationView codeLocationView = new CodeLocationView();
+        codeLocationView.setMeta(resourceMetadata);
+        return codeLocationView;
     }
 
 }
