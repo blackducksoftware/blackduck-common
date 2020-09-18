@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +26,7 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadCodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
@@ -31,10 +35,17 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOut
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
@@ -54,6 +65,53 @@ public class CodeLocationServiceTestIT {
     private final RequestFactory requestFactory = new RequestFactory();
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
+
+    @Test
+    @Disabled
+    //ejk 2020-09-17 disabling this until I can figure out a better way to create the required elements for the test to pass
+    public void testMappingWithProjectCodeCreator() throws IntegrationException, InterruptedException {
+        /*
+        This test requires a project/version: code_location_mapping_test_donotdelete/code_location_mapping_test_donotdelete
+        Also, it requires a user, project_code_scanner, with the Project Code Scanner role on the above project.
+         */
+        String codeLocationName = "bdio to be mapped";
+        File bdioFile = new File(getClass().getResource("/bdio/bdio_without_project.jsonld").getFile());
+        UploadTarget uploadTarget = UploadTarget.createDefault(new NameVersion("inaccurate", "inaccurate"), codeLocationName, bdioFile);
+        BdioUploadService bdioUploadService = blackDuckServices.blackDuckServicesFactory.createBdioUploadService();
+        bdioUploadService.uploadBdio(uploadTarget);
+
+        UserView projectCodeScanner = blackDuckServices.blackDuckServicesFactory.createUserGroupService().getUserByUsername("project_code_scanner").get();
+        Optional<CodeLocationView> codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+        int attempts = 0;
+        while (!codeLocationView.isPresent()) {
+            attempts++;
+            if (attempts > 15) {
+                fail("code location not created fast enough");
+            }
+            Thread.sleep(5000);
+            codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+        }
+        assertTrue(StringUtils.isBlank(codeLocationView.get().getMappedProjectVersion()));
+
+        HttpUrl codeLocationUrl = codeLocationView.get().getHref();
+
+        //now use the project code scanner user
+        BufferedIntLogger logger = new BufferedIntLogger();
+        BlackDuckServerConfigBuilder projectCodeScannerBuilder = BlackDuckServerConfig.newBuilder();
+        projectCodeScannerBuilder.setUrl(intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL));
+        projectCodeScannerBuilder.setUsername("project_code_scanner");
+        projectCodeScannerBuilder.setPassword("super_secure_password");
+        projectCodeScannerBuilder.setTrustCert(true);
+        BlackDuckServicesFactory specialFactory = projectCodeScannerBuilder.build().createBlackDuckServicesFactory(logger);
+        ProjectVersionWrapper projectVersionWrapper = specialFactory.createProjectService().getProjectVersion(new NameVersion("code_location_mapping_test_donotdelete", "code_location_mapping_test_donotdelete")).get();
+        CodeLocationService specialCodeLocationService = specialFactory.createCodeLocationService();
+        specialCodeLocationService.mapCodeLocation(codeLocationUrl, projectVersionWrapper.getProjectVersionView());
+
+        codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
+        assertEquals(projectVersionWrapper.getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
+
+        blackDuckServices.blackDuckService.delete(codeLocationView.get());
+    }
 
     @Test
     public void testSingleCodeLocationByName() throws IntegrationException, IOException {
@@ -80,7 +138,7 @@ public class CodeLocationServiceTestIT {
             createAndUploadSimpleBdioObject(codeLocationNames);
 
             // Verify code location now exists using getSomeMatchingResponses()
-            Predicate<CodeLocationView> nameMatcherPredicate = CodeLocationService.NAME_MATCHER.apply(codeLocationToValidate);
+            Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
             BlackDuckRequestBuilder blackDuckRequestBuilder = requestFactory.createCommonGetRequestBuilder(2, 0);
             List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, blackDuckRequestBuilder, nameMatcherPredicate, 1);
 
@@ -144,6 +202,10 @@ public class CodeLocationServiceTestIT {
         for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
             blackDuckServices.blackDuckService.delete(codeLocationToDelete);
         }
+    }
+
+    private static class UserViewWithPassword extends UserView {
+        public String password;
     }
 
 }

@@ -1,0 +1,27 @@
+[ {
+  "@id" : "uuid:4db941e8-982f-4ff2-ae60-d4a5c504287f",
+  "@type" : "BillOfMaterials",
+  "specVersion" : "1.1.0",
+  "spdx:name" : "bdio to be mapped",
+  "creationInfo" : {
+    "spdx:creator" : "Tool: Gradle-2.13",
+    "spdx:created" : "2016-09-15T19:43:14.000Z"
+  }
+}, {
+  "@id" : "mvn:com.kingofnerds/ek_mtglist/0.0.1",
+  "@type" : "Project",
+  "name" : "",
+  "revision" : "",
+  "relationship" : [ {
+    "related" : "mvn:org.apache.commons/commons-lang3/3.1",
+    "relationshipType" : "DYNAMIC_LINK"
+  } ]
+}, {
+  "@id" : "mvn:org.apache.commons/commons-lang3/3.1",
+  "@type" : "Component",
+  "revision" : "3.1",
+  "externalIdentifier" : {
+    "externalSystemTypeId" : "maven",
+    "externalId" : "org.apache.commons:commons-lang3:3.1"
+  }
+}]

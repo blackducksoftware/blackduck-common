@@ -24,11 +24,11 @@ package com.synopsys.integration.blackduck.service.dataservice;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-import org.jetbrains.annotations.NotNull;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
@@ -47,7 +47,7 @@ import com.synopsys.integration.rest.HttpUrl;
 
 public class CodeLocationService extends DataService {
     // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
-    public static final Function<String, Predicate<CodeLocationView>> NAME_MATCHER = (codeLocationName) -> (codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
+    public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
 
     public CodeLocationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         super(blackDuckService, requestFactory, logger);
@@ -90,7 +90,7 @@ public class CodeLocationService extends DataService {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
-        Predicate<CodeLocationView> predicate = NAME_MATCHER.apply(codeLocationName);
+        Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
         return blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
                    .stream()
@@ -114,6 +114,10 @@ public class CodeLocationService extends DataService {
         resourceMetadata.setHref(codeLocationUrl);
         CodeLocationView codeLocationView = new CodeLocationView();
         codeLocationView.setMeta(resourceMetadata);
+
+        NullNode pathJsonNode = new JsonNodeFactory(false).nullNode();
+        codeLocationView.setPatch(pathJsonNode);
+
         return codeLocationView;
     }
 
