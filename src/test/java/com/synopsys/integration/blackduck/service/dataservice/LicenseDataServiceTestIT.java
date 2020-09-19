@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionLicenseType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
@@ -31,7 +32,8 @@ public class LicenseDataServiceTestIT {
         LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
 
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
-        ExternalId guavaExternalId = simpleBdioFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
+        ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
+        ExternalId guavaExternalId = externalIdFactory.createMavenExternalId("com.google.guava", "guava", "20.0");
         Optional<ProjectVersionLicenseView> optionalComplexLicense = licenseService.getComplexLicenseItemFromComponent(guavaExternalId);
         ProjectVersionLicenseView complexLicense = optionalComplexLicense.get();
 

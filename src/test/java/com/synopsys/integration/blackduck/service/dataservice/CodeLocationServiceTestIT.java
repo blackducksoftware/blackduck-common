@@ -22,6 +22,8 @@ import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
 import com.synopsys.integration.bdio.model.SimpleBdioDocument;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
+import com.synopsys.integration.bdio.model.dependency.DependencyFactory;
+import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -61,6 +63,8 @@ public class CodeLocationServiceTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
+    private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
+    private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
     private final RequestFactory requestFactory = new RequestFactory();
 
@@ -170,10 +174,10 @@ public class CodeLocationServiceTestIT {
             File bdioFile = File.createTempFile("bdio", "jsonld");
             bdioFile.deleteOnExit();
 
-            Dependency bdioTestDependency = simpleBdioFactory.createDependency(COMPONENT_NAME, VERSION, simpleBdioFactory.getExternalIdFactory().createMavenExternalId(GROUP, COMPONENT_NAME, VERSION));
+            Dependency bdioTestDependency = dependencyFactory.createMavenDependency(GROUP, COMPONENT_NAME, VERSION);
             mutableDependencyGraph.addChildrenToRoot(bdioTestDependency);
 
-            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, simpleBdioFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
+            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, externalIdFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
             simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
 
             uploadBatch.addUploadTarget(UploadTarget.createDefault(new NameVersion(PROJECT_NAME, VERSION), codeLocationName, bdioFile));

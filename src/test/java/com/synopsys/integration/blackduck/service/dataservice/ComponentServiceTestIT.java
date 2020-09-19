@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.model.Forge;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
@@ -28,8 +29,9 @@ public class ComponentServiceTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ComponentService componentService = blackDuckServicesFactory.createComponentService();
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
+        ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
 
-        ExternalId integrationCommonExternalId = simpleBdioFactory.createMavenExternalId("com.blackducksoftware.integration", "integration-common", "15.0.0");
+        ExternalId integrationCommonExternalId = externalIdFactory.createMavenExternalId("com.blackducksoftware.integration", "integration-common", "15.0.0");
         Optional<ComponentsView> componentView = componentService.getFirstOrEmptyResult(integrationCommonExternalId);
 
         assertTrue(componentView.isPresent());
@@ -40,8 +42,9 @@ public class ComponentServiceTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ComponentService componentService = blackDuckServicesFactory.createComponentService();
         SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
+        ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
 
-        ExternalId cyclerExternalId = simpleBdioFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
+        ExternalId cyclerExternalId = externalIdFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
         List<ComponentsView> searchResults = componentService.getAllSearchResults(cyclerExternalId);
         assertEquals(1, searchResults.size());
         assertTrue(searchResults.get(0).getComponentName().equalsIgnoreCase("cycler"));
