@@ -22,6 +22,10 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -37,10 +41,6 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;

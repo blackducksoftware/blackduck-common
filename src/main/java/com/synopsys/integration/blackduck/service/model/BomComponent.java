@@ -22,10 +22,11 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.List;
+import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
 
 public class BomComponent {
     private String policyStatus;
@@ -57,16 +58,16 @@ public class BomComponent {
         }
 
         riskProfileView
-                .getCounts()
-                .stream()
-                .forEach(bomRiskCounts::add);
+            .getCounts()
+            .stream()
+            .forEach(bomRiskCounts::add);
     }
 
     public String getPolicyStatus() {
         return policyStatus;
     }
 
-    public void setPolicyStatus(final String policyStatus) {
+    public void setPolicyStatus(String policyStatus) {
         this.policyStatus = policyStatus;
     }
 
@@ -74,7 +75,7 @@ public class BomComponent {
         return policyRulesViolated;
     }
 
-    public void setPolicyRulesViolated(final List<PolicyRule> policyRulesViolated) {
+    public void setPolicyRulesViolated(List<PolicyRule> policyRulesViolated) {
         this.policyRulesViolated = policyRulesViolated;
     }
 
@@ -82,7 +83,7 @@ public class BomComponent {
         return componentName;
     }
 
-    public void setComponentName(final String componentName) {
+    public void setComponentName(String componentName) {
         this.componentName = componentName;
     }
 
@@ -90,7 +91,7 @@ public class BomComponent {
         return componentURL;
     }
 
-    public void setComponentURL(final String componentURL) {
+    public void setComponentURL(String componentURL) {
         this.componentURL = componentURL;
     }
 
@@ -98,7 +99,7 @@ public class BomComponent {
         return componentVersion;
     }
 
-    public void setComponentVersion(final String componentVersion) {
+    public void setComponentVersion(String componentVersion) {
         this.componentVersion = componentVersion;
     }
 
@@ -106,7 +107,7 @@ public class BomComponent {
         return componentVersionURL;
     }
 
-    public void setComponentVersionURL(final String componentVersionURL) {
+    public void setComponentVersionURL(String componentVersionURL) {
         this.componentVersionURL = componentVersionURL;
     }
 
@@ -114,7 +115,7 @@ public class BomComponent {
         return license;
     }
 
-    public void setLicense(final String license) {
+    public void setLicense(String license) {
         this.license = license;
     }
 

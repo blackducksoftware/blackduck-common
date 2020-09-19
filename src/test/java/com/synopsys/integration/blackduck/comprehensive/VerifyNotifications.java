@@ -1,5 +1,15 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
@@ -10,14 +20,6 @@ import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocation
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.exception.IntegrationException;
-
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class VerifyNotifications {
     public static void verify(UserView currentUser, NotificationService notificationService, Date userStartDate, Date systemStartDate) throws IntegrationException {
@@ -34,16 +36,16 @@ public class VerifyNotifications {
         assertFalse(filteredUserNotifications.isEmpty());
 
         List<VersionBomCodeLocationBomComputedNotificationView> bomComputedNotifications =
-                filteredNotifications
-                        .stream()
-                        .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationView) notificationView)
-                        .collect(Collectors.toList());
+            filteredNotifications
+                .stream()
+                .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationView) notificationView)
+                .collect(Collectors.toList());
 
         List<VersionBomCodeLocationBomComputedNotificationUserView> bomComputedUserNotifications =
-                filteredUserNotifications
-                        .stream()
-                        .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                        .collect(Collectors.toList());
+            filteredUserNotifications
+                .stream()
+                .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
+                .collect(Collectors.toList());
 
         assertTrue(allNotifications.containsAll(bomComputedNotifications));
         assertTrue(allUserNotifications.containsAll(bomComputedUserNotifications));
@@ -52,9 +54,9 @@ public class VerifyNotifications {
 
     private static List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationContentData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
         return notifications
-                .stream()
-                .map(NotificationContentData::getContent)
-                .collect(Collectors.toList());
+                   .stream()
+                   .map(NotificationContentData::getContent)
+                   .collect(Collectors.toList());
     }
 
 }

@@ -22,6 +22,9 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.io.IOException;
+import java.util.Optional;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -36,9 +39,6 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.response.Response;
-
-import java.io.IOException;
-import java.util.Optional;
 
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;

@@ -1,19 +1,28 @@
 package com.synopsys.integration.blackduck.service.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectSyncModelTest {
     @Test
@@ -27,10 +36,10 @@ public class ProjectSyncModelTest {
         allFields.addAll(Arrays.asList(ProjectVersionRequest.class.getDeclaredFields()));
 
         List<Field> fieldsToCheck =
-                allFields
-                        .stream()
-                        .filter(field -> !Modifier.isStatic(field.getModifiers()) && !ignoredFields.contains(field.getName()))
-                        .collect(Collectors.toList());
+            allFields
+                .stream()
+                .filter(field -> !Modifier.isStatic(field.getModifiers()) && !ignoredFields.contains(field.getName()))
+                .collect(Collectors.toList());
 
         Map<String, Class<?>> fieldNameToType = new HashMap<>();
         for (Field field : fieldsToCheck) {
@@ -40,9 +49,9 @@ public class ProjectSyncModelTest {
         }
 
         Map<String, Class<?>> syncModelFields =
-                Arrays
-                        .stream(ProjectSyncModel.class.getDeclaredFields())
-                        .collect(Collectors.toMap(Field::getName, Field::getType));
+            Arrays
+                .stream(ProjectSyncModel.class.getDeclaredFields())
+                .collect(Collectors.toMap(Field::getName, Field::getType));
 
         for (Map.Entry<String, Class<?>> entry : fieldNameToType.entrySet()) {
             String fieldName = entry.getKey();
@@ -60,10 +69,10 @@ public class ProjectSyncModelTest {
         Set<Field> allFields = (Set<Field>) allFieldsField.get(null);
 
         List<Field> syncModelFieldsToCheck =
-                Arrays
-                        .stream(ProjectSyncModel.class.getDeclaredFields())
-                        .filter(field -> !Modifier.isStatic(field.getModifiers()) && !"fieldsWithSetValues".equals(field.getName()))
-                        .collect(Collectors.toList());
+            Arrays
+                .stream(ProjectSyncModel.class.getDeclaredFields())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()) && !"fieldsWithSetValues".equals(field.getName()))
+                .collect(Collectors.toList());
 
         for (Field syncModelField : syncModelFieldsToCheck) {
             assertTrue(allFields.contains(syncModelField), String.format("Should contain %s", syncModelField.getName()));

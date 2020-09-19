@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.exception.ScanFailedException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class ScanCommandRunner {
     private final IntLogger logger;
@@ -39,45 +38,45 @@ public class ScanCommandRunner {
     private final ScanPathsUtility scanPathsUtility;
     private final ExecutorService executorService;
 
-    public ScanCommandRunner(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final ScanPathsUtility scanPathsUtility, final ExecutorService executorService) {
+    public ScanCommandRunner(IntLogger logger, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ExecutorService executorService) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.scanPathsUtility = scanPathsUtility;
         this.executorService = executorService;
     }
 
-    public List<ScanCommandOutput> executeScans(final List<ScanCommand> scanCommands, final boolean cleanupOutput) throws ScanFailedException {
+    public List<ScanCommandOutput> executeScans(List<ScanCommand> scanCommands, boolean cleanupOutput) throws ScanFailedException {
         logger.info("Starting the Black Duck Signature Scan commands.");
-        final List<ScanCommandOutput> scanCommandOutputs = executeCommands(scanCommands, cleanupOutput);
+        List<ScanCommandOutput> scanCommandOutputs = executeCommands(scanCommands, cleanupOutput);
         logger.info("Completed the Black Duck Signature Scan commands.");
 
         return scanCommandOutputs;
     }
 
-    private List<ScanCommandOutput> executeCommands(final List<ScanCommand> scanCommands, final boolean cleanupOutput) throws ScanFailedException {
-        final List<ScanCommandOutput> scanCommandOutputs = new ArrayList<>();
+    private List<ScanCommandOutput> executeCommands(List<ScanCommand> scanCommands, boolean cleanupOutput) throws ScanFailedException {
+        List<ScanCommandOutput> scanCommandOutputs = new ArrayList<>();
 
         try {
-            final List<ScanCommandCallable> callables = createCallables(scanCommands, cleanupOutput);
-            final List<Future<ScanCommandOutput>> submitted = new ArrayList<>();
-            for (final ScanCommandCallable callable : callables) {
+            List<ScanCommandCallable> callables = createCallables(scanCommands, cleanupOutput);
+            List<Future<ScanCommandOutput>> submitted = new ArrayList<>();
+            for (ScanCommandCallable callable : callables) {
                 submitted.add(executorService.submit(callable));
             }
-            for (final Future<ScanCommandOutput> future : submitted) {
-                final ScanCommandOutput scanCommandOutput = future.get();
+            for (Future<ScanCommandOutput> future : submitted) {
+                ScanCommandOutput scanCommandOutput = future.get();
                 if (scanCommandOutput != null) {
                     scanCommandOutputs.add(scanCommandOutput);
                 }
             }
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new ScanFailedException(String.format("Encountered a problem waiting for a scan to finish. %s", e.getMessage()), e);
         }
 
         return scanCommandOutputs;
     }
 
-    private List<ScanCommandCallable> createCallables(final List<ScanCommand> scanCommands, final boolean cleanupOutput) {
-        final List<ScanCommandCallable> callables = scanCommands.stream().map(scanCommand -> new ScanCommandCallable(logger, scanPathsUtility, intEnvironmentVariables, scanCommand, cleanupOutput)).collect(Collectors.toList());
+    private List<ScanCommandCallable> createCallables(List<ScanCommand> scanCommands, boolean cleanupOutput) {
+        List<ScanCommandCallable> callables = scanCommands.stream().map(scanCommand -> new ScanCommandCallable(logger, scanPathsUtility, intEnvironmentVariables, scanCommand, cleanupOutput)).collect(Collectors.toList());
 
         return callables;
     }

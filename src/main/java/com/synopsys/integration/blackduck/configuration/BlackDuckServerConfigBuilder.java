@@ -22,8 +22,18 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.BuilderProperties;
@@ -41,17 +51,8 @@ import com.synopsys.integration.rest.exception.IntegrationCertificateException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
-import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
     public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
@@ -74,8 +75,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-    private UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
-    private AuthenticationSupport authenticationSupport = new AuthenticationSupport(urlSupport);
+    private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
+    private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery = new BlackDuckMediaTypeDiscovery();
     private ExecutorService executorService = new NoThreadExecutorService();
     private RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
@@ -120,7 +121,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, requestFactory, urlSupport);
+            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
+                requestFactory);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -128,7 +130,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService, requestFactory, urlSupport);
+            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
+                requestFactory);
         }
     }
 
@@ -285,6 +288,17 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfigBuilder setAuthenticationSupport(AuthenticationSupport authenticationSupport) {
         if (null != authenticationSupport) {
             this.authenticationSupport = authenticationSupport;
+        }
+        return this;
+    }
+
+    public BlackDuckMediaTypeDiscovery getBlackDuckMediaTypeDiscovery() {
+        return blackDuckMediaTypeDiscovery;
+    }
+
+    public BlackDuckServerConfigBuilder setBlackDuckMediaTypeDiscovery(BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        if (null != blackDuckMediaTypeDiscovery) {
+            this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
         }
         return this;
     }

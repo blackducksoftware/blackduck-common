@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.List;
+
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -31,8 +33,6 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-
-import java.util.List;
 
 public class ProjectMappingService extends DataService {
     public ProjectMappingService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {

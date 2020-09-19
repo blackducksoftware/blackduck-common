@@ -1,12 +1,25 @@
 package com.synopsys.integration.blackduck.http.client;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
@@ -22,21 +35,8 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.rest.support.UrlSupport;
+
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -47,15 +47,13 @@ public class BlackDuckHttpClientTestIT {
     private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
 
-    private UrlSupport urlSupport = new UrlSupport();
-    private RequestFactory requestFactory = new RequestFactory(new BlackDuckMediaTypeDiscovery());
+    private RequestFactory requestFactory = new RequestFactory();
     private HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
     private BlackDuckService blackDuckService = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
 
     public BlackDuckHttpClientTestIT() throws IntegrationException {
-
     }
 
     @Test
@@ -188,7 +186,7 @@ public class BlackDuckHttpClientTestIT {
     // WARNING!!!!
     private ApiTokenView getApiToken(String tokenName) throws IntegrationException, IOException {
         HttpUrl blackDuckServerUrl = blackDuckUrl;
-        HttpUrl createApiTokenUrl = urlSupport.appendRelativeUrl(blackDuckServerUrl, BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
+        HttpUrl createApiTokenUrl = blackDuckServerUrl.appendRelativeUrl(BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
 
         ApiTokenRequest apiTokenRequest = new ApiTokenRequest();
         apiTokenRequest.name = tokenName;

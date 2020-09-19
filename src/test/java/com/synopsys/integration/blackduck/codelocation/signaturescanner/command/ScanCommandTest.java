@@ -1,5 +1,21 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
@@ -12,21 +28,6 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(TimingExtension.class)
 public class ScanCommandTest {
@@ -221,9 +222,9 @@ public class ScanCommandTest {
 
     private void assertIndividualFileMatching(List<String> commandList, IndividualFileMatching individualFileMatching) {
         Optional<String> isIndividualFileMatching = commandList
-                .stream()
-                .filter(s -> s.contains("individualFileMatching"))
-                .findAny();
+                                                        .stream()
+                                                        .filter(s -> s.contains("individualFileMatching"))
+                                                        .findAny();
         if (null == individualFileMatching) {
             assertFalse(isIndividualFileMatching.isPresent());
         } else {

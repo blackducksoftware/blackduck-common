@@ -22,7 +22,15 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -37,11 +45,10 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 public class CodeLocationService extends DataService {
+    // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
+    public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
+
     public CodeLocationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         super(blackDuckService, requestFactory, logger);
     }
@@ -56,8 +63,18 @@ public class CodeLocationService extends DataService {
         }
     }
 
+    public void unmapCodeLocation(HttpUrl codeLocationUrl) throws IntegrationException {
+        CodeLocationView codeLocationView = createFakeCodeLocationView(codeLocationUrl);
+        mapCodeLocation(codeLocationView, (HttpUrl) null);
+    }
+
     public void unmapCodeLocation(CodeLocationView codeLocationView) throws IntegrationException {
         mapCodeLocation(codeLocationView, (HttpUrl) null);
+    }
+
+    public void mapCodeLocation(HttpUrl codeLocationUrl, ProjectVersionView projectVersionView) throws IntegrationException {
+        CodeLocationView codeLocationView = createFakeCodeLocationView(codeLocationUrl);
+        mapCodeLocation(codeLocationView, projectVersionView);
     }
 
     public void mapCodeLocation(CodeLocationView codeLocationView, ProjectVersionView version) throws IntegrationException {
@@ -73,8 +90,7 @@ public class CodeLocationService extends DataService {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
         BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
-        // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
-        Predicate<CodeLocationView> predicate = codeLocationView -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
+        Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
         return blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
                    .stream()
@@ -91,6 +107,18 @@ public class CodeLocationService extends DataService {
         String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         HttpUrl url = new HttpUrl(uri);
         return blackDuckService.getResponse(url, ScanSummaryView.class);
+    }
+
+    private CodeLocationView createFakeCodeLocationView(final HttpUrl codeLocationUrl) {
+        ResourceMetadata resourceMetadata = new ResourceMetadata();
+        resourceMetadata.setHref(codeLocationUrl);
+        CodeLocationView codeLocationView = new CodeLocationView();
+        codeLocationView.setMeta(resourceMetadata);
+
+        NullNode pathJsonNode = new JsonNodeFactory(false).nullNode();
+        codeLocationView.setPatch(pathJsonNode);
+
+        return codeLocationView;
     }
 
 }

@@ -1,5 +1,22 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
@@ -17,23 +34,14 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class ProjectServiceTestIT {
+    public static final String JAPANESE_PROJECT_NAME = "日本のプロジェクト名";
+    public static final String JAPANESE_VERSION_NAME = "日本語版名";
+    public static final String JAPANESE_CODE_LOCATION_NAME = "日本語コードの場所名";
+
     private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
     private static BlackDuckServicesFactory blackDuckServicesFactory;
     private static BlackDuckService blackDuckService;
@@ -276,6 +284,25 @@ public class ProjectServiceTestIT {
         assertEquals("original", secondUpdate.getProjectView().getDescription());
         assertEquals("honey badger", secondUpdate.getProjectVersionView().getNickname());
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, secondUpdate.getProjectVersionView().getPhase());
+    }
+
+    @Test
+    public void testJapaneseCharacterSupport() throws IntegrationException {
+        int initialProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(JAPANESE_PROJECT_NAME, JAPANESE_VERSION_NAME);
+        ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
+
+        ProjectServiceTestIT.projectService.createProject(projectRequest);
+        Optional<ProjectVersionWrapper> optionalProjectVersionWrapper = ProjectServiceTestIT.projectService.getProjectVersion(JAPANESE_PROJECT_NAME, JAPANESE_VERSION_NAME);
+        assertTrue(optionalProjectVersionWrapper.isPresent());
+
+        int currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        assertEquals(initialProjectCount + 1, currentProjectCount);
+
+        ProjectServiceTestIT.blackDuckService.delete(optionalProjectVersionWrapper.get().getProjectView());
+
+        currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
+        assertEquals(initialProjectCount, currentProjectCount);
     }
 
 }

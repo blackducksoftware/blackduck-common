@@ -1,5 +1,21 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.TempDirectory;
+
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -10,17 +26,6 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junitpioneer.jupiter.TempDirectory;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -83,8 +88,8 @@ public class RiskReportServiceTestIT {
         Assertions.assertNotNull(reportFiles);
         Assertions.assertTrue(reportFiles.length > 0);
         Map<String, File> reportFileMap = Arrays
-                .stream(reportFiles)
-                .collect(Collectors.toMap(File::getName, Function.identity()));
+                                              .stream(reportFiles)
+                                              .collect(Collectors.toMap(File::getName, Function.identity()));
         Assertions.assertNotNull(reportFileMap.get("js"));
         Assertions.assertNotNull(reportFileMap.get("css"));
         Assertions.assertNotNull(reportFileMap.get("images"));

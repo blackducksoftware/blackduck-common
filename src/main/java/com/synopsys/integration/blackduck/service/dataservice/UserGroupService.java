@@ -22,6 +22,15 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.UserProjectsView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -36,9 +45,9 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
-import java.util.*;
-
 public class UserGroupService extends DataService {
+    public static final BiPredicate<String, UserView> MATCHING_USERNAME = (username, userView) -> username.equalsIgnoreCase(userView.getUserName());
+
     public UserGroupService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
         super(blackDuckService, requestFactory, logger);
     }
@@ -50,18 +59,18 @@ public class UserGroupService extends DataService {
     }
 
     public Optional<UserView> getUserByUsername(String username) throws IntegrationException {
-        List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
-        for (UserView user : allUsers) {
-            if (user.getUserName().equalsIgnoreCase(username)) {
-                return Optional.of(user);
-            }
+        Predicate<UserView> predicate = userView -> MATCHING_USERNAME.test(username, userView);
+        List<UserView> matchingUsers = blackDuckService.getSomeMatchingResponses(ApiDiscovery.USERS_LINK_RESPONSE, predicate, 1);
+        if (!matchingUsers.isEmpty()) {
+            return Optional.ofNullable(matchingUsers.get(0));
         }
+
         logger.error(String.format("The user (%s) does not exist.", username));
         return Optional.empty();
     }
 
-    public List<ProjectView> getProjectsForUser(String userName) throws IntegrationException {
-        Optional<UserView> user = getUserByUsername(userName);
+    public List<ProjectView> getProjectsForUser(String username) throws IntegrationException {
+        Optional<UserView> user = getUserByUsername(username);
         if (!user.isPresent()) {
             return Collections.emptyList();
         }

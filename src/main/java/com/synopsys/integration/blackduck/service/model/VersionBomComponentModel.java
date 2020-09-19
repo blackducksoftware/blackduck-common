@@ -22,17 +22,21 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileActivityDataView;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.*;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileActivityDataView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComparisonItemsComponentMatchTypesType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
+import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentView component;
@@ -140,11 +144,8 @@ public class VersionBomComponentModel {
     }
 
     private boolean hasRisk(RiskProfileCounts counts) {
-        if (counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.LOW).intValue() + counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.MEDIUM).intValue() + counts.getCount(
-                ComponentVersionRiskProfileRiskDataCountsCountType.HIGH).intValue() > 0) {
-            return true;
-        }
-        return false;
+        return counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.LOW).intValue() + counts.getCount(ComponentVersionRiskProfileRiskDataCountsCountType.MEDIUM).intValue() + counts.getCount(
+            ComponentVersionRiskProfileRiskDataCountsCountType.HIGH).intValue() > 0;
     }
 
     private List<MatchedFilesModel> getMatchedFilesModel(List<ComponentMatchedFilesView> matchedFiles) {

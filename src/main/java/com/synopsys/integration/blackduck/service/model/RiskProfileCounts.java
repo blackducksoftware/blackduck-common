@@ -22,13 +22,13 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType;
-import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType;
+import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {
     private final Map<ComponentVersionRiskProfileRiskDataCountsCountType, BigDecimal> countsMap;

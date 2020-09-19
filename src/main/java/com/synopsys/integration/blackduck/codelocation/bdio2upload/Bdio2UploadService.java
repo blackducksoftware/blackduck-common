@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2upload;
 
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
@@ -34,8 +36,6 @@ import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
-
-import java.util.Set;
 
 public class Bdio2UploadService extends DataService {
     private final UploadBdio2BatchRunner uploadBdio2BatchRunner;
@@ -69,7 +69,8 @@ public class Bdio2UploadService extends DataService {
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public void waitForBdioUpload(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public void waitForBdioUpload(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds)
+        throws IntegrationException, InterruptedException {
         codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds);
     }
 

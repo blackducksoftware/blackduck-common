@@ -22,6 +22,12 @@
  */
 package com.synopsys.integration.blackduck.phonehome;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -37,11 +43,6 @@ import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
@@ -75,7 +76,7 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, BlackDuckService blackDuckService, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
-                                    IntEnvironmentVariables intEnvironmentVariables) {
+        IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
         this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;

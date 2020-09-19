@@ -1,5 +1,19 @@
 package com.synopsys.integration.blackduck.http.client;
 
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpClient;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -15,20 +29,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.support.UrlSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
-import org.apache.http.client.HttpClient;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.junit.Assert.fail;
 
 public class IntHttpClientTestHelper {
     private static Properties testProperties;
@@ -79,15 +80,24 @@ public class IntHttpClientTestHelper {
     }
 
     public BlackDuckServerConfig getBlackDuckServerConfig() {
+        return getBlackDuckServerConfigBuilder().build();
+    }
+
+    public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
         BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
         builder.setUrl(blackDuckServerUrl);
-//        builder.setApiToken("NjliOTU0N2ItOTJkMC00YjdmLTgwNTItMjJiZmE4ZWYzNGY4OjZjNzJhNzJhLWM5ZjYtNGQyOC05YzY0LTc4MGQzYzA1MmY1MQ==");
-        builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
-        builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
+        String apiToken = getProperty(TestingPropertyKey.TEST_API_TOKEN);
+        if (StringUtils.isNotBlank(apiToken)) {
+            builder.setApiToken(apiToken);
+        } else {
+            builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
+            builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
+        }
+
         builder.setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
         builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
-        return builder.build();
+        return builder;
     }
 
     public HttpUrl getIntegrationBlackDuckServerUrl() throws IntegrationException {
@@ -126,9 +136,8 @@ public class IntHttpClientTestHelper {
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
-        UrlSupport urlSupport = BlackDuckServicesFactory.createDefaultUrlSupport();
 
-        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory, urlSupport);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory);
         return blackDuckServicesFactory;
     }
 

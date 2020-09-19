@@ -22,6 +22,8 @@
  */
 package com.synopsys.integration.blackduck.codelocation;
 
+import java.util.Set;
+
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
@@ -32,8 +34,6 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
-
-import java.util.Set;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;
@@ -48,9 +48,10 @@ public class CodeLocationWaiter {
         this.notificationService = notificationService;
     }
 
-    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount, long timeoutInSeconds, int waitIntervalInSeconds)
-            throws IntegrationException, InterruptedException {
-        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckService, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount);
+    public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount,
+        long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckService, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
+            expectedNotificationCount);
 
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
         // regardless of the timeout provided, we always want to check at least once
@@ -67,7 +68,8 @@ public class CodeLocationWaiter {
         }
 
         if (!allCompleted) {
-            return CodeLocationWaitResult.PARTIAL(codeLocationWaitJobTask.getFoundCodeLocationNames(), String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
+            return CodeLocationWaitResult
+                       .PARTIAL(codeLocationWaitJobTask.getFoundCodeLocationNames(), String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
         } else {
             logger.info("All code locations have been added to the BOM.");
             return CodeLocationWaitResult.COMPLETE(codeLocationWaitJobTask.getFoundCodeLocationNames());

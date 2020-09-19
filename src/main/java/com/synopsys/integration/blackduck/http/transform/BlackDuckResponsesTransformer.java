@@ -22,6 +22,14 @@
  */
 package com.synopsys.integration.blackduck.http.transform;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
@@ -30,13 +38,6 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class BlackDuckResponsesTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -110,10 +111,10 @@ public class BlackDuckResponsesTransformer {
 
     private <T extends BlackDuckResponse> List<T> matchPredicate(BlackDuckPageResponse<T> blackDuckPageResponse, Predicate<T> predicate) {
         return blackDuckPageResponse
-                .getItems()
-                .stream()
-                .filter(predicate)
-                .collect(Collectors.toList());
+                   .getItems()
+                   .stream()
+                   .filter(predicate)
+                   .collect(Collectors.toList());
     }
 
 }
