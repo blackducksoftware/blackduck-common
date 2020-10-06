@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -48,6 +49,7 @@ public class ScanPathsUtility {
     private static final String JAVA_PATH_FORMAT = "bin" + File.separator + "%s";
     private static final String WINDOWS_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java.exe");
     private static final String OTHER_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java");
+    private static final String CACERTS_PATH = "lib" + File.separator + "security" + File.separator + "cacerts";
     private static final String STANDALONE_JAR_PATH = "cache" + File.separator + "scan.cli.impl-standalone.jar";
 
     private static final FileFilter EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER = file -> !file.isHidden() && !file.getName().contains("windows") && file.isDirectory();
@@ -97,12 +99,15 @@ public class ScanPathsUtility {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
 
+        final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
+
+        final String pathToCacerts = findPathToCacerts(jreContentsDirectory);
+
         final String pathToJavaExecutable;
         final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
         if (StringUtils.isNotBlank(bdsJavaHome)) {
             pathToJavaExecutable = findPathToJavaExe(new File(bdsJavaHome));
         } else {
-            final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
             pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
         }
 
@@ -111,7 +116,7 @@ public class ScanPathsUtility {
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
-        return new ScanPaths(pathToJavaExecutable, pathToOneJar, pathToScanExecutable, managedByLibrary);
+        return new ScanPaths(pathToJavaExecutable, pathToCacerts, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws BlackDuckIntegrationException {
@@ -157,16 +162,11 @@ public class ScanPathsUtility {
     }
 
     private String findPathToJavaExe(final File jreContentsDirectory) throws BlackDuckIntegrationException {
-        File jreContents = jreContentsDirectory;
-        final List<String> filenames = Arrays.asList(jreContents.list());
-        if (filenames.contains("Contents")) {
-            jreContents = new File(jreContents, "Contents");
-            jreContents = new File(jreContents, "Home");
-        }
+        File jdkBase = getJdkBase(jreContentsDirectory);
 
-        File javaExe = new File(jreContents, OTHER_JAVA_PATH);
+        File javaExe = new File(jdkBase, OTHER_JAVA_PATH);
         if (OperatingSystemType.WINDOWS == operatingSystemType) {
-            javaExe = new File(jreContents, WINDOWS_JAVA_PATH);
+            javaExe = new File(jdkBase, WINDOWS_JAVA_PATH);
         }
 
         if (!javaExe.exists() || !javaExe.isFile()) {
@@ -174,6 +174,24 @@ public class ScanPathsUtility {
         }
 
         return javaExe.getAbsolutePath();
+    }
+
+    private String findPathToCacerts(final File jreContentsDirectory) {
+        File jdkBase = getJdkBase(jreContentsDirectory);
+        File cacerts = new File(jdkBase, CACERTS_PATH);
+
+        return cacerts.getAbsolutePath();
+    }
+
+    @NotNull
+    private File getJdkBase(final File jreContentsDirectory) {
+        File jdkBase = jreContentsDirectory;
+        final List<String> filenames = Arrays.asList(jdkBase.list());
+        if (filenames.contains("Contents")) {
+            jdkBase = new File(jdkBase, "Contents");
+            jdkBase = new File(jdkBase, "Home");
+        }
+        return jdkBase;
     }
 
     private String findPathToStandaloneJar(final File libDirectory) throws BlackDuckIntegrationException {
