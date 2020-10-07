@@ -30,6 +30,7 @@ import java.util.Optional;
 import org.apache.commons.compress.archivers.ArchiveException;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -51,10 +52,19 @@ public class ScannerZipInstaller {
     private final IntHttpClient intHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
+    private final KeyStoreHelper keyStoreHelper;
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
+    @Deprecated
+    /**
+     * deprecated - Please construct your own KeyStoreHelper dependency and provide it
+     */
     public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl, OperatingSystemType operatingSystemType) {
+        this(logger, intHttpClient, cleanupZipExpander, scanPathsUtility, new KeyStoreHelper(logger), blackDuckServerUrl, operatingSystemType);
+    }
+
+    public ScannerZipInstaller(final IntLogger logger, final IntHttpClient intHttpClient, final CleanupZipExpander cleanupZipExpander, final ScanPathsUtility scanPathsUtility, final KeyStoreHelper keyStoreHelper, final HttpUrl blackDuckServerUrl, final OperatingSystemType operatingSystemType) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
@@ -63,6 +73,7 @@ public class ScannerZipInstaller {
         this.intHttpClient = intHttpClient;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
+        this.keyStoreHelper = keyStoreHelper;
         this.blackDuckServerUrl = blackDuckServerUrl;
         this.operatingSystemType = operatingSystemType;
     }
@@ -153,6 +164,8 @@ public class ScannerZipInstaller {
                 javaExecutable.setExecutable(true);
                 oneJar.setExecutable(true);
                 scanExecutable.setExecutable(true);
+
+                keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl, scanPaths.getPathToCacerts());
 
                 logger.info(String.format("Black Duck Signature Scanner downloaded successfully."));
             } finally {
