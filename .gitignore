@@ -15,4 +15,4 @@ out/
 build/
 
 src/test/resources/test.properties
-src/main/com/synopsys/integration/blackduck/version.txt
+src/main/resources/com/synopsys/integration/blackduck/version.txt
