@@ -42,6 +42,7 @@ import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
+import com.synopsys.integration.util.NameVersion;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     public static final String SET_COOKIE = "Set-Cookie";
@@ -50,10 +51,25 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
 
     private final Credentials credentials;
 
+    @Deprecated
+    /**
+     * @deprecated Please supply a solution name and version.
+     */
     public CredentialsBlackDuckHttpClient(
         IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport, Credentials credentials,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery);
+        this.credentials = credentials;
+
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials cannot be null.");
+        }
+    }
+
+    public CredentialsBlackDuckHttpClient(
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
 
         if (credentials == null) {

@@ -46,7 +46,6 @@ import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;
-    private final BlackDuckService blackDuckService;
     private final PhoneHomeService phoneHomeService;
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -56,7 +55,6 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
@@ -67,7 +65,7 @@ public class BlackDuckPhoneHomeHelper {
 
         PhoneHomeService phoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, phoneHomeClient, executorService);
 
-        return new BlackDuckPhoneHomeHelper(intLogger, blackDuckService, phoneHomeService, blackDuckRegistrationService, intEnvironmentVariables);
+        return new BlackDuckPhoneHomeHelper(intLogger, phoneHomeService, blackDuckRegistrationService, intEnvironmentVariables);
     }
 
     public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, IntHttpClient intHttpClient, Gson gson) {
@@ -75,10 +73,9 @@ public class BlackDuckPhoneHomeHelper {
         return new PhoneHomeClient(intLogger, httpClientBuilder, gson);
     }
 
-    public BlackDuckPhoneHomeHelper(IntLogger logger, BlackDuckService blackDuckService, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
+    public BlackDuckPhoneHomeHelper(IntLogger logger, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
         IntEnvironmentVariables intEnvironmentVariables) {
         this.logger = logger;
-        this.blackDuckService = blackDuckService;
         this.phoneHomeService = phoneHomeService;
         this.blackDuckRegistrationService = blackDuckRegistrationService;
         this.intEnvironmentVariables = intEnvironmentVariables;

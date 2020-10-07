@@ -24,12 +24,16 @@ package com.synopsys.integration.blackduck.http.client;
 
 import java.util.Optional;
 
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
+import com.synopsys.integration.blackduck.useragent.BlackDuckCommon;
+import com.synopsys.integration.blackduck.useragent.UserAgentBuilder;
+import com.synopsys.integration.blackduck.useragent.UserAgentItem;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -40,17 +44,39 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
+import com.synopsys.integration.util.NameVersion;
 
 /**
  * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
  */
 public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final HttpUrl baseUrl;
-    protected final AuthenticationSupport authenticationSupport;
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
+    private final String userAgentString;
 
+    protected final AuthenticationSupport authenticationSupport;
+
+    @Deprecated
+    /**
+     * @deprecated Please provide a solution-specific UserAgentItem including solution name and version.
+     */
     public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, (UserAgentItem)null, authenticationSupport, blackDuckMediaTypeDiscovery);
+    }
+
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, new UserAgentItem(solutionDetails), BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
+    }
+
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, UserAgentItem solutionUserAgentItem, AuthenticationSupport authenticationSupport,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
+        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionUserAgentItem, BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
+    }
+
+    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, UserAgentItem solutionUserAgentItem, UserAgentItem blackDuckCommonUserAgentItem,
+        AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
 
         if (null == baseUrl) {
@@ -58,8 +84,14 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
         }
 
         this.baseUrl = baseUrl;
-        this.authenticationSupport = authenticationSupport;
         this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
+
+        UserAgentBuilder userAgentBuilder = new UserAgentBuilder();
+        userAgentBuilder.addUserAgent(solutionUserAgentItem);
+        userAgentBuilder.addUserAgent(blackDuckCommonUserAgentItem);
+        this.userAgentString = userAgentBuilder.createFullUserAgentString();
+
+        this.authenticationSupport = authenticationSupport;
     }
 
     @Override
@@ -70,6 +102,10 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
         String replacementMediaType = blackDuckMediaTypeDiscovery.determineMediaType(httpUrl, mediaType);
         requestBuilder.acceptMimeType(replacementMediaType);
+
+        if (!requestBuilder.getHeaders().containsKey(HttpHeaders.USER_AGENT)) {
+            requestBuilder.addHeader(HttpHeaders.USER_AGENT, userAgentString);
+        }
 
         request = requestBuilder.build();
 
@@ -103,6 +139,10 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
     public HttpUrl getBaseUrl() {
         return baseUrl;
+    }
+
+    public String getUserAgentString() {
+        return userAgentString;
     }
 
     @Override

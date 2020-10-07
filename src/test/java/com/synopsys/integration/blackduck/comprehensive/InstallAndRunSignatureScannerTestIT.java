@@ -10,8 +10,11 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
@@ -34,7 +37,6 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -43,6 +45,8 @@ import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 import com.synopsys.integration.wait.WaitJob;
 
+@Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class InstallAndRunSignatureScannerTestIT {
     public static final String PROJECT_NAME = "Scanner Installer Test";
     public static final String PROJECT_VERSION_NAME = "1.0";
@@ -122,8 +126,8 @@ public class InstallAndRunSignatureScannerTestIT {
         return scanBatch;
     }
 
-    private void assertScanFailure(BufferedIntLogger logger, SignatureScannerService signatureScannerService, ScanBatch scanBatch) throws InterruptedException, IntegrationException, IOException {
-        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size())
+    private void assertScanFailure(BufferedIntLogger logger, SignatureScannerService signatureScannerService, ScanBatch scanBatch) throws InterruptedException, IntegrationException {
+        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size());
         ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
         assertEquals(1, scanBatchOutput.getOutputs().size());
         ScanCommandOutput scanCommandOutput = scanBatchOutput.getOutputs().get(0);
@@ -133,12 +137,12 @@ public class InstallAndRunSignatureScannerTestIT {
     }
 
     private void assertScanSuccess(BufferedIntLogger logger, SignatureScannerService signatureScannerService, ScanBatch scanBatch) throws InterruptedException, IntegrationException {
-        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size())
+        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size());
         ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
         assertEquals(1, scanBatchOutput.getOutputs().size());
         ScanCommandOutput scanCommandOutput = scanBatchOutput.getOutputs().get(0);
         assertEquals(Result.SUCCESS, scanCommandOutput.getResult());
-        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size())
+        assertEquals(0, logger.getOutputList(LogLevel.ERROR).size());
     }
 
     public static class NoOpKeyStoreHelper extends KeyStoreHelper {

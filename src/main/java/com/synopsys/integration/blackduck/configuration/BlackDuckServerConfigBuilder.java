@@ -47,15 +47,17 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.credentials.Credentials;
 import com.synopsys.integration.rest.credentials.CredentialsBuilder;
-import com.synopsys.integration.rest.exception.IntegrationCertificateException;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckServerConfig> {
     public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
+    public static final BuilderPropertyKey SOLUTION_NAME_KEY = new BuilderPropertyKey("SOLUTION_NAME_KEY");
+    public static final BuilderPropertyKey SOLUTION_VERSION_KEY = new BuilderPropertyKey("SOLUTION_VERSION_KEY");
     public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_USERNAME");
     public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PASSWORD");
     public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_API_TOKEN");
@@ -83,6 +85,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
         propertyKeys.add(URL_KEY);
+        propertyKeys.add(SOLUTION_NAME_KEY);
+        propertyKeys.add(SOLUTION_VERSION_KEY);
         propertyKeys.add(USERNAME_KEY);
         propertyKeys.add(PASSWORD_KEY);
         propertyKeys.add(API_TOKEN_KEY);
@@ -100,18 +104,6 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     }
 
     @Override
-    public BlackDuckServerConfig build() {
-        try {
-            return super.build();
-        } catch (Exception e) {
-            if (!e.getMessage().contains("SunCertPathBuilderException")) {
-                throw e;
-            }
-            throw new IntegrationCertificateException(String.format("Please import the certificate for %s into your Java keystore.", getUrl()), e);
-        }
-    }
-
-    @Override
     public BlackDuckServerConfig buildWithoutValidation() {
         HttpUrl blackDuckUrl = null;
         try {
@@ -119,9 +111,10 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         } catch (IntegrationException e) {
         }
 
+        NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
                 requestFactory);
         } else {
             String username = getUsername();
@@ -130,14 +123,14 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckUrl, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
                 requestFactory);
         }
     }
 
     @Override
     protected void validate(BuilderStatus builderStatus) {
-        validateBlackDucUrl(builderStatus);
+        validateBlackDuckUrl(builderStatus);
 
         if (StringUtils.isBlank(getApiToken())) {
             validateBlackDuckCredentials(builderStatus);
@@ -188,7 +181,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
-    private void validateBlackDucUrl(BuilderStatus builderStatus) {
+    private void validateBlackDuckUrl(BuilderStatus builderStatus) {
         if (StringUtils.isBlank(getUrl())) {
             builderStatus.addErrorMessage("The Black Duck url must be specified.");
         } else {
@@ -347,6 +340,22 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     public BlackDuckServerConfigBuilder setUrl(HttpUrl url) {
         builderProperties.set(URL_KEY, url.string());
+        return this;
+    }
+
+    public NameVersion getSolutionDetails() {
+        return new NameVersion(builderProperties.get(SOLUTION_NAME_KEY), builderProperties.get(SOLUTION_VERSION_KEY));
+    }
+
+    public BlackDuckServerConfigBuilder setSolutionDetails(String name, String version) {
+        builderProperties.set(SOLUTION_NAME_KEY, name);
+        builderProperties.set(SOLUTION_VERSION_KEY, version);
+        return this;
+    }
+
+    public BlackDuckServerConfigBuilder setSolutionDetails(NameVersion solutionDetails) {
+        builderProperties.set(SOLUTION_NAME_KEY, solutionDetails.getName());
+        builderProperties.set(SOLUTION_VERSION_KEY, solutionDetails.getVersion());
         return this;
     }
 
