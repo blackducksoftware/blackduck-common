@@ -28,6 +28,10 @@ public class KeyStoreHelper {
     public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
         HttpsURLConnection httpsConnection = null;
         try {
+            if (!(httpsServer.url().openConnection() instanceof HttpsURLConnection)) {
+                // if it isn't an https server, there's no certificate to worry about
+                return;
+            }
             httpsConnection = (HttpsURLConnection) httpsServer.url().openConnection();
             httpsConnection.connect();
             Certificate[] certificates = httpsConnection.getServerCertificates();

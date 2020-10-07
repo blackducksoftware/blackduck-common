@@ -97,7 +97,7 @@ public class ScannerZipInstallerTest {
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
-            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockIntHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl("http://www.google.com"), OperatingSystemType.MAC);
+            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockIntHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl("http://www.synopsys.com"), OperatingSystemType.MAC);
 
             try {
                 ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
