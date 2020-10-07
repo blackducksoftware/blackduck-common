@@ -46,9 +46,6 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.NameVersion;
 
-/**
- * A BlackDuckRestConnection will always decorate the provided RestConnection with a ReconnectingRestConnection
- */
 public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
     private final HttpUrl baseUrl;
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
