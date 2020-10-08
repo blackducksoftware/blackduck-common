@@ -23,6 +23,7 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -127,14 +128,16 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
     }
 
     private List<VersionBomCodeLocationBomComputedNotificationUserView> getFilteredNotificationUserViews(UserView userView, NotificationTaskRange notificationTaskRange) throws IntegrationException {
-        List<NotificationUserView> notifications = notificationService
-                                                       .getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(),
-                                                           Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+        Date startDate = notificationTaskRange.getStartDate();
+        Date endDate = notificationTaskRange.getEndDate();
+        List<String> typesToInclude = Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name());
+        List<NotificationUserView> notifications = notificationService.getFilteredUserNotifications(userView, startDate, endDate, typesToInclude);
 
-        List<VersionBomCodeLocationBomComputedNotificationUserView> filteredNotifications = notifications
-                                                                                                .stream()
-                                                                                                .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)
-                                                                                                .collect(Collectors.toList());
+        List<VersionBomCodeLocationBomComputedNotificationUserView> filteredNotifications =
+            notifications
+                .stream()
+                .map(VersionBomCodeLocationBomComputedNotificationUserView.class::cast)
+                .collect(Collectors.toList());
 
         return filteredNotifications;
     }

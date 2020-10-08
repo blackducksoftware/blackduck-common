@@ -46,6 +46,7 @@ import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.util.Stringable;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
@@ -54,6 +55,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     private final HttpUrl blackDuckUrl;
+    private final NameVersion solutionDetails;
     private final int timeoutSeconds;
     private final Credentials credentials;
     private final String apiToken;
@@ -67,24 +69,46 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     private final ExecutorService executorService;
     private final RequestFactory requestFactory;
 
+    @Deprecated
+    /**
+     * @deprecated Please provide a solution name and version.
+     */
     BlackDuckServerConfig(
         HttpUrl url, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery,
         ExecutorService executorService, RequestFactory requestFactory) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, credentials, null, requestFactory);
+        this(url, null, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, credentials, null, requestFactory);
     }
 
+    @Deprecated
+    /**
+     * @deprecated Please provide a solution name and version.
+     */
     BlackDuckServerConfig(
         HttpUrl url, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, RequestFactory requestFactory) {
-        this(url, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, null, apiToken, requestFactory);
+        this(url, null, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, null, apiToken, requestFactory);
     }
 
-    private BlackDuckServerConfig(HttpUrl url, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+    BlackDuckServerConfig(
+        HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+        AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery,
+        ExecutorService executorService, RequestFactory requestFactory) {
+        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, credentials, null, requestFactory);
+    }
+
+    BlackDuckServerConfig(
+        HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+        AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, RequestFactory requestFactory) {
+        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService, null, apiToken, requestFactory);
+    }
+
+    private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, Credentials credentials, String apiToken, RequestFactory requestFactory) {
+        blackDuckUrl = url;
+        this.solutionDetails = solutionDetails;
         this.credentials = credentials;
         this.apiToken = apiToken;
-        blackDuckUrl = url;
         this.timeoutSeconds = timeoutSeconds;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
@@ -104,6 +128,10 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     public void print(IntLogger logger) {
         if (getBlackDuckUrl() != null) {
             logger.alwaysLog("--> Black Duck Server Url: " + getBlackDuckUrl());
+        }
+        if (getSolutionDetails() != null) {
+            logger.alwaysLog("--> Solution Name: " + getSolutionDetails().getName());
+            logger.alwaysLog("--> Solution Version: " + getSolutionDetails().getVersion());
         }
         if (getCredentials().isPresent() && getCredentials().get().getUsername().isPresent()) {
             logger.alwaysLog("--> Black Duck User: " + getCredentials().get().getUsername().get());
@@ -184,12 +212,12 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public CredentialsBlackDuckHttpClient createCredentialsBlackDuckHttpClient(IntLogger logger) {
-        return new CredentialsBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), authenticationSupport, getCredentials().orElse(null),
+        return new CredentialsBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), getSolutionDetails(), authenticationSupport, getCredentials().orElse(null),
             blackDuckMediaTypeDiscovery);
     }
 
     public ApiTokenBlackDuckHttpClient createApiTokenBlackDuckHttpClient(IntLogger logger) {
-        return new ApiTokenBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), gson, authenticationSupport, getApiToken().orElse(null),
+        return new ApiTokenBlackDuckHttpClient(logger, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), getSolutionDetails(), gson, authenticationSupport, getApiToken().orElse(null),
             blackDuckMediaTypeDiscovery);
     }
 
@@ -199,6 +227,10 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
     public HttpUrl getBlackDuckUrl() {
         return blackDuckUrl;
+    }
+
+    public NameVersion getSolutionDetails() {
+        return solutionDetails;
     }
 
     public Optional<Credentials> getCredentials() {

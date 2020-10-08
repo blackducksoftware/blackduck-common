@@ -13,13 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
+import com.synopsys.integration.blackduck.useragent.BlackDuckCommon;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.rest.client.ConnectionResult;
+import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -38,8 +41,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuild() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         BlackDuckServerConfig config = builder.build();
 
         assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
@@ -52,8 +54,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxies() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setBuilderDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createBuilder();
         setBuilderProxyDefaults(builder);
         BlackDuckServerConfig config = builder.build();
 
@@ -69,8 +70,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidConfigWithProxiesNoProxy() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setBuilderDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createBuilder();
         builder.setProxyPort(0);
         builder.setProxyHost(null);
         builder.setProxyNtlmDomain(null);
@@ -88,8 +88,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidCanConnect() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         BlackDuckServerConfig blackDuckServerConfig = builder.build();
         assertTrue(blackDuckServerConfig.canConnect());
         ConnectionResult connectionResult = blackDuckServerConfig.attemptConnection(new SilentIntLogger());
@@ -99,8 +98,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testInvalidUrlCanNotConnect() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         builder.setUrl("https://www.google.com");
         BlackDuckServerConfig blackDuckServerConfig = builder.build();
         assertFalse(blackDuckServerConfig.canConnect());
@@ -111,8 +109,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testInvalidPasswordCanNotConnect() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         builder.setPassword("not a real password");
         BlackDuckServerConfig blackDuckServerConfig = builder.build();
         assertFalse(blackDuckServerConfig.canConnect());
@@ -123,8 +120,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testInvalidApiTokenCanNotConnect() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         builder.setUsername(null);
         builder.setPassword(null);
         builder.setApiToken("not a real token");
@@ -137,8 +133,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildTimeoutString() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         BlackDuckServerConfig config = builder.build();
         assertEquals(new URL(URL.string()).getHost(), config.getBlackDuckUrl().url().getHost());
         assertEquals(120, config.getTimeout());
@@ -148,8 +143,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildWithProxy() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         builder.setProxyHost(BlackDuckServerConfigBuilderTestIT.PROXY_PASSTHROUGH_HOST);
         builder.setProxyPort(BlackDuckServerConfigBuilderTestIT.PROXY_PASSTHROUGH_PORT);
         BlackDuckServerConfig config = builder.build();
@@ -164,8 +158,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testUrlwithTrailingSlash() throws Exception {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         BlackDuckServerConfig config = builder.build();
         assertFalse(config.getBlackDuckUrl().toString().endsWith("/"));
         assertEquals("https", config.getBlackDuckUrl().url().getProtocol());
@@ -175,8 +168,7 @@ public class BlackDuckServerConfigBuilderTestIT {
 
     @Test
     public void testValidBuildWithProxyPortZero() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
-        setValidDefaults(builder);
+        BlackDuckServerConfigBuilder builder = createValid();
         BlackDuckServerConfig config = builder.build();
         assertFalse(config.shouldUseProxyForBlackDuck());
 
@@ -195,6 +187,33 @@ public class BlackDuckServerConfigBuilderTestIT {
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("proxy"));
         }
+    }
+
+    @Test
+    public void testSolutionDetailsProvidedUserAgentString() {
+        BlackDuckServerConfigBuilder builder = createValid();
+        builder.setSolutionDetails(new NameVersion("Solution Test", "Test Version"));
+        BlackDuckHttpClient blackDuckHttpClient = builder.build().createBlackDuckHttpClient(new SilentIntLogger());
+        assertTrue(blackDuckHttpClient.getUserAgentString().startsWith("SolutionTest/TestVersion"));
+    }
+
+    @Test
+    public void testSolutionDetailsOmittedProvidedUserAgentString() {
+        BlackDuckServerConfigBuilder builder = createValid();
+        BlackDuckHttpClient blackDuckHttpClient = builder.build().createBlackDuckHttpClient(new SilentIntLogger());
+        assertTrue(blackDuckHttpClient.getUserAgentString().startsWith(BlackDuckCommon.NAME));
+    }
+
+    private BlackDuckServerConfigBuilder createValid() {
+        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        setValidDefaults(builder);
+        return builder;
+    }
+
+    private BlackDuckServerConfigBuilder createBuilder() {
+        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        setBuilderDefaults(builder);
+        return builder;
     }
 
     private void setValidDefaults(BlackDuckServerConfigBuilder builder) {
