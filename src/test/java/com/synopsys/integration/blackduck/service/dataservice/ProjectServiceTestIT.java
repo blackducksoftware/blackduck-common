@@ -120,8 +120,10 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateUpdateProject() throws IllegalArgumentException, IntegrationException {
+        String projectName = "InitialName";
+        deleteProjectIfExists(projectName);
         ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.setName("InitialName");
+        projectRequest.setName(projectName);
         projectRequest.setProjectTier(2);
         projectRequest.setDescription("Initial Description");
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
@@ -146,8 +148,10 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testCreateUpdateProjectVersion() throws IllegalArgumentException, IntegrationException {
+        String projectName = "InitialName";
+        deleteProjectIfExists(projectName);
         ProjectRequest projectRequest = new ProjectRequest();
-        projectRequest.setName("InitialName");
+        projectRequest.setName(projectName);
         projectRequest.setProjectTier(2);
         projectRequest.setDescription("Initial Description");
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
@@ -288,6 +292,7 @@ public class ProjectServiceTestIT {
 
     @Test
     public void testJapaneseCharacterSupport() throws IntegrationException {
+        deleteProjectIfExists(JAPANESE_PROJECT_NAME);
         int initialProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(JAPANESE_PROJECT_NAME, JAPANESE_VERSION_NAME);
         ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
@@ -303,6 +308,13 @@ public class ProjectServiceTestIT {
 
         currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
         assertEquals(initialProjectCount, currentProjectCount);
+    }
+
+    private void deleteProjectIfExists(final String projectName) throws IntegrationException {
+        Optional<ProjectView> projectToDelete = projectService.getProjectByName(projectName);
+        if (projectToDelete.isPresent()) {
+            blackDuckService.delete(projectToDelete.get());
+        }
     }
 
 }
