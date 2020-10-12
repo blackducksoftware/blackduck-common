@@ -3,7 +3,7 @@ package com.synopsys.integration.blackduck.comprehensive;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
@@ -25,7 +25,7 @@ public class BlackDuckServices {
     public ProjectUsersService projectUsersService;
     public ProjectBomService projectBomService;
     public CodeLocationService codeLocationService;
-    public BlackDuckService blackDuckService;
+    public BlackDuckApiClient blackDuckApiClient;
     public ComponentService componentService;
     public PolicyRuleService policyRuleService;
     public CodeLocationCreationService codeLocationCreationService;
@@ -39,7 +39,7 @@ public class BlackDuckServices {
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();
         codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         componentService = blackDuckServicesFactory.createComponentService();
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();

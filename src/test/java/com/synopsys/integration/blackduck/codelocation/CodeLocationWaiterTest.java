@@ -33,7 +33,7 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -60,7 +60,7 @@ public class CodeLocationWaiterTest {
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
-        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckApiClient, mockCodeLocationData.mockProjectService, mockNotificationService);
         CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 0, 5);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus(), "Status was not COMPLETE but was " + codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
@@ -101,7 +101,7 @@ public class CodeLocationWaiterTest {
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
-        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckApiClient, mockCodeLocationData.mockProjectService, mockNotificationService);
         CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7, 5);
         assertTrue(CodeLocationWaitResult.Status.COMPLETE == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
@@ -122,7 +122,7 @@ public class CodeLocationWaiterTest {
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
 
-        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckService, mockCodeLocationData.mockProjectService, mockNotificationService);
+        CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, mockCodeLocationData.mockBlackDuckApiClient, mockCodeLocationData.mockProjectService, mockNotificationService);
         CodeLocationWaitResult codeLocationWaitResult = codeLocationWaiter.checkCodeLocationsAddedToBom(new UserView(), notificationTaskRange, mockCodeLocationData.testProjectAndVersion, codeLocationNames, 2, 7, 5);
         assertTrue(CodeLocationWaitResult.Status.PARTIAL == codeLocationWaitResult.getStatus());
         assertTrue(codeLocationWaitResult.getCodeLocationNames().contains("one"));
@@ -177,7 +177,7 @@ public class CodeLocationWaiterTest {
 
     private class MockCodeLocationData {
         public ProjectService mockProjectService;
-        public BlackDuckService mockBlackDuckService;
+        public BlackDuckApiClient mockBlackDuckApiClient;
         public NameVersion testProjectAndVersion;
 
         public MockCodeLocationData(List<CodeLocationView> codeLocationViewsToReturn) throws IntegrationException {
@@ -188,8 +188,8 @@ public class CodeLocationWaiterTest {
             mockProjectService = Mockito.mock(ProjectService.class);
             Mockito.when(mockProjectService.getProjectVersion(testProjectAndVersion)).thenReturn(Optional.of(projectVersionWrapper));
 
-            mockBlackDuckService = Mockito.mock(BlackDuckService.class);
-            Mockito.when(mockBlackDuckService.getAllResponses(mockProjectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(codeLocationViewsToReturn);
+            mockBlackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
+            Mockito.when(mockBlackDuckApiClient.getAllResponses(mockProjectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(codeLocationViewsToReturn);
         }
     }
 

@@ -17,7 +17,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
@@ -32,7 +32,7 @@ import com.synopsys.integration.rest.HttpUrl;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class BlackDuckServiceTestIT {
+public class BlackDuckApiClientTestIT {
     private IntHttpClientTestHelper testHelper = new IntHttpClientTestHelper();
 
     @Test
@@ -53,19 +53,19 @@ public class BlackDuckServiceTestIT {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        RequestFactory requestFactory = new RequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
 
-        BlackDuckService blackDuckService = new BlackDuckService(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, requestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
         assertNull(blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertNull(blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
-        List<ProjectView> projects = blackDuckService.getSomeResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, 5);
+        List<ProjectView> projects = blackDuckApiClient.getSomeResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, 5);
         assertTrue(projects.size() > 0);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
         ProjectView firstProject = projects.get(0);
-        ProjectView retrievedById = blackDuckService.getResponse(firstProject.getHref(), ProjectView.class);
+        ProjectView retrievedById = blackDuckApiClient.getResponse(firstProject.getHref(), ProjectView.class);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/vnd.blackducksoftware.project-detail-4+json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
     }

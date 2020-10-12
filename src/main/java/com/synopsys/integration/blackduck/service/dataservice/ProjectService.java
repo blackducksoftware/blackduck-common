@@ -32,8 +32,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -45,18 +45,18 @@ import com.synopsys.integration.util.NameVersion;
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;
 
-    public ProjectService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ProjectGetService projectGetService) {
-        super(blackDuckService, requestFactory, logger);
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ProjectGetService projectGetService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.projectGetService = projectGetService;
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        return blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
     }
 
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
-        HttpUrl projectUrl = blackDuckService.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
-        ProjectView projectView = blackDuckService.getResponse(projectUrl, ProjectView.class);
+        HttpUrl projectUrl = blackDuckApiClient.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        ProjectView projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
         if (null == projectRequest.getVersionRequest()) {
             return new ProjectVersionWrapper(projectView);
         }
@@ -66,15 +66,15 @@ public class ProjectService extends DataService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(ProjectView projectView) throws IntegrationException {
-        return blackDuckService.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE);
     }
 
     public ProjectVersionView createProjectVersion(ProjectView projectView, ProjectVersionRequest projectVersionRequest) throws IntegrationException {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
         }
-        HttpUrl projectVersionUrl = blackDuckService.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK), projectVersionRequest);
-        return blackDuckService.getResponse(projectVersionUrl, ProjectVersionView.class);
+        HttpUrl projectVersionUrl = blackDuckApiClient.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK), projectVersionRequest);
+        return blackDuckApiClient.getResponse(projectVersionUrl, ProjectVersionView.class);
     }
 
     public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
@@ -116,11 +116,11 @@ public class ProjectService extends DataService {
     }
 
     public void updateProject(ProjectView projectView) throws IntegrationException {
-        blackDuckService.put(projectView);
+        blackDuckApiClient.put(projectView);
     }
 
     public void updateProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
-        blackDuckService.put(projectVersionView);
+        blackDuckApiClient.put(projectVersionView);
     }
 
     public ProjectVersionWrapper syncProjectAndVersion(ProjectSyncModel projectSyncModel) throws IntegrationException {
@@ -141,8 +141,8 @@ public class ProjectService extends DataService {
         if (performUpdate) {
             logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
             projectSyncModel.populateProjectView(projectView);
-            blackDuckService.put(projectView);
-            projectView = blackDuckService.getResponse(projectView.getHref(), ProjectView.class);
+            blackDuckApiClient.put(projectView);
+            projectView = blackDuckApiClient.getResponse(projectView.getHref(), ProjectView.class);
         }
         ProjectVersionView projectVersionView = null;
 
@@ -154,8 +154,8 @@ public class ProjectService extends DataService {
                 if (performUpdate) {
                     logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
                     projectSyncModel.populateProjectVersionView(projectVersionView);
-                    blackDuckService.put(projectVersionView);
-                    projectVersionView = blackDuckService.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
+                    blackDuckApiClient.put(projectVersionView);
+                    projectVersionView = blackDuckApiClient.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
                 }
             } else {
                 logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));

@@ -36,14 +36,14 @@ public class PagedRequest {
 
     public PagedRequest(BlackDuckRequestBuilder requestBuilder) {
         this.requestBuilder = requestBuilder;
-        int offset = RequestFactory.DEFAULT_OFFSET;
-        int limit = RequestFactory.DEFAULT_LIMIT;
+        int offset = BlackDuckRequestFactory.DEFAULT_OFFSET;
+        int limit = BlackDuckRequestFactory.DEFAULT_LIMIT;
         if (requestBuilder.getQueryParameters() != null) {
-            if (requestBuilder.getQueryParameters().containsKey(RequestFactory.OFFSET_PARAMETER)) {
-                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(RequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
+            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.OFFSET_PARAMETER)) {
+                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
             }
-            if (requestBuilder.getQueryParameters().containsKey(RequestFactory.LIMIT_PARAMETER)) {
-                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(RequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
+            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.LIMIT_PARAMETER)) {
+                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
             }
         }
 
@@ -65,8 +65,8 @@ public class PagedRequest {
         Set<String> offsetValue = new HashSet<>();
         offsetValue.add(String.valueOf(getOffset()));
 
-        request.getQueryParameters().put(RequestFactory.LIMIT_PARAMETER, limitValue);
-        request.getQueryParameters().put(RequestFactory.OFFSET_PARAMETER, offsetValue);
+        request.getQueryParameters().put(BlackDuckRequestFactory.LIMIT_PARAMETER, limitValue);
+        request.getQueryParameters().put(BlackDuckRequestFactory.OFFSET_PARAMETER, offsetValue);
         return request;
     }
 

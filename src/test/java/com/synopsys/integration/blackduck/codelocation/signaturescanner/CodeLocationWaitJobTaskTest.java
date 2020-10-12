@@ -23,7 +23,7 @@ import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLoc
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -39,7 +39,7 @@ public class CodeLocationWaitJobTaskTest {
 
     @Test
     public void testMultipleNotificationsExpected() throws ParseException, IntegrationException {
-        BlackDuckService mockBlackDuckService = Mockito.mock(BlackDuckService.class);
+        BlackDuckApiClient mockBlackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         ProjectService mockProjectService = Mockito.mock(ProjectService.class);
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
 
@@ -56,7 +56,7 @@ public class CodeLocationWaitJobTaskTest {
         String codeLocationName = "GraceIsButGloryBegunAndGloryIsButGracePerfected";
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList(codeLocationName));
 
-        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, mockBlackDuckService, mockProjectService, mockNotificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, 2);
+        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, mockBlackDuckApiClient, mockProjectService, mockNotificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, 2);
 
         ProjectView projectView = new ProjectView();
         ProjectVersionView projectVersionView = new ProjectVersionView();
@@ -71,7 +71,7 @@ public class CodeLocationWaitJobTaskTest {
         foundCodeLocationView.setName(codeLocationName);
         foundCodeLocationView.setMeta(resourceMetadata);
 
-        Mockito.when(mockBlackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
+        Mockito.when(mockBlackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(Arrays.asList(foundCodeLocationView));
 
         Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name())))
             .thenReturn(getExpectedNotifications());

@@ -38,8 +38,8 @@ import com.synopsys.integration.blackduck.api.manual.throwaway.generated.compone
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.view.AssignedUserView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -48,13 +48,13 @@ import com.synopsys.integration.rest.HttpUrl;
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;
 
-    public ProjectUsersService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, UserGroupService userGroupService) {
-        super(blackDuckService, requestFactory, logger);
+    public ProjectUsersService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UserGroupService userGroupService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.userGroupService = userGroupService;
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(ProjectView project) throws IntegrationException {
-        List<AssignedUserView> assignedUsers = blackDuckService.getAllResponses(project, ProjectView.USERS_LINK_RESPONSE);
+        List<AssignedUserView> assignedUsers = blackDuckApiClient.getAllResponses(project, ProjectView.USERS_LINK_RESPONSE);
         return assignedUsers;
     }
 
@@ -65,7 +65,7 @@ public class ProjectUsersService extends DataService {
         List<UserView> resolvedUserViews = new ArrayList<>();
         for (AssignedUserView assigned : assignedUsers) {
             HttpUrl userUrl = new HttpUrl(assigned.getUser());
-            UserView userView = blackDuckService.getResponse(userUrl, UserView.class);
+            UserView userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
             if (userView != null) {
                 resolvedUserViews.add(userView);
             }
@@ -74,7 +74,7 @@ public class ProjectUsersService extends DataService {
     }
 
     public List<AssignedUserGroupView> getAssignedGroupsToProject(ProjectView project) throws IntegrationException {
-        List<AssignedUserGroupView> assignedGroups = blackDuckService.getAllResponses(project, ProjectView.USERGROUPS_LINK_RESPONSE);
+        List<AssignedUserGroupView> assignedGroups = blackDuckApiClient.getAllResponses(project, ProjectView.USERGROUPS_LINK_RESPONSE);
         return assignedGroups;
     }
 
@@ -85,7 +85,7 @@ public class ProjectUsersService extends DataService {
         List<UserGroupView> resolvedGroupViews = new ArrayList<>();
         for (AssignedUserGroupView assigned : assignedGroups) {
             HttpUrl groupUrl = new HttpUrl(assigned.getGroup());
-            UserGroupView groupView = blackDuckService.getResponse(groupUrl, UserGroupView.class);
+            UserGroupView groupView = blackDuckApiClient.getResponse(groupUrl, UserGroupView.class);
             if (groupView != null) {
                 resolvedGroupViews.add(groupView);
             }
@@ -103,9 +103,9 @@ public class ProjectUsersService extends DataService {
         for (AssignedUserGroupView assignedUserGroupView : assignedGroups) {
             if (assignedUserGroupView.getActive()) {
                 HttpUrl groupUrl = new HttpUrl(assignedUserGroupView.getGroup());
-                UserGroupView userGroupView = blackDuckService.getResponse(groupUrl, UserGroupView.class);
+                UserGroupView userGroupView = blackDuckApiClient.getResponse(groupUrl, UserGroupView.class);
                 if (userGroupView.getActive()) {
-                    List<UserView> groupUsers = blackDuckService.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
+                    List<UserView> groupUsers = blackDuckApiClient.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
                     users.addAll(groupUsers);
                 }
             }
@@ -114,7 +114,7 @@ public class ProjectUsersService extends DataService {
         List<AssignedUserView> assignedUsers = getAssignedUsersToProject(projectView);
         for (AssignedUserView assignedUser : assignedUsers) {
             HttpUrl userUrl = new HttpUrl(assignedUser.getUser());
-            UserView userView = blackDuckService.getResponse(userUrl, UserView.class);
+            UserView userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
             users.add(userView);
         }
 
@@ -139,11 +139,11 @@ public class ProjectUsersService extends DataService {
 
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
         userGroupRequest.setGroup(userGroupUrl.string());
-        blackDuckService.post(createUrl, userGroupRequest);
+        blackDuckApiClient.post(createUrl, userGroupRequest);
     }
 
     public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
-        List<UserView> allUsers = blackDuckService.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        List<UserView> allUsers = blackDuckApiClient.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
         UserView userView = null;
         for (UserView user : allUsers) {
             if (user.getUserName().equalsIgnoreCase(username)) {
@@ -168,7 +168,7 @@ public class ProjectUsersService extends DataService {
         assignedUserRequest.setUser(userUrl.string());
 
         HttpUrl addUserUrl = projectView.getFirstLink(ProjectView.USERS_LINK);
-        blackDuckService.post(addUserUrl, assignedUserRequest);
+        blackDuckApiClient.post(addUserUrl, assignedUserRequest);
     }
 
 }

@@ -16,12 +16,12 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 @ExtendWith(TimingExtension.class)
-public class RequestFactoryTest {
+public class BlackDuckRequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() throws IntegrationException {
         BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList("value1", "value2"));
-        RequestFactory requestFactory = new RequestFactory();
-        BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

@@ -41,8 +41,8 @@ import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
 import com.synopsys.integration.blackduck.http.BlackDuckMediaTypes;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.exception.IntegrationException;
@@ -61,8 +61,8 @@ public class ComponentService extends DataService {
                                                                                                                         .filter(notEmptyList -> notEmptyList.size() == 1)
                                                                                                                         .map(listOfSingleElement -> listOfSingleElement.get(0));
 
-    public ComponentService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
-        super(blackDuckService, requestFactory, logger);
+    public ComponentService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
     }
 
     public List<ComponentsView> getAllSearchResults(ExternalId externalId) throws IntegrationException {
@@ -71,8 +71,8 @@ public class ComponentService extends DataService {
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
-        BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
-        List<ComponentsView> allSearchResults = blackDuckService.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        List<ComponentsView> allSearchResults = blackDuckApiClient.getAllResponses(ApiDiscovery.COMPONENTS_LINK_RESPONSE, requestBuilder);
         return allSearchResults;
     }
 
@@ -95,7 +95,7 @@ public class ComponentService extends DataService {
     public Optional<ComponentVersionView> getComponentVersionView(ComponentsView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
             HttpUrl url = new HttpUrl(searchResult.getVersion());
-            return Optional.ofNullable(blackDuckService.getResponse(url, ComponentVersionView.class));
+            return Optional.ofNullable(blackDuckApiClient.getResponse(url, ComponentVersionView.class));
         } else {
             return Optional.empty();
         }
@@ -104,16 +104,16 @@ public class ComponentService extends DataService {
     public Optional<ComponentView> getComponentView(ComponentsView searchResult) throws IntegrationException {
         if (StringUtils.isNotBlank(searchResult.getVersion())) {
             HttpUrl url = new HttpUrl(searchResult.getVersion());
-            return Optional.ofNullable(blackDuckService.getResponse(url, ComponentView.class));
+            return Optional.ofNullable(blackDuckApiClient.getResponse(url, ComponentView.class));
         } else {
             return Optional.empty();
         }
     }
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder()
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder()
                                                      .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-        List<VulnerabilityView> vulnerabilityList = blackDuckService.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
+        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(componentVersion, ComponentVersionView.VULNERABILITIES_LINK_RESPONSE, requestBuilder);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
@@ -121,7 +121,7 @@ public class ComponentService extends DataService {
     public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
         String remediatingUrl = componentVersionView.getHref() + "/" + ComponentService.REMEDIATING_LINK;
         LinkSingleResponse<ComponentVersionRemediatingView> linkSingleResponse = new LinkSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
-        return Optional.ofNullable(blackDuckService.getResponse(linkSingleResponse));
+        return Optional.ofNullable(blackDuckApiClient.getResponse(linkSingleResponse));
     }
 
 }

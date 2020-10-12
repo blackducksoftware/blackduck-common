@@ -53,15 +53,6 @@ public abstract class BlackDuckHttpClient extends AuthenticatingIntHttpClient {
 
     protected final AuthenticationSupport authenticationSupport;
 
-    @Deprecated
-    /**
-     * @deprecated Please provide a solution-specific UserAgentItem including solution name and version.
-     */
-    public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, AuthenticationSupport authenticationSupport,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, (UserAgentItem)null, authenticationSupport, blackDuckMediaTypeDiscovery);
-    }
-
     public BlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, new UserAgentItem(solutionDetails), BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);

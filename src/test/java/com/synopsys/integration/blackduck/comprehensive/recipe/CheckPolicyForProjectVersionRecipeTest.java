@@ -49,13 +49,13 @@ public class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
          * To create a Policy Rule we can construct a PolicyRuleView and create it to Black Duck.
          */
         HttpUrl policyRuleUrl = policyRuleService.createPolicyRule(policyRuleView);
-        policyRuleView = blackDuckService.getResponse(policyRuleUrl, PolicyRuleView.class);
+        policyRuleView = blackDuckApiClient.getResponse(policyRuleUrl, PolicyRuleView.class);
     }
 
     @AfterEach
     public void cleanup() throws IntegrationException {
         deleteProject(projectVersionWrapper.getProjectView());
-        blackDuckService.delete(policyRuleView);
+        blackDuckApiClient.delete(policyRuleView);
     }
 
     @Test

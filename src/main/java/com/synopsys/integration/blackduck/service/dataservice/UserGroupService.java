@@ -38,8 +38,8 @@ import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -48,19 +48,19 @@ import com.synopsys.integration.rest.HttpUrl;
 public class UserGroupService extends DataService {
     public static final BiPredicate<String, UserView> MATCHING_USERNAME = (username, userView) -> username.equalsIgnoreCase(userView.getUserName());
 
-    public UserGroupService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
-        super(blackDuckService, requestFactory, logger);
+    public UserGroupService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
     }
 
     public UserGroupView createUserGroup(UserGroupRequest userGroupRequest) throws IntegrationException {
-        HttpUrl userGroupUrl = blackDuckService.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
-        UserGroupView userGroupView = blackDuckService.getResponse(userGroupUrl, UserGroupView.class);
+        HttpUrl userGroupUrl = blackDuckApiClient.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
+        UserGroupView userGroupView = blackDuckApiClient.getResponse(userGroupUrl, UserGroupView.class);
         return userGroupView;
     }
 
     public Optional<UserView> getUserByUsername(String username) throws IntegrationException {
         Predicate<UserView> predicate = userView -> MATCHING_USERNAME.test(username, userView);
-        List<UserView> matchingUsers = blackDuckService.getSomeMatchingResponses(ApiDiscovery.USERS_LINK_RESPONSE, predicate, 1);
+        List<UserView> matchingUsers = blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.USERS_LINK_RESPONSE, predicate, 1);
         if (!matchingUsers.isEmpty()) {
             return Optional.ofNullable(matchingUsers.get(0));
         }
@@ -79,12 +79,12 @@ public class UserGroupService extends DataService {
 
     public List<ProjectView> getProjectsForUser(UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
-        List<UserProjectsView> assignedProjectViews = blackDuckService.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
+        List<UserProjectsView> assignedProjectViews = blackDuckApiClient.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
         List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (UserProjectsView assigned : assignedProjectViews) {
             HttpUrl projectUrl = new HttpUrl(assigned.getProject());
-            ProjectView project = blackDuckService.getResponse(projectUrl, ProjectView.class);
+            ProjectView project = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
             if (project != null) {
                 resolvedProjectViews.add(project);
             }
@@ -102,7 +102,7 @@ public class UserGroupService extends DataService {
     }
 
     public List<RoleAssignmentView> getRolesForUser(UserView userView) throws IntegrationException {
-        return blackDuckService.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
     }
 
     public List<RoleAssignmentView> getInheritedRolesForUser(String username) throws IntegrationException {
@@ -114,7 +114,7 @@ public class UserGroupService extends DataService {
     }
 
     public List<RoleAssignmentView> getInheritedRolesForUser(UserView userView) throws IntegrationException {
-        return blackDuckService.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
     }
 
     public List<RoleAssignmentView> getAllRolesForUser(String username) throws IntegrationException {
@@ -133,7 +133,7 @@ public class UserGroupService extends DataService {
     }
 
     public Optional<UserGroupView> getGroupByName(String groupName) throws IntegrationException {
-        List<UserGroupView> allGroups = blackDuckService.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
+        List<UserGroupView> allGroups = blackDuckApiClient.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
         for (UserGroupView group : allGroups) {
             if (group.getName().equalsIgnoreCase(groupName)) {
                 return Optional.of(group);

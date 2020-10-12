@@ -28,23 +28,23 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
 public class UploadCallable implements Callable<UploadOutput> {
-    private final BlackDuckService blackDuckService;
-    private final RequestFactory requestFactory;
+    private final BlackDuckApiClient blackDuckApiClient;
+    private final BlackDuckRequestFactory blackDuckRequestFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadCallable(BlackDuckService blackDuckService, RequestFactory requestFactory, UploadTarget uploadTarget) {
-        this.blackDuckService = blackDuckService;
-        this.requestFactory = requestFactory;
+    public UploadCallable(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, UploadTarget uploadTarget) {
+        this.blackDuckApiClient = blackDuckApiClient;
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -61,12 +61,12 @@ public class UploadCallable implements Callable<UploadOutput> {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
             }
 
-            HttpUrl url = blackDuckService.getUrl(BlackDuckService.BOMIMPORT_PATH);
-            Request request = requestFactory
+            HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.BOMIMPORT_PATH);
+            Request request = blackDuckRequestFactory
                                   .createCommonPostRequestBuilder(url, jsonPayload)
                                   .acceptMimeType(uploadTarget.getMediaType())
                                   .build();
-            try (Response response = blackDuckService.execute(request)) {
+            try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
             } catch (IOException e) {

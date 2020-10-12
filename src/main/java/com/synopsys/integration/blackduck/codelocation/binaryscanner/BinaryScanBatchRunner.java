@@ -29,20 +29,20 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.log.IntLogger;
 
 public class BinaryScanBatchRunner {
     private final IntLogger logger;
-    private final BlackDuckService blackDuckService;
-    private final RequestFactory requestFactory;
+    private final BlackDuckApiClient blackDuckApiClient;
+    private final BlackDuckRequestFactory blackDuckRequestFactory;
     private final ExecutorService executorService;
 
-    public BinaryScanBatchRunner(IntLogger logger, BlackDuckService blackDuckService, RequestFactory requestFactory, ExecutorService executorService) {
+    public BinaryScanBatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, ExecutorService executorService) {
         this.logger = logger;
-        this.blackDuckService = blackDuckService;
-        this.requestFactory = requestFactory;
+        this.blackDuckApiClient = blackDuckApiClient;
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
         this.executorService = executorService;
     }
 
@@ -79,7 +79,7 @@ public class BinaryScanBatchRunner {
             uploadBatch
                 .getBinaryScans()
                 .stream()
-                .map(binaryScan -> new BinaryScanCallable(blackDuckService, requestFactory, binaryScan))
+                .map(binaryScan -> new BinaryScanCallable(blackDuckApiClient, blackDuckRequestFactory, binaryScan))
                 .collect(Collectors.toList());
 
         return callables;

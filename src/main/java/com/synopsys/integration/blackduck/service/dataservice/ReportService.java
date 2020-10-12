@@ -49,8 +49,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.BomComponent;
 import com.synopsys.integration.blackduck.service.model.PolicyRule;
@@ -75,13 +75,13 @@ public class ReportService extends DataService {
     private final HttpUrl blackDuckBaseUrl;
     private final Gson gson;
 
-    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
-        this(gson, blackDuckBaseUrl, blackDuckService, requestFactory, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
+    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ProjectService projectDataService, IntegrationEscapeUtil escapeUtil) {
+        this(gson, blackDuckBaseUrl, blackDuckApiClient, blackDuckRequestFactory, logger, projectDataService, escapeUtil, ReportService.DEFAULT_TIMEOUT);
     }
 
-    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ProjectService projectDataService,
+    public ReportService(Gson gson, HttpUrl blackDuckBaseUrl, BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ProjectService projectDataService,
         IntegrationEscapeUtil escapeUtil, long timeoutInMilliseconds) {
-        super(blackDuckService, requestFactory, logger);
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.projectDataService = projectDataService;
         this.escapeUtil = escapeUtil;
 
@@ -136,7 +136,7 @@ public class ReportService extends DataService {
         reportData.setDistribution(version.getDistribution().toString());
         List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        List<ProjectVersionComponentView> bomEntries = blackDuckService.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomEntries = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         boolean policyFailure = false;
         for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
             String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
@@ -150,7 +150,7 @@ public class ReportService extends DataService {
                 if (!policyFailure) {
                     // FIXME if we could check if Black Duck has the policy module we could remove a lot of the mess
                     try {
-                        PolicyStatusView bomPolicyStatus = blackDuckService.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
+                        PolicyStatusView bomPolicyStatus = blackDuckApiClient.getResponse(componentPolicyStatusURL, PolicyStatusView.class);
                         policyStatus = bomPolicyStatus.getApprovalStatus().toString();
                     } catch (IntegrationException e) {
                         policyFailure = true;
@@ -231,7 +231,7 @@ public class ReportService extends DataService {
         if (bomEntry != null && bomEntry.getApprovalStatus() != null) {
             PolicyStatusType status = bomEntry.getApprovalStatus();
             if (status == PolicyStatusType.IN_VIOLATION) {
-                List<ComponentPolicyRulesView> rules = blackDuckService.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
+                List<ComponentPolicyRulesView> rules = blackDuckApiClient.getAllResponses(bomEntry, ProjectVersionComponentView.POLICY_RULES_LINK_RESPONSE);
                 List<PolicyRule> rulesViolated = new ArrayList<>();
                 for (ComponentPolicyRulesView policyRuleView : rules) {
                     PolicyRule ruleViolated = new PolicyRule(policyRuleView.getName(), policyRuleView.getDescription());
@@ -316,9 +316,9 @@ public class ReportService extends DataService {
         jsonObject.addProperty("reportFormat", reportFormat.toString());
         jsonObject.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
 
-        String json = blackDuckService.convertToJson(jsonObject);
-        Request request = requestFactory.createCommonPostRequestBuilder(reportUrl, json).build();
-        return blackDuckService.executePostRequestAndRetrieveURL(request);
+        String json = blackDuckApiClient.convertToJson(jsonObject);
+        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(reportUrl, json).build();
+        return blackDuckApiClient.executePostRequestAndRetrieveURL(request);
     }
 
     /**
@@ -331,7 +331,7 @@ public class ReportService extends DataService {
         ReportView reportInfo = null;
 
         while (timeFinished == null) {
-            reportInfo = blackDuckService.getResponse(reportUrl, ReportView.class);
+            reportInfo = blackDuckApiClient.getResponse(reportUrl, ReportView.class);
             timeFinished = reportInfo.getFinishedAt();
             if (timeFinished != null) {
                 break;
@@ -353,7 +353,7 @@ public class ReportService extends DataService {
     }
 
     private JsonElement getReportContentJson(HttpUrl reportContentUri) throws IntegrationException {
-        try (Response response = blackDuckService.get(reportContentUri)) {
+        try (Response response = blackDuckApiClient.get(reportContentUri)) {
             String jsonResponse = response.getContentString();
 
             JsonObject json = gson.fromJson(jsonResponse, JsonObject.class);
@@ -367,7 +367,7 @@ public class ReportService extends DataService {
     }
 
     public void deleteBlackDuckReport(HttpUrl reportUri) throws IntegrationException {
-        blackDuckService.delete(reportUri);
+        blackDuckApiClient.delete(reportUri);
     }
 
 }

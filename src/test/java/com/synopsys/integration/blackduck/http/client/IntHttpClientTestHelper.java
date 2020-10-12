@@ -20,8 +20,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -135,9 +135,9 @@ public class IntHttpClientTestHelper {
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
-        RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
-        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory);
+        BlackDuckServicesFactory blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
         return blackDuckServicesFactory;
     }
 
@@ -152,11 +152,11 @@ public class IntHttpClientTestHelper {
         }
     }
 
-    public void deleteIfProjectExists(IntLogger logger, ProjectService projectService, BlackDuckService blackDuckService, String projectName) throws Exception {
+    public void deleteIfProjectExists(IntLogger logger, ProjectService projectService, BlackDuckApiClient blackDuckApiClient, String projectName) throws Exception {
         try {
             Optional<ProjectView> project = projectService.getProjectByName(projectName);
             if (project.isPresent()) {
-                blackDuckService.delete(project.get());
+                blackDuckApiClient.delete(project.get());
             }
         } catch (BlackDuckIntegrationException e) {
             logger.warn("Project didn't exist");

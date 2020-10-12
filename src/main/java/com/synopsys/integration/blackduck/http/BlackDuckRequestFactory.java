@@ -34,7 +34,7 @@ import com.synopsys.integration.rest.body.MultipartBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
-public class RequestFactory {
+public class BlackDuckRequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
     public static final String OFFSET_PARAMETER = "offset";
     public static final String Q_PARAMETER = "q";

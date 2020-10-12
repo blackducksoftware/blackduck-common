@@ -34,7 +34,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.BuilderProperties;
 import com.synopsys.integration.builder.BuilderPropertyKey;
@@ -80,7 +80,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
     private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery = new BlackDuckMediaTypeDiscovery();
     private ExecutorService executorService = new NoThreadExecutorService();
-    private RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+    private BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -115,7 +115,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
             return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
-                requestFactory);
+                blackDuckRequestFactory);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -124,7 +124,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             Credentials credentials = credentialsBuilder.build();
 
             return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery, executorService,
-                requestFactory);
+                blackDuckRequestFactory);
         }
     }
 
@@ -479,12 +479,12 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    public RequestFactory getRequestFactory() {
-        return requestFactory;
+    public BlackDuckRequestFactory getRequestFactory() {
+        return blackDuckRequestFactory;
     }
 
-    public void setRequestFactory(RequestFactory requestFactory) {
-        this.requestFactory = requestFactory;
+    public void setRequestFactory(BlackDuckRequestFactory blackDuckRequestFactory) {
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
 }

@@ -33,7 +33,6 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadServ
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -70,7 +69,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
-    private final UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+    private final UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
     private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
     private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
 
@@ -90,12 +89,12 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private void cleanBlackDuckTestElements() throws IntegrationException {
         Optional<ProjectView> projectView = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
         if (projectView.isPresent()) {
-            blackDuckServices.blackDuckService.delete(projectView.get());
+            blackDuckServices.blackDuckApiClient.delete(projectView.get());
         }
 
-        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, shouldDeleteCodeLocation, CODE_LOCATION_NAMES.size());
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, shouldDeleteCodeLocation, CODE_LOCATION_NAMES.size());
         for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
-            blackDuckServices.blackDuckService.delete(codeLocationToDelete);
+            blackDuckServices.blackDuckApiClient.delete(codeLocationToDelete);
         }
     }
 
@@ -135,7 +134,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
         boolean foundAllCodeLocations = waitForCodeLocations(expectedCodeLocationNames, projectVersionView);
         assertTrue(foundAllCodeLocations, "All code locations were not found");
 
-        List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         Set<String> expectedCodeLocationUrls = codeLocationViews
                                                    .stream()
                                                    .map(CodeLocationView::getHref)
@@ -154,7 +153,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private boolean waitForCodeLocations(Set<String> expectedCodeLocationNames, ProjectVersionView projectVersionView) throws InterruptedException, IntegrationException {
         Predicate<CodeLocationView> nameInSet = (codeLocationView) -> expectedCodeLocationNames.contains(codeLocationView.getName());
         WaitJobTask findAllCodeLocationNames = () -> {
-            List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckService.getSomeMatchingResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, nameInSet, expectedCodeLocationNames.size());
+            List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE, nameInSet, expectedCodeLocationNames.size());
             Set<String> foundCodeLocationNames = codeLocationViews
                                                      .stream()
                                                      .map(CodeLocationView::getName)

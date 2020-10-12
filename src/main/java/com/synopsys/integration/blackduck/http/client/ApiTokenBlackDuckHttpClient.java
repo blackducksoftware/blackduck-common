@@ -45,22 +45,6 @@ public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
     private final Gson gson;
     private final String apiToken;
 
-    @Deprecated
-    /**
-     * @deprecated Please supply a solution name and version.
-     */
-    public ApiTokenBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, authenticationSupport, blackDuckMediaTypeDiscovery);
-        this.gson = gson;
-        this.apiToken = apiToken;
-
-        if (StringUtils.isBlank(apiToken)) {
-            throw new IllegalArgumentException("No API token was found.");
-        }
-    }
-
     public ApiTokenBlackDuckHttpClient(
         IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
