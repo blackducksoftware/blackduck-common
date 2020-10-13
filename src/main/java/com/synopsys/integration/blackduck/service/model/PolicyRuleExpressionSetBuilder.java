@@ -39,8 +39,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseCodeSharingType;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
@@ -105,7 +105,7 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.COMPONENT_USAGE, componentUsageTypes);
     }
 
-    public void addLicenseFamilyCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<CustomLicenseRequestCodeSharingType> licenseCodeSharingTypes) throws BlackDuckIntegrationException {
+    public void addLicenseFamilyCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<LicenseCodeSharingType> licenseCodeSharingTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.LICENSE_FAMILY, licenseCodeSharingTypes);
     }
 

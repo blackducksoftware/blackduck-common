@@ -31,7 +31,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionVie
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomLicenseView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
 import com.synopsys.integration.blackduck.http.RequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.DataService;

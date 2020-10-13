@@ -32,7 +32,7 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectVersion
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.NameValuePairView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.NameValuePairView;
 
 public class PolicyStatusDescription {
     private final ProjectVersionPolicyStatusView policyStatusItem;

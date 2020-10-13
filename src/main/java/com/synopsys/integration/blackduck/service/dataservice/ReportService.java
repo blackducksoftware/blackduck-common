@@ -39,14 +39,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.deprecated.enumeration.ReportFormatType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyStatusView;
+import com.synopsys.integration.blackduck.api.generated.deprecated.view.PolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ReportType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseReportsReportReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.http.RequestFactory;
@@ -314,7 +314,7 @@ public class ReportService extends DataService {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("reportFormat", reportFormat.toString());
-        jsonObject.addProperty("reportType", ReportType.VERSION_LICENSE.toString());
+        jsonObject.addProperty("reportType", LicenseReportsReportReportType.VERSION_LICENSE.toString());
 
         String json = blackDuckService.convertToJson(jsonObject);
         Request request = requestFactory.createCommonPostRequestBuilder(reportUrl, json).build();

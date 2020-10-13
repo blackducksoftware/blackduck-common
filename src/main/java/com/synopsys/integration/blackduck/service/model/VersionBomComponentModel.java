@@ -32,11 +32,11 @@ import com.synopsys.integration.blackduck.api.generated.component.ProjectVersion
 import com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesUsageType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComparisonItemsComponentMatchTypesType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentMatchTypesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.VersionBomOriginView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomOriginView;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentView component;
@@ -99,7 +99,7 @@ public class VersionBomComponentModel {
         return component.getOrigins();
     }
 
-    public List<ProjectVersionComparisonItemsComponentMatchTypesType> getMatchTypes() {
+    public List<ProjectVersionComponentMatchTypesType> getMatchTypes() {
         return component.getMatchTypes();
     }
 
