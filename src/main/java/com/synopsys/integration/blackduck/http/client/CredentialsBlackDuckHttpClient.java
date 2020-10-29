@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.codec.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -45,17 +44,31 @@ import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.NameVersion;
 
 public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
-    public static final String SET_COOKIE = "Set-Cookie";
-    public static final String AUTHORIZATION_BEARER_PREFIX = "AUTHORIZATION_BEARER=";
-    public static final String HEADER_VALUE_SEPARATOR = ";";
-
     private final Credentials credentials;
+    private final CookieHeaderParser cookieHeaderParser;
 
+    @Deprecated
+    /**
+     * @deprecated Please provide a CookieHeaderParser.
+     */
     public CredentialsBlackDuckHttpClient(
         IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
         super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
+        this.cookieHeaderParser = new CookieHeaderParser();
+
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials cannot be null.");
+        }
+    }
+
+    public CredentialsBlackDuckHttpClient(
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
+        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, CookieHeaderParser cookieHeaderParser) {
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        this.credentials = credentials;
+        this.cookieHeaderParser = cookieHeaderParser;
 
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials cannot be null.");
@@ -76,18 +89,9 @@ public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
         if (response.isStatusCodeSuccess()) {
             CloseableHttpResponse actualResponse = response.getActualResponse();
-            Optional<String> token = parseBearerToken(actualResponse);
+            Optional<String> token = cookieHeaderParser.parseBearerToken(actualResponse.getAllHeaders());
             authenticationSupport.addBearerToken(logger, request, this, token);
         }
-    }
-
-    private Optional<String> parseBearerToken(CloseableHttpResponse response) {
-        if (response.containsHeader(SET_COOKIE)) {
-            String setCookieHeader = response.getFirstHeader(SET_COOKIE).getValue();
-            return Optional.ofNullable(StringUtils.substringBetween(setCookieHeader, AUTHORIZATION_BEARER_PREFIX, HEADER_VALUE_SEPARATOR));
-        }
-
-        return Optional.empty();
     }
 
 }
