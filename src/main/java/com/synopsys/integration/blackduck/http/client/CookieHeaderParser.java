@@ -29,14 +29,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 public class CookieHeaderParser {
-    public static final String SET_COOKIE = "Set-Cookie";
+    public static final String SET_COOKIE = "SET-COOKIE";
     public static final String AUTHORIZATION_BEARER_PREFIX = "AUTHORIZATION_BEARER=";
     public static final String HEADER_VALUE_SEPARATOR = ";";
 
     public Optional<String> parseBearerToken(Header[] allHeaders) {
         return Arrays
                    .stream(allHeaders)
-                   .filter(header -> SET_COOKIE.equals(header.getName()))
+                   // https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+                   // header names are case insensitive
+                   .filter(header -> SET_COOKIE.equalsIgnoreCase(header.getName()))
                    .filter(header -> header.getValue().contains(AUTHORIZATION_BEARER_PREFIX))
                    .findFirst()
                    .map(header -> getToken(header.getValue()));

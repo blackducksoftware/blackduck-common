@@ -55,4 +55,16 @@ public class CookieHeaderParserTest {
         assertEquals("bearertoken", cookieHeaderParser.parseBearerToken(headers).get());
     }
 
+    @Test
+    public void testParsingCaseInsensitive() {
+        CookieHeaderParser cookieHeaderParser = new CookieHeaderParser();
+        Header[] headers = {
+            new BasicHeader("Content-type", "application/json")
+            , new BasicHeader("SeT-cOoKiE", CookieHeaderParser.AUTHORIZATION_BEARER_PREFIX + BEARER_TOKEN)
+            , new BasicHeader("User-Agent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2")
+        };
+
+        assertEquals("bearertoken", cookieHeaderParser.parseBearerToken(headers).get());
+    }
+
 }
