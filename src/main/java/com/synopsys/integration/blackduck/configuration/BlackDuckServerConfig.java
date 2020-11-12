@@ -84,7 +84,8 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
             blackDuckRequestFactory);
     }
 
-    private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
+    private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson,
+        ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, Credentials credentials, String apiToken, BlackDuckRequestFactory blackDuckRequestFactory) {
         blackDuckUrl = url;
         this.solutionDetails = solutionDetails;
@@ -180,8 +181,8 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
-        BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
-        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckRestConnection, logger, blackDuckRequestFactory);
+        BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
+        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
     }
 
     public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {

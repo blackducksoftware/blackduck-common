@@ -27,7 +27,6 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
@@ -88,8 +87,8 @@ public class ScannerZipInstallerTest {
         Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
 
-        IntHttpClient mockIntHttpClient = Mockito.mock(IntHttpClient.class);
-        Mockito.when(mockIntHttpClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+        BlackDuckHttpClient mockBlackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
+        Mockito.when(mockBlackDuckHttpClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
 
         IntLogger logger = new BufferedIntLogger();
         Path tempDirectory = Files.createTempDirectory(null);
@@ -97,7 +96,7 @@ public class ScannerZipInstallerTest {
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
-            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockIntHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl("http://www.synopsys.com"), OperatingSystemType.MAC);
+            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockBlackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl("http://www.synopsys.com"), OperatingSystemType.MAC);
 
             try {
                 ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);

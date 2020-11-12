@@ -33,7 +33,7 @@ import com.synopsys.integration.rest.HttpUrl;
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 public class BlackDuckApiClientTestIT {
-    private IntHttpClientTestHelper testHelper = new IntHttpClientTestHelper();
+    private final IntHttpClientTestHelper testHelper = new IntHttpClientTestHelper();
 
     @Test
     public void testMediaType() throws IntegrationException {

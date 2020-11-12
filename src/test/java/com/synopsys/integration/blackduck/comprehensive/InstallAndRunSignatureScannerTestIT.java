@@ -29,7 +29,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.DefaultBlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -74,7 +74,7 @@ public class InstallAndRunSignatureScannerTestIT {
         IntEnvironmentVariables environmentVariables = blackDuckServicesFactory.getEnvironmentVariables();
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
-        BlackDuckHttpClient httpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
+        DefaultBlackDuckHttpClient httpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         HttpUrl blackDuckServerUrl = httpClient.getBaseUrl();
 
