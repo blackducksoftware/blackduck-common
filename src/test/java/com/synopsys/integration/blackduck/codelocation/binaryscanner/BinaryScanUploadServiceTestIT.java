@@ -23,9 +23,12 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
 import com.synopsys.integration.blackduck.comprehensive.VerifyNotifications;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.log.LogLevel;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -43,13 +46,20 @@ public class BinaryScanUploadServiceTestIT {
     }
 
     @Test
-    @Disabled
-    //disabled because special config is needed to support /api/uploads (binary scan)
-    public void testCodeLocationWithJapaneseFileFromBinaryScanUpload() throws Exception {
+    public void testCodeLocationFromBinaryScanUploadWhenNotConfigured() throws Exception {
         BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
         BinaryScanData binaryScanData = createBinaryScanData(blackDuckServices, createTestBinaryScan());
 
-        assertBinaryUploadCompleted(blackDuckServices, binaryScanData);
+        BinaryScanUploadService binaryScanUploadService = blackDuckServices.blackDuckServicesFactory.createBinaryScanUploadService();
+        BinaryScanBatchOutput binaryScanBatchOutput = binaryScanUploadService.uploadBinaryScanAndWait(binaryScanData.binaryScan, 15 * 60);
+        BufferedIntLogger logger = new BufferedIntLogger();
+        try {
+            binaryScanBatchOutput.throwExceptionForError(logger);
+        } catch (Exception e) {
+            assertTrue(e instanceof BlackDuckIntegrationException);
+            assertTrue(e.getMessage().startsWith("Error when uploading binary scan"));
+            assertTrue(logger.getOutputString(LogLevel.ERROR).contains(e.getMessage()));
+        }
     }
 
     @Test
