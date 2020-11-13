@@ -15,7 +15,7 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationServi
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
-import com.synopsys.integration.blackduck.http.client.DefaultBlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -75,14 +75,14 @@ public class BasicRecipe {
          * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
-        DefaultBlackDuckHttpClient defaultBlackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
         gson = BlackDuckServicesFactory.createDefaultGson();
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, defaultBlackDuckHttpClient, logger, blackDuckRequestFactory);
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
         blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService();
         projectService = blackDuckServicesFactory.createProjectService();

@@ -21,7 +21,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatus
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
-import com.synopsys.integration.blackduck.http.client.DefaultBlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
@@ -36,19 +36,19 @@ public class BlackDuckApiClientTest {
     @Test
     public void testGettingResponseWhenLinkNotPresent() throws IOException, IntegrationException {
         IntLogger logger = new BufferedIntLogger();
-        DefaultBlackDuckHttpClient defaultBlackDuckHttpClient = Mockito.mock(DefaultBlackDuckHttpClient.class);
+        BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
-        BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(defaultBlackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(defaultBlackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_not_complete.json");
 
         String incompleteJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         ProjectVersionView projectVersionViewWithMissingLink = blackDuckJsonTransformer.getResponseAs(incompleteJson, ProjectVersionView.class);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(defaultBlackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
         Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertFalse(ProjectVersionPolicyStatusView.isPresent());
@@ -57,12 +57,12 @@ public class BlackDuckApiClientTest {
     @Test
     public void testGettingResponseWhenLinkPresent() throws IOException, IntegrationException {
         IntLogger logger = new BufferedIntLogger();
-        DefaultBlackDuckHttpClient defaultBlackDuckHttpClient = Mockito.mock(DefaultBlackDuckHttpClient.class);
+        BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
-        BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(defaultBlackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(defaultBlackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_complete.json");
 
@@ -74,9 +74,9 @@ public class BlackDuckApiClientTest {
         Response mockedResponse = Mockito.mock(Response.class);
         Mockito.when(mockedResponse.getContentString()).thenReturn(responseContentString);
 
-        Mockito.when(defaultBlackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
+        Mockito.when(blackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(defaultBlackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
         Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertTrue(ProjectVersionPolicyStatusView.isPresent());
