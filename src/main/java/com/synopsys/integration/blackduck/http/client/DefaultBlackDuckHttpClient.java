@@ -136,6 +136,11 @@ public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpCl
     }
 
     @Override
+    public HttpClientBuilder getHttpClientBuilder() {
+        return getClientBuilder();
+    }
+
+    @Override
     protected void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
         super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
         httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());

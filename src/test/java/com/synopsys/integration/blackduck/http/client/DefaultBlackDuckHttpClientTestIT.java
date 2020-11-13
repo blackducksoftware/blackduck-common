@@ -66,8 +66,8 @@ public class DefaultBlackDuckHttpClientTestIT {
 
         BlackDuckServerConfig validConfig = builder.build();
         assertTrue(validConfig.canConnect());
-        DefaultBlackDuckHttpClient defaultBlackDuckHttpClient = validConfig.createBlackDuckHttpClient(new SilentIntLogger());
-        try (Response response = defaultBlackDuckHttpClient.attemptAuthentication()) {
+        BlackDuckHttpClient blackDuckHttpClient = validConfig.createBlackDuckHttpClient(new SilentIntLogger());
+        try (Response response = blackDuckHttpClient.attemptAuthentication()) {
             assertTrue(response.isStatusCodeSuccess());
             assertFalse(response.isStatusCodeError());
         }
@@ -78,8 +78,8 @@ public class DefaultBlackDuckHttpClientTestIT {
         builder.setPassword(password);
         BlackDuckServerConfig invalidUrlConfig = builder.build();
         assertFalse(invalidUrlConfig.canConnect());
-        defaultBlackDuckHttpClient = invalidUrlConfig.createBlackDuckHttpClient(new SilentIntLogger());
-        try (Response response = defaultBlackDuckHttpClient.attemptAuthentication()) {
+        blackDuckHttpClient = invalidUrlConfig.createBlackDuckHttpClient(new SilentIntLogger());
+        try (Response response = blackDuckHttpClient.attemptAuthentication()) {
             assertFalse(response.isStatusCodeSuccess());
             assertTrue(response.isStatusCodeError());
         }
@@ -89,8 +89,8 @@ public class DefaultBlackDuckHttpClientTestIT {
         builder.setPassword("this is not the password");
         BlackDuckServerConfig invalidPasswordConfig = builder.build();
         assertFalse(invalidPasswordConfig.canConnect());
-        defaultBlackDuckHttpClient = invalidPasswordConfig.createBlackDuckHttpClient(new SilentIntLogger());
-        try (Response response = defaultBlackDuckHttpClient.attemptAuthentication()) {
+        blackDuckHttpClient = invalidPasswordConfig.createBlackDuckHttpClient(new SilentIntLogger());
+        try (Response response = blackDuckHttpClient.attemptAuthentication()) {
             assertFalse(response.isStatusCodeSuccess());
             assertTrue(response.isStatusCodeError());
         }
