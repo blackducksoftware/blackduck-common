@@ -63,9 +63,12 @@ public class InstallAndRunSignatureScannerTestIT {
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
 
         File scannerDirectoryPath = Files.createTempDirectory("testscanner").toFile();
+        scannerDirectoryPath.deleteOnExit();
         scannerDirectoryPath.mkdirs();
         File installDirectory = new File(scannerDirectoryPath, "scanner_install");
+        installDirectory.deleteOnExit();
         File outputDirectory = new File(scannerDirectoryPath, "scanner_output");
+        outputDirectory.deleteOnExit();
 
         ScanBatch scanBatch = createScanBatch(blackDuckServerConfig, installDirectory, outputDirectory);
 
@@ -114,7 +117,7 @@ public class InstallAndRunSignatureScannerTestIT {
         blackDuckApiClient.delete(codeLocationViewOptional.get());
     }
 
-    private ScanBatch createScanBatch(final BlackDuckServerConfig blackDuckServerConfig, final File installDirectory, final File outputDirectory) {
+    private ScanBatch createScanBatch(BlackDuckServerConfig blackDuckServerConfig, File installDirectory, File outputDirectory) {
         File scanFile = intHttpClientTestHelper.getFile("integration-bdio-21.0.2-sources.jar");
         ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
         scanBatchBuilder.fromBlackDuckServerConfig(blackDuckServerConfig);
@@ -151,7 +154,7 @@ public class InstallAndRunSignatureScannerTestIT {
         }
 
         @Override
-        public void updateKeyStoreWithServerCertificate(final HttpUrl httpsServer, final String keyStoreFilePath) {
+        public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
             // do nothing
         }
     }
