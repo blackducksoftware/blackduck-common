@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.TestFiles;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.codelocation.Result;
@@ -62,10 +61,10 @@ public class InstallAndRunSignatureScannerTestIT {
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
 
-        File scannerDirectoryPath = TestFiles.createThrowingDeletingFile(() -> Files.createTempDirectory("testscanner").toFile());
+        File scannerDirectoryPath = Files.createTempDirectory("testscanner").toFile();
         scannerDirectoryPath.mkdirs();
-        File installDirectory = TestFiles.createDeletingFile(() -> new File(scannerDirectoryPath, "scanner_install"));
-        File outputDirectory = TestFiles.createDeletingFile(() -> new File(scannerDirectoryPath, "scanner_output"));
+        File installDirectory = new File(scannerDirectoryPath, "scanner_install");
+        File outputDirectory = new File(scannerDirectoryPath, "scanner_output");
 
         ScanBatch scanBatch = createScanBatch(blackDuckServerConfig, installDirectory, outputDirectory);
 
