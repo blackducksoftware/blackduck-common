@@ -7,17 +7,17 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
@@ -42,7 +42,7 @@ public class BasicRecipe {
     protected ExecutorService executorService;
     protected IntLogger logger;
     protected BlackDuckServicesFactory blackDuckServicesFactory;
-    protected BlackDuckService blackDuckService;
+    protected BlackDuckApiClient blackDuckApiClient;
     protected BlackDuckBucketService blackDuckBucketService;
     protected ProjectService projectService;
     protected ProjectUsersService projectUsersService;
@@ -52,7 +52,7 @@ public class BasicRecipe {
     protected CodeLocationCreationService codeLocationCreationService;
     protected PolicyRuleService policyRuleService;
     protected UploadBatchRunner uploadRunner;
-    protected RequestFactory requestFactory;
+    protected BlackDuckRequestFactory blackDuckRequestFactory;
 
     @BeforeEach
     public void startRecipe() {
@@ -80,10 +80,10 @@ public class BasicRecipe {
         gson = BlackDuckServicesFactory.createDefaultGson();
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
-        requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, requestFactory);
-        blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
+        blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
@@ -93,7 +93,7 @@ public class BasicRecipe {
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
 
-        uploadRunner = new UploadBatchRunner(logger, blackDuckService, requestFactory, executorService);
+        uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService);
     }
 
     public ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {
@@ -106,7 +106,7 @@ public class BasicRecipe {
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName);
         projectSyncModel.setDescription("A sample testing project to demonstrate blackduck-common capabilities.");
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
-        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE);
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
 
         return projectSyncModel;
     }
@@ -122,14 +122,14 @@ public class BasicRecipe {
 
     public void deleteProject(ProjectView projectView) throws IntegrationException {
         if (null != projectView) {
-            blackDuckService.delete(projectView);
+            blackDuckApiClient.delete(projectView);
         }
     }
 
     public void deleteCodeLocation(String codeLocationName) throws IntegrationException {
         Optional<CodeLocationView> codeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
         if (codeLocationView.isPresent()) {
-            blackDuckService.delete(codeLocationView.get());
+            blackDuckApiClient.delete(codeLocationView.get());
         }
     }
 

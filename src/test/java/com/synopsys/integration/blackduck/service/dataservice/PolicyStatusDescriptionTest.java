@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.NameValuePairView;
 import com.synopsys.integration.blackduck.service.model.PolicyStatusDescription;
@@ -27,8 +27,8 @@ public class PolicyStatusDescriptionTest {
         int expectedBlockerSeverity = 3;
         int expectedTrivialSeverity = 1;
         int expectedMajorSeverity = 0;
-        int actualInViolationOverall = test.getCountOfStatus(PolicyStatusType.IN_VIOLATION);
-        int actualNotInViolationOverall = test.getCountOfStatus(PolicyStatusType.NOT_IN_VIOLATION);
+        int actualInViolationOverall = test.getCountOfStatus(ProjectVersionComponentPolicyStatusType.IN_VIOLATION);
+        int actualNotInViolationOverall = test.getCountOfStatus(ProjectVersionComponentPolicyStatusType.NOT_IN_VIOLATION);
         int actualBlockerSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.BLOCKER);
         int actualTrivialSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.TRIVIAL);
         int actualMajorSeverity = test.getCountOfSeverity(PolicyRuleSeverityType.MAJOR);
@@ -68,11 +68,11 @@ public class PolicyStatusDescriptionTest {
         projectVersionPolicyStatusComponentVersionPolicyViolationDetailsView.setSeverityLevels(violations);
 
         NameValuePairView inViolation = new NameValuePairView();
-        inViolation.setName(PolicyStatusType.IN_VIOLATION.name());
+        inViolation.setName(ProjectVersionComponentPolicyStatusType.IN_VIOLATION.name());
         inViolation.setValue(4);
 
         NameValuePairView notInViolation = new NameValuePairView();
-        notInViolation.setName(PolicyStatusType.NOT_IN_VIOLATION.name());
+        notInViolation.setName(ProjectVersionComponentPolicyStatusType.NOT_IN_VIOLATION.name());
         notInViolation.setValue(1);
 
         List<NameValuePairView> statuses = new ArrayList<>();
@@ -82,7 +82,7 @@ public class PolicyStatusDescriptionTest {
         ProjectVersionPolicyStatusView policyStatusItem = new ProjectVersionPolicyStatusView();
         policyStatusItem.setComponentVersionPolicyViolationDetails(projectVersionPolicyStatusComponentVersionPolicyViolationDetailsView);
         policyStatusItem.setComponentVersionStatusCounts(statuses);
-        policyStatusItem.setOverallStatus(PolicyStatusType.IN_VIOLATION);
+        policyStatusItem.setOverallStatus(ProjectVersionComponentPolicyStatusType.IN_VIOLATION);
 
         return policyStatusItem;
     }

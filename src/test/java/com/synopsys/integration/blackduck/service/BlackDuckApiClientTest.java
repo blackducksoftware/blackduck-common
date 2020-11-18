@@ -17,10 +17,10 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
@@ -32,7 +32,7 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 @ExtendWith(TimingExtension.class)
-public class BlackDuckServiceTest {
+public class BlackDuckApiClientTest {
     @Test
     public void testGettingResponseWhenLinkNotPresent() throws IOException, IntegrationException {
         IntLogger logger = new BufferedIntLogger();
@@ -42,15 +42,15 @@ public class BlackDuckServiceTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_not_complete.json");
 
         String incompleteJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         ProjectVersionView projectVersionViewWithMissingLink = blackDuckJsonTransformer.getResponseAs(incompleteJson, ProjectVersionView.class);
 
-        BlackDuckService blackDuckService = new BlackDuckService(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, requestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
-        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertFalse(ProjectVersionPolicyStatusView.isPresent());
     }
 
@@ -63,7 +63,7 @@ public class BlackDuckServiceTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        RequestFactory requestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_complete.json");
 
         String completeJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
@@ -76,11 +76,11 @@ public class BlackDuckServiceTest {
 
         Mockito.when(blackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
 
-        BlackDuckService blackDuckService = new BlackDuckService(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, requestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
-        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckService.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertTrue(ProjectVersionPolicyStatusView.isPresent());
-        assertEquals(PolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
+        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
     }
 
 }

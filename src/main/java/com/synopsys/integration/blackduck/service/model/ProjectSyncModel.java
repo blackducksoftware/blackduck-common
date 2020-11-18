@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -78,7 +78,7 @@ public class ProjectSyncModel {
 
     // version fields
     private String cloneFromReleaseUrl;
-    private LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution;
+    private ProjectVersionDistributionType distribution;
     private String nickname;
     private ProjectVersionPhaseType phase;
     private String releaseComments;
@@ -103,7 +103,7 @@ public class ProjectSyncModel {
 
     public static ProjectSyncModel createWithDefaults(NameVersion projectAndVersion) {
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectAndVersion);
-        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL);
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.EXTERNAL);
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         return projectSyncModel;
     }
@@ -281,11 +281,11 @@ public class ProjectSyncModel {
         fieldsWithSetValues.add(ProjectSyncModel.CLONE_FROM_RELEASE_URL_FIELD);
     }
 
-    public LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType getDistribution() {
+    public ProjectVersionDistributionType getDistribution() {
         return distribution;
     }
 
-    public void setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution) {
+    public void setDistribution(ProjectVersionDistributionType distribution) {
         this.distribution = distribution;
         fieldsWithSetValues.add(ProjectSyncModel.DISTRIBUTION_FIELD);
     }

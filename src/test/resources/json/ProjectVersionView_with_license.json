@@ -7,7 +7,20 @@
     "type": "DISJUNCTIVE",
     "licenses": [
       {
-        "license": "https:\/\/int-hub04.dc1.lan\/api\/licenses\/00000000-0010-0000-0000-000000000000",
+        "license": {
+          "name": "Unknown License",
+          "codeSharing": "UNKNOWN",
+          "ownership": "UNKNOWN",
+          "licenseStatus": "UNREVIEWED",
+          "licenseSource": "KB",
+          "_meta": {
+            "allow": [
+              "DELETE",
+              "GET",
+              "PUT"
+            ]
+          }
+        },
         "licenses": [
         ],
         "name": "Unknown License",

@@ -29,11 +29,11 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -43,19 +43,19 @@ import com.synopsys.integration.rest.response.Response;
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ComponentService componentDataService) {
-        super(blackDuckService, requestFactory, logger);
+    public LicenseService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentDataService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.componentDataService = componentDataService;
     }
 
-    public Optional<ProjectVersionLicenseView> getComplexLicenseItemFromComponent(ExternalId externalId) throws IntegrationException {
+    public Optional<ComponentVersionLicenseView> getComplexLicenseItemFromComponent(ExternalId externalId) throws IntegrationException {
         Optional<ComponentsView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
         }
 
         HttpUrl componentVersionUrl = new HttpUrl(componentSearchView.get().getVersion());
-        ComponentVersionView componentVersion = blackDuckService.getResponse(componentVersionUrl, ComponentVersionView.class);
+        ComponentVersionView componentVersion = blackDuckApiClient.getResponse(componentVersionUrl, ComponentVersionView.class);
 
         return Optional.ofNullable(componentVersion.getLicense());
     }
@@ -65,8 +65,8 @@ public class LicenseService extends DataService {
         return getLicenseView(url);
     }
 
-    public LicenseView getLicenseView(ProjectVersionLicenseLicensesView projectVersionLicenseLicensesView) throws IntegrationException {
-        HttpUrl url = new HttpUrl(projectVersionLicenseLicensesView.getLicense());
+    public LicenseView getLicenseView(ComponentVersionLicenseLicensesView componentVersionLicenseLicensesView) throws IntegrationException {
+        HttpUrl url = new HttpUrl(componentVersionLicenseLicensesView.getLicense().getName());
         return getLicenseView(url);
     }
 
@@ -74,13 +74,13 @@ public class LicenseService extends DataService {
         if (licenseUrl == null) {
             return null;
         }
-        LicenseView licenseView = blackDuckService.getResponse(licenseUrl, LicenseView.class);
+        LicenseView licenseView = blackDuckApiClient.getResponse(licenseUrl, LicenseView.class);
         return licenseView;
     }
 
     public String getLicenseText(LicenseView licenseView) throws IntegrationException {
         HttpUrl licenseTextUrl = licenseView.getFirstLink(LicenseView.TEXT_LINK);
-        try (Response response = blackDuckService.get(licenseTextUrl)) {
+        try (Response response = blackDuckApiClient.get(licenseTextUrl)) {
             return response.getContentString();
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

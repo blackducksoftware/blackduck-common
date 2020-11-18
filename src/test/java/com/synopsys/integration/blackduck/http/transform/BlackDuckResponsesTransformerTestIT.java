@@ -11,7 +11,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.PagedRequest;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -23,7 +23,7 @@ import com.synopsys.integration.rest.HttpUrl;
 class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-    private final RequestFactory requestFactory = new RequestFactory();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }
@@ -69,7 +69,7 @@ class BlackDuckResponsesTransformerTestIT {
     private BlackDuckRequestBuilder createRequestBuilder() throws IntegrationException {
         String blackDuckBaseUrl = intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
         HttpUrl url = new HttpUrl(blackDuckBaseUrl).appendRelativeUrl(ApiDiscovery.PROJECTS_LINK_RESPONSE.getBlackDuckPath().getPath());
-        return requestFactory.createCommonGetRequestBuilder(url);
+        return blackDuckRequestFactory.createCommonGetRequestBuilder(url);
     }
 
     private BlackDuckResponsesTransformer createBlackDuckResponsesTransformer() {

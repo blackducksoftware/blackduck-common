@@ -32,20 +32,20 @@ import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.log.IntLogger;
 
 public class UploadBdio2BatchRunner {
     private final IntLogger logger;
-    private final BlackDuckService blackDuckService;
-    private final RequestFactory requestFactory;
+    private final BlackDuckApiClient blackDuckApiClient;
+    private final BlackDuckRequestFactory blackDuckRequestFactory;
     private final ExecutorService executorService;
 
-    public UploadBdio2BatchRunner(IntLogger logger, BlackDuckService blackDuckService, RequestFactory requestFactory, ExecutorService executorService) {
+    public UploadBdio2BatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, ExecutorService executorService) {
         this.logger = logger;
-        this.blackDuckService = blackDuckService;
-        this.requestFactory = requestFactory;
+        this.blackDuckApiClient = blackDuckApiClient;
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
         this.executorService = executorService;
     }
 
@@ -80,7 +80,7 @@ public class UploadBdio2BatchRunner {
     private List<UploadBdio2Callable> createCallables(UploadBatch uploadBatch) {
         return uploadBatch.getUploadTargets()
                    .stream()
-                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckService, requestFactory, uploadTarget))
+                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, blackDuckRequestFactory, uploadTarget))
                    .collect(Collectors.toList());
     }
 

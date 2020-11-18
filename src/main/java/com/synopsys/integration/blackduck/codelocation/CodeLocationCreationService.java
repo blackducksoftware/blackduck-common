@@ -30,8 +30,8 @@ import java.util.Set;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -45,8 +45,8 @@ public class CodeLocationCreationService extends DataService {
     private final CodeLocationWaiter codeLocationWaiter;
     private final NotificationService notificationService;
 
-    public CodeLocationCreationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService) {
-        super(blackDuckService, requestFactory, logger);
+    public CodeLocationCreationService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.codeLocationWaiter = codeLocationWaiter;
         this.notificationService = notificationService;
     }
@@ -80,7 +80,7 @@ public class CodeLocationCreationService extends DataService {
 
     public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames,
         int expectedNotificationCount, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds, waitIntervalInSeconds);
     }
 
@@ -89,7 +89,7 @@ public class CodeLocationCreationService extends DataService {
         LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
         LocalDateTime threeDaysLater = localStartTime.plusDays(3);
 
-        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
         Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 

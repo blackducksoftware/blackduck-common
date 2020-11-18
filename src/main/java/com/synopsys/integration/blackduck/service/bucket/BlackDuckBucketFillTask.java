@@ -27,15 +27,15 @@ import java.util.concurrent.Callable;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 
 public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Callable<Optional<T>> {
-    private final BlackDuckService blackDuckService;
+    private final BlackDuckApiClient blackDuckApiClient;
     private final BlackDuckBucket blackDuckBucket;
     private final LinkSingleResponse<T> linkSingleResponse;
 
-    public BlackDuckBucketFillTask(BlackDuckService blackDuckService, BlackDuckBucket blackDuckBucket, LinkSingleResponse<T> linkSingleResponse) {
-        this.blackDuckService = blackDuckService;
+    public BlackDuckBucketFillTask(BlackDuckApiClient blackDuckApiClient, BlackDuckBucket blackDuckBucket, LinkSingleResponse<T> linkSingleResponse) {
+        this.blackDuckApiClient = blackDuckApiClient;
         this.blackDuckBucket = blackDuckBucket;
         this.linkSingleResponse = linkSingleResponse;
     }
@@ -44,7 +44,7 @@ public class BlackDuckBucketFillTask<T extends BlackDuckResponse> implements Cal
     public Optional<T> call() {
         if (!blackDuckBucket.contains(linkSingleResponse.getLink())) {
             try {
-                T blackDuckResponse = blackDuckService.getResponse(linkSingleResponse);
+                T blackDuckResponse = blackDuckApiClient.getResponse(linkSingleResponse);
                 blackDuckBucket.addValid(linkSingleResponse.getLink(), blackDuckResponse);
                 return Optional.of(blackDuckResponse);
             } catch (Exception e) {

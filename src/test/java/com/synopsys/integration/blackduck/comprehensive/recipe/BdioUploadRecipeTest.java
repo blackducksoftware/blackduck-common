@@ -55,7 +55,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         //in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
         IntLogger logger = new BufferedIntLogger();
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService, requestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
@@ -64,7 +64,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         projectVersionWrapper = projectService.getProjectVersion(projectAndVersion);
         assertTrue(projectVersionWrapper.isPresent());
-        List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> versionCodeLocations = blackDuckApiClient.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertEquals(1, versionCodeLocations.size());
         CodeLocationView versionCodeLocation = versionCodeLocations.get(0);
         assertEquals(codeLocationName, versionCodeLocation.getName());
@@ -76,7 +76,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         // in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
         IntLogger logger = new BufferedIntLogger();
 
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckService, requestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
@@ -100,7 +100,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectAndVersion);
         projectService.createProject(projectSyncModel.createProjectRequest());
         projectVersionWrapper = projectService.getProjectVersion(projectAndVersion);
-        List<CodeLocationView> versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> versionCodeLocations = blackDuckApiClient.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         assertTrue(versionCodeLocations.isEmpty());
 
         NotificationTaskRange notificationTaskRange = codeLocationCreationService.calculateCodeLocationRange();
@@ -116,7 +116,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         }
         waitResult.getCodeLocationNames().stream().forEach(System.out::println);
 
-        versionCodeLocations = blackDuckService.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        versionCodeLocations = blackDuckApiClient.getAllResponses(projectVersionWrapper.get().getProjectVersionView(), ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         CodeLocationView versionCodeLocation = versionCodeLocations.get(0);
         assertEquals(codeLocationName, versionCodeLocation.getName());
     }

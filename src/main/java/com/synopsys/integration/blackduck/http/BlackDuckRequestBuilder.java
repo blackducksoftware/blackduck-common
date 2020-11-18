@@ -22,10 +22,10 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import static com.synopsys.integration.blackduck.http.RequestFactory.FILTER_PARAMETER;
-import static com.synopsys.integration.blackduck.http.RequestFactory.LIMIT_PARAMETER;
-import static com.synopsys.integration.blackduck.http.RequestFactory.OFFSET_PARAMETER;
-import static com.synopsys.integration.blackduck.http.RequestFactory.Q_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.FILTER_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.LIMIT_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.OFFSET_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.Q_PARAMETER;
 
 import java.nio.charset.Charset;
 import java.util.Map;

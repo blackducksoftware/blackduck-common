@@ -14,7 +14,7 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -43,8 +43,8 @@ class ProjectMappingServiceTest {
 
     @AfterEach
     void tearDown() throws IntegrationException {
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
-        blackDuckService.delete(projectView);
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        blackDuckApiClient.delete(projectView);
     }
 
     @Test

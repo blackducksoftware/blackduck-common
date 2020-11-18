@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -27,7 +27,7 @@ import com.synopsys.integration.blackduck.api.manual.temporary.component.Project
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -44,21 +44,21 @@ public class ProjectServiceTestIT {
 
     private final static IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
     private static BlackDuckServicesFactory blackDuckServicesFactory;
-    private static BlackDuckService blackDuckService;
+    private static BlackDuckApiClient blackDuckApiClient;
     private static ProjectService projectService;
     private static ProjectView project = null;
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         ProjectServiceTestIT.blackDuckServicesFactory = ProjectServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
-        ProjectServiceTestIT.blackDuckService = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckService();
+        ProjectServiceTestIT.blackDuckApiClient = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckService();
         ProjectServiceTestIT.projectService = ProjectServiceTestIT.blackDuckServicesFactory.createProjectService();
     }
 
     @AfterEach
     public void tearDownAfterTest() throws Exception {
         if (ProjectServiceTestIT.project != null) {
-            ProjectServiceTestIT.blackDuckService.delete(ProjectServiceTestIT.project);
+            ProjectServiceTestIT.blackDuckApiClient.delete(ProjectServiceTestIT.project);
             ProjectServiceTestIT.project = null;
         }
     }
@@ -79,17 +79,17 @@ public class ProjectServiceTestIT {
         System.out.println("projectUrl: " + projectUrl);
 
         ProjectVersionRequest projectVersionRequest1 = new ProjectVersionRequest();
-        projectVersionRequest1.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
+        projectVersionRequest1.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest1.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest1.setVersionName(testProjectVersion1Name);
 
         ProjectVersionRequest projectVersionRequest2 = new ProjectVersionRequest();
-        projectVersionRequest2.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
+        projectVersionRequest2.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest2.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest2.setVersionName(testProjectVersion2Name);
 
         ProjectVersionRequest projectVersionRequest3 = new ProjectVersionRequest();
-        projectVersionRequest3.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
+        projectVersionRequest3.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest3.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest3.setVersionName(testProjectVersion3Name);
 
@@ -106,11 +106,11 @@ public class ProjectServiceTestIT {
         Optional<ProjectVersionView> projectVersion3 = ProjectServiceTestIT.projectService.getProjectVersion(ProjectServiceTestIT.project, testProjectVersion3Name);
         assertEquals(testProjectVersion3Name, projectVersion3.get().getVersionName());
 
-        ProjectServiceTestIT.blackDuckService.delete(ProjectServiceTestIT.project);
+        ProjectServiceTestIT.blackDuckApiClient.delete(ProjectServiceTestIT.project);
         ProjectServiceTestIT.project = null;
 
         try {
-            ProjectServiceTestIT.blackDuckService.getResponse(projectUrl, ProjectView.class);
+            ProjectServiceTestIT.blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
             fail("This project should have been deleted");
         } catch (Exception e) {
             assertTrue(e instanceof BlackDuckApiException);
@@ -137,9 +137,9 @@ public class ProjectServiceTestIT {
         ProjectServiceTestIT.project.setName("New Name");
         ProjectServiceTestIT.project.setProjectTier(4);
         ProjectServiceTestIT.project.setDescription("New Description");
-        ProjectServiceTestIT.blackDuckService.put(ProjectServiceTestIT.project);
+        ProjectServiceTestIT.blackDuckApiClient.put(ProjectServiceTestIT.project);
 
-        ProjectServiceTestIT.project = ProjectServiceTestIT.blackDuckService.getResponse(projectUrl, ProjectView.class);
+        ProjectServiceTestIT.project = ProjectServiceTestIT.blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
 
         assertEquals("New Name", ProjectServiceTestIT.project.getName());
         assertTrue(4 == ProjectServiceTestIT.project.getProjectTier());
@@ -157,7 +157,7 @@ public class ProjectServiceTestIT {
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.setVersionName("Initial VersionName");
         projectVersionRequest.setPhase(ProjectVersionPhaseType.PLANNING);
-        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.EXTERNAL);
         projectRequest.setVersionRequest(projectVersionRequest);
 
         ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
@@ -166,18 +166,18 @@ public class ProjectServiceTestIT {
 
         assertEquals("Initial VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.PLANNING, projectVersionView.getPhase());
-        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.EXTERNAL, projectVersionView.getDistribution());
+        assertEquals(ProjectVersionDistributionType.EXTERNAL, projectVersionView.getDistribution());
 
         projectVersionView.setVersionName("New VersionName");
         projectVersionView.setPhase(ProjectVersionPhaseType.DEPRECATED);
-        projectVersionView.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
-        ProjectServiceTestIT.blackDuckService.put(projectVersionView);
+        projectVersionView.setDistribution(ProjectVersionDistributionType.INTERNAL);
+        ProjectServiceTestIT.blackDuckApiClient.put(projectVersionView);
 
-        projectVersionView = ProjectServiceTestIT.blackDuckService.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
+        projectVersionView = ProjectServiceTestIT.blackDuckApiClient.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
 
         assertEquals("New VersionName", projectVersionView.getVersionName());
         assertEquals(ProjectVersionPhaseType.DEPRECATED, projectVersionView.getPhase());
-        assertEquals(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL, projectVersionView.getDistribution());
+        assertEquals(ProjectVersionDistributionType.INTERNAL, projectVersionView.getDistribution());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class ProjectServiceTestIT {
 
         Optional<ProjectVersionWrapper> projectVersionWrapper = ProjectServiceTestIT.projectService.getProjectVersion(projectName, projectVersionName);
         ProjectServiceTestIT.project = projectVersionWrapper.get().getProjectView();
-        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
         Optional<ProjectVersionView> latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
@@ -205,7 +205,7 @@ public class ProjectServiceTestIT {
 
         ProjectServiceTestIT.projectService.createProjectVersion(ProjectServiceTestIT.project, projectVersionRequest);
 
-        List<ProjectVersionView> projectVersionViewsAfterUpdate = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViewsAfterUpdate = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViewsAfterUpdate.size());
 
         latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
@@ -234,20 +234,20 @@ public class ProjectServiceTestIT {
         HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
         HttpUrl projectVersionUrl = projectVersionView.getHref();
 
-        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(1, projectVersionViews.size());
 
         ProjectServiceTestIT.project.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
-        ProjectServiceTestIT.blackDuckService.put(ProjectServiceTestIT.project);
+        ProjectServiceTestIT.blackDuckApiClient.put(ProjectServiceTestIT.project);
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.setCloneFromReleaseUrl(projectVersionUrl.string());
         projectVersionRequest.setVersionName("1.0.0-clone");
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
-        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
         ProjectServiceTestIT.projectService.createProjectVersion(ProjectServiceTestIT.project, projectVersionRequest);
 
-        projectVersionViews = ProjectServiceTestIT.blackDuckService.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
         assertEquals(2, projectVersionViews.size());
     }
 
@@ -304,7 +304,7 @@ public class ProjectServiceTestIT {
         int currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
         assertEquals(initialProjectCount + 1, currentProjectCount);
 
-        ProjectServiceTestIT.blackDuckService.delete(optionalProjectVersionWrapper.get().getProjectView());
+        ProjectServiceTestIT.blackDuckApiClient.delete(optionalProjectVersionWrapper.get().getProjectView());
 
         currentProjectCount = ProjectServiceTestIT.projectService.getAllProjects().size();
         assertEquals(initialProjectCount, currentProjectCount);
@@ -313,7 +313,7 @@ public class ProjectServiceTestIT {
     private void deleteProjectIfExists(final String projectName) throws IntegrationException {
         Optional<ProjectView> projectToDelete = projectService.getProjectByName(projectName);
         if (projectToDelete.isPresent()) {
-            blackDuckService.delete(projectToDelete.get());
+            blackDuckApiClient.delete(projectToDelete.get());
         }
     }
 

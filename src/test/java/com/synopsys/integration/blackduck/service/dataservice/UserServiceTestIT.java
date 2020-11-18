@@ -19,7 +19,7 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.UserRequest;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.exception.IntegrationException;
@@ -50,7 +50,7 @@ public class UserServiceTestIT {
     public void testAddingGroupToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         UserGroupService userGroupService = blackDuckServicesFactory.createUserGroupService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
@@ -81,14 +81,14 @@ public class UserServiceTestIT {
         } finally {
             if (null != projectView) {
                 try {
-                    blackDuckService.delete(projectView);
+                    blackDuckApiClient.delete(projectView);
                 } catch (Exception ignored) {
                     // ignored
                 }
             }
             if (null != userGroupView) {
                 try {
-                    blackDuckService.delete(userGroupView);
+                    blackDuckApiClient.delete(userGroupView);
                 } catch (Exception ignored) {
                     // ignored
                 }
@@ -100,7 +100,7 @@ public class UserServiceTestIT {
     public void testAddingUserToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
 
@@ -123,8 +123,8 @@ public class UserServiceTestIT {
             userRequest.setEmail("noreply@synopsys.com");
             userRequest.setPassword("blackduck");
 
-            HttpUrl userUrl = blackDuckService.post(ApiDiscovery.USERS_LINK, userRequest);
-            userView = blackDuckService.getResponse(userUrl, UserView.class);
+            HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
+            userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
 
             List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);
             assertFalse(projectUsers.contains(userView));
@@ -136,14 +136,14 @@ public class UserServiceTestIT {
         } finally {
             if (null != projectView) {
                 try {
-                    blackDuckService.delete(projectView);
+                    blackDuckApiClient.delete(projectView);
                 } catch (Exception ignored) {
                     // ignored
                 }
             }
             if (null != userView) {
                 try {
-                    blackDuckService.delete(userView);
+                    blackDuckApiClient.delete(userView);
                 } catch (Exception ignored) {
                     // ignored
                 }

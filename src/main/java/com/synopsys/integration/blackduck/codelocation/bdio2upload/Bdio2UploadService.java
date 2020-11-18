@@ -29,8 +29,8 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationReque
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
@@ -41,8 +41,8 @@ public class Bdio2UploadService extends DataService {
     private final UploadBdio2BatchRunner uploadBdio2BatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public Bdio2UploadService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, UploadBdio2BatchRunner uploadBdio2BatchRunner, CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckService, requestFactory, logger);
+    public Bdio2UploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UploadBdio2BatchRunner uploadBdio2BatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.uploadBdio2BatchRunner = uploadBdio2BatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

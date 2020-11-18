@@ -37,7 +37,7 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -49,7 +49,7 @@ import com.synopsys.integration.wait.WaitJobTask;
 
 public class CodeLocationWaitJobTask implements WaitJobTask {
     private final IntLogger logger;
-    private final BlackDuckService blackDuckService;
+    private final BlackDuckApiClient blackDuckApiClient;
     private final ProjectService projectService;
     private final NotificationService notificationService;
 
@@ -61,10 +61,10 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
 
     private final Set<String> foundCodeLocationNames = new HashSet<>();
 
-    public CodeLocationWaitJobTask(IntLogger logger, BlackDuckService blackDuckService, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
+    public CodeLocationWaitJobTask(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
         NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount) {
         this.logger = logger;
-        this.blackDuckService = blackDuckService;
+        this.blackDuckApiClient = blackDuckApiClient;
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.userView = userView;
@@ -120,7 +120,7 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
     }
 
     private Map<String, String> retrieveCodeLocations(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<CodeLocationView> codeLocationViews = blackDuckService.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> codeLocationViews = blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         return codeLocationViews
                    .stream()
                    .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))

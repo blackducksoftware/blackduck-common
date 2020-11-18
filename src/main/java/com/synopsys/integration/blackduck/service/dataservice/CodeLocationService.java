@@ -38,8 +38,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.manual.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -49,12 +49,12 @@ public class CodeLocationService extends DataService {
     // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
     public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
 
-    public CodeLocationService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger) {
-        super(blackDuckService, requestFactory, logger);
+    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        return blackDuckService.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE);
     }
 
     public void unmapCodeLocations(List<CodeLocationView> codeLocationViews) throws IntegrationException {
@@ -83,16 +83,16 @@ public class CodeLocationService extends DataService {
 
     public void mapCodeLocation(CodeLocationView codeLocationView, HttpUrl versionUrl) throws IntegrationException {
         codeLocationView.setMappedProjectVersion(null == versionUrl ? "" : versionUrl.string());
-        blackDuckService.put(codeLocationView);
+        blackDuckApiClient.put(codeLocationView);
     }
 
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
-        BlackDuckRequestBuilder requestBuilder = requestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
-        return blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
+        return blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, requestBuilder, predicate, 1)
                    .stream()
                    .findFirst();
     }
@@ -100,13 +100,13 @@ public class CodeLocationService extends DataService {
     public CodeLocationView getCodeLocationById(String codeLocationId) throws IntegrationException {
         BlackDuckPath blackDuckPath = new BlackDuckPath(ApiDiscovery.CODELOCATIONS_LINK.getPath() + "/" + codeLocationId);
         BlackDuckPathSingleResponse<CodeLocationView> codeLocationResponse = new BlackDuckPathSingleResponse<>(blackDuckPath, CodeLocationView.class);
-        return blackDuckService.getResponse(codeLocationResponse);
+        return blackDuckApiClient.getResponse(codeLocationResponse);
     }
 
     public ScanSummaryView getScanSummaryViewById(String scanSummaryId) throws IntegrationException {
-        String uri = BlackDuckService.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
+        String uri = BlackDuckApiClient.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         HttpUrl url = new HttpUrl(uri);
-        return blackDuckService.getResponse(url, ScanSummaryView.class);
+        return blackDuckApiClient.getResponse(url, ScanSummaryView.class);
     }
 
     private CodeLocationView createFakeCodeLocationView(final HttpUrl codeLocationUrl) {

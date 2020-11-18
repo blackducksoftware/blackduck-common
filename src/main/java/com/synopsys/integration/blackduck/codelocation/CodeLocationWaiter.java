@@ -26,7 +26,7 @@ import java.util.Set;
 
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -37,20 +37,20 @@ import com.synopsys.integration.wait.WaitJob;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;
-    private final BlackDuckService blackDuckService;
+    private final BlackDuckApiClient blackDuckApiClient;
     private final ProjectService projectService;
     private final NotificationService notificationService;
 
-    public CodeLocationWaiter(IntLogger logger, BlackDuckService blackDuckService, ProjectService projectService, NotificationService notificationService) {
+    public CodeLocationWaiter(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ProjectService projectService, NotificationService notificationService) {
         this.logger = logger;
-        this.blackDuckService = blackDuckService;
+        this.blackDuckApiClient = blackDuckApiClient;
         this.projectService = projectService;
         this.notificationService = notificationService;
     }
 
     public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount,
         long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckService, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
+        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckApiClient, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
             expectedNotificationCount);
 
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed

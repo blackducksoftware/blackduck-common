@@ -40,7 +40,7 @@ import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.RequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -66,7 +66,7 @@ public class CodeLocationServiceTestIT {
     private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
     private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
-    private final RequestFactory requestFactory = new RequestFactory();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 
@@ -114,7 +114,7 @@ public class CodeLocationServiceTestIT {
         codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
         assertEquals(projectVersionWrapper.getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
 
-        blackDuckServices.blackDuckService.delete(codeLocationView.get());
+        blackDuckServices.blackDuckApiClient.delete(codeLocationView.get());
     }
 
     @Test
@@ -143,8 +143,8 @@ public class CodeLocationServiceTestIT {
 
             // Verify code location now exists using getSomeMatchingResponses()
             Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
-            BlackDuckRequestBuilder blackDuckRequestBuilder = requestFactory.createCommonGetRequestBuilder(2, 0);
-            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, blackDuckRequestBuilder, nameMatcherPredicate, 1);
+            BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(2, 0);
+            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, blackDuckRequestBuilder, nameMatcherPredicate, 1);
 
             assertEquals(1, foundCodeLocation.size(), String.format("Matching code locations should be 1 but is %d", foundCodeLocation.size()));
             assertEquals(codeLocationToValidate, foundCodeLocation.get(0).getName(), "Found code location does not equal expected");
@@ -195,16 +195,16 @@ public class CodeLocationServiceTestIT {
     private void deleteProjectByName(BlackDuckServices blackDuckServices) throws IntegrationException {
         Optional<ProjectView> projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(PROJECT_NAME);
         if (projectThatShouldNotExist.isPresent()) {
-            blackDuckServices.blackDuckService.delete(projectThatShouldNotExist.get());
+            blackDuckServices.blackDuckApiClient.delete(projectThatShouldNotExist.get());
         }
     }
 
     private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, List<String> codeLocationNames) throws IntegrationException {
         Predicate<CodeLocationView> toDelete = (codeLocationView -> codeLocationNames.contains(codeLocationView.getName()));
-        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckService.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, toDelete, codeLocationNames.size());
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, toDelete, codeLocationNames.size());
 
         for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
-            blackDuckServices.blackDuckService.delete(codeLocationToDelete);
+            blackDuckServices.blackDuckApiClient.delete(codeLocationToDelete);
         }
     }
 

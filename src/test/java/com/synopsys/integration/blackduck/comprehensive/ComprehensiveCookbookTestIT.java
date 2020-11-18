@@ -22,8 +22,8 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
@@ -52,7 +52,7 @@ import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
@@ -76,14 +76,14 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
+        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckApiClient, testProjectName);
 
         // get the count of all projects now
-        int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCount = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         // create the project
         ProjectRequest projectRequest = new ProjectRequest();
@@ -96,13 +96,13 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        int projectCountAfterCreate = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        int projectVersionCount = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
+        int projectVersionCount = blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest.setVersionName("RestConnectionTest");
         ProjectVersionView projectVersionItem = projectService.createProjectVersion(projectItem, projectVersionRequest);
@@ -112,7 +112,7 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectVersionItemFromName.isPresent());
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.get().toString());
 
-        assertTrue(blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
+        assertTrue(blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
     }
 
     @Test
@@ -121,17 +121,17 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
-        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckService, testProjectName);
+        intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckApiClient, testProjectName);
 
         // get the count of all projects now
-        int projectCount = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCount = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         String versionName = "RestConnectionTest";
-        LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution = LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL;
+        ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
         ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, versionName);
         projectSyncModel.setPhase(phase);
@@ -148,7 +148,7 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        int projectCountAfterCreate = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
         Optional<ProjectVersionView> projectVersionItem = projectService.getProjectVersion(projectItem, versionName);
@@ -174,7 +174,7 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
-        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
@@ -208,7 +208,7 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
-        UserView currentUser = blackDuckServices.blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
@@ -266,12 +266,12 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-            BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+            BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
 
-            List<ProjectView> allProjects = blackDuckService.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+            List<ProjectView> allProjects = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
             System.out.println(String.format("project count: %d", allProjects.size()));
             for (ProjectView projectItem : allProjects) {
-                List<ProjectVersionView> allProjectVersions = blackDuckService.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+                List<ProjectVersionView> allProjectVersions = blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
                 System.out.println(projectItem.toString());
                 System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (ProjectVersionView projectVersionItem : allProjectVersions) {
@@ -320,7 +320,7 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(projectVersion);
 
         // check that we have components in the BOM
-        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckService.getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         assertTrue(bomComponents.size() > 0);
 
         // Look for testComponent in BOM
@@ -337,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
         Optional<ProjectVersionPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
         assertTrue(policyStatusItem.isPresent());
-        assertEquals(PolicyStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
+        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
 
         Optional<PolicyRuleView> checkPolicyRule = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         assertTrue(checkPolicyRule.isPresent());
@@ -349,7 +349,7 @@ public class ComprehensiveCookbookTestIT {
         // delete the project, if it exists
         Optional<ProjectView> projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(checkPolicyData.projectName);
         if (projectThatShouldNotExist.isPresent()) {
-            blackDuckServices.blackDuckService.delete(projectThatShouldNotExist.get());
+            blackDuckServices.blackDuckApiClient.delete(projectThatShouldNotExist.get());
         }
         projectThatShouldNotExist = blackDuckServices.projectService.getProjectByName(checkPolicyData.projectName);
         assertFalse(projectThatShouldNotExist.isPresent());
@@ -357,7 +357,7 @@ public class ComprehensiveCookbookTestIT {
         // delete the code location if it exists
         Optional<CodeLocationView> codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(checkPolicyData.codeLocationName);
         if (codeLocationView.isPresent()) {
-            blackDuckServices.blackDuckService.delete(codeLocationView.get());
+            blackDuckServices.blackDuckApiClient.delete(codeLocationView.get());
         }
         codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(checkPolicyData.codeLocationName);
         assertFalse(codeLocationView.isPresent());
@@ -365,7 +365,7 @@ public class ComprehensiveCookbookTestIT {
         // delete the policy rule if it exists
         Optional<PolicyRuleView> policyRuleView = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         if (policyRuleView.isPresent()) {
-            blackDuckServices.blackDuckService.delete(policyRuleView.get());
+            blackDuckServices.blackDuckApiClient.delete(policyRuleView.get());
         }
         policyRuleView = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         assertFalse(policyRuleView.isPresent());

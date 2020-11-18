@@ -32,7 +32,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -103,7 +103,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // finally, verify the code location exists and then delete it to clean up
         CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         WaitJob waitJob = WaitJob.create(logger, 120, System.currentTimeMillis(), 10, () -> {
             return codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME).isPresent();
         });
@@ -111,7 +111,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
         Optional<CodeLocationView> codeLocationViewOptional = codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME);
         assertTrue(codeLocationViewOptional.isPresent());
-        blackDuckService.delete(codeLocationViewOptional.get());
+        blackDuckApiClient.delete(codeLocationViewOptional.get());
     }
 
     private ScanBatch createScanBatch(final BlackDuckServerConfig blackDuckServerConfig, final File installDirectory, final File outputDirectory) {

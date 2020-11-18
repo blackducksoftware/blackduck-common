@@ -24,7 +24,7 @@ import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
@@ -46,14 +46,14 @@ public class NotificationsTestIT {
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
-        BlackDuckService blackDuckService = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
 
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
         ProjectSyncModel projectSyncModel2 = ProjectSyncModel.createWithDefaults(projectName, projectVersion2Name);
 
-        UserView currentUser = blackDuckService.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
         Date endDate = Date.from(startDate.toInstant().plus(1, ChronoUnit.DAYS));
         List<String> notificationTypes = new ArrayList<>();
@@ -65,8 +65,8 @@ public class NotificationsTestIT {
         ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
         // DELETE
-        blackDuckService.delete(projectVersionWrapper2.getProjectVersionView());
-        blackDuckService.delete(projectVersionWrapper.getProjectView());
+        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView());
+        blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
 
         // two project version create
         // one project version delete, one project delete

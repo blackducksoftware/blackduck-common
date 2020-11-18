@@ -28,22 +28,22 @@ import java.util.concurrent.Future;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
-import com.synopsys.integration.blackduck.http.RequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.log.IntLogger;
 
 public class BlackDuckBucketService extends DataService {
     private final ExecutorService executorService;
 
-    public BlackDuckBucketService(BlackDuckService blackDuckService, RequestFactory requestFactory, IntLogger logger, ExecutorService executorService) {
-        super(blackDuckService, requestFactory, logger);
+    public BlackDuckBucketService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ExecutorService executorService) {
+        super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.executorService = executorService;
     }
 
     public <T extends BlackDuckResponse> Future<Optional<T>> addToTheBucket(BlackDuckBucket blackDuckBucket, String uri, Class<T> responseClass) {
         LinkSingleResponse<? extends BlackDuckResponse> linkSingleResponse = new LinkSingleResponse<>(uri, responseClass);
-        BlackDuckBucketFillTask blackDuckBucketFillTask = new BlackDuckBucketFillTask(blackDuckService, blackDuckBucket, linkSingleResponse);
+        BlackDuckBucketFillTask blackDuckBucketFillTask = new BlackDuckBucketFillTask(blackDuckApiClient, blackDuckBucket, linkSingleResponse);
         return executorService.submit(blackDuckBucketFillTask);
     }
 

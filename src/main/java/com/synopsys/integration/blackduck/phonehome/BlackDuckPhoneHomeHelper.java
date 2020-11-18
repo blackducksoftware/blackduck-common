@@ -29,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.service.BlackDuckService;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
