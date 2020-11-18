@@ -33,14 +33,13 @@ import com.synopsys.integration.blackduck.api.enumeration.ReviewStatusType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.CustomLicenseRequestCodeSharingType;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
@@ -96,17 +95,13 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_PHASE, projectVersionPhaseTypes);
     }
 
-    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType> LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes)
+    public void addDistributionCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<ProjectVersionDistributionType> ProjectVersionDistributionTypes)
         throws BlackDuckIntegrationException {
-        addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionTypes);
+        addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.VERSION_DISTRIBUTION, ProjectVersionDistributionTypes);
     }
 
     public void addComponentUsageCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<PolicyRuleComponentUsageValueSetType> componentUsageTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.COMPONENT_USAGE, componentUsageTypes);
-    }
-
-    public void addLicenseFamilyCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<CustomLicenseRequestCodeSharingType> licenseCodeSharingTypes) throws BlackDuckIntegrationException {
-        addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.LICENSE_FAMILY, licenseCodeSharingTypes);
     }
 
     public void addSingleObjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, Object object) throws BlackDuckIntegrationException {

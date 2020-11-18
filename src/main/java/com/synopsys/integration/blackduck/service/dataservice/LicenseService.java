@@ -27,6 +27,8 @@ import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
@@ -46,7 +48,7 @@ public class LicenseService extends DataService {
         this.componentDataService = componentDataService;
     }
 
-    public Optional<ProjectVersionLicenseView> getComplexLicenseItemFromComponent(ExternalId externalId) throws IntegrationException {
+    public Optional<ComponentVersionLicenseView> getComplexLicenseItemFromComponent(ExternalId externalId) throws IntegrationException {
         Optional<ComponentsView> componentSearchView = componentDataService.getFirstOrEmptyResult(externalId);
         if (!componentSearchView.isPresent()) {
             return Optional.empty();
@@ -63,8 +65,8 @@ public class LicenseService extends DataService {
         return getLicenseView(url);
     }
 
-    public LicenseView getLicenseView(ProjectVersionLicenseLicensesView projectVersionLicenseLicensesView) throws IntegrationException {
-        HttpUrl url = new HttpUrl(projectVersionLicenseLicensesView.getLicense());
+    public LicenseView getLicenseView(ComponentVersionLicenseLicensesView componentVersionLicenseLicensesView) throws IntegrationException {
+        HttpUrl url = new HttpUrl(componentVersionLicenseLicensesView.getLicense().getName());
         return getLicenseView(url);
     }
 

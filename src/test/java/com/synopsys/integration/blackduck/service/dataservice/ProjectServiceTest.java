@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -27,6 +28,7 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 
 public class ProjectServiceTest {
+    @Disabled
     @Test
     public void testGettingLatestProjectVersion() throws IOException, IntegrationException {
         IntLogger logger = new BufferedIntLogger();

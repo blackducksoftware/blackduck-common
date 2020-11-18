@@ -19,7 +19,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;

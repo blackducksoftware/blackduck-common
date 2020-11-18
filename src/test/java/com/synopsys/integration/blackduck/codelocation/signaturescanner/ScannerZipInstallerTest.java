@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -80,6 +81,7 @@ public class ScannerZipInstallerTest {
         assertTrue(new File(scanPaths.getPathToScanExecutable()).canExecute());
     }
 
+    @Disabled
     @Test
     public void testInitialDownload() throws Exception {
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();

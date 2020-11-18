@@ -14,7 +14,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
@@ -68,7 +68,7 @@ public class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
         ProjectVersionPolicyStatusView policyStatus = projectBomService.getPolicyStatusForVersion(projectVersionWrapper.getProjectVersionView()).get();
-        Assertions.assertEquals(PolicyStatusType.IN_VIOLATION, policyStatus.getOverallStatus());
+        Assertions.assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, policyStatus.getOverallStatus());
     }
 
     private PolicyRuleView constructTestPolicy(ComponentService componentService) throws IntegrationException {
