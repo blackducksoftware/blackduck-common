@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -54,7 +55,7 @@ public class InstallAndRunSignatureScannerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
     @Test
-    public void testInstallingAndRunningSignatureScanner() throws Exception {
+    public void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
         // here, we do not want to automatically trust the server's certificate
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = intHttpClientTestHelper.getBlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setTrustCert(false);
