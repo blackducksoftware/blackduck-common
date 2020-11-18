@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TestFiles;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.codelocation.Result;
@@ -55,17 +55,17 @@ public class InstallAndRunSignatureScannerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
     @Test
-    public void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
+    public void testInstallingAndRunningSignatureScanner() throws Exception {
         // here, we do not want to automatically trust the server's certificate
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = intHttpClientTestHelper.getBlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setTrustCert(false);
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
 
-        File scannerDirectoryPath = Files.createTempDirectory("testscanner").toFile();
+        File scannerDirectoryPath = TestFiles.createThrowingDeletingFile(() -> Files.createTempDirectory("testscanner").toFile());
         scannerDirectoryPath.mkdirs();
-        File installDirectory = new File(scannerDirectoryPath, "scanner_install");
-        File outputDirectory = new File(scannerDirectoryPath, "scanner_output");
+        File installDirectory = TestFiles.createDeletingFile(() -> new File(scannerDirectoryPath, "scanner_install"));
+        File outputDirectory = TestFiles.createDeletingFile(() -> new File(scannerDirectoryPath, "scanner_output"));
 
         ScanBatch scanBatch = createScanBatch(blackDuckServerConfig, installDirectory, outputDirectory);
 

@@ -58,8 +58,11 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectMappingServ
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
 import com.synopsys.integration.blackduck.service.dataservice.ReportService;
+import com.synopsys.integration.blackduck.service.dataservice.RoleService;
 import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
+import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
+import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
@@ -189,6 +192,18 @@ public class BlackDuckServicesFactory {
 
     public ReportService createReportService(long timeoutInMilliseconds) {
         return new ReportService(gson, blackDuckHttpClient.getBaseUrl(), blackDuckApiClient, blackDuckRequestFactory, logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
+    }
+
+    public UserService createUserService() {
+        return new UserService(blackDuckApiClient, blackDuckRequestFactory, logger);
+    }
+
+    public RoleService createRoleService() {
+        return new RoleService(blackDuckApiClient, blackDuckRequestFactory, logger);
+    }
+
+    public UserRoleService createUserRoleService() {
+        return new UserRoleService(blackDuckApiClient, blackDuckRequestFactory, logger);
     }
 
     public UserGroupService createUserGroupService() {
