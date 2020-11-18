@@ -66,7 +66,7 @@ public class LicenseService extends DataService {
     }
 
     public LicenseView getLicenseView(ComponentVersionLicenseLicensesView componentVersionLicenseLicensesView) throws IntegrationException {
-        HttpUrl url = new HttpUrl(componentVersionLicenseLicensesView.getLicense().getName());
+        HttpUrl url = new HttpUrl(componentVersionLicenseLicensesView.getLicense());
         return getLicenseView(url);
     }
 
