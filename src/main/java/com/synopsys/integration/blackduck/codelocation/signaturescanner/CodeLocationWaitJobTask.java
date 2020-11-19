@@ -133,13 +133,10 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
         List<String> typesToInclude = Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name());
         List<NotificationUserView> notifications = notificationService.getFilteredUserNotifications(userView, startDate, endDate, typesToInclude);
 
-        List<VersionBomCodeLocationBomComputedNotificationUserView> filteredNotifications =
-            notifications
-                .stream()
-                .map(VersionBomCodeLocationBomComputedNotificationUserView.class::cast)
-                .collect(Collectors.toList());
-
-        return filteredNotifications;
+        return notifications
+                   .stream()
+                   .map(VersionBomCodeLocationBomComputedNotificationUserView.class::cast)
+                   .collect(Collectors.toList());
     }
 
 }

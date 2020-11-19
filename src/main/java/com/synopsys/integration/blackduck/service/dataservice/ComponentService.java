@@ -31,10 +31,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.deprecated.response.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.deprecated.response.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
@@ -53,13 +53,17 @@ public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
     public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
 
-    public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-                                                                                                                       .filter(notEmptyList -> notEmptyList.size() > 0)
-                                                                                                                       .map(notEmptyList -> notEmptyList.get(0));
+    public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT =
+        (list) ->
+            Optional.ofNullable(list)
+                .filter(notEmptyList -> notEmptyList.size() > 0)
+                .map(notEmptyList -> notEmptyList.get(0));
 
-    public static final Function<List<ComponentsView>, Optional<ComponentsView>> SINGLE_OR_EMPTY_RESULT = (list) -> Optional.ofNullable(list)
-                                                                                                                        .filter(notEmptyList -> notEmptyList.size() == 1)
-                                                                                                                        .map(listOfSingleElement -> listOfSingleElement.get(0));
+    public static final Function<List<ComponentsView>, Optional<ComponentsView>> SINGLE_OR_EMPTY_RESULT =
+        (list) ->
+            Optional.ofNullable(list)
+                .filter(notEmptyList -> notEmptyList.size() == 1)
+                .map(listOfSingleElement -> listOfSingleElement.get(0));
 
     public ComponentService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
         super(blackDuckApiClient, blackDuckRequestFactory, logger);

@@ -57,6 +57,12 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder setBlackDuckPageDefinition(BlackDuckPageDefinition blackDuckPageDefinition) {
+        addLimit(blackDuckPageDefinition.getLimit());
+        addOffset(blackDuckPageDefinition.getOffset());
+        return this;
+    }
+
     public BlackDuckRequestBuilder addLimit(int limit) {
         requestBuilder.addQueryParameter(LIMIT_PARAMETER, String.valueOf(limit));
         return this;
