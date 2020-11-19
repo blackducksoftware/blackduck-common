@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.RoleAssignmentRequest;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.RoleAssignmentRequest;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;

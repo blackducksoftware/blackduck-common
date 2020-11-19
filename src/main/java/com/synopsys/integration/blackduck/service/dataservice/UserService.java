@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserRequest;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.UserRequest;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
