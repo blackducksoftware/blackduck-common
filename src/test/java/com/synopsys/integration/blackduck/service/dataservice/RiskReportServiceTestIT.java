@@ -17,10 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
@@ -41,7 +41,7 @@ public class RiskReportServiceTestIT {
 
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, testProjectVersionName);
         projectSyncModel.setPhase(ProjectVersionPhaseType.valueOf(testPhase));
-        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.valueOf(testDistribution));
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.valueOf(testDistribution));
 
         BlackDuckServicesFactory blackDuckServicesFactory = restConnectionTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();

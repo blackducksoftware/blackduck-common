@@ -22,8 +22,8 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
@@ -31,9 +31,9 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolic
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.ProjectVersionRequest;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.Result;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
@@ -102,7 +102,7 @@ public class ComprehensiveCookbookTestIT {
         int projectVersionCount = blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
-        projectVersionRequest.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
         projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectVersionRequest.setVersionName("RestConnectionTest");
         ProjectVersionView projectVersionItem = projectService.createProjectVersion(projectItem, projectVersionRequest);
@@ -131,7 +131,7 @@ public class ComprehensiveCookbookTestIT {
         int projectCount = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
 
         String versionName = "RestConnectionTest";
-        LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType distribution = LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.INTERNAL;
+        ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
         ProjectVersionPhaseType phase = ProjectVersionPhaseType.DEVELOPMENT;
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(testProjectName, versionName);
         projectSyncModel.setPhase(phase);
@@ -337,7 +337,7 @@ public class ComprehensiveCookbookTestIT {
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
         Optional<ProjectVersionPolicyStatusView> policyStatusItem = blackDuckServices.projectBomService.getPolicyStatusForVersion(projectVersionView);
         assertTrue(policyStatusItem.isPresent());
-        assertEquals(PolicyStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
+        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, policyStatusItem.get().getOverallStatus());
 
         Optional<PolicyRuleView> checkPolicyRule = blackDuckServices.policyRuleService.getPolicyRuleViewByName(checkPolicyData.policyRuleName);
         assertTrue(checkPolicyRule.isPresent());

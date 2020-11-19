@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -80,7 +80,7 @@ public class BlackDuckApiClientTest {
 
         Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
         assertTrue(ProjectVersionPolicyStatusView.isPresent());
-        assertEquals(PolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
+        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
     }
 
 }

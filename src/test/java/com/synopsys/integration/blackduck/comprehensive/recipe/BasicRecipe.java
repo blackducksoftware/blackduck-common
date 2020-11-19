@@ -7,10 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.enumeration.ProjectVersionPhaseType;
+import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
@@ -106,7 +106,7 @@ public class BasicRecipe {
         ProjectSyncModel projectSyncModel = new ProjectSyncModel(projectName, projectVersionName);
         projectSyncModel.setDescription("A sample testing project to demonstrate blackduck-common capabilities.");
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
-        projectSyncModel.setDistribution(LicenseFamilyLicenseFamilyRiskRulesReleaseDistributionType.OPENSOURCE);
+        projectSyncModel.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
 
         return projectSyncModel;
     }

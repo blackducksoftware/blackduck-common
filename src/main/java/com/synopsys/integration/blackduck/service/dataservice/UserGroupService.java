@@ -32,12 +32,12 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.UserProjectsView;
+import com.synopsys.integration.blackduck.api.generated.response.AssignedProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.throwaway.generated.component.UserGroupRequest;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -79,10 +79,10 @@ public class UserGroupService extends DataService {
 
     public List<ProjectView> getProjectsForUser(UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
-        List<UserProjectsView> assignedProjectViews = blackDuckApiClient.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
+        List<AssignedProjectView> assignedProjectViews = blackDuckApiClient.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
 
         List<ProjectView> resolvedProjectViews = new ArrayList<>();
-        for (UserProjectsView assigned : assignedProjectViews) {
+        for (AssignedProjectView assigned : assignedProjectViews) {
             HttpUrl projectUrl = new HttpUrl(assigned.getProject());
             ProjectView project = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
             if (project != null) {

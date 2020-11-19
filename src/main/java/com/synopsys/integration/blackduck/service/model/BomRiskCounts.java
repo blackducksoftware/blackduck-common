@@ -22,18 +22,18 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType.HIGH;
-import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType.LOW;
-import static com.synopsys.integration.blackduck.api.generated.enumeration.ComponentVersionRiskProfileRiskDataCountsCountType.MEDIUM;
+import static com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType.HIGH;
+import static com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType.LOW;
+import static com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType.MEDIUM;
 
-import com.synopsys.integration.blackduck.api.generated.component.ComponentVersionRiskProfileRiskDataCountsView;
+import com.synopsys.integration.blackduck.api.generated.component.RiskProfileCountsView;
 
 public class BomRiskCounts {
     private int high;
     private int medium;
     private int low;
 
-    public void add(ComponentVersionRiskProfileRiskDataCountsView countsView) {
+    public void add(RiskProfileCountsView countsView) {
         int count = countsView.getCount().intValue();
         if (HIGH == countsView.getCountType()) {
             high += count;
