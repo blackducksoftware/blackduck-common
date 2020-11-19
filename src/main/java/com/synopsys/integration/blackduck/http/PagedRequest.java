@@ -57,6 +57,12 @@ public class PagedRequest {
         this.limit = limit;
     }
 
+    public PagedRequest(BlackDuckRequestBuilder requestBuilder, BlackDuckPageDefinition blackDuckPageDefinition) {
+        this.requestBuilder = requestBuilder;
+        this.offset = blackDuckPageDefinition.getOffset();
+        this.limit = blackDuckPageDefinition.getLimit();
+    }
+
     public Request createRequest() {
         Request request = requestBuilder.getRequestBuilder().build();
         Set<String> limitValue = new HashSet<>();

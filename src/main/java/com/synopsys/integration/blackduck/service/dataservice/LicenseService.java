@@ -27,10 +27,10 @@ import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
+import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
