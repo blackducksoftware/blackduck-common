@@ -45,7 +45,7 @@ public class LicenseDataServiceTestIT {
         //assertTrue(StringUtils.isNotBlank(embeddedLicense.getLicense()));
         assertEquals("Apache License 2.0", embeddedLicense.getLicenseDisplay());
         assertEquals("Apache License 2.0", embeddedLicense.getName());
-        assertEquals("OPEN_SOURCE", embeddedLicense.getOwnership());
+        assertEquals("OPEN_SOURCE", embeddedLicense.getOwnership().name());
         //assertNull(embeddedLicense.getType());
         assertEquals(0, embeddedLicense.getLicenses().size());
 
