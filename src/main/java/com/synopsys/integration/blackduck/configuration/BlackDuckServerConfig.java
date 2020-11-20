@@ -34,6 +34,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.ApiTokenBlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.CredentialsBlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.cache.CachingHttpClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.Buildable;
 import com.synopsys.integration.log.IntLogger;
@@ -84,8 +85,9 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
             blackDuckRequestFactory);
     }
 
-    private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
-        AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, Credentials credentials, String apiToken, BlackDuckRequestFactory blackDuckRequestFactory) {
+    private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson,
+        ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, ExecutorService executorService, Credentials credentials, String apiToken,
+        BlackDuckRequestFactory blackDuckRequestFactory) {
         blackDuckUrl = url;
         this.solutionDetails = solutionDetails;
         this.credentials = credentials;
@@ -180,8 +182,17 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
-        BlackDuckHttpClient blackDuckRestConnection = createBlackDuckHttpClient(logger);
-        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckRestConnection, logger, blackDuckRequestFactory);
+        BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
+        return createBlackDuckServicesFactory(blackDuckHttpClient, logger);
+    }
+
+    public BlackDuckServicesFactory createCachedBlackDuckServicesFactory(IntLogger logger) {
+        BlackDuckHttpClient blackDuckHttpClient = createCacheHttpClient(logger);
+        return createBlackDuckServicesFactory(blackDuckHttpClient, logger);
+    }
+
+    public BlackDuckServicesFactory createBlackDuckServicesFactory(BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
+        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
     }
 
     public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {
@@ -190,6 +201,11 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         } else {
             return createCredentialsBlackDuckHttpClient(logger);
         }
+    }
+
+    public CachingHttpClient createCacheHttpClient(IntLogger logger) {
+        BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
+        return new CachingHttpClient(blackDuckHttpClient);
     }
 
     public CredentialsBlackDuckHttpClient createCredentialsBlackDuckHttpClient(IntLogger logger) {
