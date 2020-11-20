@@ -17,8 +17,13 @@ versionFile.mkdirs()
 versionFile.delete()
 versionFile << version
 
+//TODO Remove this before release
+repositories {
+    mavenLocal()
+}
+
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.3'
+    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.4-SNAPSHOT'
     api 'com.synopsys.integration:integration-reporting:2.0.1'
     api 'com.synopsys.integration:integration-bdio:22.0.1'
     api 'com.synopsys.integration:phone-home-client:4.0.2'
