@@ -23,22 +23,36 @@
 package com.synopsys.integration.blackduck.developermode;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.io.FileUtils;
 
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
-import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.body.StringBodyContent;
+import com.synopsys.integration.rest.request.Request;
 
-public class DeveloperScanService extends DataService {
+public class DeveloperScanService {
+    private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-ld-1+json";
+    private static final String HEADER_X_BD_MODE = "X-BD-MODE";
+    private static final String HEADER_X_BD_SCAN_ID = "X-BD-SCAN-ID";
+    private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
+    private static final String HEADER_X_BD_SCAN_TYPE = "X-BD-SCAN-TYPE";
+    private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
-    public DeveloperScanService(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
-        final IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    private BlackDuckHttpClient blackDuckHttpClient;
+
+    public DeveloperScanService(final BlackDuckHttpClient blackDuckHttpClient) {
+        this.blackDuckHttpClient = blackDuckHttpClient;
     }
 
-    public BomMatchDeveloperView performDeveloperScan(File bdioFile) {
+    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile) throws IntegrationException {
         if (!bdioFile.isFile()) {
             throw new IllegalArgumentException(String.format("bdio file provided is not a file. Path: %s ", bdioFile.getAbsolutePath()));
         }
@@ -49,37 +63,88 @@ public class DeveloperScanService extends DataService {
         if (!bdioFile.toPath().endsWith(".bdio")) {
             throw new IllegalArgumentException(String.format("Unknown file extension. Cannot perform developer scan. Path: %s", bdioFile.getAbsolutePath()));
         }
-        startUpload();
-        // for each entry in the bdio file upload chunk
-        endUpload();
-
-        // poll wait for result;
-
-        return new BomMatchDeveloperView();
+        List<BdioContent> bdioContentList = new ArrayList<>();
+        return uploadFilesAndWait(scanType, bdioContentList);
     }
 
-    public BomMatchDeveloperView performDeveloperScan(List<File> bdioFiles) {
+    public BomMatchDeveloperView performDeveloperScan(String scanType, List<File> bdioFiles) throws IntegrationException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("bdio files cannot be empty.");
         }
-        startUpload();
-        // for each entry in the bdio file upload chunk
-        endUpload();
+
+        List<BdioContent> bdioContentList = new ArrayList<>();
+        try {
+            for (File bdioFile : bdioFiles) {
+                String fileContent = FileUtils.readFileToString(bdioFile, StandardCharsets.UTF_8);
+                bdioContentList.add(new BdioContent(bdioFile.getName(), fileContent));
+            }
+        } catch (IOException ex) {
+            throw new IntegrationException("Couldn't read BDIO file", ex);
+        }
+        return uploadFilesAndWait(scanType, bdioContentList);
+    }
+
+    private BomMatchDeveloperView uploadFilesAndWait(String scanType, List<BdioContent> bdioFiles) throws IntegrationException {
+        if (bdioFiles.isEmpty()) {
+            throw new IllegalArgumentException("BDIO files cannot be empty.");
+        }
+        BdioContent header = bdioFiles.stream()
+                                 .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+                                 .findFirst()
+                                 .orElseThrow(() -> new IntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
+
+        List<BdioContent> remainingFiles = bdioFiles.stream()
+                                               .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+                                               .collect(Collectors.toList());
+        UUID scanId = UUID.randomUUID();
+        int count = bdioFiles.size();
+        startUpload(scanId, count, scanType, header);
+        for (BdioContent content : remainingFiles) {
+            uploadChunk(scanId, scanType, content);
+        }
 
         // poll wait for result;
 
         return new BomMatchDeveloperView();
     }
 
-    private void startUpload() {
-
+    private void startUpload(UUID scanId, int count, String scanType, BdioContent header) throws IntegrationException {
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.addHeader("Content-type", CONTENT_TYPE);
+        requestBuilder.addHeader(HEADER_X_BD_MODE, "start");
+        requestBuilder.addHeader(HEADER_X_BD_SCAN_ID, scanId.toString());
+        requestBuilder.addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count));
+        requestBuilder.addHeader(HEADER_X_BD_SCAN_TYPE, scanType);
+        StringBodyContent bodyContent = new StringBodyContent(header.getContent());
+        requestBuilder.bodyContent(bodyContent);
+        blackDuckHttpClient.execute(requestBuilder.build());
     }
 
-    private void uploadChunk() {
-
+    private void uploadChunk(UUID scanId, String scanType, BdioContent bdioContent) throws IntegrationException {
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.addHeader("Content-type", CONTENT_TYPE);
+        requestBuilder.addHeader(HEADER_X_BD_MODE, "append");
+        requestBuilder.addHeader(HEADER_X_BD_SCAN_ID, scanId.toString());
+        requestBuilder.addHeader(HEADER_X_BD_SCAN_TYPE, scanType);
+        StringBodyContent bodyContent = new StringBodyContent(bdioContent.getContent());
+        blackDuckHttpClient.execute(requestBuilder.build());
     }
 
-    private void endUpload() {
+    private class BdioContent {
+        private String fileName;
+        private String content;
 
+        public BdioContent(final String fileName, final String content) {
+            this.fileName = fileName;
+            this.content = content;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public String getContent() {
+            return content;
+        }
     }
 }
