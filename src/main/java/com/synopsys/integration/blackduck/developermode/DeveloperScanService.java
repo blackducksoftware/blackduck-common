@@ -39,6 +39,7 @@ import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.body.StringBodyContent;
@@ -135,7 +136,7 @@ public class DeveloperScanService {
         BdioContent header = bdioFiles.stream()
                                  .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
                                  .findFirst()
-                                 .orElseThrow(() -> new IntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
+                                 .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
 
         List<BdioContent> remainingFiles = bdioFiles.stream()
                                                .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
