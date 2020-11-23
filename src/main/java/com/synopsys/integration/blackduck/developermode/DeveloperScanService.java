@@ -45,6 +45,7 @@ import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
 public class DeveloperScanService {
+    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 60;
     private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-ld-1+json";
     private static final String HEADER_X_BD_MODE = "X-BD-MODE";
     private static final String HEADER_X_BD_SCAN_ID = "X-BD-SCAN-ID";
@@ -53,12 +54,22 @@ public class DeveloperScanService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
     private BlackDuckHttpClient blackDuckHttpClient;
+    private DeveloperScanWaiter developerScanWaiter;
 
-    public DeveloperScanService(final BlackDuckHttpClient blackDuckHttpClient) {
+    public DeveloperScanService(final BlackDuckHttpClient blackDuckHttpClient, final DeveloperScanWaiter developerScanWaiter) {
         this.blackDuckHttpClient = blackDuckHttpClient;
+        this.developerScanWaiter = developerScanWaiter;
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile) throws IntegrationException {
+    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performDeveloperScan(scanType, bdioFile, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    }
+
+    public BomMatchDeveloperView performDeveloperScan(String scanType, List<File> bdioFiles, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performDeveloperScan(scanType, bdioFiles, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    }
+
+    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (!bdioFile.isFile()) {
             throw new IllegalArgumentException(String.format("bdio file provided is not a file. Path: %s ", bdioFile.getAbsolutePath()));
         }
@@ -79,10 +90,10 @@ public class DeveloperScanService {
         } catch (IOException ex) {
             throw new IntegrationException(String.format("Exception unzipping BDIO file. Path: %s", bdioFile.getAbsolutePath()), ex);
         }
-        return uploadFilesAndWait(scanType, bdioContentList);
+        return uploadFilesAndWait(scanType, bdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, List<File> bdioFiles) throws IntegrationException {
+    public BomMatchDeveloperView performDeveloperScan(String scanType, List<File> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("bdio files cannot be empty.");
         }
@@ -96,7 +107,7 @@ public class DeveloperScanService {
         } catch (IOException ex) {
             throw new IntegrationException("Couldn't read BDIO file", ex);
         }
-        return uploadFilesAndWait(scanType, bdioContentList);
+        return uploadFilesAndWait(scanType, bdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
 
     private BdioContent readEntryContent(ZipFile zipFile, ZipEntry entry) throws IntegrationException {
@@ -117,7 +128,7 @@ public class DeveloperScanService {
         return new BdioContent(entry.getName(), entryContent);
     }
 
-    private BomMatchDeveloperView uploadFilesAndWait(String scanType, List<BdioContent> bdioFiles) throws IntegrationException {
+    private BomMatchDeveloperView uploadFilesAndWait(String scanType, List<BdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -136,13 +147,12 @@ public class DeveloperScanService {
             uploadChunk(scanId, scanType, content);
         }
 
-        // poll wait for result;
-
-        return new BomMatchDeveloperView();
+        return waitForUploadResults(scanId, timeoutInSeconds, waitIntervalInSeconds);
     }
 
     private void startUpload(UUID scanId, int count, String scanType, BdioContent header) throws IntegrationException {
         Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.acceptMimeType(CONTENT_TYPE);
         requestBuilder.addHeader("Content-type", CONTENT_TYPE);
         requestBuilder.addHeader(HEADER_X_BD_MODE, "start");
         requestBuilder.addHeader(HEADER_X_BD_SCAN_ID, scanId.toString());
@@ -155,12 +165,18 @@ public class DeveloperScanService {
 
     private void uploadChunk(UUID scanId, String scanType, BdioContent bdioContent) throws IntegrationException {
         Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.acceptMimeType(CONTENT_TYPE);
         requestBuilder.addHeader("Content-type", CONTENT_TYPE);
         requestBuilder.addHeader(HEADER_X_BD_MODE, "append");
         requestBuilder.addHeader(HEADER_X_BD_SCAN_ID, scanId.toString());
         requestBuilder.addHeader(HEADER_X_BD_SCAN_TYPE, scanType);
         StringBodyContent bodyContent = new StringBodyContent(bdioContent.getContent());
+        requestBuilder.bodyContent(bodyContent);
         blackDuckHttpClient.execute(requestBuilder.build());
+    }
+
+    private BomMatchDeveloperView waitForUploadResults(UUID scanId, long timeoutInSecond, int waitIntervalInSeconds) throws InterruptedException, IntegrationException {
+        return developerScanWaiter.checkScanResult(scanId, timeoutInSecond, waitIntervalInSeconds);
     }
 
     private class BdioContent {
