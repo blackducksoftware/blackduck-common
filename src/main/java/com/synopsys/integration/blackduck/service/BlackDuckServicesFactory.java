@@ -223,7 +223,7 @@ public class BlackDuckServicesFactory {
 
     public DeveloperScanService createDeveloperScanService() {
         DeveloperScanWaiter developerScanWaiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
-        return new DeveloperScanService(blackDuckHttpClient, developerScanWaiter);
+        return new DeveloperScanService(blackDuckApiClient, blackDuckRequestFactory, developerScanWaiter);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

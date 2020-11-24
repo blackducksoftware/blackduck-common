@@ -61,7 +61,7 @@ public class DeveloperScanWaiter {
         }
 
         if (!allCompleted) {
-            throw new BlackDuckIntegrationException("Error getting developer scan result.");
+            throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
         return blackDuckApiClient.getResponse(blackDuckSingleResponse);
     }

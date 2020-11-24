@@ -24,11 +24,14 @@ package com.synopsys.integration.blackduck.developermode;
 
 import java.io.IOException;
 
+import org.apache.http.HttpStatus;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.WaitJobTask;
 
@@ -47,6 +50,12 @@ public class DeveloperScanWaitJobTask implements WaitJobTask {
     public boolean isComplete() throws IntegrationException {
         try (Response response = blackDuckApiClient.get(resultPath)) {
             return response.isStatusCodeSuccess();
+        } catch (IntegrationRestException ex) {
+            if (HttpStatus.SC_NOT_FOUND == ex.getHttpStatusCode()) {
+                return false;
+            } else {
+                throw ex;
+            }
         } catch (IOException ex) {
             throw new BlackDuckIntegrationException(ex.getMessage(), ex);
         }
