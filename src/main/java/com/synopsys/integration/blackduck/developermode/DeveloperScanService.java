@@ -66,31 +66,31 @@ public class DeveloperScanService {
         this.developerScanWaiter = developerScanWaiter;
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return performDeveloperScan(scanType, bdioFile, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performDeveloperScan(scanType, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdioFile, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        String absolutePath = bdioFile.getAbsolutePath();
-        if (!bdioFile.isFile()) {
+    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        String absolutePath = bdio2File.getAbsolutePath();
+        if (!bdio2File.isFile()) {
             throw new IllegalArgumentException(String.format("bdio file provided is not a file. Path: %s ", absolutePath));
         }
-        if (!bdioFile.exists()) {
+        if (!bdio2File.exists()) {
             throw new IllegalArgumentException(String.format("bdio file does not exist. Path: %s", absolutePath));
         }
         String fileExtension = FilenameUtils.getExtension(absolutePath);
         if (!"bdio".equals(fileExtension)) {
-            throw new IllegalArgumentException(String.format("Unknown file extension. Cannot perform developer scan. Path: %s", bdioFile.getAbsolutePath()));
+            throw new IllegalArgumentException(String.format("Unknown file extension. Cannot perform developer scan. Path: %s", absolutePath));
         }
         List<BdioContent> bdioContentList = new ArrayList<>();
-        try (ZipFile zipFile = new ZipFile(bdioFile)) {
+        try (ZipFile zipFile = new ZipFile(bdio2File)) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 bdioContentList.add(readEntryContent(zipFile, entry));
             }
         } catch (IOException ex) {
-            throw new IntegrationException(String.format("Exception unzipping BDIO file. Path: %s", bdioFile.getAbsolutePath()), ex);
+            throw new IntegrationException(String.format("Exception unzipping BDIO file. Path: %s", bdio2File), ex);
         }
         return uploadFilesAndWait(scanType, bdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
