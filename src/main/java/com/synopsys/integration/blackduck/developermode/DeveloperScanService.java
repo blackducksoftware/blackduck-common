@@ -66,11 +66,11 @@ public class DeveloperScanService {
         this.developerScanWaiter = developerScanWaiter;
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public List<BomMatchDeveloperView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return performDeveloperScan(scanType, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public BomMatchDeveloperView performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<BomMatchDeveloperView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         String absolutePath = bdio2File.getAbsolutePath();
         if (!bdio2File.isFile()) {
             throw new IllegalArgumentException(String.format("bdio file provided is not a file. Path: %s ", absolutePath));
@@ -113,7 +113,7 @@ public class DeveloperScanService {
         return new BdioContent(entry.getName(), entryContent);
     }
 
-    private BomMatchDeveloperView uploadFilesAndWait(String scanType, List<BdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    private List<BomMatchDeveloperView> uploadFilesAndWait(String scanType, List<BdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -165,7 +165,7 @@ public class DeveloperScanService {
         blackDuckApiClient.execute(request);
     }
 
-    private BomMatchDeveloperView waitForUploadResults(UUID scanId, long timeoutInSecond, int waitIntervalInSeconds) throws InterruptedException, IntegrationException {
+    private List<BomMatchDeveloperView> waitForUploadResults(UUID scanId, long timeoutInSecond, int waitIntervalInSeconds) throws InterruptedException, IntegrationException {
         return developerScanWaiter.checkScanResult(scanId, timeoutInSecond, waitIntervalInSeconds);
     }
 

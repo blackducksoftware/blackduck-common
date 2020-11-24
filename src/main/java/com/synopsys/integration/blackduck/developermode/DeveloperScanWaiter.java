@@ -22,10 +22,11 @@
  */
 package com.synopsys.integration.blackduck.developermode;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -42,9 +43,9 @@ public class DeveloperScanWaiter {
         this.blackDuckApiClient = blackDuckApiClient;
     }
 
-    public BomMatchDeveloperView checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<BomMatchDeveloperView> checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         BlackDuckPath apiPath = new BlackDuckPath(String.format("/api/scans/%s/developer-result", scanId.toString()));
-        BlackDuckPathSingleResponse<BomMatchDeveloperView> blackDuckSingleResponse = new BlackDuckPathSingleResponse<>(apiPath, BomMatchDeveloperView.class);
+        BlackDuckPathMultipleResponses<BomMatchDeveloperView> multipleResponses = new BlackDuckPathMultipleResponses<>(apiPath, BomMatchDeveloperView.class);
         DeveloperScanWaitJobTask waitTask = new DeveloperScanWaitJobTask(logger, blackDuckApiClient, apiPath);
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
         // regardless of the timeout provided, we always want to check at least once
@@ -63,6 +64,6 @@ public class DeveloperScanWaiter {
         if (!allCompleted) {
             throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
-        return blackDuckApiClient.getResponse(blackDuckSingleResponse);
+        return blackDuckApiClient.getAllResponses(multipleResponses);
     }
 }
