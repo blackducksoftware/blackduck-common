@@ -47,7 +47,7 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 public class DeveloperScanService {
-    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 1;
+    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 1; // TODO update to 60
     private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-ld-1+json";
     private static final String HEADER_X_BD_MODE = "X-BD-MODE";
     private static final String HEADER_X_BD_PASSTHRU = "X-BD-PASSTHRU";
@@ -66,6 +66,7 @@ public class DeveloperScanService {
         this.developerScanWaiter = developerScanWaiter;
     }
 
+    // TODO remove scanType and provide default blackduck-common
     public List<BomMatchDeveloperView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return performDeveloperScan(scanType, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
@@ -87,6 +88,7 @@ public class DeveloperScanService {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                //TODO if not a JSONLD file skip
                 bdioContentList.add(readEntryContent(zipFile, entry));
             }
         } catch (IOException ex) {
@@ -142,7 +144,7 @@ public class DeveloperScanService {
                               .acceptMimeType(CONTENT_TYPE)
                               .addHeader("Content-type", CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "start")
-                              .addHeader(HEADER_X_BD_PASSTHRU, "foo")
+                              .addHeader(HEADER_X_BD_PASSTHRU, "ignoredButRequired")
                               .addHeader(HEADER_X_BD_SCAN_ID, scanId.toString())
                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
                               .addHeader(HEADER_X_BD_SCAN_TYPE, scanType)
@@ -158,7 +160,7 @@ public class DeveloperScanService {
                               .acceptMimeType(CONTENT_TYPE)
                               .addHeader("Content-type", CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "append")
-                              .addHeader(HEADER_X_BD_PASSTHRU, "foo")
+                              .addHeader(HEADER_X_BD_PASSTHRU, "ignoredButRequired")
                               .addHeader(HEADER_X_BD_SCAN_ID, scanId.toString())
                               .addHeader(HEADER_X_BD_SCAN_TYPE, scanType)
                               .build();
