@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.List;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ public class DeveloperScanServiceTestIT {
             DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
             File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanMissingHeader.bdio").getFile());
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            developerScanService.performDeveloperScan("PACKAGE_MANAGER", bdioFile, timeout);
+            developerScanService.performDeveloperScan("blackduck-common developer mode service test", bdioFile, timeout);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass
@@ -85,7 +86,7 @@ public class DeveloperScanServiceTestIT {
         DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
         File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        BomMatchDeveloperView result = developerScanService.performDeveloperScan("PACKAGE_MANAGER", bdioFile, timeout);
-        assertNotNull(result);
+        List<BomMatchDeveloperView> results = developerScanService.performDeveloperScan("blackduck-common developer mode service test", bdioFile, timeout);
+        assertNotNull(results);
     }
 }

@@ -3,13 +3,15 @@ package com.synopsys.integration.blackduck.developermode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -22,18 +24,19 @@ public class DeveloperScanWaiterTest {
     public void testWaitSuccess() throws Exception {
         BufferedIntLogger logger = new BufferedIntLogger();
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
-        BomMatchDeveloperView expectedView = new BomMatchDeveloperView();
+        List<BomMatchDeveloperView> expectedResults = new ArrayList<>();
+        expectedResults.add(new BomMatchDeveloperView());
         Response response = Mockito.mock(Response.class);
         Mockito.when(blackDuckApiClient.get(Mockito.any(BlackDuckPath.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
-        Mockito.when(blackDuckApiClient.getResponse(Mockito.any(BlackDuckPathSingleResponse.class))).thenReturn(expectedView);
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(expectedResults);
         DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
         UUID scanId = UUID.randomUUID();
         long timeoutInSeconds = 10;
         int waitInSeconds = 30;
-        BomMatchDeveloperView result = waiter.checkScanResult(scanId, timeoutInSeconds, waitInSeconds);
+        List<BomMatchDeveloperView> results = waiter.checkScanResult(scanId, timeoutInSeconds, waitInSeconds);
 
-        assertEquals(expectedView, result);
+        assertEquals(expectedResults, results);
     }
 
     @Test
@@ -44,7 +47,7 @@ public class DeveloperScanWaiterTest {
         Response response = Mockito.mock(Response.class);
         Mockito.when(blackDuckApiClient.get(Mockito.any(BlackDuckPath.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
-        Mockito.when(blackDuckApiClient.getResponse(Mockito.any(BlackDuckPathSingleResponse.class))).thenReturn(expectedView);
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
         DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
         UUID scanId = UUID.randomUUID();
         long timeoutInSeconds = 10;
