@@ -22,21 +22,10 @@
  */
 package com.synopsys.integration.blackduck.developermode;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import org.apache.commons.io.FilenameUtils;
 
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -47,10 +36,12 @@ public class DeveloperScanService {
     private static final String DEFAULT_SCAN_TYPE = "BlackDuckCommon";
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
+    private DeveloperModeBdio2Reader bdio2Reader;
     private DeveloperScanWaiter developerScanWaiter;
     private DeveloperModeBdio2Uploader bdio2Uploader;
 
-    public DeveloperScanService(DeveloperModeBdio2Uploader bdio2Uploader, DeveloperScanWaiter developerScanWaiter) {
+    public DeveloperScanService(DeveloperModeBdio2Reader bdio2Reader, DeveloperModeBdio2Uploader bdio2Uploader, DeveloperScanWaiter developerScanWaiter) {
+        this.bdio2Reader = bdio2Reader;
         this.developerScanWaiter = developerScanWaiter;
         this.bdio2Uploader = bdio2Uploader;
     }
@@ -60,51 +51,8 @@ public class DeveloperScanService {
     }
 
     public List<BomMatchDeveloperView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        validateBdioFile(bdio2File);
-        List<DeveloperModeBdioContent> developerModeBdioContentList = new ArrayList<>();
-        try (ZipFile zipFile = new ZipFile(bdio2File)) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                //TODO if not a JSONLD file skip
-                developerModeBdioContentList.add(readEntryContent(zipFile, entry));
-            }
-        } catch (IOException ex) {
-            throw new IntegrationException(String.format("Exception unzipping BDIO file. Path: %s", bdio2File.getAbsolutePath()), ex);
-        }
+        List<DeveloperModeBdioContent> developerModeBdioContentList = bdio2Reader.readBdio2File(bdio2File);
         return uploadFilesAndWait(scanType, developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
-    }
-
-    private void validateBdioFile(File bdio2File) throws IllegalArgumentException {
-        String absolutePath = bdio2File.getAbsolutePath();
-        if (!bdio2File.isFile()) {
-            throw new IllegalArgumentException(String.format("bdio file provided is not a file. Path: %s ", absolutePath));
-        }
-        if (!bdio2File.exists()) {
-            throw new IllegalArgumentException(String.format("bdio file does not exist. Path: %s", absolutePath));
-        }
-        String fileExtension = FilenameUtils.getExtension(absolutePath);
-        if (!"bdio".equals(fileExtension)) {
-            throw new IllegalArgumentException(String.format("Unknown file extension. Cannot perform developer scan. Path: %s", absolutePath));
-        }
-    }
-
-    private DeveloperModeBdioContent readEntryContent(ZipFile zipFile, ZipEntry entry) throws IntegrationException {
-        String entryContent;
-        byte[] buffer = new byte[1024];
-        try (InputStream zipInputStream = zipFile.getInputStream(entry);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream)) {
-            int length;
-            while ((length = zipInputStream.read(buffer)) > 0) {
-                bufferedOutputStream.write(buffer, 0, length);
-            }
-            bufferedOutputStream.flush();
-            entryContent = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
-        } catch (IOException ex) {
-            throw new IntegrationException(String.format("Error reading entry %s", entry.getName()), ex);
-        }
-        return new DeveloperModeBdioContent(entry.getName(), entryContent);
     }
 
     private List<BomMatchDeveloperView> uploadFilesAndWait(String scanType, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
@@ -121,9 +69,9 @@ public class DeveloperScanService {
                                                             .collect(Collectors.toList());
         UUID scanId = UUID.randomUUID();
         int count = remainingFiles.size();
-        bdio2Uploader.startUpload(scanId, count, scanType, header);
+        bdio2Uploader.start(scanId, count, scanType, header);
         for (DeveloperModeBdioContent content : remainingFiles) {
-            bdio2Uploader.uploadChunk(scanId, scanType, content);
+            bdio2Uploader.append(scanId, scanType, content);
         }
 
         return developerScanWaiter.checkScanResult(scanId, timeoutInSeconds, waitIntervalInSeconds);

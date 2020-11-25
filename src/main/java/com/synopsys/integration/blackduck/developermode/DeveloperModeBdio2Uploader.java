@@ -23,7 +23,7 @@ public class DeveloperModeBdio2Uploader {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public void startUpload(UUID scanId, int count, String scanType, DeveloperModeBdioContent header) throws IntegrationException {
+    public void start(UUID scanId, int count, String scanType, DeveloperModeBdioContent header) throws IntegrationException {
         HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
@@ -39,7 +39,7 @@ public class DeveloperModeBdio2Uploader {
         blackDuckApiClient.execute(request);
     }
 
-    public void uploadChunk(UUID scanId, String scanType, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
+    public void append(UUID scanId, String scanType, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
         HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, developerModeBdioContent.getContent())
