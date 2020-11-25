@@ -32,7 +32,7 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.exception.IntegrationException;
 
 public class DeveloperScanService {
-    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 1; // TODO update to 60
+    public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
     private static final String DEFAULT_SCAN_TYPE = "BlackDuckCommon";
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
