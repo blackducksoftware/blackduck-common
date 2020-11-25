@@ -40,6 +40,7 @@ import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanB
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
+import com.synopsys.integration.blackduck.developermode.DeveloperModeBdio2Uploader;
 import com.synopsys.integration.blackduck.developermode.DeveloperScanService;
 import com.synopsys.integration.blackduck.developermode.DeveloperScanWaiter;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -223,7 +224,8 @@ public class BlackDuckServicesFactory {
 
     public DeveloperScanService createDeveloperScanService() {
         DeveloperScanWaiter developerScanWaiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
-        return new DeveloperScanService(blackDuckApiClient, blackDuckRequestFactory, developerScanWaiter);
+        DeveloperModeBdio2Uploader bdio2Uploader = new DeveloperModeBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory);
+        return new DeveloperScanService(bdio2Uploader, developerScanWaiter);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

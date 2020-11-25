@@ -177,6 +177,11 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     // getting responses from a uri
     // ------------------------------------------------
+    public <T extends BlackDuckResponse> List<T> getArrayResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
+        return blackDuckResponsesTransformer.getArrayResponse(requestBuilder.build(), responseClass);
+    }
+
     public <T extends BlackDuckResponse> List<T> getAllResponses(HttpUrl url, Class<T> responseClass) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
         return blackDuckResponsesTransformer.getAllResponses(new PagedRequest(requestBuilder), responseClass).getItems();

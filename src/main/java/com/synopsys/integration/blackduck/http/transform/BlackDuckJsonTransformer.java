@@ -114,6 +114,21 @@ public class BlackDuckJsonTransformer {
         }
     }
 
+    public <T extends BlackDuckResponse> List<T> getArrayResponse(String json, Class<T> clazz) throws IntegrationException {
+        try {
+            JsonArray items = gson.fromJson(json, JsonArray.class);
+            List<T> itemList = new ArrayList<>();
+            for (JsonElement jsonElement : items) {
+                itemList.add(getResponseAs(jsonElement, clazz));
+            }
+
+            return itemList;
+        } catch (JsonSyntaxException e) {
+            logger.error(String.format("Could not parse the provided json responses with Gson:%s%s", System.lineSeparator(), json));
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
+        }
+    }
+
     public String producePatchedJson(BlackDuckResponse blackDuckResponse) {
         String lossyJson = gson.toJson(blackDuckResponse);
         try {

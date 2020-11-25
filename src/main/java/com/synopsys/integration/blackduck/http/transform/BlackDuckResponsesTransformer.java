@@ -64,6 +64,16 @@ public class BlackDuckResponsesTransformer {
         return getInternalMatchingResponse(pagedRequest, clazz, pagedRequest.getLimit(), alwaysTrue());
     }
 
+    public <T extends BlackDuckResponse> List<T> getArrayResponse(Request request, Class<T> clazz) throws IntegrationException {
+        try (Response initialResponse = blackDuckHttpClient.execute(request)) {
+            blackDuckHttpClient.throwExceptionForError(initialResponse);
+            String initialJsonResponse = initialResponse.getContentString();
+            return blackDuckJsonTransformer.getArrayResponse(initialJsonResponse, clazz);
+        } catch (IOException e) {
+            throw new BlackDuckIntegrationException(e.getMessage(), e);
+        }
+    }
+
     private <T extends BlackDuckResponse> Predicate<T> alwaysTrue() {
         return (blackDuckResponse) -> true;
     }

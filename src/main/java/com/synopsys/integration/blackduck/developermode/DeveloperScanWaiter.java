@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.UUID;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.wait.WaitJob;
 
 public class DeveloperScanWaiter {
@@ -45,7 +45,7 @@ public class DeveloperScanWaiter {
 
     public List<BomMatchDeveloperView> checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         BlackDuckPath apiPath = new BlackDuckPath(String.format("/api/scans/%s/developer-result", scanId.toString()));
-        BlackDuckPathMultipleResponses<BomMatchDeveloperView> multipleResponses = new BlackDuckPathMultipleResponses<>(apiPath, BomMatchDeveloperView.class);
+        HttpUrl url = blackDuckApiClient.getUrl(apiPath);
         DeveloperScanWaitJobTask waitTask = new DeveloperScanWaitJobTask(logger, blackDuckApiClient, apiPath);
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
         // regardless of the timeout provided, we always want to check at least once
@@ -64,6 +64,7 @@ public class DeveloperScanWaiter {
         if (!allCompleted) {
             throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
-        return blackDuckApiClient.getAllResponses(multipleResponses);
+        // TODO: This method was created for the developer scan payload.  A large array of data may cause problems and not conform to API specifications. Need to work with the developers to revise the result.
+        return blackDuckApiClient.getArrayResponse(url, BomMatchDeveloperView.class);
     }
 }
