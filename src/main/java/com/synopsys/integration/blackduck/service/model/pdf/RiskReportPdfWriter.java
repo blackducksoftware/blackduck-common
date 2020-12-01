@@ -101,8 +101,8 @@ public class RiskReportPdfWriter {
             float pageWidth = pageBox.getWidth();
             float pageHeight = pageBox.getHeight();
 
-            PDRectangle headerRectangle = writeHeader(pageWidth, pageHeight, report.getDate());
-            PDRectangle dateRectangle = writeDate(headerRectangle.getLowerLeftY(), report.getDate());
+            PDRectangle headerRectangle = writeHeader(pageWidth, pageHeight);
+            PDRectangle dateRectangle = writeDate(headerRectangle.getLowerLeftY(), report.getDateTime());
             PDRectangle bottomOfProjectInfoRectangle = writeProjectInformation(pageWidth, dateRectangle.getLowerLeftY(), report);
             PDRectangle bottomOfSummaryTableRectangle = writeSummaryTables(pageWidth, bottomOfProjectInfoRectangle.getLowerLeftY(), report);
             PDRectangle bottomOfComponentTableRectangle = writeComponentTable(pageWidth, bottomOfSummaryTableRectangle.getLowerLeftY(), report);
@@ -115,7 +115,7 @@ public class RiskReportPdfWriter {
         }
     }
 
-    private PDRectangle writeHeader(float pageWidth, float startingHeight, LocalDateTime date) throws IOException, URISyntaxException {
+    private PDRectangle writeHeader(float pageWidth, float startingHeight) throws IOException, URISyntaxException {
         PDRectangle logoRectangle = pdfManager.drawRectangle(0, startingHeight - 100, pageWidth, 100, Color.WHITE);
         pdfManager.drawImage(30, logoRectangle.getLowerLeftY() + 27.5F, 203, 45, "/riskreport/web/images/Synopsys_logo.png");
         PDRectangle titleRectangle = pdfManager.drawRectangle(0, logoRectangle.getLowerLeftY() - 80, pageWidth - 35, 80, new Color(110, 50, 155).darker());

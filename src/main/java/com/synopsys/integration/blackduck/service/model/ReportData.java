@@ -37,7 +37,7 @@ public class ReportData {
     private String distribution;
     private List<BomComponent> components;
     private int totalComponents;
-    private LocalDateTime date;
+    private LocalDateTime dateTime = LocalDateTime.now();
 
     private BomRiskCounts securityRiskCounts = new BomRiskCounts();
     private BomRiskCounts licenseRiskCounts = new BomRiskCounts();
@@ -46,10 +46,6 @@ public class ReportData {
     private int vulnerabilityRiskNoneCount;
     private int licenseRiskNoneCount;
     private int operationalRiskNoneCount;
-
-    public ReportData() {
-        this.date = LocalDateTime.now();
-    }
 
     public String htmlEscape(String valueToEscape) {
         if (StringUtils.isBlank(valueToEscape)) {
@@ -110,8 +106,8 @@ public class ReportData {
         return totalComponents;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     public int getVulnerabilityRiskHighCount() {
