@@ -47,11 +47,11 @@ public class BlackDuckHttpClientTestIT {
     private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
 
-    private BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
-    private HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
-    private String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
-    private String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
-    private BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+    private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
+    private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
+    private final String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
+    private final BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
 
     public BlackDuckHttpClientTestIT() throws IntegrationException {
     }

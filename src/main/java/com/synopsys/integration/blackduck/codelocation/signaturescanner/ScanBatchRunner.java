@@ -54,8 +54,8 @@ public class ScanBatchRunner {
         return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
     }
 
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, OperatingSystemType operatingSystemType,
-        ScanCommandRunner scanCommandRunner) {
+    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
+        OperatingSystemType operatingSystemType, ScanCommandRunner scanCommandRunner) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
 
