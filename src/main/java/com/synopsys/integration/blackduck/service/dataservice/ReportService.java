@@ -182,11 +182,10 @@ public class ReportService extends DataService {
             throw new IntegrationException(String.format("Could not find any code locations for %s - %s", projectName, projectVersion.getVersionName()));
         }
 
-        Date dateOfLatestScan = Collections.max(codeLocations.stream()
+         return Collections.max(codeLocations.stream()
                                                     .map(CodeLocationView::getUpdatedAt)
+                                                    .map(date -> convertDateToLocalDateTime(date))
                                                     .collect(Collectors.toList()));
-
-        return convertDateToLocalDateTime(dateOfLatestScan);
     }
 
     private LocalDateTime convertDateToLocalDateTime(Date date) {
