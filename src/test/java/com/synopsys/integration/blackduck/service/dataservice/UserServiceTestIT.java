@@ -121,7 +121,7 @@ public class UserServiceTestIT {
             userRequest.setLastName("IntegrationTest");
             userRequest.setActive(true);
             userRequest.setEmail("noreply@synopsys.com");
-            userRequest.setPassword("blackduck");
+            userRequest.setPassword("53CUR17y7hR0ugH085Cur17y");
 
             HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
             userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
