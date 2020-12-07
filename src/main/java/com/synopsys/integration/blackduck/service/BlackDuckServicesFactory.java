@@ -243,7 +243,7 @@ public class BlackDuckServicesFactory {
         return intEnvironmentVariables;
     }
 
-    public BlackDuckApiClient getBlackDuckService() {
+    public BlackDuckApiClient getBlackDuckApiClient() {
         return blackDuckApiClient;
     }
 

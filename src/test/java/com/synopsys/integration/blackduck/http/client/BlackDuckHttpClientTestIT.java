@@ -51,7 +51,7 @@ public class BlackDuckHttpClientTestIT {
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private final String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
-    private final BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckService();
+    private final BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckApiClient();
 
     public BlackDuckHttpClientTestIT() throws IntegrationException {
     }
@@ -161,7 +161,7 @@ public class BlackDuckHttpClientTestIT {
     private void testRequestRequiringAuthentication(BlackDuckServerConfig blackDuckServerConfig) throws IntegrationException {
         IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
         BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
         assertNotNull(currentUser);
         assertEquals(username, currentUser.getUserName());

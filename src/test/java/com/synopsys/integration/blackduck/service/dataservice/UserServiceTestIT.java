@@ -50,7 +50,7 @@ public class UserServiceTestIT {
     public void testAddingGroupToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         UserGroupService userGroupService = blackDuckServicesFactory.createUserGroupService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
@@ -100,7 +100,7 @@ public class UserServiceTestIT {
     public void testAddingUserToProject() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
 
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
 
@@ -121,7 +121,7 @@ public class UserServiceTestIT {
             userRequest.setLastName("IntegrationTest");
             userRequest.setActive(true);
             userRequest.setEmail("noreply@synopsys.com");
-            userRequest.setPassword("blackduck");
+            userRequest.setPassword("53CUR17y7hR0ugH085Cur17y");
 
             HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
             userView = blackDuckApiClient.getResponse(userUrl, UserView.class);

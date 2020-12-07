@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
@@ -51,7 +51,7 @@ public class ProjectServiceTestIT {
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
         ProjectServiceTestIT.blackDuckServicesFactory = ProjectServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
-        ProjectServiceTestIT.blackDuckApiClient = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckService();
+        ProjectServiceTestIT.blackDuckApiClient = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectServiceTestIT.projectService = ProjectServiceTestIT.blackDuckServicesFactory.createProjectService();
     }
 

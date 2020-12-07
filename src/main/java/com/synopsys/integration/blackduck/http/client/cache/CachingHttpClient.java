@@ -23,10 +23,9 @@
 package com.synopsys.integration.blackduck.http.client.cache;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -40,15 +39,11 @@ import com.synopsys.integration.rest.response.Response;
 
 public class CachingHttpClient implements BlackDuckHttpClient {
     private final BlackDuckHttpClient blackDuckHttpClient;
-    private final Map<Request, Response> cache;
+    private final LRUMap<Request, Response> cache;
 
     public CachingHttpClient(BlackDuckHttpClient blackDuckHttpClient) {
-        this(blackDuckHttpClient, new ConcurrentHashMap<>());
-    }
-
-    public CachingHttpClient(BlackDuckHttpClient blackDuckHttpClient, Map<Request, Response> cache) {
         this.blackDuckHttpClient = blackDuckHttpClient;
-        this.cache = cache;
+        this.cache = new LRUMap<>(1000);
     }
 
     public void emptyCache() {
@@ -61,8 +56,10 @@ public class CachingHttpClient implements BlackDuckHttpClient {
             return cache.get(request);
         }
         Response response = blackDuckHttpClient.execute(request);
-        cache.put(request, response);
-        return response;
+
+        // the usage of the response will determine whether or not it is cached, because we can only cache responses IFF they are retrieved by string content
+        CacheableResponse cacheableResponse = new CacheableResponse(request, response, cache);
+        return cacheableResponse;
     }
 
     @Override
