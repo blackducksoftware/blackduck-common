@@ -26,10 +26,14 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -40,6 +44,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportFormatType;
+import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentPolicyRulesView;
 import com.synopsys.integration.blackduck.api.generated.deprecated.view.PolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
@@ -165,7 +170,29 @@ public class ReportService extends DataService {
             components.add(component);
         }
         reportData.setComponents(components);
+        LocalDateTime dateTime = getDateTimeOfLatestScanForProjectVersion(version, project.getName());
+        reportData.setDateTimeOfLatestScan(dateTime);
+
         return reportData;
+    }
+
+    private LocalDateTime getDateTimeOfLatestScanForProjectVersion(ProjectVersionView projectVersion, String projectName) throws IntegrationException {
+        List<CodeLocationView> codeLocations = blackDuckApiClient.getAllResponses(projectVersion, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        if (codeLocations.isEmpty()) {
+            throw new IntegrationException(String.format("Could not find any code locations for %s - %s", projectName, projectVersion.getVersionName()));
+        }
+
+        Date dateOfLatestScan = Collections.max(codeLocations.stream()
+                                                    .map(CodeLocationView::getUpdatedAt)
+                                                    .collect(Collectors.toList()));
+
+        return convertDateToLocalDateTime(dateOfLatestScan);
+    }
+
+    private LocalDateTime convertDateToLocalDateTime(Date date) {
+        return date.toInstant()
+                   .atZone(ZoneId.systemDefault())
+                   .toLocalDateTime();
     }
 
     public void createReportFiles(File outputDirectory, ProjectView project, ProjectVersionView version) throws IntegrationException {
