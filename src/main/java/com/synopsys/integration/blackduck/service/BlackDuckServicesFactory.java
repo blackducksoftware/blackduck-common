@@ -103,7 +103,8 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckServicesFactory(
-        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, BlackDuckRequestFactory blackDuckRequestFactory) {
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger,
+        BlackDuckRequestFactory blackDuckRequestFactory) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
