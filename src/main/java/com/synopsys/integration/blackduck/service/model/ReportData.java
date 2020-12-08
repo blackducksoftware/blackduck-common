@@ -24,6 +24,7 @@ package com.synopsys.integration.blackduck.service.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -106,8 +107,8 @@ public class ReportData {
         return totalComponents;
     }
 
-    public LocalDateTime getDateTimeOfLatestScan() {
-        return dateTimeOfLatestScan;
+    public Optional<LocalDateTime> getDateTimeOfLatestScan() {
+        return Optional.ofNullable(dateTimeOfLatestScan);
     }
 
     public void setDateTimeOfLatestScan(final LocalDateTime dateTimeOfLatestScan) {

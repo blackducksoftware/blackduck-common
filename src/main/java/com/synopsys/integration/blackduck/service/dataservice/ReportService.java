@@ -179,7 +179,8 @@ public class ReportService extends DataService {
     private LocalDateTime getDateTimeOfLatestScanForProjectVersion(ProjectVersionView projectVersion, String projectName) throws IntegrationException {
         List<CodeLocationView> codeLocations = blackDuckApiClient.getAllResponses(projectVersion, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
         if (codeLocations.isEmpty()) {
-            throw new IntegrationException(String.format("Could not find any code locations for %s - %s", projectName, projectVersion.getVersionName()));
+            logger.info(String.format("Could not find any code locations for %s - %s", projectName, projectVersion.getVersionName()));
+            return null;
         }
 
         Date dateOfLatestScan = Collections.max(codeLocations.stream()

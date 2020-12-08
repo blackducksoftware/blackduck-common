@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -102,7 +103,7 @@ public class RiskReportPdfWriter {
             float pageHeight = pageBox.getHeight();
 
             PDRectangle headerRectangle = writeHeader(pageWidth, pageHeight);
-            PDRectangle dateTimeRectangle = writeDateTime(headerRectangle.getLowerLeftY(), report.getDateTimeOfLatestScan());
+            PDRectangle dateTimeRectangle = writeDateTime(headerRectangle.getLowerLeftY(), report.getDateTimeOfLatestScan().orElse(null));
             PDRectangle bottomOfProjectInfoRectangle = writeProjectInformation(pageWidth, dateTimeRectangle.getLowerLeftY(), report);
             PDRectangle bottomOfSummaryTableRectangle = writeSummaryTables(pageWidth, bottomOfProjectInfoRectangle.getLowerLeftY(), report);
             PDRectangle bottomOfComponentTableRectangle = writeComponentTable(pageWidth, bottomOfSummaryTableRectangle.getLowerLeftY(), report);
@@ -125,8 +126,13 @@ public class RiskReportPdfWriter {
     }
 
     private PDRectangle writeDateTime(float startingHeight, LocalDateTime dateTimeOfLatestScan) throws IOException {
-        String formattedDateTimeString = String.format("Latest scan: %s.", dateTimeOfLatestScan.format(DateTimeFormatter.ofPattern("MM/dd/yyyy - HH:mm:ss")).replace("-", "at"));
-        return pdfManager.writeText(5, startingHeight - 10, formattedDateTimeString, PDType1Font.TIMES_ITALIC, 8, Color.BLACK);
+        String formattedDateTimeString;
+        if (dateTimeOfLatestScan != null) {
+            formattedDateTimeString = dateTimeOfLatestScan.format(DateTimeFormatter.ofPattern("MM/dd/yyyy - HH:mm:ss")).replace("-", "at");
+        } else {
+            formattedDateTimeString = "N/A";
+        }
+        return pdfManager.writeText(5, startingHeight - 10, String.format("Latest scan: %s.", formattedDateTimeString), PDType1Font.TIMES_ITALIC, 8, Color.BLACK);
     }
 
     private PDRectangle writeProjectInformation(float pageWidth, float startingHeight, ReportData reportData) throws IOException {
