@@ -43,25 +43,9 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.NameVersion;
 
-public class CredentialsBlackDuckHttpClient extends BlackDuckHttpClient {
+public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final Credentials credentials;
     private final CookieHeaderParser cookieHeaderParser;
-
-    @Deprecated
-    /**
-     * @deprecated Please provide a CookieHeaderParser.
-     */
-    public CredentialsBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
-        this.credentials = credentials;
-        this.cookieHeaderParser = new CookieHeaderParser();
-
-        if (credentials == null) {
-            throw new IllegalArgumentException("Credentials cannot be null.");
-        }
-    }
 
     public CredentialsBlackDuckHttpClient(
         IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,

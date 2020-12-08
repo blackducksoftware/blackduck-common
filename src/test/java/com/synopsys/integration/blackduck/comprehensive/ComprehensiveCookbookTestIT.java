@@ -22,8 +22,8 @@ import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
@@ -68,7 +68,7 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
-    private BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(new Gson(), new ObjectMapper(), new SilentIntLogger());
+    private final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(new Gson(), new ObjectMapper(), new SilentIntLogger());
 
     @Test
     public void createProjectVersion() throws Exception {
@@ -76,7 +76,7 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
@@ -121,7 +121,7 @@ public class ComprehensiveCookbookTestIT {
 
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         IntLogger logger = blackDuckServicesFactory.getLogger();
 
         // delete the project, if it exists
@@ -266,7 +266,7 @@ public class ComprehensiveCookbookTestIT {
     public void testGettingAllProjectsAndVersions() throws Exception {
         if (Boolean.parseBoolean(intHttpClientTestHelper.getProperty("LOG_DETAILS_TO_CONSOLE"))) {
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-            BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+            BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
 
             List<ProjectView> allProjects = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
             System.out.println(String.format("project count: %d", allProjects.size()));
