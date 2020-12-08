@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
+import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -25,7 +25,7 @@ public class DeveloperScanServiceTestIT {
         DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
         File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        List<BomMatchDeveloperView> results = developerScanService.performDeveloperScan(bdioFile, timeout);
+        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan(bdioFile, timeout);
         assertNotNull(results);
         assertFalse(results.isEmpty());
     }
