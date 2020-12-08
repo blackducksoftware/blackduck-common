@@ -18,7 +18,7 @@ versionFile.delete()
 versionFile << version
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.5-SNAPSHOT'
+    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.4'
     api 'com.synopsys.integration:integration-reporting:2.0.1'
     api 'com.synopsys.integration:integration-bdio:22.0.1'
     api 'com.synopsys.integration:phone-home-client:4.0.2'

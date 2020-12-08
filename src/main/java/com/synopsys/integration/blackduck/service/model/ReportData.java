@@ -22,7 +22,9 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -36,6 +38,7 @@ public class ReportData {
     private String distribution;
     private List<BomComponent> components;
     private int totalComponents;
+    private LocalDateTime dateTimeOfLatestScan;
 
     private BomRiskCounts securityRiskCounts = new BomRiskCounts();
     private BomRiskCounts licenseRiskCounts = new BomRiskCounts();
@@ -102,6 +105,14 @@ public class ReportData {
 
     public int getTotalComponents() {
         return totalComponents;
+    }
+
+    public Optional<LocalDateTime> getDateTimeOfLatestScan() {
+        return Optional.ofNullable(dateTimeOfLatestScan);
+    }
+
+    public void setDateTimeOfLatestScan(final LocalDateTime dateTimeOfLatestScan) {
+        this.dateTimeOfLatestScan = dateTimeOfLatestScan;
     }
 
     public int getVulnerabilityRiskHighCount() {
