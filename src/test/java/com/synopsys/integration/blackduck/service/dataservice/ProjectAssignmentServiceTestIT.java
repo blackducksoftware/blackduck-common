@@ -36,7 +36,7 @@ public class ProjectAssignmentServiceTestIT {
     @AfterAll
     public static void tearDownAfterClass() throws Exception {
         if (ProjectAssignmentServiceTestIT.project != null) {
-            ProjectAssignmentServiceTestIT.blackDuckServicesFactory.getBlackDuckService().delete(ProjectAssignmentServiceTestIT.project);
+            ProjectAssignmentServiceTestIT.blackDuckServicesFactory.getBlackDuckApiClient().delete(ProjectAssignmentServiceTestIT.project);
         }
     }
 

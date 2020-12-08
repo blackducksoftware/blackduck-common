@@ -43,7 +43,7 @@ class ProjectMappingServiceTest {
 
     @AfterEach
     void tearDown() throws IntegrationException {
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         blackDuckApiClient.delete(projectView);
     }
 
