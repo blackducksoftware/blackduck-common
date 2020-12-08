@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
+import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -43,7 +43,7 @@ public class DeveloperScanWaiter {
         this.blackDuckApiClient = blackDuckApiClient;
     }
 
-    public List<BomMatchDeveloperView> checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         BlackDuckPath apiPath = new BlackDuckPath(String.format("/api/scans/%s/developer-result", scanId.toString()));
         HttpUrl url = blackDuckApiClient.getUrl(apiPath);
         DeveloperScanWaitJobTask waitTask = new DeveloperScanWaitJobTask(logger, blackDuckApiClient, apiPath);
@@ -64,7 +64,6 @@ public class DeveloperScanWaiter {
         if (!allCompleted) {
             throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
-        // TODO: This method was created for the developer scan payload.  A large array of data may cause problems and not conform to API specifications. Need to work with the developers to revise the result.
-        return blackDuckApiClient.getArrayResponse(url, BomMatchDeveloperView.class);
+        return blackDuckApiClient.getAllResponses(url, DeveloperScanComponentResultView.class);
     }
 }

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.api.manual.view.BomMatchDeveloperView;
+import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
 
@@ -46,16 +46,16 @@ public class DeveloperScanService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public List<BomMatchDeveloperView> performDeveloperScan(File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> performDeveloperScan(File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return performDeveloperScan(DEFAULT_SCAN_TYPE, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public List<BomMatchDeveloperView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         List<DeveloperModeBdioContent> developerModeBdioContentList = bdio2Reader.readBdio2File(bdio2File);
         return uploadFilesAndWait(scanType, developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
 
-    private List<BomMatchDeveloperView> uploadFilesAndWait(String scanType, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    private List<DeveloperScanComponentResultView> uploadFilesAndWait(String scanType, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
