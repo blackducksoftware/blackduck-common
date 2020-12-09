@@ -122,10 +122,6 @@ public class ComponentService extends DataService {
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
-    public boolean hasUpgradeGuidance(ComponentVersionView componentVersionView) {
-        return componentVersionView.hasLink(ComponentVersionView.UPGRADE_GUIDANCE_LINK);
-    }
-
     public Optional<ComponentVersionUpgradeGuidanceView> getUpgradeGuidance(ComponentVersionView componentVersionView) throws IntegrationException {
         return blackDuckApiClient.getResponse(componentVersionView, ComponentVersionView.UPGRADE_GUIDANCE_LINK_RESPONSE);
     }
@@ -134,7 +130,7 @@ public class ComponentService extends DataService {
     /**
      * @deprecated ComponentVersionRemediatingView is no longer available as of Black Duck 2020.10.0
      */
-    public boolean hasRemediationInformation(ComponentVersionView componentVersionView) {
+    public boolean canRetrieveRemediationInformation(ComponentVersionView componentVersionView) {
         try {
             simplyRetrieveRemediationInformation(componentVersionView);
             return true;
@@ -148,7 +144,7 @@ public class ComponentService extends DataService {
      * @deprecated ComponentVersionRemediatingView is no longer available as of Black Duck 2020.10.0
      */
     public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
-        if (hasRemediationInformation(componentVersionView)) {
+        if (canRetrieveRemediationInformation(componentVersionView)) {
             return simplyRetrieveRemediationInformation(componentVersionView);
         }
 
