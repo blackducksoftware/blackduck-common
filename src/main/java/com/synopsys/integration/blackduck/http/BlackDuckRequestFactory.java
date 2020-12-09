@@ -84,8 +84,7 @@ public class BlackDuckRequestFactory {
                    .url(url)
                    .addBlackDuckQuery(blackDuckQuery)
                    .addBlackDuckFilter(blackDuckRequestFilter)
-                   .addLimit(limit)
-                   .addOffset(offset);
+                   .setBlackDuckPageDefinition(new BlackDuckPageDefinition(limit, offset));
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {

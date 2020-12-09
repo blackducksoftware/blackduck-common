@@ -91,7 +91,9 @@ public class ScanBatchBuilderTest {
     private ScanBatchBuilder createInitialValidBuilder() {
         ScanBatchBuilder builder = new ScanBatchBuilder();
         try {
-            builder.addTarget(ScanTarget.createBasicTarget(File.createTempFile("test_scan", null).getCanonicalPath()));
+            File testScanFile = File.createTempFile("test_scan", null);
+            testScanFile.deleteOnExit();
+            builder.addTarget(ScanTarget.createBasicTarget(testScanFile.getCanonicalPath()));
         } catch (IOException e) {
             fail("Couldn't add the target", e);
         }

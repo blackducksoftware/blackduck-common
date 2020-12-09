@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
@@ -39,7 +40,6 @@ import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
-import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NoThreadExecutorService;
 
@@ -58,17 +58,17 @@ public class BlackDuckPhoneHomeHelper {
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
         IntEnvironmentVariables intEnvironmentVariables = blackDuckServicesFactory.getEnvironmentVariables();
-        IntHttpClient intHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
+        BlackDuckHttpClient blackDuckHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
+        HttpClientBuilder httpClientBuilder = blackDuckHttpClient.getHttpClientBuilder();
         Gson gson = blackDuckServicesFactory.getGson();
-        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, intHttpClient, gson);
+        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, httpClientBuilder, gson);
 
         PhoneHomeService phoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, phoneHomeClient, executorService);
 
         return new BlackDuckPhoneHomeHelper(intLogger, phoneHomeService, blackDuckRegistrationService, intEnvironmentVariables);
     }
 
-    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, IntHttpClient intHttpClient, Gson gson) {
-        HttpClientBuilder httpClientBuilder = intHttpClient.getClientBuilder();
+    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson) {
         return new PhoneHomeClient(intLogger, httpClientBuilder, gson);
     }
 

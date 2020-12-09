@@ -46,7 +46,7 @@ public class NotificationsTestIT {
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
 

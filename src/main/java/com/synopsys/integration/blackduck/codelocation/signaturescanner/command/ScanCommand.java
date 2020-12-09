@@ -144,6 +144,7 @@ public class ScanCommand {
         return cmd;
     }
 
+    //--value="this thing that is important with spaces"
     private void populateAdditionalScanArguments(List<String> cmd) {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
             for (String additionalArgument : additionalScanArguments.split(" ")) {
