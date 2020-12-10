@@ -242,7 +242,15 @@ public class BlackDuckServicesFactory {
         return intEnvironmentVariables;
     }
 
+    @Deprecated
+    /**
+     * @deprecated Please use getBlackDuckApiClient().
+     */
     public BlackDuckApiClient getBlackDuckService() {
+        return blackDuckApiClient;
+    }
+
+    public BlackDuckApiClient getBlackDuckApiClient() {
         return blackDuckApiClient;
     }
 
