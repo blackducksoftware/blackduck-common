@@ -30,11 +30,11 @@ import java.util.Optional;
 import org.apache.commons.compress.archivers.ArchiveException;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
@@ -49,28 +49,21 @@ public class ScannerZipInstaller {
     public static final String VERSION_FILENAME = "blackDuckVersion.txt";
 
     private final IntLogger logger;
-    private final IntHttpClient intHttpClient;
+    private final BlackDuckHttpClient blackDuckHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
     private final KeyStoreHelper keyStoreHelper;
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    @Deprecated
-    /**
-     * deprecated - Please construct your own KeyStoreHelper dependency and provide it
-     */
-    public ScannerZipInstaller(IntLogger logger, IntHttpClient intHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl, OperatingSystemType operatingSystemType) {
-        this(logger, intHttpClient, cleanupZipExpander, scanPathsUtility, new KeyStoreHelper(logger), blackDuckServerUrl, operatingSystemType);
-    }
-
-    public ScannerZipInstaller(final IntLogger logger, final IntHttpClient intHttpClient, final CleanupZipExpander cleanupZipExpander, final ScanPathsUtility scanPathsUtility, final KeyStoreHelper keyStoreHelper, final HttpUrl blackDuckServerUrl, final OperatingSystemType operatingSystemType) {
+    public ScannerZipInstaller(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
+        final OperatingSystemType operatingSystemType) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
 
         this.logger = logger;
-        this.intHttpClient = intHttpClient;
+        this.blackDuckHttpClient = blackDuckHttpClient;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
         this.keyStoreHelper = keyStoreHelper;
@@ -143,7 +136,7 @@ public class ScannerZipInstaller {
         logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
 
         Request downloadRequest = new Request.Builder(downloadUrl).build();
-        Optional<Response> optionalResponse = intHttpClient.executeGetRequestIfModifiedSince(downloadRequest, lastTimeDownloaded);
+        Optional<Response> optionalResponse = blackDuckHttpClient.executeGetRequestIfModifiedSince(downloadRequest, lastTimeDownloaded);
         if (optionalResponse.isPresent()) {
             Response response = optionalResponse.get();
             try {

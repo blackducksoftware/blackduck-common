@@ -103,7 +103,8 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckServicesFactory(
-        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger, BlackDuckRequestFactory blackDuckRequestFactory) {
+        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger,
+        BlackDuckRequestFactory blackDuckRequestFactory) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.gson = gson;
         this.objectMapper = objectMapper;
@@ -240,14 +241,6 @@ public class BlackDuckServicesFactory {
 
     public IntEnvironmentVariables getEnvironmentVariables() {
         return intEnvironmentVariables;
-    }
-
-    @Deprecated
-    /**
-     * @deprecated Please use getBlackDuckApiClient().
-     */
-    public BlackDuckApiClient getBlackDuckService() {
-        return blackDuckApiClient;
     }
 
     public BlackDuckApiClient getBlackDuckApiClient() {

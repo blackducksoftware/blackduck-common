@@ -41,7 +41,7 @@ import com.synopsys.integration.util.NameVersion;
 /**
  * Connection to the Black Duck application which authenticates using the API token feature
  */
-public class ApiTokenBlackDuckHttpClient extends BlackDuckHttpClient {
+public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final Gson gson;
     private final String apiToken;
 

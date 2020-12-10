@@ -58,18 +58,8 @@ public class BlackDuckRequestBuilder {
     }
 
     public BlackDuckRequestBuilder setBlackDuckPageDefinition(BlackDuckPageDefinition blackDuckPageDefinition) {
-        addLimit(blackDuckPageDefinition.getLimit());
-        addOffset(blackDuckPageDefinition.getOffset());
-        return this;
-    }
-
-    public BlackDuckRequestBuilder addLimit(int limit) {
-        requestBuilder.addQueryParameter(LIMIT_PARAMETER, String.valueOf(limit));
-        return this;
-    }
-
-    public BlackDuckRequestBuilder addOffset(int offset) {
-        requestBuilder.addQueryParameter(OFFSET_PARAMETER, String.valueOf(offset));
+        requestBuilder.setQueryParameter(LIMIT_PARAMETER, String.valueOf(blackDuckPageDefinition.getLimit()));
+        requestBuilder.setQueryParameter(OFFSET_PARAMETER, String.valueOf(blackDuckPageDefinition.getOffset()));
         return this;
     }
 

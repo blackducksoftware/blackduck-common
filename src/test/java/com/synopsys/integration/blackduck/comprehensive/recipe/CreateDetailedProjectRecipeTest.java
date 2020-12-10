@@ -44,7 +44,7 @@ public class CreateDetailedProjectRecipeTest extends BasicRecipe {
          * fields are set correctly with the BlackDuckService, a general purpose API
          * wrapper to handle common GET requests and their response payloads
          */
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
         ProjectVersionView projectVersionView = blackDuckApiClient.getResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE).get();
 
