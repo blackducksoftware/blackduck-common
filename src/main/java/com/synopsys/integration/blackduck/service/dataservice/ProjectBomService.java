@@ -106,8 +106,10 @@ public class ProjectBomService extends DataService {
         if (componentSearchResultView.isPresent()) {
             if (StringUtils.isNotBlank(componentSearchResultView.get().getVariant())) {
                 componentVersionUrl = componentSearchResultView.get().getVariant();
-            } else {
+            } else if (StringUtils.isNotBlank(componentSearchResultView.get().getVersion())) {
                 componentVersionUrl = componentSearchResultView.get().getVersion();
+            } else {
+                componentVersionUrl = componentSearchResultView.get().getComponent();
             }
             addComponentToProjectVersion(new HttpUrl(componentVersionUrl), projectVersionComponentsUrl);
         }
