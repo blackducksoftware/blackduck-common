@@ -71,7 +71,7 @@ public class KeyStoreHelper {
                 keyStore.store(outputStream, DEFAULT_JAVA_KEYSTORE_PASSWORD);
             }
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
-            logger.error("Could not manage the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
+            logger.errorAndDebug("Could not manage the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
         }
     }
 

@@ -341,4 +341,5 @@ public class BlackDuckApiClient {
     private HttpUrl fullBlackDuckUrl(BlackDuckPath blackDuckPath) throws IntegrationException {
         return blackDuckPath.getFullBlackDuckUrl(blackDuckBaseUrl);
     }
+
 }

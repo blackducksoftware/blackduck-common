@@ -145,4 +145,5 @@ public class CacheableResponse implements Response {
     public void throwExceptionForError() throws IntegrationRestException {
         response.throwExceptionForError();
     }
+
 }
