@@ -56,14 +56,6 @@ public class ScannerZipInstaller {
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    @Deprecated
-    /**
-     * deprecated - Please construct your own KeyStoreHelper dependency and provide it
-     */
-    public ScannerZipInstaller(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, HttpUrl blackDuckServerUrl, OperatingSystemType operatingSystemType) {
-        this(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new KeyStoreHelper(logger), blackDuckServerUrl, operatingSystemType);
-    }
-
     public ScannerZipInstaller(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
         final OperatingSystemType operatingSystemType) {
         if (null == blackDuckServerUrl) {

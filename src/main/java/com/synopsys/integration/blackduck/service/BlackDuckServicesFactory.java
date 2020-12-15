@@ -53,6 +53,7 @@ import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
+import com.synopsys.integration.blackduck.service.dataservice.IssueService;
 import com.synopsys.integration.blackduck.service.dataservice.LicenseService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
@@ -169,6 +170,10 @@ public class BlackDuckServicesFactory {
         return new BlackDuckRegistrationService(blackDuckApiClient, blackDuckRequestFactory, logger, blackDuckHttpClient.getBaseUrl());
     }
 
+    public IssueService createIssueService() {
+        return new IssueService(blackDuckApiClient, blackDuckRequestFactory, logger);
+    }
+
     public LicenseService createLicenseService() {
         return new LicenseService(blackDuckApiClient, blackDuckRequestFactory, logger, createComponentService());
     }
@@ -254,7 +259,7 @@ public class BlackDuckServicesFactory {
         return intEnvironmentVariables;
     }
 
-    public BlackDuckApiClient getBlackDuckService() {
+    public BlackDuckApiClient getBlackDuckApiClient() {
         return blackDuckApiClient;
     }
 

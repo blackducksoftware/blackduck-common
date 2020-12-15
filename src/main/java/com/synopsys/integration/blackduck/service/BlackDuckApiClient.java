@@ -216,6 +216,11 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     // getting responses from a LinkSingleResponse
     // ------------------------------------------------
+
+    /**
+     * @deprecated This uses LinkSingleResponse incorrectly. Please use getResponse(HttpUrl url, Class<T> responseClass) instead.
+     */
+    @Deprecated
     public <T extends BlackDuckResponse> T getResponse(LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
         HttpUrl url = new HttpUrl(linkSingleResponse.getLink());
         Request request = blackDuckRequestFactory.createCommonGetRequest(url);
@@ -336,4 +341,5 @@ public class BlackDuckApiClient {
     private HttpUrl fullBlackDuckUrl(BlackDuckPath blackDuckPath) throws IntegrationException {
         return blackDuckPath.getFullBlackDuckUrl(blackDuckBaseUrl);
     }
+
 }

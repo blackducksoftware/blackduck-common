@@ -39,7 +39,7 @@ public class BlackDuckServices {
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();
         codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         componentService = blackDuckServicesFactory.createComponentService();
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();

@@ -48,7 +48,6 @@ public class CachingHttpClientTestIT {
         Duration duration = Duration.between(startTimeBeforeCache, finishedTimeBeforeCache);
         Duration durationAfterCache = Duration.between(startTimeAfterCache, finishedTimeAfterCache);
         assertTrue(0 < duration.compareTo(durationAfterCache));
-
     }
 
 }

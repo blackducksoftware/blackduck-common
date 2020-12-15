@@ -35,9 +35,11 @@ import com.synopsys.integration.blackduck.api.manual.contract.NotificationViewDa
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
+import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
+import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -56,31 +58,35 @@ public class NotificationService extends DataService {
     public List<NotificationView> getAllNotifications(Date startDate, Date endDate) throws IntegrationException {
         List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         BlackDuckRequestBuilder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
-        List<NotificationView> allNotificationItems = blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
+        return blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
+    }
 
-        return allNotificationItems;
+    public BlackDuckPageResponse<NotificationView> getPageOfNotifications(Date startDate, Date endDate, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
+        List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
+        BlackDuckRequestBuilder requestBuilder = createNotificationRequestBuilder(startDate, endDate, allKnownNotificationTypes);
+        return blackDuckApiClient.getPageResponse(requestBuilder, NotificationView.class, blackDuckPageDefinition);
     }
 
     public List<NotificationUserView> getAllUserNotifications(UserView user, Date startDate, Date endDate) throws IntegrationException {
         List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
         BlackDuckRequestBuilder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, allKnownNotificationTypes);
-        List<NotificationUserView> allUserNotificationItems = blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
+        return blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
+    }
 
-        return allUserNotificationItems;
+    public BlackDuckPageResponse getPageOfUserNotifications(UserView user, Date startDate, Date endDate, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
+        List<String> allKnownNotificationTypes = getAllKnownNotificationTypes();
+        BlackDuckRequestBuilder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, allKnownNotificationTypes);
+        return blackDuckApiClient.getPageResponse(requestBuilder, NotificationUserView.class, blackDuckPageDefinition);
     }
 
     public List<NotificationView> getFilteredNotifications(Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        List<NotificationView> allNotificationItems = blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
-
-        return reallyFilterNotifications(allNotificationItems, notificationTypesToInclude);
+        return blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
     }
 
     public List<NotificationUserView> getFilteredUserNotifications(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, notificationTypesToInclude);
-        List<NotificationUserView> allUserNotificationItems = blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
-
-        return reallyFilterNotifications(allUserNotificationItems, notificationTypesToInclude);
+        return blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
     }
 
     /**
@@ -148,19 +154,6 @@ public class NotificationService extends DataService {
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString)
                    .addBlackDuckFilter(notificationTypeFilter);
-    }
-
-    /*
-    FIXME
-    as of 2018.11.0, the notification filtering appears to be broken, so we must REALLY filter the notifications
-    when that is fixed, this can be removed
-    UPDATE: as of 2018.12.0, this is fixed - this can likely be removed when we no longer care about supporting flavors of 2018.11
-    */
-    private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
-        return notifications
-                   .stream()
-                   .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
-                   .collect(Collectors.toList());
     }
 
 }

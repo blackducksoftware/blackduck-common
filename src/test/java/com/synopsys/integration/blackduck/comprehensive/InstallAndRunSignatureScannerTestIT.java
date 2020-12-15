@@ -106,7 +106,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // finally, verify the code location exists and then delete it to clean up
         CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
-        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckService();
+        BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         WaitJob waitJob = WaitJob.create(logger, 120, System.currentTimeMillis(), 10, () -> {
             return codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME).isPresent();
         });

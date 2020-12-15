@@ -22,12 +22,12 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.enumeration.RankedSeverityType;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
@@ -99,7 +99,8 @@ public class PolicyStatusDescription {
     private void getPolicySeverityMessage(StringBuilder stringBuilder) {
         stringBuilder.append("Policy Severity counts: ");
         // let's loop over the actual enum values for a consistently ordered output
-        String policySeverityItems = Arrays.stream(PolicyRuleSeverityType.values())
+        String policySeverityItems = RankedSeverityType.getRankedValues()
+                                         .stream()
                                          .filter(policySeverityCount::containsKey)
                                          .map(policyRuleSeverityType -> fixMatchPlural("%d %s a severity level of %s", policySeverityCount.get(policyRuleSeverityType).value, policyRuleSeverityType))
                                          .collect(Collectors.joining(", "));

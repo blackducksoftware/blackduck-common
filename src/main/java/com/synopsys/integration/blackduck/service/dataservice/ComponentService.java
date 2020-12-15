@@ -34,6 +34,7 @@ import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.deprecated.response.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
@@ -51,7 +52,7 @@ import com.synopsys.integration.rest.HttpUrl;
 
 public class ComponentService extends DataService {
     public static final String REMEDIATING_LINK = "remediating";
-    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(ComponentService.REMEDIATING_LINK, RemediationOptionsView.class);
+    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>("remediating", RemediationOptionsView.class);
 
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT =
         (list) ->
@@ -121,11 +122,38 @@ public class ComponentService extends DataService {
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
-    // TODO deprecate when the REMEDIATING_LINK is included in ComponentVersionView
+    public Optional<ComponentVersionUpgradeGuidanceView> getUpgradeGuidance(ComponentVersionView componentVersionView) throws IntegrationException {
+        return blackDuckApiClient.getResponse(componentVersionView, ComponentVersionView.UPGRADE_GUIDANCE_LINK_RESPONSE);
+    }
+
+    @Deprecated
+    /**
+     * @deprecated ComponentVersionRemediatingView is no longer available as of Black Duck 2020.10.0
+     */
+    public boolean canRetrieveRemediationInformation(ComponentVersionView componentVersionView) {
+        try {
+            simplyRetrieveRemediationInformation(componentVersionView);
+            return true;
+        } catch (IntegrationException e) {
+            return false;
+        }
+    }
+
+    @Deprecated
+    /**
+     * @deprecated ComponentVersionRemediatingView is no longer available as of Black Duck 2020.10.0
+     */
     public Optional<ComponentVersionRemediatingView> getRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
-        String remediatingUrl = componentVersionView.getHref() + "/" + ComponentService.REMEDIATING_LINK;
-        LinkSingleResponse<ComponentVersionRemediatingView> linkSingleResponse = new LinkSingleResponse<>(remediatingUrl, ComponentVersionRemediatingView.class);
-        return Optional.ofNullable(blackDuckApiClient.getResponse(linkSingleResponse));
+        if (canRetrieveRemediationInformation(componentVersionView)) {
+            return simplyRetrieveRemediationInformation(componentVersionView);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<ComponentVersionRemediatingView> simplyRetrieveRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
+        HttpUrl remediatingUrl = componentVersionView.getHref().appendRelativeUrl(ComponentService.REMEDIATING_LINK);
+        return Optional.ofNullable(blackDuckApiClient.getResponse(remediatingUrl, ComponentVersionRemediatingView.class));
     }
 
 }
