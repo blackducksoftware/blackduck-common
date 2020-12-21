@@ -24,13 +24,17 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tools.ant.types.Commandline;
 
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+
 
 public class ScanCommand {
     private final String scheme;
@@ -144,11 +148,13 @@ public class ScanCommand {
         return cmd;
     }
 
+    //--value="this thing that is important with spaces"
     private void populateAdditionalScanArguments(List<String> cmd) {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
-            for (String additionalArgument : additionalScanArguments.split(" ")) {
-                if (StringUtils.isNotBlank(additionalArgument)) {
-                    cmd.add(additionalArgument);
+            String[] arguments = Commandline.translateCommandline(additionalScanArguments);
+            for (String argument : arguments) {
+                if (StringUtils.isNotBlank(argument)) {
+                    cmd.add(argument);
                 }
             }
         }
