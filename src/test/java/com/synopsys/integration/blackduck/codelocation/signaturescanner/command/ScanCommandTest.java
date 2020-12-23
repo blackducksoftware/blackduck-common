@@ -173,14 +173,6 @@ public class ScanCommandTest {
         assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
     }
 
-    @Test
-    public void testAdditionalArgumentsWithSpaces() throws BlackDuckIntegrationException {
-        scanBatchBuilder.additionalScanArguments("--upload-source --exclude \"/Users/joe/test folder/\" --name \"my--test\"");
-        List<String> commandList = createCommandList();
-        assertTrue(commandList.contains("\"/Users/joe/test folder/\""));
-        assertTrue(commandList.contains("\"my--test\""));
-    }
-
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
             scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));

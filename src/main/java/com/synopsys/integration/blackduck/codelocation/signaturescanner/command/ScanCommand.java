@@ -148,7 +148,7 @@ public class ScanCommand {
     //--value="this thing that is important with spaces"
     private void populateAdditionalScanArguments(List<String> cmd) {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
-            CommandLineArgumentParser extractor = new CommandLineArgumentParser();
+            ScanCommandArgumentParser extractor = new ScanCommandArgumentParser();
             List<String> arguments = extractor.parse(additionalScanArguments);
             for (String argument : arguments) {
                 if (StringUtils.isNotBlank(argument)) {

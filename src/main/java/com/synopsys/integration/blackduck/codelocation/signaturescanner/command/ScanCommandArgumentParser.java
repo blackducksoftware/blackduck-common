@@ -6,19 +6,15 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CommandLineArgumentParser {
+public class ScanCommandArgumentParser {
 
-    public List<String> parse(String commandLine) {
-        if (StringUtils.isBlank(commandLine)) {
+    public List<String> parse(String command) {
+        if (!isParseable(command)) {
             return new ArrayList<>();
         }
 
-        if (!hasEvenNumberOfQuotes(commandLine)) {
-            // uneven number of quotes not parseable;
-            return new ArrayList<>();
-        }
         List<String> parsedArguments = new LinkedList<>();
-        String[] splitBySpaces = commandLine.split("\\s");
+        String[] splitBySpaces = command.split("\\s");
         boolean inQuotes = false;
         StringBuilder currentArgument = null;
         for (String text : splitBySpaces) {
@@ -40,6 +36,13 @@ public class CommandLineArgumentParser {
             }
         }
         return parsedArguments;
+    }
+
+    private boolean isParseable(String command) {
+        if (StringUtils.isBlank(command)) {
+            return false;
+        }
+        return hasEvenNumberOfQuotes(command);
     }
 
     private boolean hasEvenNumberOfQuotes(String commandLine) {
