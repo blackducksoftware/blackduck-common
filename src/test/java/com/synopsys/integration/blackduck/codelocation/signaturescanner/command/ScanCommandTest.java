@@ -177,8 +177,8 @@ public class ScanCommandTest {
     public void testAdditionalArgumentsWithSpaces() throws BlackDuckIntegrationException {
         scanBatchBuilder.additionalScanArguments("--upload-source --exclude \"/Users/joe/test folder/\" --name \"my--test\"");
         List<String> commandList = createCommandList();
-        assertTrue(commandList.contains("/Users/joe/test folder/"));
-        assertTrue(commandList.contains("my--test"));
+        assertTrue(commandList.contains("\"/Users/joe/test folder/\""));
+        assertTrue(commandList.contains("\"my--test\""));
     }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {

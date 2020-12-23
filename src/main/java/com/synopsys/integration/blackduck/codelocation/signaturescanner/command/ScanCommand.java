@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tools.ant.types.Commandline;
 
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -149,7 +148,8 @@ public class ScanCommand {
     //--value="this thing that is important with spaces"
     private void populateAdditionalScanArguments(List<String> cmd) {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
-            String[] arguments = Commandline.translateCommandline(additionalScanArguments);
+            CommandLineArgumentParser extractor = new CommandLineArgumentParser();
+            List<String> arguments = extractor.parse(additionalScanArguments);
             for (String argument : arguments) {
                 if (StringUtils.isNotBlank(argument)) {
                     cmd.add(argument);
