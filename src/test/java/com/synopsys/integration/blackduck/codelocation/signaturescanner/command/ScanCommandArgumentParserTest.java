@@ -10,10 +10,10 @@ public class ScanCommandArgumentParserTest {
 
     @Test
     public void testParsesArgumentsWithSpaces() {
-        String command = "--upload-source --exclude \"/Users/joe/test folder/\" --name \"my--test\"";
+        String command = "--upload-source --exclude \"/Users/joe/test folder/\"";
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
         List<String> arguments = parser.parse(command);
+        assertTrue(arguments.contains("--exclude"));
         assertTrue(arguments.contains("\"/Users/joe/test folder/\""));
-        assertTrue(arguments.contains("\"my--test\""));
     }
 }

@@ -18,16 +18,17 @@ public class ScanCommandArgumentParser {
         boolean inQuotes = false;
         StringBuilder currentArgument = null;
         for (String text : splitBySpaces) {
-            if (text.startsWith("\"") || text.startsWith("'")) {
+            if (text.startsWith("\"")) {
                 inQuotes = true;
                 currentArgument = new StringBuilder();
             }
             if (inQuotes) {
                 if (currentArgument.length() > 0) {
+                    // we must be dealing with a quoted argument that has a space.  to preserve the original argument, add a space and then append the rest
                     currentArgument.append(" ");
                 }
                 currentArgument.append(text);
-                if (text.endsWith("\"") || text.endsWith("'")) {
+                if (text.endsWith("\"")) {
                     inQuotes = false;
                     parsedArguments.add(currentArgument.toString());
                 }
@@ -47,11 +48,6 @@ public class ScanCommandArgumentParser {
 
     private boolean hasEvenNumberOfQuotes(String commandLine) {
         int pairsOfDoubleQuotes = StringUtils.countMatches(commandLine, "\"") % 2;
-        int pairsOfSingleQuotes = StringUtils.countMatches(commandLine, "'") % 2;
-
-        if (pairsOfDoubleQuotes != 0 || pairsOfSingleQuotes != 0) {
-            return false;
-        }
-        return true;
+        return pairsOfDoubleQuotes == 0;
     }
 }
