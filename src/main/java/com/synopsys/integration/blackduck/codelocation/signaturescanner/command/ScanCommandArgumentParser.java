@@ -29,9 +29,12 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.exception.IntegrationArgumentException;
+import com.synopsys.integration.exception.IntegrationException;
+
 public class ScanCommandArgumentParser {
 
-    public List<String> parse(String command) {
+    public List<String> parse(String command) throws IntegrationException {
         if (!isParseable(command)) {
             return new ArrayList<>();
         }
@@ -52,6 +55,7 @@ public class ScanCommandArgumentParser {
                 }
                 currentArgument.append(text);
                 if (text.endsWith("\"") && !text.endsWith("\\\"")) {
+                    // we are only concerned with non-escaped quotes (escaped characters will just be passed along to scanner)
                     inQuotes = false;
                     parsedArguments.add(currentArgument.toString());
                 }
@@ -62,24 +66,28 @@ public class ScanCommandArgumentParser {
         return parsedArguments;
     }
 
-    private boolean isParseable(String command) {
+    private boolean isParseable(String command) throws IntegrationException {
         if (StringUtils.isBlank(command)) {
             return false;
         }
         return hasEvenNumberOfNonEscapedQuotes(command);
     }
 
-    private boolean hasEvenNumberOfNonEscapedQuotes(String commandLine) {
+    private boolean hasEvenNumberOfNonEscapedQuotes(String command) throws IntegrationException {
         int numberOfNonEscapedQuotes = 0;
         char quote = '"';
         char backSlash = '\\';
         char last = 0;
-        for (char current : commandLine.toCharArray()) {
+        for (char current : command.toCharArray()) {
             if (current == quote && last != backSlash) {
                 numberOfNonEscapedQuotes++;
             }
             last = current;
         }
-        return (numberOfNonEscapedQuotes % 2) == 0;
+
+        if ((numberOfNonEscapedQuotes % 2) != 0) {
+            throw new IntegrationException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
+        }
+        return true;
     }
 }

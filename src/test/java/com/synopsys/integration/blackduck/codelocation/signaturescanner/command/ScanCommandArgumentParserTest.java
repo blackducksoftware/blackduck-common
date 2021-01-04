@@ -7,36 +7,48 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.synopsys.integration.exception.IntegrationException;
+
 public class ScanCommandArgumentParserTest {
 
     @Test
-    public void testParsesArgumentsWithSpaces() {
-        String argumentsWithSpaces = "--upload-source --exclude \"/Users/joe/test folder/\"";
+    public void testParsesArgumentsWithSpaces() throws IntegrationException {
+        String command = "--upload-source --exclude \"/Users/joe/test folder/\"";
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
-        List<String> arguments = parser.parse(argumentsWithSpaces);
+        List<String> arguments = parser.parse(command);
         assertTrue(arguments.contains("--exclude"));
         assertTrue(arguments.contains("\"/Users/joe/test folder/\""));
     }
 
     @Test
-    public void testReturnsEmpytListWhenNumberOfNonEscapedQuotesIsUneven() {
+    public void testReturnsThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven() {
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
+        String command;
 
-        String command1 = "--exclude \"this\" \"";
-        Assertions.assertEquals(0, parser.parse(command1).size());
+        command = "--exclude \"this\" \"";
+        Assertions.assertTrue(throwsException(command, parser));
 
-        String command2 = "--exclude \"thi\"s \"";
-        Assertions.assertEquals(0, parser.parse(command2).size());
+        command = "--exclude \"thi\"s \"";
+        Assertions.assertTrue(throwsException(command, parser));
 
-        String command3 = "--exclude \"this\\\" \"";
-        Assertions.assertNotEquals(0, parser.parse(command3).size());
+        command = "--exclude \"this\\\" \"";
+        Assertions.assertFalse(throwsException(command, parser));
 
-        String command4 = "--exclude \"this\\\" thing\"\"";
-        Assertions.assertEquals(0, parser.parse(command4).size());
+        command = "--exclude \"this\\\" thing\"\"";
+        Assertions.assertTrue(throwsException(command, parser));
+    }
+
+    private boolean throwsException(String command, ScanCommandArgumentParser parser) {
+        try {
+            parser.parse(command);
+        } catch (IntegrationException e) {
+            return true;
+        }
+        return false;
     }
 
     @Test
-    public void testParsesArgumentsWithEscapedQuotes() {
+    public void testParsesArgumentsWithEscapedQuotes() throws IntegrationException {
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
 
         String command1 = "--exclude \"/Users/joe/test \\\" folder/\"";

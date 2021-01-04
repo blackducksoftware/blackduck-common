@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 
@@ -88,7 +89,7 @@ public class ScanCommand {
         this.versionName = versionName;
     }
 
-    public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException {
+    public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
         List<String> cmd = new ArrayList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
@@ -146,10 +147,10 @@ public class ScanCommand {
     }
 
     //--value="this thing that is important with spaces"
-    private void populateAdditionalScanArguments(List<String> cmd) {
+    private void populateAdditionalScanArguments(List<String> cmd) throws IntegrationException {
         if (StringUtils.isNotBlank(additionalScanArguments)) {
-            ScanCommandArgumentParser extractor = new ScanCommandArgumentParser();
-            List<String> arguments = extractor.parse(additionalScanArguments);
+            ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
+            List<String> arguments = parser.parse(additionalScanArguments);
             for (String argument : arguments) {
                 if (StringUtils.isNotBlank(argument)) {
                     cmd.add(argument);

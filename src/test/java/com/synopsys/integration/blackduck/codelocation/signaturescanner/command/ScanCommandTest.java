@@ -57,35 +57,35 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testSnippetScan() throws BlackDuckIntegrationException {
+    public void testSnippetScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, true, false, false);
     }
 
     @Test
-    public void testSnippetOnlyScan() throws BlackDuckIntegrationException {
+    public void testSnippetOnlyScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING_ONLY);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, false);
     }
 
     @Test
-    public void testFullSnippetScan() throws BlackDuckIntegrationException {
+    public void testFullSnippetScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, true, false, true);
     }
 
     @Test
-    public void testFullSnippetOnlyScan() throws BlackDuckIntegrationException {
+    public void testFullSnippetOnlyScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, true);
     }
 
     @Test
-    public void testSnippetScanWithUploadSource() throws BlackDuckIntegrationException {
+    public void testSnippetScanWithUploadSource() throws IntegrationException {
         scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, true);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, true);
@@ -93,7 +93,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testSnippetScanWithoutUploadSource() throws BlackDuckIntegrationException {
+    public void testSnippetScanWithoutUploadSource() throws IntegrationException {
         scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, false);
         List<String> commandList = createCommandList();
         assertSnippetCommands(commandList, false, true, true);
@@ -101,7 +101,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testSnippetScanLoggingWhenDryRun() throws BlackDuckIntegrationException {
+    public void testSnippetScanLoggingWhenDryRun() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
 
         ScanBatch scanBatch = scanBatchBuilder.build();
@@ -118,7 +118,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testWithoutLicenseSearch() throws BlackDuckIntegrationException {
+    public void testWithoutLicenseSearch() throws IntegrationException {
         scanBatchBuilder.licenseSearch(false);
         List<String> commandList = createCommandList();
         assertLicenseSearch(commandList, false);
@@ -126,7 +126,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testLicenseSearch() throws BlackDuckIntegrationException {
+    public void testLicenseSearch() throws IntegrationException {
         scanBatchBuilder.licenseSearch(true);
         List<String> commandList = createCommandList();
         assertLicenseSearch(commandList, true);
@@ -134,7 +134,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testLicenseSearchWithUploadSource() throws BlackDuckIntegrationException {
+    public void testLicenseSearchWithUploadSource() throws IntegrationException {
         scanBatchBuilder.licenseSearch(true);
         scanBatchBuilder.uploadSource(true);
         List<String> commandList = createCommandList();
@@ -143,7 +143,7 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testLicenseSearchDryRun() throws BlackDuckIntegrationException {
+    public void testLicenseSearchDryRun() throws IntegrationException {
         scanBatchBuilder.licenseSearch(true);
 
         ScanBatch scanBatch = scanBatchBuilder.build();
@@ -160,14 +160,14 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testIndividualFileMatchingNotSet() throws BlackDuckIntegrationException {
+    public void testIndividualFileMatchingNotSet() throws IntegrationException {
         scanBatchBuilder.individualFileMatching(null);
         List<String> commandList = createCommandList();
         assertIndividualFileMatching(commandList, null);
     }
 
     @Test
-    public void testIndividualFileMatchingValidValue() throws BlackDuckIntegrationException {
+    public void testIndividualFileMatchingValidValue() throws IntegrationException {
         scanBatchBuilder.individualFileMatching(IndividualFileMatching.BINARY);
         List<String> commandList = createCommandList();
         assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
@@ -184,7 +184,7 @@ public class ScanCommandTest {
         scanBatchBuilder.outputDirectory(tempDirectory.toFile());
     }
 
-    private List<String> createCommandList() throws BlackDuckIntegrationException {
+    private List<String> createCommandList() throws IntegrationException {
         ScanBatch scanBatch = scanBatchBuilder.build();
         ScanCommand scanCommand = assertCommand(scanBatch);
 
@@ -194,7 +194,7 @@ public class ScanCommandTest {
         return commandList;
     }
 
-    private void assertLogging(ScanCommand scanCommand, int expectedPostLogSize) {
+    private void assertLogging(ScanCommand scanCommand, int expectedPostLogSize) throws IntegrationException {
         BufferedIntLogger bufferedLogger = new BufferedIntLogger();
         assertEquals(0, bufferedLogger.getOutputList(LogLevel.WARN).size());
         scanCommand.createCommandForProcessBuilder(bufferedLogger, Mockito.mock(ScanPaths.class), scanCommand.getOutputDirectory().getAbsolutePath());
