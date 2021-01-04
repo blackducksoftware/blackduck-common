@@ -21,7 +21,7 @@ public class ScanCommandArgumentParserTest {
     }
 
     @Test
-    public void testReturnsThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven() {
+    public void testThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven() {
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
         String command;
 
