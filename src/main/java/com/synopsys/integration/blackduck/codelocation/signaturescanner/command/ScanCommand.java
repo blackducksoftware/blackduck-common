@@ -148,6 +148,7 @@ public class ScanCommand {
 
     //--value="this thing that is important with spaces"
     private void populateAdditionalScanArguments(List<String> cmd) throws IntegrationException {
+        //TODO - maybe remove this check, it's redundant with the check in the parser
         if (StringUtils.isNotBlank(additionalScanArguments)) {
             ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
             List<String> arguments = parser.parse(additionalScanArguments);

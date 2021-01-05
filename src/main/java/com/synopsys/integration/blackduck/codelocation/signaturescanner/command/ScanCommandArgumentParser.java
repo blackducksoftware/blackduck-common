@@ -33,35 +33,43 @@ import com.synopsys.integration.exception.IntegrationArgumentException;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class ScanCommandArgumentParser {
-
     public List<String> parse(String command) throws IntegrationException {
-        if (!isParseable(command)) {
+        if (StringUtils.isBlank(command)) {
             return new ArrayList<>();
         }
 
-        List<String> parsedArguments = new LinkedList<>();
+        //TODO - maybe make this a validate method or something like 'enforceMatchedQuotes'
+        if (!hasEvenNumberOfNonEscapedQuotes(command)) {
+            throw new IntegrationException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
+        }
+
+        List<String> parsedArguments = new ArrayList<>(); // TODO- list implementation shouldn't differ within method
         String[] splitBySpaces = command.split("\\s");
         boolean inQuotes = false;
-        StringBuilder currentArgument = null;
+        StringBuilder quotedArgument = null;
         for (String text : splitBySpaces) {
-            if (text.startsWith("\"")) {
+            if (text.startsWith("\"") && !inQuotes) {
                 inQuotes = true;
-                currentArgument = new StringBuilder();
+                quotedArgument = new StringBuilder();
             }
             if (inQuotes) {
-                if (currentArgument.length() > 0) {
+                if (quotedArgument.length() > 0) {
                     // we must be dealing with a quoted argument that has a space.  to preserve the original argument, add a space and then append the rest
-                    currentArgument.append(" ");
+                    quotedArgument.append(" ");
                 }
-                currentArgument.append(text);
+                quotedArgument.append(text);
                 if (text.endsWith("\"") && !text.endsWith("\\\"")) {
                     // we are only concerned with non-escaped quotes (escaped characters will just be passed along to scanner)
                     inQuotes = false;
-                    parsedArguments.add(currentArgument.toString());
+                    parsedArguments.add(quotedArgument.toString());
                 }
             } else {
                 parsedArguments.add(text);
             }
+        }
+        String originalCheck = StringUtils.join(parsedArguments, " ");
+        if (!originalCheck.equals(command)) {
+            throw new IntegrationException("AHHHHH"); // TODO - change this message...maybe
         }
         return parsedArguments;
     }
@@ -76,18 +84,15 @@ public class ScanCommandArgumentParser {
     private boolean hasEvenNumberOfNonEscapedQuotes(String command) throws IntegrationException {
         int numberOfNonEscapedQuotes = 0;
         char quote = '"';
-        char backSlash = '\\';
+        char backslash = '\\';
         char last = 0;
         for (char current : command.toCharArray()) {
-            if (current == quote && last != backSlash) {
+            if (current == quote && last != backslash) {
                 numberOfNonEscapedQuotes++;
             }
             last = current;
         }
 
-        if ((numberOfNonEscapedQuotes % 2) != 0) {
-            throw new IntegrationException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
-        }
-        return true;
+        return (numberOfNonEscapedQuotes % 2) == 0;
     }
 }
