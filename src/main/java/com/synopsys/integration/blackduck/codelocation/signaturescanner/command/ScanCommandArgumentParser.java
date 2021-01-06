@@ -29,21 +29,18 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.exception.MismatchedQuotesException;
+import com.synopsys.integration.blackduck.exception.SignatureScannerInputException;
 import com.synopsys.integration.exception.IntegrationArgumentException;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class ScanCommandArgumentParser {
-    public List<String> parse(String command) throws IntegrationException {
-        if (StringUtils.isBlank(command)) {
-            return new ArrayList<>();
+    public List<String> parse(String command) throws SignatureScannerInputException {
+        if (!isParseable(command)) {
+            return new LinkedList<>();
         }
 
-        //TODO - maybe make this a validate method or something like 'enforceMatchedQuotes'
-        if (!hasEvenNumberOfNonEscapedQuotes(command)) {
-            throw new IntegrationException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
-        }
-
-        List<String> parsedArguments = new ArrayList<>(); // TODO- list implementation shouldn't differ within method
+        List<String> parsedArguments = new LinkedList<>();
         String[] splitBySpaces = command.split("\\s");
         boolean inQuotes = false;
         StringBuilder quotedArgument = null;
@@ -69,19 +66,26 @@ public class ScanCommandArgumentParser {
         }
         String originalCheck = StringUtils.join(parsedArguments, " ");
         if (!originalCheck.equals(command)) {
-            throw new IntegrationException("AHHHHH"); // TODO - change this message...maybe
+            throw new SignatureScannerInputException("Unable to parse signature scanner arguments.  Please check your input for improper syntax, such as trailing spaces.");
         }
         return parsedArguments;
     }
 
-    private boolean isParseable(String command) throws IntegrationException {
+    private boolean isParseable(String command) throws SignatureScannerInputException {
         if (StringUtils.isBlank(command)) {
             return false;
         }
-        return hasEvenNumberOfNonEscapedQuotes(command);
+        validateCommand(command);
+        return true;
     }
 
-    private boolean hasEvenNumberOfNonEscapedQuotes(String command) throws IntegrationException {
+    private void validateCommand(String command) throws SignatureScannerInputException {
+        if (!hasEvenNumberOfNonEscapedQuotes(command)) {
+            throw new MismatchedQuotesException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
+    }
+    }
+
+    private boolean hasEvenNumberOfNonEscapedQuotes(String command) {
         int numberOfNonEscapedQuotes = 0;
         char quote = '"';
         char backslash = '\\';

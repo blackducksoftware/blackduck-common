@@ -1,0 +1,3 @@
+"/Users/joe/test \" folder/"
+"/Users/joe/tes\"t folder/"
+"/Users/joe/tes\\"t folder/"

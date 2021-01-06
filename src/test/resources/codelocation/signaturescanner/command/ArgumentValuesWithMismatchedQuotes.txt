@@ -1,0 +1,4 @@
+"this" " = true
+"thi"s " = true
+"this\" " = false
+"this\" thing"" = true

@@ -3,11 +3,16 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.google.common.io.Files;
+import com.synopsys.integration.blackduck.exception.SignatureScannerInputException;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class ScanCommandArgumentParserTest {
@@ -21,45 +26,39 @@ public class ScanCommandArgumentParserTest {
         assertTrue(arguments.contains("\"/Users/joe/test folder/\""));
     }
 
-    // create distinct exceptions
     @Test
-    public void testStrangeInput() throws IntegrationException {
-        String command = "--exclude \"/Users/.../untitled folder/ \"--upload-source";
-        assertTrue(throwsException(command, parser));
-
-        String command2 = "\"\"\"\"";
-        assertEquals(1, parser.parse(command2).size());
-
-        String command3 = "--exclude \"this \""; // TODO- (when encoding values with a trailing space in resource file, should use unicode /u0020 to ensure nobody misses it
-        assertTrue(throwsException(command3, parser));
-
-        String command4 = "--exclude \"this \" abc";
-        assertEquals(3, parser.parse(command4).size());
+    public void testStrangeInputThatShouldTriggerExceptions() throws URISyntaxException, IOException {
+        File argumentValuesResourceFile = getResourceFile("/codelocation/signaturescanner/command/ArgumentsThatShouldCauseExceptions.txt");
+        for (String argument : Files.readLines(argumentValuesResourceFile, Charset.defaultCharset())) {
+            assertTrue(throwsException(argument, parser));
+        }
     }
 
-    //TODO- look into parameterized tests (maybe one that takes values from a resource file to enhance readability, make a copy of test first to ensure I don't make mistakes)
     @Test
-    public void testThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven() {
-        String command;
-
-        // Input w/ escaped quotes
-        command = "--exclude \"this\" \"";
-        Assertions.assertTrue(throwsException(command, parser));
-
-        command = "--exclude \"thi\"s \"";
-        Assertions.assertTrue(throwsException(command, parser));
-
-        command = "--exclude \"this\\\" \"";
-        Assertions.assertFalse(throwsException(command, parser));
-
-        command = "--exclude \"this\\\" thing\"\"";
-        Assertions.assertTrue(throwsException(command, parser));
-
-        // Input with trailing space
-
+    public void testStrangeInputThatShouldProcessSuccessfully() throws IOException, URISyntaxException, SignatureScannerInputException {
+        File argumentValuesResourceFile = getResourceFile("/codelocation/signaturescanner/command/ArgumentsThatShouldProcessSuccessfully.txt");
+        for (String line : Files.readLines(argumentValuesResourceFile, Charset.defaultCharset())) {
+            String[] pieces = line.split(" = ");
+            String argument = pieces[0];
+            int numberOfPieces = Integer.parseInt(pieces[1]);
+            assertEquals(numberOfPieces, parser.parse(argument).size());
+        }
     }
 
-    // if I create distinct exceptions, have them extend a parent 'ScannerInputException' and dictate that in this method's parameter
+    //TODO- look into parameterized tests <-- is it really necessary?
+    @Test
+    public void testThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven() throws URISyntaxException, IOException, IntegrationException {
+        File argumentValuesResourceFile = getResourceFile("/codelocation/signaturescanner/command/ArgumentValuesWithMismatchedQuotes.txt");
+        for (String line : Files.readLines(argumentValuesResourceFile, Charset.defaultCharset())) {
+            String[] pieces = line.split(" = ");
+            String argValue = pieces[0];
+            boolean shouldThrowException = pieces[1].equals("true");
+            String command = String.format("--exclude %s", argValue);
+            assertEquals(shouldThrowException, throwsException(command, parser));
+        }
+    }
+
+    // TODO - feasible to pass specific exception into method?
     private boolean throwsException(String command, ScanCommandArgumentParser parser) {
         try {
             parser.parse(command);
@@ -70,20 +69,17 @@ public class ScanCommandArgumentParserTest {
     }
 
     @Test
-    public void testParsesArgumentsWithEscapedQuotes() throws IntegrationException {
-        String command1 = "--exclude \"/Users/joe/test \\\" folder/\"";
-        List<String> arguments1 = parser.parse(command1);
-        assertTrue(arguments1.contains("--exclude"));
-        assertTrue(arguments1.contains("\"/Users/joe/test \\\" folder/\""));
+    public void testParsesArgumentsWithEscapedQuotes() throws IntegrationException, URISyntaxException, IOException {
+        File argumentValuesResourceFile = getResourceFile("/codelocation/signaturescanner/command/ArgumentValuesWithEscapedQuotes.txt");
+        for (String argValue : Files.readLines(argumentValuesResourceFile, Charset.defaultCharset())) {
+            String command = String.format("--exclude %s", argValue);
+            List<String> arguments = parser.parse(command);
+            assertTrue(arguments.contains("--exclude"));
+            assertTrue(arguments.contains(argValue));
+        }
+    }
 
-        String command2 = "--exclude \"/Users/joe/tes\\\"t folder/\"";
-        List<String> arguments2 = parser.parse(command2);
-        assertTrue(arguments2.contains("--exclude"));
-        assertTrue(arguments2.contains("\"/Users/joe/tes\\\"t folder/\""));
-
-        String command3 = "--exclude \"/Users/joe/tes\\\\\"t folder/\"";
-        List<String> arguments3 = parser.parse(command3);
-        assertTrue(arguments3.contains("--exclude"));
-        assertTrue(arguments3.contains("\"/Users/joe/tes\\\\\"t folder/\""));
+    private File getResourceFile(String resourceName) throws URISyntaxException {
+        return new File(ScanCommandArgumentParserTest.class.getResource(resourceName).toURI());
     }
 }
