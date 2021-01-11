@@ -34,13 +34,6 @@ public class ScanCommandArgumentParserTest {
         assertEquals(numExpectedPiecesInResult, parser.parse(argument).size());
     }
 
-    @ParameterizedTest
-    @CsvFileSource(resources = "/codelocation/signaturescanner/command/ArgumentValuesWithMismatchedQuotes.txt")
-    public void testThrowsExceptionWhenNumberOfNonEscapedQuotesIsUneven(String argValue, boolean shouldThrowException) {
-        String command = String.format("--exclude %s", argValue);
-        assertEquals(shouldThrowException, throwsException(command, parser));
-    }
-
     private boolean throwsException(String command, ScanCommandArgumentParser parser) {
         try {
             parser.parse(command);

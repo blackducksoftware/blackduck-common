@@ -1,0 +1,4 @@
+"this" ", false
+"thi"s ", false
+"this\" ", true
+"this\" thing"", false

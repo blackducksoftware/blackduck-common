@@ -141,13 +141,13 @@ public class ScanCommand {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
 
-        populateAdditionalScanArguments(cmd);
+        ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
+        populateAdditionalScanArguments(cmd, parser);
 
         return cmd;
     }
 
-    private void populateAdditionalScanArguments(List<String> cmd) throws IntegrationException {
-        ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
+    private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
         List<String> arguments = parser.parse(additionalScanArguments);
         for (String argument : arguments) {
             if (StringUtils.isNotBlank(argument)) {

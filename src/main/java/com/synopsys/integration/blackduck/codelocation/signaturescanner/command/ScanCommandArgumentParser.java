@@ -80,23 +80,10 @@ public class ScanCommandArgumentParser {
     }
 
     private void validateCommand(String command) throws SignatureScannerInputException {
-        if (!hasEvenNumberOfNonEscapedQuotes(command)) {
+        ScanCommandQuoteParser quoteParser = new ScanCommandQuoteParser();
+        if (!quoteParser.hasEvenNumberOfNonEscapedQuotes(command)) {
             throw new MismatchedQuotesException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
-    }
-    }
-
-    private boolean hasEvenNumberOfNonEscapedQuotes(String command) {
-        int numberOfNonEscapedQuotes = 0;
-        char quote = '"';
-        char backslash = '\\';
-        char last = 0;
-        for (char current : command.toCharArray()) {
-            if (current == quote && last != backslash) {
-                numberOfNonEscapedQuotes++;
-            }
-            last = current;
         }
-
-        return (numberOfNonEscapedQuotes % 2) == 0;
     }
+
 }
