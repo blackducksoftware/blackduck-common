@@ -34,15 +34,6 @@ public class ScanCommandArgumentParserTest {
         assertEquals(numExpectedPiecesInResult, parser.parse(argument).size());
     }
 
-    private boolean throwsException(String command, ScanCommandArgumentParser parser) {
-        try {
-            parser.parse(command);
-        } catch (SignatureScannerInputException e) {
-            return true;
-        }
-        return false;
-    }
-
     @ParameterizedTest
     @CsvFileSource(resources = "/codelocation/signaturescanner/command/ArgumentValuesWithEscapedQuotes.txt")
     public void testParsesArgumentsWithEscapedQuotes(String argValue) throws SignatureScannerInputException {
