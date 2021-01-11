@@ -29,8 +29,10 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
+
 
 public class ScanCommand {
     private final String scheme;
@@ -87,7 +89,7 @@ public class ScanCommand {
         this.versionName = versionName;
     }
 
-    public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException {
+    public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
         List<String> cmd = new ArrayList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
@@ -139,18 +141,17 @@ public class ScanCommand {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
 
-        populateAdditionalScanArguments(cmd);
+        ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
+        populateAdditionalScanArguments(cmd, parser);
 
         return cmd;
     }
 
-    //--value="this thing that is important with spaces"
-    private void populateAdditionalScanArguments(List<String> cmd) {
-        if (StringUtils.isNotBlank(additionalScanArguments)) {
-            for (String additionalArgument : additionalScanArguments.split(" ")) {
-                if (StringUtils.isNotBlank(additionalArgument)) {
-                    cmd.add(additionalArgument);
-                }
+    private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
+        List<String> arguments = parser.parse(additionalScanArguments);
+        for (String argument : arguments) {
+            if (StringUtils.isNotBlank(argument)) {
+                cmd.add(argument);
             }
         }
     }
