@@ -1,0 +1,2 @@
+--exclude "/Users/.../untitled folder/ "--upload-source
+--exclude "this "\u0020
