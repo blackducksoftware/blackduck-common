@@ -103,6 +103,14 @@ public class BlackDuckApiClient {
         return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit));
     }
 
+    public <T extends BlackDuckResponse> List<T> getAllMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Predicate<T> predicate) throws IntegrationException {
+        return getAllMatchingResponses(blackDuckPathMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder(), predicate);
+    }
+
+    public <T extends BlackDuckResponse> List<T> getAllMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate) throws IntegrationException {
+        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getAllMatchingResponses(pagedRequest, responseClass, predicate));
+    }
+
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
         return getAllResponses(blackDuckPathMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder());
     }

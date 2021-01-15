@@ -25,6 +25,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -52,6 +53,10 @@ public class ProjectService extends DataService {
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
         return blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+    }
+
+    public List<ProjectView> getAllProjects(Predicate<ProjectView> includeProjectViewPredicate) throws IntegrationException {
+        return blackDuckApiClient.getAllMatchingResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, includeProjectViewPredicate);
     }
 
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {

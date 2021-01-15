@@ -52,6 +52,10 @@ public class BlackDuckResponsesTransformer {
         return getInternalMatchingResponse(pagedRequest, clazz, totalLimit, predicate);
     }
 
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllMatchingResponses(PagedRequest pagedRequest, Class<T> clazz, Predicate<T> predicate) throws IntegrationException {
+        return getInternalMatchingResponse(pagedRequest, clazz, Integer.MAX_VALUE, predicate);
+    }
+
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
         return getInternalMatchingResponse(pagedRequest, clazz, Integer.MAX_VALUE, alwaysTrue());
     }

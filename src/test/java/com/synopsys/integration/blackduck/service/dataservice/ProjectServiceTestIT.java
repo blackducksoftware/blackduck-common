@@ -64,6 +64,20 @@ public class ProjectServiceTestIT {
     }
 
     @Test
+    void testGetAllMatchingProjects() throws IntegrationException {
+        long timestamp = new Date().getTime();
+        String testProjectName = "hub-common-it-ProjectServiceTest-" + timestamp;
+        ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.setName(testProjectName);
+        ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
+        ProjectServiceTestIT.project = projectVersionWrapper.getProjectView();
+
+        List<ProjectView> allMatchingProjects = ProjectServiceTestIT.projectService.getAllProjects((projectView -> projectView.getName().equals(testProjectName)));
+
+        assertEquals(1, allMatchingProjects.size());
+    }
+
+    @Test
     public void testCreateDeleteWithNickname() throws IllegalArgumentException, IntegrationException {
         Long timestamp = (new Date()).getTime();
         String testProjectName = "hub-common-it-ProjectServiceTest-" + timestamp;
