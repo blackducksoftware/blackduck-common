@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2020 Synopsys, Inc.
+ * Copyright (c) 2021 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.rest.HttpUrl;
 
 public class DeveloperScanService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
@@ -50,12 +51,12 @@ public class DeveloperScanService {
         return performDeveloperScan(DEFAULT_SCAN_TYPE, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public List<DeveloperScanComponentResultView> performDeveloperScan(String scanType, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> performDeveloperScan(String userAgent, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         List<DeveloperModeBdioContent> developerModeBdioContentList = bdio2Reader.readBdio2File(bdio2File);
-        return uploadFilesAndWait(scanType, developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
+        return uploadFilesAndWait(userAgent, developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
 
-    private List<DeveloperScanComponentResultView> uploadFilesAndWait(String scanType, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    private List<DeveloperScanComponentResultView> uploadFilesAndWait(String userAgent, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -69,10 +70,11 @@ public class DeveloperScanService {
                                                             .collect(Collectors.toList());
         UUID scanId = UUID.randomUUID();
         int count = remainingFiles.size();
-        bdio2Uploader.start(scanId, count, scanType, header);
+        HttpUrl url = bdio2Uploader.start(userAgent, header);
         for (DeveloperModeBdioContent content : remainingFiles) {
-            bdio2Uploader.append(scanId, scanType, content);
+            bdio2Uploader.append(url, userAgent, count, content);
         }
+        bdio2Uploader.finish(url, userAgent, count);
 
         return developerScanWaiter.checkScanResult(scanId, timeoutInSeconds, waitIntervalInSeconds);
     }

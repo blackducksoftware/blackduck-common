@@ -1,7 +1,7 @@
 /**
  * blackduck-common
  *
- * Copyright (c) 2020 Synopsys, Inc.
+ * Copyright (c) 2021 Synopsys, Inc.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -22,7 +22,7 @@
  */
 package com.synopsys.integration.blackduck.developermode;
 
-import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -31,12 +31,12 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 public class DeveloperModeBdio2Uploader {
-    private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-ld-1+json";
+    private static final String HEADER_CONTENT_TYPE = "Content-type";
+    private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-1-ld-2+json";
     private static final String HEADER_X_BD_MODE = "X-BD-MODE";
-    private static final String HEADER_X_BD_PASSTHRU = "X-BD-PASSTHRU";
-    private static final String HEADER_X_BD_SCAN_ID = "X-BD-SCAN-ID";
     private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
-    private static final String HEADER_X_BD_SCAN_TYPE = "X-BD-SCAN-TYPE";
+    private static final String HEADER_USER_AGENT = "User-Agent";
+
     private BlackDuckApiClient blackDuckApiClient;
     private BlackDuckRequestFactory blackDuckRequestFactory;
 
@@ -45,32 +45,38 @@ public class DeveloperModeBdio2Uploader {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public void start(UUID scanId, int count, String scanType, DeveloperModeBdioContent header) throws IntegrationException {
-        HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
+    public HttpUrl start(String userAgent, DeveloperModeBdioContent header) throws IntegrationException {
+        HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
                               .acceptMimeType(CONTENT_TYPE)
-                              .addHeader("Content-type", CONTENT_TYPE)
-                              .addHeader(HEADER_X_BD_MODE, "start")
-                              .addHeader(HEADER_X_BD_PASSTHRU, "ignoredButRequired")
-                              .addHeader(HEADER_X_BD_SCAN_ID, scanId.toString())
-                              .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
-                              .addHeader(HEADER_X_BD_SCAN_TYPE, scanType)
+                              .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
+                              .addHeader(HEADER_USER_AGENT, userAgent)
                               .build();
 
-        blackDuckApiClient.execute(request);
+        return blackDuckApiClient.executePostRequestAndRetrieveURL(request);
     }
 
-    public void append(UUID scanId, String scanType, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
-        HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
+    public void append(HttpUrl url, String userAgent, int count, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
         Request request = blackDuckRequestFactory
-                              .createCommonPostRequestBuilder(url, developerModeBdioContent.getContent())
+                              .createCommonPutRequestBuilder(url, developerModeBdioContent.getContent())
                               .acceptMimeType(CONTENT_TYPE)
-                              .addHeader("Content-type", CONTENT_TYPE)
+                              .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "append")
-                              .addHeader(HEADER_X_BD_PASSTHRU, "ignoredButRequired")
-                              .addHeader(HEADER_X_BD_SCAN_ID, scanId.toString())
-                              .addHeader(HEADER_X_BD_SCAN_TYPE, scanType)
+                              .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                              .addHeader(HEADER_USER_AGENT, userAgent)
+                              .build();
+        blackDuckApiClient.execute(request);  // 202 accepted
+    }
+
+    public void finish(HttpUrl url, String userAgent, int count) throws IntegrationException {
+        Request request = blackDuckRequestFactory
+                              .createCommonPutRequestBuilder(url, StringUtils.EMPTY)
+                              .acceptMimeType(CONTENT_TYPE)
+                              .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
+                              .addHeader(HEADER_X_BD_MODE, "finish")
+                              .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                              .addHeader(HEADER_USER_AGENT, userAgent)
                               .build();
         blackDuckApiClient.execute(request);
     }
