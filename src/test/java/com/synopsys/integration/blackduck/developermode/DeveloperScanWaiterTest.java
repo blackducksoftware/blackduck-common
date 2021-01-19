@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -23,7 +21,6 @@ public class DeveloperScanWaiterTest {
 
     @Test
     public void testWaitSuccess() throws Exception {
-        UUID scanId = UUID.randomUUID();
         List<DeveloperScanComponentResultView> expectedResults = new ArrayList<>();
         expectedResults.add(new DeveloperScanComponentResultView());
         BufferedIntLogger logger = new BufferedIntLogger();
@@ -32,7 +29,7 @@ public class DeveloperScanWaiterTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
         Mockito.when(blackDuckApiClient.getUrl(Mockito.any())).thenReturn(url);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(BlackDuckPath.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(HttpUrl.class), Mockito.eq(DeveloperScanComponentResultView.class))).thenReturn(expectedResults);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(expectedResults);
@@ -40,7 +37,7 @@ public class DeveloperScanWaiterTest {
 
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
-        List<DeveloperScanComponentResultView> results = waiter.checkScanResult(scanId, timeoutInSeconds, waitInSeconds);
+        List<DeveloperScanComponentResultView> results = waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
 
         assertEquals(expectedResults, results);
     }
@@ -48,17 +45,17 @@ public class DeveloperScanWaiterTest {
     @Test
     public void testWaitLongerThanTimeout() throws Exception {
         BufferedIntLogger logger = new BufferedIntLogger();
+        HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(BlackDuckPath.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
         DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
-        UUID scanId = UUID.randomUUID();
         long timeoutInSeconds = 1;
         int waitInSeconds = 2;
         try {
-            waiter.checkScanResult(scanId, timeoutInSeconds, waitInSeconds);
+            waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
             fail();
         } catch (IntegrationException | InterruptedException ex) {
             // pass
@@ -68,17 +65,17 @@ public class DeveloperScanWaiterTest {
     @Test
     public void testWaitFailed() throws Exception {
         BufferedIntLogger logger = new BufferedIntLogger();
+        HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(BlackDuckPath.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
         DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
-        UUID scanId = UUID.randomUUID();
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
         try {
-            waiter.checkScanResult(scanId, timeoutInSeconds, waitInSeconds);
+            waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
             fail();
         } catch (IntegrationException | InterruptedException ex) {
             // pass

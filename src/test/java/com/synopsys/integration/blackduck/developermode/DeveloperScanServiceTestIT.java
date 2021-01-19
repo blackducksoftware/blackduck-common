@@ -25,7 +25,7 @@ public class DeveloperScanServiceTestIT {
         DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
         File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan(bdioFile, timeout);
+        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan("blackduckCommon/1.1", bdioFile, timeout);
         assertNotNull(results);
         assertFalse(results.isEmpty());
     }
@@ -38,7 +38,7 @@ public class DeveloperScanServiceTestIT {
             DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
             File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanMissingHeader.bdio").getFile());
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            developerScanService.performDeveloperScan(bdioFile, timeout);
+            developerScanService.performDeveloperScan("blackduckCommon/1.1", bdioFile, timeout);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass

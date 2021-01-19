@@ -23,9 +23,7 @@
 package com.synopsys.integration.blackduck.developermode;
 
 import java.util.List;
-import java.util.UUID;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -43,10 +41,8 @@ public class DeveloperScanWaiter {
         this.blackDuckApiClient = blackDuckApiClient;
     }
 
-    public List<DeveloperScanComponentResultView> checkScanResult(UUID scanId, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        BlackDuckPath apiPath = new BlackDuckPath(String.format("/api/scans/%s/developer-result", scanId.toString()));
-        HttpUrl url = blackDuckApiClient.getUrl(apiPath);
-        DeveloperScanWaitJobTask waitTask = new DeveloperScanWaitJobTask(logger, blackDuckApiClient, apiPath);
+    public List<DeveloperScanComponentResultView> checkScanResult(HttpUrl url, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        DeveloperScanWaitJobTask waitTask = new DeveloperScanWaitJobTask(blackDuckApiClient, url);
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
         // regardless of the timeout provided, we always want to check at least once
         boolean allCompleted = waitTask.isComplete();

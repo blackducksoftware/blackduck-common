@@ -24,7 +24,6 @@ package com.synopsys.integration.blackduck.developermode;
 
 import java.io.File;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
@@ -34,7 +33,6 @@ import com.synopsys.integration.rest.HttpUrl;
 
 public class DeveloperScanService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
-    private static final String DEFAULT_SCAN_TYPE = "BlackDuckCommon";
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
     private DeveloperModeBdio2Reader bdio2Reader;
@@ -47,8 +45,8 @@ public class DeveloperScanService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public List<DeveloperScanComponentResultView> performDeveloperScan(File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return performDeveloperScan(DEFAULT_SCAN_TYPE, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    public List<DeveloperScanComponentResultView> performDeveloperScan(String userAgent, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performDeveloperScan(userAgent, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
     public List<DeveloperScanComponentResultView> performDeveloperScan(String userAgent, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
@@ -68,7 +66,6 @@ public class DeveloperScanService {
         List<DeveloperModeBdioContent> remainingFiles = bdioFiles.stream()
                                                             .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
                                                             .collect(Collectors.toList());
-        UUID scanId = UUID.randomUUID();
         int count = remainingFiles.size();
         HttpUrl url = bdio2Uploader.start(userAgent, header);
         for (DeveloperModeBdioContent content : remainingFiles) {
@@ -76,6 +73,6 @@ public class DeveloperScanService {
         }
         bdio2Uploader.finish(url, userAgent, count);
 
-        return developerScanWaiter.checkScanResult(scanId, timeoutInSeconds, waitIntervalInSeconds);
+        return developerScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
     }
 }

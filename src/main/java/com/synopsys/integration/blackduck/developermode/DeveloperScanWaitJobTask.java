@@ -26,29 +26,26 @@ import java.io.IOException;
 
 import org.apache.http.HttpStatus;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.WaitJobTask;
 
 public class DeveloperScanWaitJobTask implements WaitJobTask {
-    private BlackDuckPath resultPath;
-    private IntLogger logger;
+    private HttpUrl resultUrl;
     private BlackDuckApiClient blackDuckApiClient;
 
-    public DeveloperScanWaitJobTask(final IntLogger logger, final BlackDuckApiClient blackDuckApiClient, BlackDuckPath resultPath) {
-        this.logger = logger;
+    public DeveloperScanWaitJobTask(BlackDuckApiClient blackDuckApiClient, HttpUrl resultUrl) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.resultPath = resultPath;
+        this.resultUrl = resultUrl;
     }
 
     @Override
     public boolean isComplete() throws IntegrationException {
-        try (Response response = blackDuckApiClient.get(resultPath)) {
+        try (Response response = blackDuckApiClient.get(resultUrl)) {
             return response.isStatusCodeSuccess();
         } catch (IntegrationRestException ex) {
             if (HttpStatus.SC_NOT_FOUND == ex.getHttpStatusCode()) {
