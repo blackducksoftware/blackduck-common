@@ -35,7 +35,6 @@ public class DeveloperModeBdio2Uploader {
     private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-1-ld-2+json";
     private static final String HEADER_X_BD_MODE = "X-BD-MODE";
     private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
-    private static final String HEADER_USER_AGENT = "User-Agent";
 
     private BlackDuckApiClient blackDuckApiClient;
     private BlackDuckRequestFactory blackDuckRequestFactory;
@@ -49,7 +48,6 @@ public class DeveloperModeBdio2Uploader {
         HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
-                              .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .build();
 
@@ -59,7 +57,6 @@ public class DeveloperModeBdio2Uploader {
     public void append(HttpUrl url, int count, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
         Request request = blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, developerModeBdioContent.getContent())
-                              .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "append")
                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
@@ -70,7 +67,6 @@ public class DeveloperModeBdio2Uploader {
     public void finish(HttpUrl url, int count) throws IntegrationException {
         Request request = blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, StringUtils.EMPTY)
-                              .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "finish")
                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
