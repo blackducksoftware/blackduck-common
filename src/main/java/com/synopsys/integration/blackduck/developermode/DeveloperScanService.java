@@ -45,16 +45,16 @@ public class DeveloperScanService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public List<DeveloperScanComponentResultView> performDeveloperScan(String userAgent, File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return performDeveloperScan(userAgent, bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    public List<DeveloperScanComponentResultView> performDeveloperScan(File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performDeveloperScan(bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public List<DeveloperScanComponentResultView> performDeveloperScan(String userAgent, File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> performDeveloperScan(File bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         List<DeveloperModeBdioContent> developerModeBdioContentList = bdio2Reader.readBdio2File(bdio2File);
-        return uploadFilesAndWait(userAgent, developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
+        return uploadFilesAndWait(developerModeBdioContentList, timeoutInSeconds, waitIntervalInSeconds);
     }
 
-    private List<DeveloperScanComponentResultView> uploadFilesAndWait(String userAgent, List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    private List<DeveloperScanComponentResultView> uploadFilesAndWait(List<DeveloperModeBdioContent> bdioFiles, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -67,11 +67,11 @@ public class DeveloperScanService {
                                                             .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
                                                             .collect(Collectors.toList());
         int count = remainingFiles.size();
-        HttpUrl url = bdio2Uploader.start(userAgent, header);
+        HttpUrl url = bdio2Uploader.start(header);
         for (DeveloperModeBdioContent content : remainingFiles) {
-            bdio2Uploader.append(url, userAgent, count, content);
+            bdio2Uploader.append(url, count, content);
         }
-        bdio2Uploader.finish(url, userAgent, count);
+        bdio2Uploader.finish(url, count);
 
         return developerScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
     }

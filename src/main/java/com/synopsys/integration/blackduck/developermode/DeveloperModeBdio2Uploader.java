@@ -45,38 +45,35 @@ public class DeveloperModeBdio2Uploader {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public HttpUrl start(String userAgent, DeveloperModeBdioContent header) throws IntegrationException {
+    public HttpUrl start(DeveloperModeBdioContent header) throws IntegrationException {
         HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
                               .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
-                              .addHeader(HEADER_USER_AGENT, userAgent)
                               .build();
 
         return blackDuckApiClient.executePostRequestAndRetrieveURL(request);
     }
 
-    public void append(HttpUrl url, String userAgent, int count, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
+    public void append(HttpUrl url, int count, DeveloperModeBdioContent developerModeBdioContent) throws IntegrationException {
         Request request = blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, developerModeBdioContent.getContent())
                               .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "append")
                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
-                              .addHeader(HEADER_USER_AGENT, userAgent)
                               .build();
         blackDuckApiClient.execute(request);  // 202 accepted
     }
 
-    public void finish(HttpUrl url, String userAgent, int count) throws IntegrationException {
+    public void finish(HttpUrl url, int count) throws IntegrationException {
         Request request = blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, StringUtils.EMPTY)
                               .acceptMimeType(CONTENT_TYPE)
                               .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
                               .addHeader(HEADER_X_BD_MODE, "finish")
                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
-                              .addHeader(HEADER_USER_AGENT, userAgent)
                               .build();
         blackDuckApiClient.execute(request);
     }
