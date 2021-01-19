@@ -25,7 +25,7 @@ public class DeveloperScanServiceTestIT {
         DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
         File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan(bdioFile, timeout);
+        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan(bdioFile, timeout, 5);
         assertNotNull(results);
         assertFalse(results.isEmpty());
     }
