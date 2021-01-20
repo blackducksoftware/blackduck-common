@@ -17,11 +17,6 @@ versionFile.mkdirs()
 versionFile.delete()
 versionFile << version
 
-//TODO Remove this before release
-repositories {
-    mavenLocal()
-}
-
 dependencies {
     api 'com.synopsys.integration:blackduck-common-api:2020.8.0.9'
     api 'com.synopsys.integration:integration-reporting:2.0.2'
