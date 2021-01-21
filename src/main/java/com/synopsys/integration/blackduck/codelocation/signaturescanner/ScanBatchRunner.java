@@ -33,6 +33,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.log.IntLogger;
@@ -58,7 +59,8 @@ public class ScanBatchRunner {
     public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
         OperatingSystemType operatingSystemType, ScanCommandRunner scanCommandRunner) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, blackDuckRequestFactory);
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
 
         return new ScanBatchRunner(intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);

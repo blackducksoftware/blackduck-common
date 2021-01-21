@@ -23,6 +23,7 @@
 package com.synopsys.integration.blackduck.http.client.cache;
 
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.commons.collections4.map.LRUMap;
@@ -95,6 +96,11 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     @Override
     public HttpUrl getBaseUrl() {
         return blackDuckHttpClient.getBaseUrl();
+    }
+
+    @Override
+    public Certificate getServerCertificate() {
+        return blackDuckHttpClient.getServerCertificate();
     }
 
     @Override

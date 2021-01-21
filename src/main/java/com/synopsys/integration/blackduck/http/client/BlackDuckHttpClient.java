@@ -23,6 +23,7 @@
 package com.synopsys.integration.blackduck.http.client;
 
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.http.client.methods.HttpUriRequest;
@@ -50,6 +51,8 @@ public interface BlackDuckHttpClient {
     void throwExceptionForError(Response response) throws IntegrationException;
 
     HttpUrl getBaseUrl();
+
+    Certificate getServerCertificate();
 
     String getUserAgentString();
 
