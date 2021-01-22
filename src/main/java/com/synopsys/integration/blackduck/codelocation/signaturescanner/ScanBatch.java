@@ -34,6 +34,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerAdditionalArguments;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.builder.Buildable;
@@ -60,7 +61,7 @@ public class ScanBatch extends Stringable implements Buildable {
     private final File outputDirectory;
     private final int scanMemoryInMegabytes;
     private final String scanCliOpts;
-    private final String additionalScanArguments;
+    private final SignatureScannerAdditionalArguments additionalScanArguments;
     private final boolean runInsecure;
     private final boolean dryRun;
     private final ProxyInfo proxyInfo;
@@ -71,7 +72,7 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean verbose;
 
     public ScanBatch(File signatureScannerInstallDirectory, File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
-        String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
+        String scanCliOpts, SignatureScannerAdditionalArguments additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
         List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
@@ -174,7 +175,7 @@ public class ScanBatch extends Stringable implements Buildable {
         return scanCliOpts;
     }
 
-    public String getAdditionalScanArguments() {
+    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
         return additionalScanArguments;
     }
 

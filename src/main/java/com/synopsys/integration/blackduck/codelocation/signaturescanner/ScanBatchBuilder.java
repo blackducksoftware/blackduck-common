@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerAdditionalArguments;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.builder.BuilderStatus;
@@ -52,7 +53,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean debug;
     private boolean verbose = true;
     private String scanCliOpts;
-    private String additionalScanArguments;
+    private SignatureScannerAdditionalArguments additionalScanArguments = new SignatureScannerAdditionalArguments("");
 
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
@@ -74,7 +75,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
+        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch, additionalScanArguments);
+        dryRun = dryRun || additionalScanArguments.containsDryRun();
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
             projectName, projectVersionName, scanTargets);
@@ -240,12 +242,12 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
-    public String getAdditionalScanArguments() {
+    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
         return additionalScanArguments;
     }
 
     public ScanBatchBuilder additionalScanArguments(String additionalScanArguments) {
-        this.additionalScanArguments = additionalScanArguments;
+        this.additionalScanArguments = new SignatureScannerAdditionalArguments(additionalScanArguments);
         return this;
     }
 

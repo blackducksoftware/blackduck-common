@@ -32,16 +32,18 @@ public class BlackDuckOnlineProperties {
     private final boolean uploadSource;
     private final boolean licenseSearch;
     private final boolean copyrightSearch;
+    private final SignatureScannerAdditionalArguments additionalArguments;
 
     private final boolean snippetMatchingFlag;
     private final boolean snippetMatchingOnlyFlag;
     private final boolean fullSnippetScanFlag;
 
-    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch) {
+    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch, SignatureScannerAdditionalArguments additionalArguments) {
         this.snippetMatchingMode = snippetMatchingMode;
         this.uploadSource = uploadSource;
         this.licenseSearch = licenseSearch;
         this.copyrightSearch = copyrightSearch;
+        this.additionalArguments = additionalArguments;
 
         snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
         snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
@@ -49,32 +51,38 @@ public class BlackDuckOnlineProperties {
     }
 
     public boolean isOnlineCapabilityNeeded() {
-        return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch;
+        return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch || additionalArguments.containsOnlineProperty();
     }
 
     public void addOnlineCommands(List<String> cmd) {
         if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
             if (snippetMatchingFlag) {
-                cmd.add("--snippet-matching");
+                addIfNotAlreadyPassedThrough("--snippet-matching", cmd);
             } else {
-                cmd.add("--snippet-matching-only");
+                addIfNotAlreadyPassedThrough("--snippet-matching-only", cmd);
             }
 
             if (fullSnippetScanFlag) {
-                cmd.add("--full-snippet-scan");
+                addIfNotAlreadyPassedThrough("--full-snippet-scan", cmd);
             }
         }
 
         if (licenseSearch) {
-            cmd.add("--license-search");
+            addIfNotAlreadyPassedThrough("--license-search", cmd);
         }
 
         if (copyrightSearch) {
-            cmd.add("--copyright-search");
+            addIfNotAlreadyPassedThrough("--copyright-search", cmd);
         }
 
         if (uploadSource) {
-            cmd.add("--upload-source");
+            addIfNotAlreadyPassedThrough("--upload-source", cmd);
+        }
+    }
+
+    private void addIfNotAlreadyPassedThrough(String argument, List<String> cmd) {
+        if (!additionalArguments.containsArgument(argument)) {
+            cmd.add(argument);
         }
     }
 

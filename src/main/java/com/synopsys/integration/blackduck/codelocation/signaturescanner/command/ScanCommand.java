@@ -51,7 +51,7 @@ public class ScanCommand {
     private final File outputDirectory;
     private final int scanMemoryInMegabytes;
     private final String scanCliOpts;
-    private final String additionalScanArguments;
+    private final SignatureScannerAdditionalArguments additionalScanArguments;
     private final boolean runInsecure;
     private final boolean dryRun;
     private final ProxyInfo proxyInfo;
@@ -63,7 +63,7 @@ public class ScanCommand {
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
-        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
+        SignatureScannerAdditionalArguments additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -141,15 +141,13 @@ public class ScanCommand {
             cmd.add("--individualFileMatching=" + individualFileMatching);
         }
 
-        ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
-        populateAdditionalScanArguments(cmd, parser);
+        populateAdditionalScanArguments(cmd);
 
         return cmd;
     }
 
-    private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
-        List<String> arguments = parser.parse(additionalScanArguments);
-        for (String argument : arguments) {
+    private void populateAdditionalScanArguments(List<String> cmd) {
+        for (String argument : additionalScanArguments.getArguments()) {
             if (StringUtils.isNotBlank(argument)) {
                 cmd.add(argument);
             }
@@ -337,7 +335,7 @@ public class ScanCommand {
         return excludePatterns;
     }
 
-    public String getAdditionalScanArguments() {
+    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
         return additionalScanArguments;
     }
 
