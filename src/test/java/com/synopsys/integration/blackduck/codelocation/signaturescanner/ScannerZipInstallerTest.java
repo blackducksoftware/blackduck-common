@@ -24,6 +24,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.log.BufferedIntLogger;
@@ -67,7 +68,7 @@ public class ScannerZipInstallerTest {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, new BlackDuckRequestFactory());
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType);
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
@@ -99,7 +100,7 @@ public class ScannerZipInstallerTest {
         File downloadTarget = tempDirectory.toFile();
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+            KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, mockBlackDuckHttpClient, new BlackDuckRequestFactory());
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
             ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockBlackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl("http://www.synopsys.com"), OperatingSystemType.MAC);
 

@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
@@ -29,6 +30,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
@@ -97,7 +99,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, new BlackDuckRequestFactory());
         ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType);
         ScanBatchRunner scanBatchRunnerWith = ScanBatchRunner.createComplete(environmentVariables, installerWithKeyStoreManagement, scanPathsUtility, scanCommandRunner);
         SignatureScannerService signatureScannerServiceWith = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWith);
@@ -150,7 +152,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
     public static class NoOpKeyStoreHelper extends KeyStoreHelper {
         public NoOpKeyStoreHelper() {
-            super(new SilentIntLogger());
+            super(new SilentIntLogger(), Mockito.mock(BlackDuckHttpClient.class), new BlackDuckRequestFactory());
         }
 
         @Override
