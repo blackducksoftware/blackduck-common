@@ -176,7 +176,7 @@ public class ScanCommand {
 
     private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, List<String> cmd) {
         logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
-        blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn);
+        blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn, additionalScanArguments);
 
         // The dryRunWriteDir is the same as the log directory path
         // The CLI will create a subdirectory for the json files
