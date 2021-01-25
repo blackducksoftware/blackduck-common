@@ -34,7 +34,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
-import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -44,20 +44,24 @@ public class KeyStoreHelper {
     private static final char[] DEFAULT_JAVA_KEYSTORE_PASSWORD = new char[] { 'c', 'h', 'a', 'n', 'g', 'e', 'i', 't' };
 
     private final IntLogger logger;
-    private final BlackDuckHttpClient blackDuckHttpClient;
+    private final SignatureScannerCertificateClient certificateClient;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
 
-    public KeyStoreHelper(final IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, BlackDuckRequestFactory blackDuckRequestFactory) {
+    public KeyStoreHelper(final IntLogger logger, SignatureScannerCertificateClient certificateClient, BlackDuckRequestFactory blackDuckRequestFactory) {
         this.logger = logger;
-        this.blackDuckHttpClient = blackDuckHttpClient;
+        this.certificateClient = certificateClient;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
     public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
         try {
             Request request = blackDuckRequestFactory.createCommonGetRequest(httpsServer);
-            blackDuckHttpClient.execute(request);
-            Certificate serverCertificate = blackDuckHttpClient.getServerCertificate();
+            certificateClient.execute(request);
+            Certificate serverCertificate = certificateClient.getServerCertificate();
+            if (null == serverCertificate) {
+                logger.error("Could not retrieve the certificate from the server.");
+                return;
+            }
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             try (InputStream inputStream = new FileInputStream(keyStoreFilePath)) {

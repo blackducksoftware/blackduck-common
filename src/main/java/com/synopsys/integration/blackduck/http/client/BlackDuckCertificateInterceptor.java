@@ -37,10 +37,12 @@ public class BlackDuckCertificateInterceptor implements HttpResponseInterceptor 
     @Override
     public void process(HttpResponse response, HttpContext context) throws IOException {
         ManagedHttpClientConnection routedConnection = (ManagedHttpClientConnection) context.getAttribute(HttpCoreContext.HTTP_CONNECTION);
-        SSLSession sslSession = routedConnection.getSSLSession();
-        if (sslSession != null) {
-            Certificate[] certificates = sslSession.getPeerCertificates();
-            context.setAttribute(DefaultBlackDuckHttpClient.PEER_CERTIFICATES, certificates);
+        if (routedConnection.isOpen()) {
+            SSLSession sslSession = routedConnection.getSSLSession();
+            if (sslSession != null) {
+                Certificate[] certificates = sslSession.getPeerCertificates();
+                context.setAttribute(SignatureScannerCertificateClient.PEER_CERTIFICATES, certificates);
+            }
         }
     }
 

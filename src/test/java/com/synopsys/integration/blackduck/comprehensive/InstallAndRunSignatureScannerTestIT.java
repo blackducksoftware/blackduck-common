@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -99,7 +100,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, blackDuckRequestFactory);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, new SignatureScannerCertificateClient(blackDuckHttpClient), blackDuckRequestFactory);
         ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType);
         ScanBatchRunner scanBatchRunnerWith = ScanBatchRunner.createComplete(environmentVariables, installerWithKeyStoreManagement, scanPathsUtility, scanCommandRunner);
         SignatureScannerService signatureScannerServiceWith = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWith);
@@ -152,7 +153,7 @@ public class InstallAndRunSignatureScannerTestIT {
 
     public static class NoOpKeyStoreHelper extends KeyStoreHelper {
         public NoOpKeyStoreHelper(BlackDuckHttpClient blackDuckHttpClient, BlackDuckRequestFactory blackDuckRequestFactory) {
-            super(new SilentIntLogger(), blackDuckHttpClient, blackDuckRequestFactory);
+            super(new SilentIntLogger(), new SignatureScannerCertificateClient(blackDuckHttpClient), blackDuckRequestFactory);
         }
 
         @Override
