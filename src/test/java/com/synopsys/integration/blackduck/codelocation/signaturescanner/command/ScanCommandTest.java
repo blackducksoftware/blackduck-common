@@ -173,6 +173,14 @@ public class ScanCommandTest {
         assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
     }
 
+    @Test
+    public void testDoesNotIncludeOnlinePropertiesWhenDryRunPassedThroughAdditionalArguments() throws IntegrationException {
+        scanBatchBuilder.additionalScanArguments("--dryRunWriteDir /Users/joe/test");
+        List<String> commandList = createCommandList();
+        assertFalse(commandList.contains("--scheme"));
+        assertFalse(commandList.contains("--host"));
+    }
+
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
             scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
