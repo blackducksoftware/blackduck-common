@@ -23,7 +23,6 @@
 package com.synopsys.integration.blackduck.http.client.cache;
 
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.commons.collections4.map.LRUMap;
@@ -32,8 +31,10 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
@@ -99,11 +100,6 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     }
 
     @Override
-    public Certificate getServerCertificate() {
-        return blackDuckHttpClient.getServerCertificate();
-    }
-
-    @Override
     public String getUserAgentString() {
         return blackDuckHttpClient.getUserAgentString();
     }
@@ -111,6 +107,26 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     @Override
     public HttpClientBuilder getHttpClientBuilder() {
         return blackDuckHttpClient.getHttpClientBuilder();
+    }
+
+    @Override
+    public int getTimeoutInSeconds() {
+        return blackDuckHttpClient.getTimeoutInSeconds();
+    }
+
+    @Override
+    public boolean isAlwaysTrustServerCertificate() {
+        return blackDuckHttpClient.isAlwaysTrustServerCertificate();
+    }
+
+    @Override
+    public ProxyInfo getProxyInfo() {
+        return blackDuckHttpClient.getProxyInfo();
+    }
+
+    @Override
+    public IntLogger getLogger() {
+        return blackDuckHttpClient.getLogger();
     }
 
 }

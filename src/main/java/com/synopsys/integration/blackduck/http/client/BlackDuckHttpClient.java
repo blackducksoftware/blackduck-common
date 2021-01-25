@@ -23,14 +23,15 @@
 package com.synopsys.integration.blackduck.http.client;
 
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
@@ -52,10 +53,16 @@ public interface BlackDuckHttpClient {
 
     HttpUrl getBaseUrl();
 
-    Certificate getServerCertificate();
-
     String getUserAgentString();
 
     HttpClientBuilder getHttpClientBuilder();
+
+    int getTimeoutInSeconds();
+
+    boolean isAlwaysTrustServerCertificate();
+
+    ProxyInfo getProxyInfo();
+
+    IntLogger getLogger();
 
 }

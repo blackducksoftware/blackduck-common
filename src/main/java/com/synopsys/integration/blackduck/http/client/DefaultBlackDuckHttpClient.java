@@ -22,15 +22,12 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
-import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
@@ -50,15 +47,11 @@ import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.NameVersion;
 
 public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpClient implements BlackDuckHttpClient {
-    public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
-
     private final HttpUrl baseUrl;
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
     private final String userAgentString;
 
     protected final AuthenticationSupport authenticationSupport;
-
-    private Certificate serverCertificate;
 
     public DefaultBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
@@ -105,13 +98,7 @@ public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpCl
         request = requestBuilder.build();
 
         try {
-            HttpContext httpContext = new BasicHttpContext();
-            Response response = super.execute(request, httpContext);
-
-            Certificate[] peerCertificates = (Certificate[]) httpContext.getAttribute(PEER_CERTIFICATES);
-            serverCertificate = peerCertificates[0];
-
-            return response;
+            return super.execute(request);
         } catch (IntegrationRestException e) {
             throw transformException(e);
         }
@@ -144,11 +131,6 @@ public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpCl
     }
 
     @Override
-    public Certificate getServerCertificate() {
-        return serverCertificate;
-    }
-
-    @Override
     public String getUserAgentString() {
         return userAgentString;
     }
@@ -162,7 +144,6 @@ public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpCl
     protected void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
         super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
         httpClientBuilder.setRedirectStrategy(new BlackDuckRedirectStrategy());
-        httpClientBuilder.addInterceptorLast(new BlackDuckCertificateInterceptor());
     }
 
     private IntegrationException transformException(IntegrationRestException e) {
