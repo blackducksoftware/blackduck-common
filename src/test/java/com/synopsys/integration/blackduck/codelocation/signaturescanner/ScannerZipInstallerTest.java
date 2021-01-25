@@ -26,6 +26,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -67,7 +68,8 @@ public class ScannerZipInstallerTest {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, blackDuckServicesFactory.getRequestFactory());
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType);
 
         scannerZipInstaller.installOrUpdateScanner(downloadTarget);
@@ -99,7 +101,11 @@ public class ScannerZipInstallerTest {
         File downloadTarget = tempDirectory.toFile();
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+            BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
+            BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
+            BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
+            KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, blackDuckHttpClient, blackDuckServicesFactory.getRequestFactory());
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
             ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, mockBlackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl("http://www.synopsys.com"), OperatingSystemType.MAC);
 
