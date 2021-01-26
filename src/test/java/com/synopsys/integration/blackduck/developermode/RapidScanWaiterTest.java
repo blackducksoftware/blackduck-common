@@ -17,7 +17,7 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.response.Response;
 
-public class DeveloperScanWaiterTest {
+public class RapidScanWaiterTest {
 
     @Test
     public void testWaitSuccess() throws Exception {
@@ -33,7 +33,7 @@ public class DeveloperScanWaiterTest {
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(HttpUrl.class), Mockito.eq(DeveloperScanComponentResultView.class))).thenReturn(expectedResults);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(expectedResults);
-        DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
+        RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
 
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
@@ -51,7 +51,7 @@ public class DeveloperScanWaiterTest {
         Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
-        DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
+        RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 1;
         int waitInSeconds = 2;
         try {
@@ -71,7 +71,7 @@ public class DeveloperScanWaiterTest {
         Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
-        DeveloperScanWaiter waiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
+        RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
         try {

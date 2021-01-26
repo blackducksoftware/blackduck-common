@@ -31,17 +31,17 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 
-public class DeveloperScanService {
+public class RapidScanService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
-    private DeveloperModeBdio2Reader bdio2Reader;
-    private DeveloperScanWaiter developerScanWaiter;
-    private DeveloperModeBdio2Uploader bdio2Uploader;
+    private RapidScanBdio2Reader bdio2Reader;
+    private RapidScanWaiter rapidScanWaiter;
+    private RapidScanBdio2Uploader bdio2Uploader;
 
-    public DeveloperScanService(DeveloperModeBdio2Reader bdio2Reader, DeveloperModeBdio2Uploader bdio2Uploader, DeveloperScanWaiter developerScanWaiter) {
+    public RapidScanService(RapidScanBdio2Reader bdio2Reader, RapidScanBdio2Uploader bdio2Uploader, RapidScanWaiter rapidScanWaiter) {
         this.bdio2Reader = bdio2Reader;
-        this.developerScanWaiter = developerScanWaiter;
+        this.rapidScanWaiter = rapidScanWaiter;
         this.bdio2Uploader = bdio2Uploader;
     }
 
@@ -73,6 +73,6 @@ public class DeveloperScanService {
         }
         bdio2Uploader.finish(url, count);
 
-        return developerScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
+        return rapidScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
     }
 }

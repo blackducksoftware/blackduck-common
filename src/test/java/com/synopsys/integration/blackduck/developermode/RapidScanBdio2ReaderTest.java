@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-public class DeveloperModeBdio2ReaderTest {
+public class RapidScanBdio2ReaderTest {
     @Test
     public void testFileDirectory() throws Exception {
         try {
             File bdioFile = new File(getClass().getResource("/bdio/developer_scan/").getFile());
-            DeveloperModeBdio2Reader reader = new DeveloperModeBdio2Reader();
+            RapidScanBdio2Reader reader = new RapidScanBdio2Reader();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -26,7 +26,7 @@ public class DeveloperModeBdio2ReaderTest {
     public void testFileMissing() throws Exception {
         try {
             File bdioFile = new File("/bdio/developer_scan/badPath.bdio");
-            DeveloperModeBdio2Reader reader = new DeveloperModeBdio2Reader();
+            RapidScanBdio2Reader reader = new RapidScanBdio2Reader();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -39,7 +39,7 @@ public class DeveloperModeBdio2ReaderTest {
         File bdioFile = Files.createTempFile("badExtension", "txt").toFile();
         bdioFile.deleteOnExit();
         try {
-            DeveloperModeBdio2Reader reader = new DeveloperModeBdio2Reader();
+            RapidScanBdio2Reader reader = new RapidScanBdio2Reader();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -50,7 +50,7 @@ public class DeveloperModeBdio2ReaderTest {
     @Test
     public void testReadValidFile() throws Exception {
         File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
-        DeveloperModeBdio2Reader reader = new DeveloperModeBdio2Reader();
+        RapidScanBdio2Reader reader = new RapidScanBdio2Reader();
         List<DeveloperModeBdioContent> contents = reader.readBdio2File(bdioFile);
         assertFalse(contents.isEmpty());
     }

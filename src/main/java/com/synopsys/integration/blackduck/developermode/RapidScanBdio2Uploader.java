@@ -30,7 +30,7 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
-public class DeveloperModeBdio2Uploader {
+public class RapidScanBdio2Uploader {
     private static final String HEADER_CONTENT_TYPE = "Content-type";
     private static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-1-ld-2+json";
     private static final String HEADER_X_BD_MODE = "X-BD-MODE";
@@ -39,7 +39,7 @@ public class DeveloperModeBdio2Uploader {
     private BlackDuckApiClient blackDuckApiClient;
     private BlackDuckRequestFactory blackDuckRequestFactory;
 
-    public DeveloperModeBdio2Uploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory) {
+    public RapidScanBdio2Uploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }

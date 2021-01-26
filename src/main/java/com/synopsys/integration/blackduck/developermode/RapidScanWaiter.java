@@ -32,11 +32,11 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.wait.WaitJob;
 
-public class DeveloperScanWaiter {
+public class RapidScanWaiter {
     private IntLogger logger;
     private BlackDuckApiClient blackDuckApiClient;
 
-    public DeveloperScanWaiter(final IntLogger logger, final BlackDuckApiClient blackDuckApiClient) {
+    public RapidScanWaiter(final IntLogger logger, final BlackDuckApiClient blackDuckApiClient) {
         this.logger = logger;
         this.blackDuckApiClient = blackDuckApiClient;
     }
