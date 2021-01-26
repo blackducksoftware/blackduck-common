@@ -33,31 +33,35 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.request.Request;
 
 public class KeyStoreHelper {
     private static final char[] DEFAULT_JAVA_KEYSTORE_PASSWORD = new char[] { 'c', 'h', 'a', 'n', 'g', 'e', 'i', 't' };
 
     private final IntLogger logger;
+    private final SignatureScannerCertificateClient certificateClient;
+    private final BlackDuckRequestFactory blackDuckRequestFactory;
 
-    public KeyStoreHelper(final IntLogger logger) {
+    public KeyStoreHelper(final IntLogger logger, SignatureScannerCertificateClient certificateClient, BlackDuckRequestFactory blackDuckRequestFactory) {
         this.logger = logger;
+        this.certificateClient = certificateClient;
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
     public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
-        HttpsURLConnection httpsConnection = null;
         try {
-            if (!(httpsServer.url().openConnection() instanceof HttpsURLConnection)) {
-                // if it isn't an https server, there's no certificate to worry about
+            Request request = blackDuckRequestFactory.createCommonGetRequest(httpsServer);
+            certificateClient.execute(request);
+            Certificate serverCertificate = certificateClient.getServerCertificate();
+            if (null == serverCertificate) {
+                logger.error("Could not retrieve the certificate from the server.");
                 return;
             }
-            httpsConnection = (HttpsURLConnection) httpsServer.url().openConnection();
-            httpsConnection.connect();
-            Certificate[] certificates = httpsConnection.getServerCertificates();
-            httpsConnection.disconnect();
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             try (InputStream inputStream = new FileInputStream(keyStoreFilePath)) {
@@ -65,12 +69,12 @@ public class KeyStoreHelper {
             }
 
             String alias = httpsServer.url().getHost();
-            keyStore.setCertificateEntry(alias, certificates[0]);
+            keyStore.setCertificateEntry(alias, serverCertificate);
 
             try (OutputStream outputStream = new FileOutputStream(keyStoreFilePath)) {
                 keyStore.store(outputStream, DEFAULT_JAVA_KEYSTORE_PASSWORD);
             }
-        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException | IntegrationException e) {
             logger.errorAndDebug("Could not manage the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
         }
     }
