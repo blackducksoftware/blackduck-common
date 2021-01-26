@@ -40,10 +40,10 @@ import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanB
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.developermode.DeveloperModeBdio2Reader;
-import com.synopsys.integration.blackduck.developermode.DeveloperModeBdio2Uploader;
-import com.synopsys.integration.blackduck.developermode.DeveloperScanService;
-import com.synopsys.integration.blackduck.developermode.DeveloperScanWaiter;
+import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Reader;
+import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Uploader;
+import com.synopsys.integration.blackduck.developermode.RapidScanService;
+import com.synopsys.integration.blackduck.developermode.RapidScanWaiter;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
@@ -75,6 +75,7 @@ import com.synopsys.integration.util.IntegrationEscapeUtil;
 import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServicesFactory {
+    public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final ObjectMapper objectMapper;
@@ -82,30 +83,10 @@ public class BlackDuckServicesFactory {
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final IntLogger logger;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
-
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final BlackDuckApiClient blackDuckApiClient;
-
-    public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
-
-    public static Gson createDefaultGson() {
-        return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
-    }
-
-    public static ObjectMapper createDefaultObjectMapper() {
-        return new ObjectMapper();
-    }
-
-    public static GsonBuilder createDefaultGsonBuilder() {
-        return new GsonBuilder()
-                   .setDateFormat(RestConstants.JSON_DATE_FORMAT);
-    }
-
-    public static BlackDuckRequestFactory createDefaultRequestFactory() {
-        return new BlackDuckRequestFactory();
-    }
 
     public BlackDuckServicesFactory(
         IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger,
@@ -123,6 +104,23 @@ public class BlackDuckServicesFactory {
         blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+    }
+
+    public static Gson createDefaultGson() {
+        return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
+    }
+
+    public static ObjectMapper createDefaultObjectMapper() {
+        return new ObjectMapper();
+    }
+
+    public static GsonBuilder createDefaultGsonBuilder() {
+        return new GsonBuilder()
+                   .setDateFormat(RestConstants.JSON_DATE_FORMAT);
+    }
+
+    public static BlackDuckRequestFactory createDefaultRequestFactory() {
+        return new BlackDuckRequestFactory();
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -228,11 +226,11 @@ public class BlackDuckServicesFactory {
         return new TagService(blackDuckApiClient, blackDuckRequestFactory, logger);
     }
 
-    public DeveloperScanService createDeveloperScanService() {
-        DeveloperModeBdio2Reader bdio2Reader = new DeveloperModeBdio2Reader();
-        DeveloperScanWaiter developerScanWaiter = new DeveloperScanWaiter(logger, blackDuckApiClient);
-        DeveloperModeBdio2Uploader bdio2Uploader = new DeveloperModeBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory);
-        return new DeveloperScanService(bdio2Reader, bdio2Uploader, developerScanWaiter);
+    public RapidScanService createRapidScanService() {
+        RapidScanBdio2Reader bdio2Reader = new RapidScanBdio2Reader();
+        RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
+        RapidScanBdio2Uploader bdio2Uploader = new RapidScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory);
+        return new RapidScanService(bdio2Reader, bdio2Uploader, rapidScanWaiter);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

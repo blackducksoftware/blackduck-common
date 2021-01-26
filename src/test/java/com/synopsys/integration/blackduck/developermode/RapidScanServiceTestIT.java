@@ -12,17 +12,17 @@ import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 
 @Tag("integration")
-public class DeveloperScanServiceTestIT {
+public class RapidScanServiceTestIT {
 
     //TODO Uncomment when BlackDuck officially supports developer mode.
     //    @Test
-    //    public void testDeveloperScan() throws Exception {
+    //    public void testRapidScan() throws Exception {
     //        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     //        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-    //        DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
+    //        RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
     //        File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
     //        int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-    //        List<DeveloperScanComponentResultView> results = developerScanService.performDeveloperScan(bdioFile, timeout, 5);
+    //        List<DeveloperScanComponentResultView> results = rapidScanService.performDeveloperScan(bdioFile, timeout, 5);
     //        assertNotNull(results);
     //        assertFalse(results.isEmpty());
     //    }
@@ -32,10 +32,10 @@ public class DeveloperScanServiceTestIT {
         try {
             IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-            DeveloperScanService developerScanService = blackDuckServicesFactory.createDeveloperScanService();
+            RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
             File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanMissingHeader.bdio").getFile());
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            developerScanService.performDeveloperScan(bdioFile, timeout);
+            rapidScanService.performDeveloperScan(bdioFile, timeout);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass

@@ -38,7 +38,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.synopsys.integration.exception.IntegrationException;
 
-public class DeveloperModeBdio2Reader {
+public class RapidScanBdio2Reader {
 
     public List<DeveloperModeBdioContent> readBdio2File(File bdio2File) throws IntegrationException {
         validateBdioFile(bdio2File);
