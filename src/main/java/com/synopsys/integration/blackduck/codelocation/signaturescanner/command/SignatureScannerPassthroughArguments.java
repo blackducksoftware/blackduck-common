@@ -27,7 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SignatureScannerAdditionalArguments {
+public class SignatureScannerPassthroughArguments {
     private static final String DRY_RUN_ARGUMENT = "--dryRunWriteDir";
     private static final String SNIPPET_MATCHING_ARGUMENT = "--snippet-matching";
     private static final String SNIPPET_MATCHING_ONLY_ARGUMENT = "--snippet-matching-only";
@@ -37,8 +37,10 @@ public class SignatureScannerAdditionalArguments {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private ScanCommandArgumentParser scanCommandArgumentParser = new ScanCommandArgumentParser();
     private List<String> arguments;
+    private String argumentsAsString;
 
-    public SignatureScannerAdditionalArguments(String argumentsAsString) {
+    public SignatureScannerPassthroughArguments(String argumentsAsString) {
+        this.argumentsAsString = argumentsAsString;
         try {
             this.arguments = scanCommandArgumentParser.parse(argumentsAsString);
         } catch (Exception e) {
@@ -63,6 +65,10 @@ public class SignatureScannerAdditionalArguments {
 
     public List<String> getArguments() {
         return arguments;
+    }
+
+    public String getArgumentsAsString() {
+        return argumentsAsString;
     }
 
 }

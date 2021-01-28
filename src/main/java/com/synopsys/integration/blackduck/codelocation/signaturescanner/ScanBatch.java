@@ -34,7 +34,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerAdditionalArguments;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerPassthroughArguments;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.builder.Buildable;
@@ -61,7 +61,8 @@ public class ScanBatch extends Stringable implements Buildable {
     private final File outputDirectory;
     private final int scanMemoryInMegabytes;
     private final String scanCliOpts;
-    private final SignatureScannerAdditionalArguments additionalScanArguments;
+    //TODO- rename this field to passthroughArguments (is that okay to do in a non-major version?)
+    private final SignatureScannerPassthroughArguments additionalScanArguments;
     private final boolean runInsecure;
     private final boolean dryRun;
     private final ProxyInfo proxyInfo;
@@ -72,7 +73,15 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean verbose;
 
     public ScanBatch(File signatureScannerInstallDirectory, File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
-        String scanCliOpts, SignatureScannerAdditionalArguments additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
+        String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
+        String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
+        List<ScanTarget> scanTargets) {
+        this(signatureScannerInstallDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, new SignatureScannerPassthroughArguments(additionalScanArguments),
+            blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, runInsecure, projectName, projectVersionName, scanTargets);
+    }
+
+    public ScanBatch(File signatureScannerInstallDirectory, File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
+        String scanCliOpts, SignatureScannerPassthroughArguments additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
         List<ScanTarget> scanTargets) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
@@ -175,7 +184,7 @@ public class ScanBatch extends Stringable implements Buildable {
         return scanCliOpts;
     }
 
-    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
+    public SignatureScannerPassthroughArguments getAdditionalScanArguments() {
         return additionalScanArguments;
     }
 

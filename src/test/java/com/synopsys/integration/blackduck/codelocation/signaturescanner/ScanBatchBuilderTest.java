@@ -101,4 +101,15 @@ public class ScanBatchBuilderTest {
         return builder;
     }
 
+    @Test
+    public void testDryRunValueCorrect() {
+        ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
+
+        scanBatchBuilder.dryRun(false);
+        assertFalse(scanBatchBuilder.isDryRun());
+
+        scanBatchBuilder.additionalScanArguments("--dryRunWriteDir /test/");
+        assertTrue(scanBatchBuilder.isDryRun());
+    }
+
 }

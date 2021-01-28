@@ -48,11 +48,39 @@ public class BlackDuckOnlineProperties {
         fullSnippetScanFlag = SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
     }
 
-    public boolean isOnlineCapabilityNeeded(SignatureScannerAdditionalArguments additionalArguments) {
-        return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch || additionalArguments.containsOnlineProperty();
+    public boolean isOnlineCapabilityNeeded() {
+        return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch;
     }
 
+    // TODO - for next major version: can we delete this?
     public void addOnlineCommands(List<String> cmd) {
+        if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
+            if (snippetMatchingFlag) {
+                cmd.add("--snippet-matching");
+            } else {
+                cmd.add("--snippet-matching-only");
+            }
+
+            if (fullSnippetScanFlag) {
+                cmd.add("--full-snippet-scan");
+            }
+        }
+
+        if (licenseSearch) {
+            cmd.add("--license-search");
+        }
+
+        if (copyrightSearch) {
+            cmd.add("--copyright-search");
+        }
+
+        if (uploadSource) {
+            cmd.add("--upload-source");
+        }
+
+    }
+
+    public void addOnlineCommands(ScanCommandArguments cmd) {
         if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
             if (snippetMatchingFlag) {
                 cmd.add("--snippet-matching");
@@ -79,8 +107,8 @@ public class BlackDuckOnlineProperties {
         
     }
 
-    public void warnIfOnlineIsNeeded(Consumer<String> stringConsumer, SignatureScannerAdditionalArguments additionalArguments) {
-        if (isOnlineCapabilityNeeded(additionalArguments)) {
+    public void warnIfOnlineIsNeeded(Consumer<String> stringConsumer) {
+        if (isOnlineCapabilityNeeded()) {
             stringConsumer.accept(ONLINE_CAPABILITY_NEEDED_WARNING);
         }
     }

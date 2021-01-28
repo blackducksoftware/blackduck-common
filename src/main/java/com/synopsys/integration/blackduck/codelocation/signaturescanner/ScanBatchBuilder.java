@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerAdditionalArguments;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SignatureScannerPassthroughArguments;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.builder.BuilderStatus;
@@ -53,7 +53,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean debug;
     private boolean verbose = true;
     private String scanCliOpts;
-    private SignatureScannerAdditionalArguments additionalScanArguments = new SignatureScannerAdditionalArguments("");
+    //TODO- rename this field to passthroughArguments (is that okay to do in a non-major version?)
+    private SignatureScannerPassthroughArguments additionalScanArguments = new SignatureScannerPassthroughArguments("");
 
     private SnippetMatching snippetMatching;
     private boolean uploadSource;
@@ -76,7 +77,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     @Override
     protected ScanBatch buildWithoutValidation() {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
-        dryRun = dryRun || additionalScanArguments.containsDryRun();
         return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
             projectName, projectVersionName, scanTargets);
@@ -212,7 +212,15 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public ScanBatchBuilder dryRun(boolean dryRun) {
         this.dryRun = dryRun;
+        determineDryRun();
         return this;
+    }
+
+    // Because the true value of dryRun depends on the explicit setting of its value via dryRun()
+    // as well as the presence a pass through argument detected via additionalScanArguments.containsDryRun()
+    // we must re-determine the true value of dryRun when either dryRun or additionalScanArguments is changed
+    private void determineDryRun() {
+        this.dryRun = dryRun || additionalScanArguments.containsDryRun();
     }
 
     public boolean isDebug() {
@@ -242,12 +250,15 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
-    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
-        return additionalScanArguments;
+    public String getAdditionalScanArguments() {
+        return additionalScanArguments.getArgumentsAsString();
     }
 
+    public SignatureScannerPassthroughArguments getPassthroughArguments() { return additionalScanArguments; }
+
     public ScanBatchBuilder additionalScanArguments(String additionalScanArguments) {
-        this.additionalScanArguments = new SignatureScannerAdditionalArguments(additionalScanArguments);
+        this.additionalScanArguments = new SignatureScannerPassthroughArguments(additionalScanArguments);
+        determineDryRun();
         return this;
     }
 

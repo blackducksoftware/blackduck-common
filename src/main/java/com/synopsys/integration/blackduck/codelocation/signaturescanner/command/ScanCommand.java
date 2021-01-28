@@ -51,7 +51,8 @@ public class ScanCommand {
     private final File outputDirectory;
     private final int scanMemoryInMegabytes;
     private final String scanCliOpts;
-    private final SignatureScannerAdditionalArguments additionalScanArguments;
+    //TODO- rename this field to passthroughArguments (is that okay to do in a non-major version?)
+    private final SignatureScannerPassthroughArguments additionalScanArguments;
     private final boolean runInsecure;
     private final boolean dryRun;
     private final ProxyInfo proxyInfo;
@@ -63,7 +64,14 @@ public class ScanCommand {
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
-        SignatureScannerAdditionalArguments additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
+        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
+        this(signatureScannerInstallDirectory, outputDirectory, dryRun, proxyInfo, scanCliOpts, scanMemoryInMegabytes, scheme, host, blackDuckApiToken, blackDuckUsername, blackDuckPassword, port, runInsecure, name, blackDuckOnlineProperties,
+            individualFileMatching, excludePatterns, new SignatureScannerPassthroughArguments(additionalScanArguments), targetPath, verbose, debug, projectName, versionName);
+    }
+
+    public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
+        String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
+        SignatureScannerPassthroughArguments additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -90,7 +98,7 @@ public class ScanCommand {
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
-        List<String> cmd = new ArrayList<>();
+        ScanCommandArguments cmd = new ScanCommandArguments(additionalScanArguments);
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
@@ -143,10 +151,10 @@ public class ScanCommand {
 
         populateAdditionalScanArguments(cmd);
 
-        return cmd;
+        return cmd.getCommand();
     }
 
-    private void populateAdditionalScanArguments(List<String> cmd) {
+    private void populateAdditionalScanArguments(ScanCommandArguments cmd) {
         for (String argument : additionalScanArguments.getArguments()) {
             if (StringUtils.isNotBlank(argument)) {
                 cmd.add(argument);
@@ -154,7 +162,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateExcludePatterns(List<String> cmd) {
+    private void populateExcludePatterns(ScanCommandArguments cmd) {
         if (excludePatterns != null) {
             for (String exclusionPattern : excludePatterns) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
@@ -165,7 +173,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateProjectAndVersion(List<String> cmd) {
+    private void populateProjectAndVersion(ScanCommandArguments cmd) {
         if (StringUtils.isNotBlank(projectName) && StringUtils.isNotBlank(versionName)) {
             cmd.add("--project");
             cmd.add(projectName);
@@ -174,17 +182,21 @@ public class ScanCommand {
         }
     }
 
-    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, List<String> cmd) {
+    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, ScanCommandArguments cmd) {
         logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
-        blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn, additionalScanArguments);
+        if (blackDuckOnlineProperties.isOnlineCapabilityNeeded() || additionalScanArguments.containsOnlineProperty()) {
+            logger.warn(BlackDuckOnlineProperties.ONLINE_CAPABILITY_NEEDED_WARNING);
+        }
 
         // The dryRunWriteDir is the same as the log directory path
         // The CLI will create a subdirectory for the json files
-        cmd.add("--dryRunWriteDir");
-        cmd.add(specificRunOutputDirectoryPath);
+        if (!additionalScanArguments.containsDryRun()) {
+            cmd.add("--dryRunWriteDir");
+            cmd.add(specificRunOutputDirectoryPath);
+        }
     }
 
-    private void populateOnlineProperties(IntLogger logger, List<String> cmd) {
+    private void populateOnlineProperties(IntLogger logger, ScanCommandArguments cmd) {
         cmd.add("--scheme");
         cmd.add(scheme);
         cmd.add("--host");
@@ -211,7 +223,7 @@ public class ScanCommand {
         blackDuckOnlineProperties.addOnlineCommands(cmd);
     }
 
-    private void populateScanCliOpts(List<String> cmd) {
+    private void populateScanCliOpts(ScanCommandArguments cmd) {
         if (StringUtils.isNotBlank(scanCliOpts)) {
             for (String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
@@ -221,7 +233,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateProxyDetails(List<String> cmd) {
+    private void populateProxyDetails(ScanCommandArguments cmd) {
         ProxyInfo blackDuckProxyInfo = proxyInfo;
         String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
         int proxyPort = blackDuckProxyInfo.getPort();
@@ -335,7 +347,11 @@ public class ScanCommand {
         return excludePatterns;
     }
 
-    public SignatureScannerAdditionalArguments getAdditionalScanArguments() {
+    public String getAdditionalScanArguments() {
+        return additionalScanArguments.getArgumentsAsString();
+    }
+
+    public SignatureScannerPassthroughArguments getPassthroughArguments() {
         return additionalScanArguments;
     }
 
