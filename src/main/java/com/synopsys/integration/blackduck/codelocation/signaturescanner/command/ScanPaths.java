@@ -1,4 +1,4 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
@@ -39,27 +39,13 @@ public class ScanPaths {
         this.managedByLibrary = managedByLibrary;
     }
 
-    // TODO - for next major version: can we delete this?
     public void addJavaAndOnePathArguments(final List<String> cmd) {
         cmd.add(getPathToJavaExecutable());
         cmd.add("-Done-jar.silent=true");
         cmd.add("-Done-jar.jar.path=" + getPathToOneJar());
     }
 
-    public void addJavaAndOnePathArguments(final ScanCommandArguments cmd) {
-        cmd.add(getPathToJavaExecutable());
-        cmd.add("-Done-jar.silent=true");
-        cmd.add("-Done-jar.jar.path=" + getPathToOneJar());
-    }
-
-
-    // TODO - for next major version: can we delete this?
     public void addScanExecutableArguments(final List<String> cmd) {
-        cmd.add("-jar");
-        cmd.add(getPathToScanExecutable());
-    }
-
-    public void addScanExecutableArguments(final ScanCommandArguments cmd) {
         cmd.add("-jar");
         cmd.add(getPathToScanExecutable());
     }

@@ -1,4 +1,4 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
@@ -52,7 +52,6 @@ public class BlackDuckOnlineProperties {
         return snippetMatchingFlag || snippetMatchingOnlyFlag || uploadSource || licenseSearch;
     }
 
-    // TODO - for next major version: can we delete this?
     public void addOnlineCommands(List<String> cmd) {
         if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
             if (snippetMatchingFlag) {
@@ -78,33 +77,6 @@ public class BlackDuckOnlineProperties {
             cmd.add("--upload-source");
         }
 
-    }
-
-    public void addOnlineCommands(ScanCommandArguments cmd) {
-        if (snippetMatchingFlag || snippetMatchingOnlyFlag) {
-            if (snippetMatchingFlag) {
-                cmd.add("--snippet-matching");
-            } else {
-                cmd.add("--snippet-matching-only");
-            }
-
-            if (fullSnippetScanFlag) {
-                cmd.add("--full-snippet-scan");
-            }
-        }
-
-        if (licenseSearch) {
-            cmd.add("--license-search");
-        }
-
-        if (copyrightSearch) {
-            cmd.add("--copyright-search");
-        }
-
-        if (uploadSource) {
-            cmd.add("--upload-source");
-        }
-        
     }
 
     public void warnIfOnlineIsNeeded(Consumer<String> stringConsumer) {

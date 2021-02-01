@@ -1,4 +1,4 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
@@ -24,6 +24,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -98,7 +99,7 @@ public class ScanCommand {
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
-        ScanCommandArguments cmd = new ScanCommandArguments(additionalScanArguments);
+        List<String> cmd = new LinkedList<>();
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
         scannerPaths.addJavaAndOnePathArguments(cmd);
@@ -151,10 +152,10 @@ public class ScanCommand {
 
         populateAdditionalScanArguments(cmd);
 
-        return cmd.getCommand();
+        return cmd;
     }
 
-    private void populateAdditionalScanArguments(ScanCommandArguments cmd) {
+    private void populateAdditionalScanArguments(List<String> cmd) {
         for (String argument : additionalScanArguments.getArguments()) {
             if (StringUtils.isNotBlank(argument)) {
                 cmd.add(argument);
@@ -162,7 +163,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateExcludePatterns(ScanCommandArguments cmd) {
+    private void populateExcludePatterns(List<String> cmd) {
         if (excludePatterns != null) {
             for (String exclusionPattern : excludePatterns) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
@@ -173,7 +174,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateProjectAndVersion(ScanCommandArguments cmd) {
+    private void populateProjectAndVersion(List<String> cmd) {
         if (StringUtils.isNotBlank(projectName) && StringUtils.isNotBlank(versionName)) {
             cmd.add("--project");
             cmd.add(projectName);
@@ -182,7 +183,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, ScanCommandArguments cmd) {
+    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, List<String> cmd) {
         logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
         if (blackDuckOnlineProperties.isOnlineCapabilityNeeded() || additionalScanArguments.containsOnlineProperty()) {
             logger.warn(BlackDuckOnlineProperties.ONLINE_CAPABILITY_NEEDED_WARNING);
@@ -196,7 +197,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateOnlineProperties(IntLogger logger, ScanCommandArguments cmd) {
+    private void populateOnlineProperties(IntLogger logger, List<String> cmd) {
         cmd.add("--scheme");
         cmd.add(scheme);
         cmd.add("--host");
@@ -223,7 +224,7 @@ public class ScanCommand {
         blackDuckOnlineProperties.addOnlineCommands(cmd);
     }
 
-    private void populateScanCliOpts(ScanCommandArguments cmd) {
+    private void populateScanCliOpts(List<String> cmd) {
         if (StringUtils.isNotBlank(scanCliOpts)) {
             for (String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
@@ -233,7 +234,7 @@ public class ScanCommand {
         }
     }
 
-    private void populateProxyDetails(ScanCommandArguments cmd) {
+    private void populateProxyDetails(List<String> cmd) {
         ProxyInfo blackDuckProxyInfo = proxyInfo;
         String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
         int proxyPort = blackDuckProxyInfo.getPort();
