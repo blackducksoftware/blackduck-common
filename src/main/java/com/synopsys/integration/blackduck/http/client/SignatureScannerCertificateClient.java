@@ -1,4 +1,4 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
@@ -24,6 +24,8 @@ package com.synopsys.integration.blackduck.http.client;
 
 import java.security.cert.Certificate;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
@@ -46,6 +48,10 @@ public class SignatureScannerCertificateClient extends IntHttpClient {
 
     public SignatureScannerCertificateClient(IntLogger logger, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo) {
         super(logger, timeoutInSeconds, alwaysTrustServerCertificate, proxyInfo);
+    }
+
+    public SignatureScannerCertificateClient(IntLogger logger, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, SSLContext sslContext) {
+        super(logger, timeoutInSeconds, alwaysTrustServerCertificate, proxyInfo, sslContext);
     }
 
     @Override
