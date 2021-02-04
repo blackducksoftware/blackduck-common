@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.http.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,9 +52,6 @@ public class SignatureScannerCertificateClientTest {
     private static Request BLACK_DUCK_DEFAULT_REQUEST;
     public static HandshakeCertificates SERVER_CERTIFICATE;
     private static MockWebServer DESTINATION_MOCK_SERVER;
-    private static String DESTINATION_MOCK_SERVER_URL;
-    private static MockWebServer REDIRECTING_MOCK_SERVER;
-    private static String REDIRECTING_MOCK_SERVER_URL;
 
     private static final char[] KEYSTORE_PASSWORD = "changeit".toCharArray();
     private static final String CERTIFICATE_ALIAS = "bd-common-test-cert";
@@ -69,10 +67,10 @@ public class SignatureScannerCertificateClientTest {
         DESTINATION_MOCK_SERVER.useHttps(SERVER_CERTIFICATE.sslSocketFactory(), false);
         DESTINATION_MOCK_SERVER.enqueue(new MockResponse().setBody(SERVER_BODY));
 
-        DESTINATION_MOCK_SERVER_URL = DESTINATION_MOCK_SERVER.url("/").toString();
-        System.out.println(String.format("Destination MockWebServer started for test at %s", DESTINATION_MOCK_SERVER_URL));
+        String destinationMockServerUrl = DESTINATION_MOCK_SERVER.url("/").toString();
+        System.out.println(String.format("Destination MockWebServer started for test at %s", destinationMockServerUrl));
 
-        HttpUrl httpsServer = new HttpUrl(DESTINATION_MOCK_SERVER_URL);
+        HttpUrl httpsServer = new HttpUrl(destinationMockServerUrl);
 
         BLACK_DUCK_DEFAULT_REQUEST = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
 
@@ -85,7 +83,6 @@ public class SignatureScannerCertificateClientTest {
         assertTrue(keyStore.delete(), String.format("Failed removing keystore: %s", KEYSTORE_FILENAME));
 
         DESTINATION_MOCK_SERVER.shutdown();
-        //        REDIRECTING_MOCK_SERVER.shutdown();
     }
 
     private static KeyStore createEmptyKeyStoreWithCertificate(X509Certificate x509Certificate) throws IntegrationException {
@@ -131,9 +128,9 @@ public class SignatureScannerCertificateClientTest {
 
     @Test
     public void noProxyTrustTrue() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, InterruptedException {
-        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> false).build();
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO, sslContext);
-        //assertNotSame(sslContext, signatureScannerCertificateClient.getSSLContext());
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
+        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, true, ProxyInfo.NO_PROXY_INFO, sslContext);
+        assertNotSame(sslContext, signatureScannerCertificateClient.getSSLContext());
 
         Response response = signatureScannerCertificateClient.execute(BLACK_DUCK_DEFAULT_REQUEST);
 
@@ -142,5 +139,5 @@ public class SignatureScannerCertificateClientTest {
         assertNotNull(signatureScannerCertificateClient.getServerCertificate());
         assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerCertificateClient.getServerCertificate());
     }
-    
+
 }
