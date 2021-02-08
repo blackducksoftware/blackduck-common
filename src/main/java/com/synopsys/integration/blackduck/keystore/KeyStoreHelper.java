@@ -37,8 +37,6 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 
 public class KeyStoreHelper {
     private static final char[] DEFAULT_JAVA_KEYSTORE_PASSWORD = new char[] { 'c', 'h', 'a', 'n', 'g', 'e', 'i', 't' };
@@ -53,22 +51,13 @@ public class KeyStoreHelper {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
+    public void updateKeyStoreWithServerCertificate(String alias, Certificate serverCertificate, String keyStoreFilePath) {
         try {
-            Request request = blackDuckRequestFactory.createCommonGetRequest(httpsServer);
-            certificateClient.execute(request);
-            Certificate serverCertificate = certificateClient.getServerCertificate();
-            if (null == serverCertificate) {
-                logger.error("Could not retrieve the certificate from the server.");
-                return;
-            }
-
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             try (InputStream inputStream = new FileInputStream(keyStoreFilePath)) {
                 keyStore.load(inputStream, DEFAULT_JAVA_KEYSTORE_PASSWORD);
             }
 
-            String alias = httpsServer.url().getHost();
             keyStore.setCertificateEntry(alias, serverCertificate);
 
             try (OutputStream outputStream = new FileOutputStream(keyStoreFilePath)) {

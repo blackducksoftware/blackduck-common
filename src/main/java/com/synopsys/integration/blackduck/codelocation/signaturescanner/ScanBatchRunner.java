@@ -34,10 +34,10 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
-import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -49,7 +49,7 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final File defaultInstallDirectory;
 
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService) {
+    public static ScanBatchRunner createDefault(IntLogger logger, IntHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService) {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility, executorService);
@@ -57,7 +57,7 @@ public class ScanBatchRunner {
         return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner);
     }
 
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
+    public static ScanBatchRunner createDefault(IntLogger logger, IntHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
         OperatingSystemType operatingSystemType, ScanCommandRunner scanCommandRunner) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
