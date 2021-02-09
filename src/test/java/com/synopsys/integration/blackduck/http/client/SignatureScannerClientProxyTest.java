@@ -27,7 +27,7 @@ import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
-public class SignatureScannerCertificateClientProxyTest {
+public class SignatureScannerClientProxyTest {
 
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
     private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory();
@@ -67,10 +67,10 @@ public class SignatureScannerCertificateClientProxyTest {
 
     @Test
     public void noProxyTest() throws IntegrationException {
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
         Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
-        Response response = signatureScannerCertificateClient.execute(request);
+        Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 
         assertEquals(MOCK_SERVER_STATUS_CODE, response.getStatusCode());
@@ -82,10 +82,10 @@ public class SignatureScannerCertificateClientProxyTest {
 
     @Test
     public void withProxyTest() throws IntegrationException {
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, false, PROXY_INFO);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
         Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
-        Response response = signatureScannerCertificateClient.execute(request);
+        Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 
         assertEquals(PROXY_SERVER_STATUS_CODE, response.getStatusCode());

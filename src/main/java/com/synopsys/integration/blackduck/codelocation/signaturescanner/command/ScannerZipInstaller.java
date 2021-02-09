@@ -1,4 +1,4 @@
-/*
+/**
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
@@ -25,12 +25,13 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.Certificate;
 import java.util.Optional;
 
 import org.apache.commons.compress.archivers.ArchiveException;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -49,21 +50,21 @@ public class ScannerZipInstaller {
     public static final String VERSION_FILENAME = "blackDuckVersion.txt";
 
     private final IntLogger logger;
-    private final BlackDuckHttpClient blackDuckHttpClient;
+    private final SignatureScannerClient signatureScannerClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
     private final KeyStoreHelper keyStoreHelper;
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
 
-    public ScannerZipInstaller(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
-        final OperatingSystemType operatingSystemType) {
+    public ScannerZipInstaller(IntLogger logger, SignatureScannerClient signatureScannerClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
+        OperatingSystemType operatingSystemType) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
 
         this.logger = logger;
-        this.blackDuckHttpClient = blackDuckHttpClient;
+        this.signatureScannerClient = signatureScannerClient;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
         this.keyStoreHelper = keyStoreHelper;
@@ -136,36 +137,37 @@ public class ScannerZipInstaller {
         logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
 
         Request downloadRequest = new Request.Builder(downloadUrl).build();
-        Optional<Response> optionalResponse = blackDuckHttpClient.executeGetRequestIfModifiedSince(downloadRequest, lastTimeDownloaded);
-        if (optionalResponse.isPresent()) {
-            Response response = optionalResponse.get();
-            try {
-                logger.info("Downloading the Black Duck Signature Scanner.");
-                try (InputStream responseStream = response.getContent()) {
-                    logger.info(String.format(
-                        "If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.",
-                        scannerExpansionDirectory.getAbsolutePath()));
-                    cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
-                }
-                long lastModifiedOnServer = response.getLastModified();
-                versionFile.setLastModified(lastModifiedOnServer);
 
-                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scannerExpansionDirectory.getParentFile());
-                File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
-                File oneJar = new File(scanPaths.getPathToOneJar());
-                File scanExecutable = new File(scanPaths.getPathToScanExecutable());
-                javaExecutable.setExecutable(true);
-                oneJar.setExecutable(true);
-                scanExecutable.setExecutable(true);
-
-                keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl, scanPaths.getPathToCacerts());
-
-                logger.info(String.format("Black Duck Signature Scanner downloaded successfully."));
-            } finally {
-                response.close();
-            }
-        } else {
+        Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(downloadRequest, lastTimeDownloaded);
+        if (!optionalResponse.isPresent()) {
             logger.debug("The Black Duck Signature Scanner has not been modified since it was last downloaded - skipping download.");
+            return;
+        }
+
+        try (Response response = optionalResponse.get()) {
+            logger.info("Downloading the Black Duck Signature Scanner.");
+            try (InputStream responseStream = response.getContent()) {
+                logger.info(String.format(
+                    "If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.",
+                    scannerExpansionDirectory.getAbsolutePath()));
+                cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
+            }
+            long lastModifiedOnServer = response.getLastModified();
+            versionFile.setLastModified(lastModifiedOnServer);
+
+            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scannerExpansionDirectory.getParentFile());
+            File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
+            File oneJar = new File(scanPaths.getPathToOneJar());
+            File scanExecutable = new File(scanPaths.getPathToScanExecutable());
+            javaExecutable.setExecutable(true);
+            oneJar.setExecutable(true);
+            scanExecutable.setExecutable(true);
+
+            Certificate serverCertificate = signatureScannerClient.getServerCertificate();
+
+            keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), serverCertificate, scanPaths.getPathToCacerts());
+
+            logger.info("Black Duck Signature Scanner downloaded successfully.");
         }
     }
 

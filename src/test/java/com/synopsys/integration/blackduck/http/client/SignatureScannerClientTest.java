@@ -10,13 +10,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.net.ssl.SSLContext;
@@ -42,14 +42,15 @@ import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 
 @ExtendWith(TimingExtension.class)
-public class SignatureScannerCertificateClientTest {
+public class SignatureScannerClientTest {
 
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
     private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory();
 
     private static final char[] KEYSTORE_PASSWORD = "changeit".toCharArray();
     private static final String CERTIFICATE_ALIAS = "bd-common-test-cert";
-    private static final String SERVER_BODY = "BlackDuck-Common response body";
+    private static final String SERVER_BODY_RESPONSE1 = "BlackDuck-Common response body #1";
+    private static final String SERVER_BODY_RESPONSE2 = "BlackDuck-Common response body #2";
 
     private static HeldCertificate LOCALHOST_CERTIFICATE;
     private static String KEYSTORE_FILENAME;
@@ -58,14 +59,15 @@ public class SignatureScannerCertificateClientTest {
     private static MockWebServer DESTINATION_MOCK_SERVER;
 
     @BeforeEach
-    void setUp() throws UnknownHostException, IntegrationException {
+    void setUp() throws IOException, IntegrationException {
         String localHost = InetAddress.getByName("localhost").getCanonicalHostName();
         LOCALHOST_CERTIFICATE = new HeldCertificate.Builder().addSubjectAlternativeName(localHost).build();
         HandshakeCertificates serverCertificate = new HandshakeCertificates.Builder().heldCertificate(LOCALHOST_CERTIFICATE).build();
 
         DESTINATION_MOCK_SERVER = new MockWebServer();
         DESTINATION_MOCK_SERVER.useHttps(serverCertificate.sslSocketFactory(), false);
-        DESTINATION_MOCK_SERVER.enqueue(new MockResponse().setBody(SERVER_BODY));
+        DESTINATION_MOCK_SERVER.enqueue(new MockResponse().setBody(SERVER_BODY_RESPONSE1));
+        DESTINATION_MOCK_SERVER.enqueue(new MockResponse().setBody(SERVER_BODY_RESPONSE2));
 
         String destinationMockServerUrl = DESTINATION_MOCK_SERVER.url("/").toString();
         System.out.println(String.format("Destination MockWebServer started for test at %s", destinationMockServerUrl));
@@ -113,31 +115,36 @@ public class SignatureScannerCertificateClientTest {
     }
 
     @Test
-    public void getCertNoProxyTrustFalse() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException {
-        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> false).build();
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO, sslContext);
-        assertSame(sslContext, signatureScannerCertificateClient.getSSLContext());
+    public void getCertWithContext() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, ProxyInfo.NO_PROXY_INFO, sslContext);
+        assertSame(sslContext, signatureScannerClient.getSSLContext());
 
-        Response response = signatureScannerCertificateClient.execute(BLACK_DUCK_DEFAULT_REQUEST);
+        Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
+        Response response = optionalResponse.orElse(null);
 
+        assertNotNull(response);
         assertEquals(200, response.getStatusCode());
-        assertEquals(SERVER_BODY, response.getContentString());
-        assertNotNull(signatureScannerCertificateClient.getServerCertificate());
-        assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerCertificateClient.getServerCertificate());
+        assertEquals(SERVER_BODY_RESPONSE2, response.getContentString());
+        assertNotNull(signatureScannerClient.getServerCertificate());
+        assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerClient.getServerCertificate());
     }
 
     @Test
-    public void getCertNoProxyTrustTrue() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException {
+    public void getCertTrustTrue() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(LOGGER, 10, true, ProxyInfo.NO_PROXY_INFO, sslContext);
-        assertNotSame(sslContext, signatureScannerCertificateClient.getSSLContext());
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, true, ProxyInfo.NO_PROXY_INFO);
+        assertNotSame(sslContext, signatureScannerClient.getSSLContext());
 
-        Response response = signatureScannerCertificateClient.execute(BLACK_DUCK_DEFAULT_REQUEST);
+        Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
+        Response response = optionalResponse.orElse(null);
 
+        assertNotNull(response);
         assertEquals(200, response.getStatusCode());
-        assertEquals(SERVER_BODY, response.getContentString());
-        assertNotNull(signatureScannerCertificateClient.getServerCertificate());
-        assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerCertificateClient.getServerCertificate());
+        assertEquals(SERVER_BODY_RESPONSE2, response.getContentString());
+        assertNotNull(signatureScannerClient.getServerCertificate());
+        assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerClient.getServerCertificate());
+
     }
 
 }
