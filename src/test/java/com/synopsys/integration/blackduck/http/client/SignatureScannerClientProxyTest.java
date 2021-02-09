@@ -28,7 +28,6 @@ import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class SignatureScannerClientProxyTest {
-
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
     private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory();
 
