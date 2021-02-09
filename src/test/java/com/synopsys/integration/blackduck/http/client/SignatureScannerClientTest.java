@@ -2,8 +2,6 @@ package com.synopsys.integration.blackduck.http.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -43,7 +41,6 @@ import okhttp3.tls.HeldCertificate;
 
 @ExtendWith(TimingExtension.class)
 public class SignatureScannerClientTest {
-
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
     private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory();
 
@@ -118,7 +115,6 @@ public class SignatureScannerClientTest {
     public void getCertWithContext() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, ProxyInfo.NO_PROXY_INFO, sslContext);
-        assertSame(sslContext, signatureScannerClient.getSSLContext());
 
         Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
         Response response = optionalResponse.orElse(null);
@@ -134,7 +130,6 @@ public class SignatureScannerClientTest {
     public void getCertTrustTrue() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, true, ProxyInfo.NO_PROXY_INFO);
-        assertNotSame(sslContext, signatureScannerClient.getSSLContext());
 
         Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
         Response response = optionalResponse.orElse(null);
@@ -144,7 +139,6 @@ public class SignatureScannerClientTest {
         assertEquals(SERVER_BODY_RESPONSE2, response.getContentString());
         assertNotNull(signatureScannerClient.getServerCertificate());
         assertEquals(LOCALHOST_CERTIFICATE.certificate(), signatureScannerClient.getServerCertificate());
-
     }
 
 }
