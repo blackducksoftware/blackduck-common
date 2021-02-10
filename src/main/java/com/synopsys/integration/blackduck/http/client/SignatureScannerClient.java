@@ -22,11 +22,16 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
+import java.io.IOException;
 import java.security.cert.Certificate;
+import java.util.Optional;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -35,17 +40,21 @@ import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
-public class SignatureScannerCertificateClient extends IntHttpClient {
+public class SignatureScannerClient extends IntHttpClient {
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";
 
     private Certificate serverCertificate;
 
-    public SignatureScannerCertificateClient(BlackDuckHttpClient blackDuckHttpClient) {
+    public SignatureScannerClient(BlackDuckHttpClient blackDuckHttpClient) {
         super(blackDuckHttpClient.getLogger(), blackDuckHttpClient.getTimeoutInSeconds(), blackDuckHttpClient.isAlwaysTrustServerCertificate(), blackDuckHttpClient.getProxyInfo());
     }
 
-    public SignatureScannerCertificateClient(IntLogger logger, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo) {
+    public SignatureScannerClient(IntLogger logger, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo) {
         super(logger, timeoutInSeconds, alwaysTrustServerCertificate, proxyInfo);
+    }
+
+    public SignatureScannerClient(IntLogger logger, int timeoutInSeconds, ProxyInfo proxyInfo, SSLContext sslContext) {
+        super(logger, timeoutInSeconds, proxyInfo, sslContext);
     }
 
     @Override
@@ -56,9 +65,9 @@ public class SignatureScannerCertificateClient extends IntHttpClient {
     }
 
     @Override
-    public Response execute(Request request) throws IntegrationException {
-        BasicHttpContext httpContext = new BasicHttpContext();
-        Response response = super.execute(request, httpContext);
+    public Optional<Response> executeGetRequestIfModifiedSince(Request getRequest, long timeToCheck) throws IntegrationException, IOException {
+        HttpContext httpContext = new BasicHttpContext();
+        Optional<Response> response = super.executeGetRequestIfModifiedSince(getRequest, timeToCheck, httpContext);
 
         Certificate[] peerCertificates = (Certificate[]) httpContext.getAttribute(PEER_CERTIFICATES);
         if (null != peerCertificates) {

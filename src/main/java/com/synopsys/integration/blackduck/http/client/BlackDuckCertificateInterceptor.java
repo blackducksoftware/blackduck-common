@@ -41,7 +41,7 @@ public class BlackDuckCertificateInterceptor implements HttpResponseInterceptor 
             SSLSession sslSession = routedConnection.getSSLSession();
             if (sslSession != null) {
                 Certificate[] certificates = sslSession.getPeerCertificates();
-                context.setAttribute(SignatureScannerCertificateClient.PEER_CERTIFICATES, certificates);
+                context.setAttribute(SignatureScannerClient.PEER_CERTIFICATES, certificates);
             }
         }
     }
