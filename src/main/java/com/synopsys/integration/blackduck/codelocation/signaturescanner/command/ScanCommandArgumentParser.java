@@ -64,10 +64,9 @@ public class ScanCommandArgumentParser {
                 parsedArguments.add(text);
             }
         }
-        String originalCheck = StringUtils.join(parsedArguments, " ");
-        if (!originalCheck.equals(command)) {
-            throw new SignatureScannerInputException("Unable to parse signature scanner arguments.  Please check your input for improper syntax, such as trailing spaces.");
-        }
+
+        validateParsedArguments(parsedArguments, command);
+
         return parsedArguments;
     }
 
@@ -83,6 +82,13 @@ public class ScanCommandArgumentParser {
         ScanCommandQuoteParser quoteParser = new ScanCommandQuoteParser();
         if (!quoteParser.hasEvenNumberOfNonEscapedQuotes(command)) {
             throw new MismatchedQuotesException(String.format("Unable to parse signature scanner arguments due to unbalanced quotes in command: %s", command));
+        }
+    }
+
+    private void validateParsedArguments(List<String> parsedArguments, String command) throws SignatureScannerInputException {
+        String originalCheck = StringUtils.join(parsedArguments, " ");
+        if (!originalCheck.equals(command)) {
+            throw new SignatureScannerInputException("Unable to parse signature scanner arguments.  Please check your input for improper syntax, such as trailing spaces.");
         }
     }
 
