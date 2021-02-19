@@ -32,7 +32,6 @@ import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 
 public class Bdio2Writer {
-
     public BdioWriter createBdioWriter(final OutputStream outputStream, final BdioMetadata bdioMetadata) {
         final BdioWriter.StreamSupplier streamSupplier = new BdioWriter.BdioFile(outputStream);
         return new BdioWriter(bdioMetadata, streamSupplier);
