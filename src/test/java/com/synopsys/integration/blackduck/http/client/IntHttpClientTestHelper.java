@@ -100,8 +100,12 @@ public class IntHttpClientTestHelper {
         return builder;
     }
 
-    public HttpUrl getIntegrationBlackDuckServerUrl() throws IntegrationException {
-        return new HttpUrl(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL));
+    public HttpUrl getIntegrationBlackDuckServerUrl() {
+        try {
+            return new HttpUrl(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL));
+        } catch (IntegrationException e) {
+            throw new RuntimeException(String.format("Your test url is bad: %s", e.getMessage()), e);
+        }
     }
 
     public String getTestUsername() {
