@@ -52,6 +52,7 @@ import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
@@ -68,7 +69,10 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
-    private final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(new Gson(), new ObjectMapper(), new SilentIntLogger());
+    private final Gson gson = BlackDuckServicesFactory.createDefaultGson();
+    private final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+    private final BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+    private final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, new SilentIntLogger());
 
     @Test
     public void createProjectVersion() throws Exception {

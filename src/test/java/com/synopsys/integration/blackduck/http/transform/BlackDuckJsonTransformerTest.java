@@ -26,6 +26,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
@@ -34,6 +35,7 @@ import com.synopsys.integration.log.IntLogger;
 public class BlackDuckJsonTransformerTest {
     private static Gson gson;
     private static ObjectMapper objectMapper;
+    private static BlackDuckResponseResolver blackDuckResponseResolver;
     private static IntLogger logger;
     private static BlackDuckJsonTransformer blackDuckJsonTransformer;
 
@@ -41,8 +43,9 @@ public class BlackDuckJsonTransformerTest {
     public static void setup() {
         BlackDuckJsonTransformerTest.gson = BlackDuckServicesFactory.createDefaultGson();
         BlackDuckJsonTransformerTest.objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
+        BlackDuckJsonTransformerTest.blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformerTest.logger = new BufferedIntLogger();
-        BlackDuckJsonTransformerTest.blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckJsonTransformerTest.gson, BlackDuckJsonTransformerTest.objectMapper, BlackDuckJsonTransformerTest.logger);
+        BlackDuckJsonTransformerTest.blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
     }
 
     @Test

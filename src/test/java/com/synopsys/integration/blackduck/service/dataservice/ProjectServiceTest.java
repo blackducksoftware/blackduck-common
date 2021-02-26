@@ -21,6 +21,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -34,7 +35,8 @@ public class ProjectServiceTest {
         IntLogger logger = new BufferedIntLogger();
         Gson gson = BlackDuckServicesFactory.createDefaultGson();
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, logger);
+        BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
         InputStream inputStream = getClass().getResourceAsStream("/json/pageOfProjectVersionViews.json");
 
