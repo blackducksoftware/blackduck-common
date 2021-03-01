@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
@@ -79,8 +80,8 @@ public class UserServiceTestIT {
             projectGroups = PROJECT_USERS_SERVICE.getGroupsForProject(projectView);
             assertTrue(projectGroups.contains(userGroupView));
         } finally {
-            cleanProject(projectView);
-            cleanGroup(userGroupView);
+            cleanView(projectView);
+            cleanView(userGroupView);
         }
     }
 
@@ -107,8 +108,8 @@ public class UserServiceTestIT {
             projectUsers = PROJECT_USERS_SERVICE.getUsersForProject(projectView);
             assertTrue(projectUsers.contains(userView));
         } finally {
-            cleanProject(projectView);
-            cleanUser(userView);
+            cleanView(projectView);
+            cleanView(userView);
         }
     }
 
@@ -127,7 +128,7 @@ public class UserServiceTestIT {
             ProjectView finalProjectView = projectView;
             assertThrows(BlackDuckIntegrationException.class, () -> PROJECT_USERS_SERVICE.addUserToProject(finalProjectView, userName));
         } finally {
-            cleanProject(projectView);
+            cleanView(projectView);
         }
     }
 
@@ -160,9 +161,9 @@ public class UserServiceTestIT {
             assertFalse(allActiveUsersForProject.contains(inActiveUserView));
             assertTrue(allActiveUsersForProject.contains(activeUserView));
         } finally {
-            cleanProject(projectView);
-            cleanUser(inActiveUserView);
-            cleanUser(activeUserView);
+            cleanView(projectView);
+            cleanView(inActiveUserView);
+            cleanView(activeUserView);
         }
     }
 
@@ -179,33 +180,14 @@ public class UserServiceTestIT {
         return BLACKDUCK_API_CLIENT.getResponse(userUrl, UserView.class);
     }
 
-    private void cleanProject(ProjectView projectView) {
-        if (null != projectView) {
+    private void cleanView(BlackDuckView blackDuckView) {
+        if (null != blackDuckView) {
             try {
-                BLACKDUCK_API_CLIENT.delete(projectView);
+                BLACKDUCK_API_CLIENT.delete(blackDuckView);
             } catch (Exception ignored) {
                 // ignored
             }
         }
     }
 
-    private void cleanUser(UserView userView) {
-        if (null != userView) {
-            try {
-                BLACKDUCK_API_CLIENT.delete(userView);
-            } catch (Exception ignored) {
-                // ignored
-            }
-        }
-    }
-
-    private void cleanGroup(UserGroupView userGroupView) {
-        if (null != userGroupView) {
-            try {
-                BLACKDUCK_API_CLIENT.delete(userGroupView);
-            } catch (Exception ignored) {
-                // ignored
-            }
-        }
-    }
 }
