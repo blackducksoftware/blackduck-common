@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,136 +35,145 @@ import com.synopsys.integration.rest.HttpUrl;
 public class UserServiceTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
-    private final BlackDuckServicesFactory BLACKDUCK_SERVICES_FACTORY = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
-    private final BlackDuckApiClient BLACKDUCK_API_CLIENT = BLACKDUCK_SERVICES_FACTORY.getBlackDuckApiClient();
-    private final ProjectService PROJECT_SERVICE = BLACKDUCK_SERVICES_FACTORY.createProjectService();
-    private final UserGroupService USER_GROUP_SERVICE = BLACKDUCK_SERVICES_FACTORY.createUserGroupService();
-    private final ProjectUsersService PROJECT_USERS_SERVICE = BLACKDUCK_SERVICES_FACTORY.createProjectUsersService();
+    private final BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
+    private final BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
+    private final ProjectService projectService = blackDuckServicesFactory.createProjectService();
+    private final UserService userService = blackDuckServicesFactory.createUserService();
+    private final UserGroupService userGroupService = blackDuckServicesFactory.createUserGroupService();
+    private final ProjectUsersService projectUsersService = blackDuckServicesFactory.createProjectUsersService();
+
+    private final String baseUserName = this.getClass().getSimpleName() + "_";
+    private final String activeUser = baseUserName + "active-user";
+    private final String inactiveUser = baseUserName + "inactive-user";
 
     public UserServiceTestIT() throws IntegrationException {}
 
     @Test
     public void getProjectsForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        List<ProjectView> projectsForUser = BLACKDUCK_SERVICES_FACTORY.createUserGroupService().getProjectsForUser(UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
+        List<ProjectView> projectsForUser = blackDuckServicesFactory.createUserGroupService().getProjectsForUser(UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
         assertNotNull(projectsForUser);
     }
 
     @Test
     public void getRolesForUserTestIT() throws IllegalArgumentException, IntegrationException {
-        List<RoleAssignmentView> rolesForUser = BLACKDUCK_SERVICES_FACTORY.createUserGroupService().getRolesForUser(UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
+        List<RoleAssignmentView> rolesForUser = blackDuckServicesFactory.createUserGroupService().getRolesForUser(UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername());
         assertTrue(rolesForUser.size() > 0);
     }
 
     @Test
     public void testAddingGroupToProject() throws IntegrationException {
-        String projectName = "user-group-project" + System.currentTimeMillis();
         String userGroupName = "user-group-test" + System.currentTimeMillis();
         ProjectView projectView = null;
         UserGroupView userGroupView = null;
 
         try {
-            ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
-            PROJECT_SERVICE.syncProjectAndVersion(projectSyncModel);
-
-            projectView = PROJECT_SERVICE.getProjectByName(projectName).get();
+            projectView = createProjectView();
 
             UserGroupRequest userGroupRequest = new UserGroupRequest();
             userGroupRequest.setName(userGroupName);
 
-            userGroupView = USER_GROUP_SERVICE.createUserGroup(userGroupRequest);
+            userGroupView = userGroupService.createUserGroup(userGroupRequest);
 
-            List<UserGroupView> projectGroups = PROJECT_USERS_SERVICE.getGroupsForProject(projectView);
+            List<UserGroupView> projectGroups = projectUsersService.getGroupsForProject(projectView);
             assertFalse(projectGroups.contains(userGroupView));
 
-            PROJECT_USERS_SERVICE.addGroupToProject(projectView, userGroupName);
+            projectUsersService.addGroupToProject(projectView, userGroupName);
 
-            projectGroups = PROJECT_USERS_SERVICE.getGroupsForProject(projectView);
+            projectGroups = projectUsersService.getGroupsForProject(projectView);
             assertTrue(projectGroups.contains(userGroupView));
         } finally {
-            cleanView(projectView);
-            cleanView(userGroupView);
+            deleteView(projectView);
+            deleteView(userGroupView);
         }
     }
 
     @Test
     public void testAddingUserToProject() throws IntegrationException {
         String projectName = "user-group-project" + System.currentTimeMillis();
-        String userName = "user" + System.currentTimeMillis();
         ProjectView projectView = null;
         UserView userView = null;
 
         try {
-            ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
-            PROJECT_SERVICE.syncProjectAndVersion(projectSyncModel);
+            projectView = createProjectView();
 
-            projectView = PROJECT_SERVICE.getProjectByName(projectName).get();
+            userView = createUserView(activeUser, true);
 
-            userView = createUserView(userName, true);
-
-            List<UserView> projectUsers = PROJECT_USERS_SERVICE.getUsersForProject(projectView);
+            List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);
             assertFalse(projectUsers.contains(userView));
 
-            PROJECT_USERS_SERVICE.addUserToProject(projectView, userName);
+            projectUsersService.addUserToProject(projectView, activeUser);
 
-            projectUsers = PROJECT_USERS_SERVICE.getUsersForProject(projectView);
+            projectUsers = projectUsersService.getUsersForProject(projectView);
             assertTrue(projectUsers.contains(userView));
         } finally {
-            cleanView(projectView);
-            cleanView(userView);
+            deleteView(projectView);
         }
     }
 
     @Test
     public void testInvalidUser() throws IntegrationException {
-        String projectName = "user-group-project" + System.currentTimeMillis();
-        String userName = "user" + System.currentTimeMillis();
+        String userName = "user-not-exist" + System.currentTimeMillis();
         ProjectView projectView = null;
 
         try {
-            ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
-            PROJECT_SERVICE.syncProjectAndVersion(projectSyncModel);
-
-            projectView = PROJECT_SERVICE.getProjectByName(projectName).orElse(null);
+            projectView = createProjectView();
 
             ProjectView finalProjectView = projectView;
-            assertThrows(BlackDuckIntegrationException.class, () -> PROJECT_USERS_SERVICE.addUserToProject(finalProjectView, userName));
+            assertThrows(BlackDuckIntegrationException.class, () -> projectUsersService.addUserToProject(finalProjectView, userName));
         } finally {
-            cleanView(projectView);
+            deleteView(projectView);
         }
     }
 
     @Test
     public void testGetActiveUsersForProject() throws IntegrationException {
-        String projectName = "user-group-project" + System.currentTimeMillis();
-        String inActiveUser = "inactive-user" + System.currentTimeMillis();
-        String activeUser = "active-user" + System.currentTimeMillis();
         ProjectView projectView = null;
-        UserView inActiveUserView = null;
-        UserView activeUserView = null;
-        Set<UserView> allActiveUsersForProject = null;
 
         try {
-            ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
-            PROJECT_SERVICE.syncProjectAndVersion(projectSyncModel);
-            projectView = PROJECT_SERVICE.getProjectByName(projectName).orElse(null);
+            projectView = createProjectView();
 
-            inActiveUserView = createUserView(inActiveUser, false);
-            activeUserView = createUserView(activeUser, true);
+            UserView activeUserView = createUserView(activeUser, true);
+            UserView inactiveUserView = createUserView(inactiveUser, false);
 
-            allActiveUsersForProject = PROJECT_USERS_SERVICE.getAllActiveUsersForProject(projectView);
-            assertFalse(allActiveUsersForProject.contains(inActiveUserView));
+            Set<UserView> allActiveUsersForProject = projectUsersService.getAllActiveUsersForProject(projectView);
             assertFalse(allActiveUsersForProject.contains(activeUserView));
+            assertFalse(allActiveUsersForProject.contains(inactiveUserView));
 
-            PROJECT_USERS_SERVICE.addUserToProject(projectView, inActiveUser);
-            PROJECT_USERS_SERVICE.addUserToProject(projectView, activeUser);
+            projectUsersService.addUserToProject(projectView, activeUser);
+            projectUsersService.addUserToProject(projectView, inactiveUser);
 
-            allActiveUsersForProject = PROJECT_USERS_SERVICE.getAllActiveUsersForProject(projectView);
-            assertFalse(allActiveUsersForProject.contains(inActiveUserView));
+            allActiveUsersForProject = projectUsersService.getAllActiveUsersForProject(projectView);
             assertTrue(allActiveUsersForProject.contains(activeUserView));
+            assertFalse(allActiveUsersForProject.contains(inactiveUserView));
         } finally {
-            cleanView(projectView);
-            cleanView(inActiveUserView);
-            cleanView(activeUserView);
+            deleteView(projectView);
+        }
+    }
+
+    @Test
+    public void testAddSameUserToProject() throws IntegrationException {
+        ProjectView projectView = null;
+
+        try {
+            projectView = createProjectView();
+
+            UserView userView = createUserView(activeUser, true);
+
+            List<UserView> initialUserList = projectUsersService.getUsersForProject(projectView);
+            assertFalse(initialUserList.contains(userView));
+
+            projectUsersService.addUserToProject(projectView, activeUser);
+
+            initialUserList = projectUsersService.getUsersForProject(projectView);
+            assertTrue(initialUserList.contains(userView));
+
+            projectUsersService.addUserToProject(projectView, activeUser);
+
+            List<UserView> finalUserList = projectUsersService.getUsersForProject(projectView);
+            assertEquals(initialUserList.size(), finalUserList.size());
+            assertEquals(initialUserList, finalUserList);
+        } finally {
+            deleteView(projectView);
         }
     }
 
@@ -176,14 +186,30 @@ public class UserServiceTestIT {
         userRequest.setEmail("noreply@synopsys.com");
         userRequest.setPassword("53CUR17y7hR0ugH085Cur17y");
 
-        HttpUrl userUrl = BLACKDUCK_API_CLIENT.post(ApiDiscovery.USERS_LINK, userRequest);
-        return BLACKDUCK_API_CLIENT.getResponse(userUrl, UserView.class);
+        UserView userView = userService.findUserByUsername(userName).orElse(null);
+        if (userView == null) {
+            System.out.println("Creating user " + userName);
+            HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
+            userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
+        } else {
+            System.out.println(String.format("User %s already existed", userName));
+        }
+
+        return userView;
     }
 
-    private void cleanView(BlackDuckView blackDuckView) {
+    private ProjectView createProjectView() throws IntegrationException {
+        String projectName = "user-group-project" + System.currentTimeMillis();
+        ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, "test");
+        projectService.syncProjectAndVersion(projectSyncModel);
+
+        return projectService.getProjectByName(projectName).orElse(null);
+    }
+
+    private void deleteView(BlackDuckView blackDuckView) {
         if (null != blackDuckView) {
             try {
-                BLACKDUCK_API_CLIENT.delete(blackDuckView);
+                blackDuckApiClient.delete(blackDuckView);
             } catch (Exception ignored) {
                 // ignored
             }
