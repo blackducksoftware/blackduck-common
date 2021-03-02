@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -27,9 +28,7 @@ import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.bdio2.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.Bdio2Factory;
 import com.synopsys.integration.blackduck.bdio2.Bdio2Writer;
@@ -44,28 +43,18 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class Bdio2UploadRecipeTest extends BasicRecipe {
     public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
-    public static final NameVersion PROJECT = new NameVersion("blackduck-common", "test");
+    public static final NameVersion PROJECT = new NameVersion("bdio2uploadtest-" + UUID.randomUUID().toString(), "test");
 
     private Optional<ProjectVersionWrapper> projectVersionWrapper;
 
     @AfterEach
     public void cleanup() throws IntegrationException {
-        if (projectVersionWrapper.isPresent()) {
-            deleteProject(projectVersionWrapper.get().getProjectView());
-        }
+        deleteProject(projectService.getProjectByName(PROJECT.getName()).orElseThrow(null));
         deleteCodeLocation(CODE_LOCATION_NAME);
     }
 
     @Test
     public void uploadBdio2() throws IOException, IntegrationException, InterruptedException {
-        // before we upload anything, no project or code location should exist
-        Optional<ProjectView> existingProject = projectService.getProjectByName(PROJECT.getName());
-        assertFalse(existingProject.isPresent());
-
-        Optional<CodeLocationView> existingCodeLocation = codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME);
-        assertFalse(existingCodeLocation.isPresent());
-
-        // pre-check done, let's create stuff!
         Bdio2Factory bdio2Factory = new Bdio2Factory();
 
         // create the bdio2 metadata
