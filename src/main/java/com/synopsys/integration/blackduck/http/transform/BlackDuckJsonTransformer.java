@@ -27,6 +27,7 @@ import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.response.Response;
@@ -34,11 +35,13 @@ import com.synopsys.integration.rest.response.Response;
 public class BlackDuckJsonTransformer {
     private final Gson gson;
     private final ObjectMapper objectMapper;
+    private final BlackDuckResponseResolver responseResolver;
     private final IntLogger logger;
 
-    public BlackDuckJsonTransformer(Gson gson, ObjectMapper objectMapper, IntLogger logger) {
+    public BlackDuckJsonTransformer(Gson gson, ObjectMapper objectMapper, BlackDuckResponseResolver responseResolver, IntLogger logger) {
         this.gson = gson;
         this.objectMapper = objectMapper;
+        this.responseResolver = responseResolver;
         this.logger = logger;
     }
 
@@ -60,15 +63,7 @@ public class BlackDuckJsonTransformer {
     public <T extends BlackDuckResponse> T getResponseAs(JsonElement jsonElement, Class<T> clazz) throws BlackDuckIntegrationException {
         String json = gson.toJson(jsonElement);
         try {
-            T blackDuckResponse = gson.fromJson(jsonElement, clazz);
-
-            if (blackDuckResponse.hasSubclasses()) {
-                // when a response can be subclassed, it will use its own state to
-                // determine the specific subclass that should be used
-                Class<? extends BlackDuckResponse> subclass = blackDuckResponse.getSubclass();
-                BlackDuckResponse subclassResponse = gson.fromJson(jsonElement, subclass);
-                blackDuckResponse = (T) subclassResponse;
-            }
+            T blackDuckResponse = responseResolver.resolve(jsonElement, clazz);
 
             blackDuckResponse.setGson(gson);
             blackDuckResponse.setJsonElement(jsonElement);

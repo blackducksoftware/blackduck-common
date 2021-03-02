@@ -10,10 +10,11 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
@@ -73,7 +74,8 @@ class BlackDuckResponsesTransformerTestIT {
     }
 
     private BlackDuckResponsesTransformer createBlackDuckResponsesTransformer() {
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(blackDuckServicesFactory.getGson(), blackDuckServicesFactory.getObjectMapper(), blackDuckServicesFactory.getLogger());
+        BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(blackDuckServicesFactory.getGson());
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(blackDuckServicesFactory.getGson(), blackDuckServicesFactory.getObjectMapper(), blackDuckResponseResolver, blackDuckServicesFactory.getLogger());
         return new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
     }
 

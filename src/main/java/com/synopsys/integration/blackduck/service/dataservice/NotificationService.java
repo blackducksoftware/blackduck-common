@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.contract.NotificationViewData;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
@@ -94,7 +93,7 @@ public class NotificationService extends DataService {
         return getFirstCreatedAtDate(userNotifications);
     }
 
-    private Date getFirstCreatedAtDate(List<? extends NotificationViewData> notifications) {
+    private Date getFirstCreatedAtDate(List<? extends NotificationView> notifications) {
         if (notifications.size() == 1) {
             return notifications.get(0).getCreatedAt();
         } else {

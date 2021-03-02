@@ -105,19 +105,13 @@ public class ProjectUsersService extends DataService {
 
         return users
                    .stream()
-                   .filter(userView -> userView.getActive())
+                   .filter(UserView::getActive)
                    .collect(Collectors.toSet());
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
         Optional<UserGroupView> optionalUserGroupView = userGroupService.getGroupByName(groupName);
         UserGroupView userGroupView = optionalUserGroupView.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
-
-        List<UserGroupView> currentGroups = getGroupsForProject(projectView);
-        if (currentGroups.contains(userGroupView)) {
-            logger.info(String.format("The supplied project (%s) already contained the group (%s).", projectView.getName(), groupName));
-            return;
-        }
 
         HttpUrl userGroupUrl = userGroupView.getHref();
         HttpUrl createUrl = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
@@ -142,12 +136,6 @@ public class ProjectUsersService extends DataService {
     }
 
     public void addUserToProject(ProjectView projectView, UserView userView) throws IntegrationException {
-        List<UserView> currentUsers = getUsersForProject(projectView);
-        if (currentUsers.contains(userView)) {
-            logger.info(String.format("The supplied project (%s) already contained the user (%s).", projectView.getName(), userView.getUserName()));
-            return;
-        }
-
         AssignedUserRequest assignedUserRequest = new AssignedUserRequest();
         HttpUrl userUrl = userView.getHref();
         assignedUserRequest.setUser(userUrl.string());
