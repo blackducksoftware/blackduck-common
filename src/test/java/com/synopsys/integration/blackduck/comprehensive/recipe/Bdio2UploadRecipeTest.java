@@ -44,15 +44,13 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class Bdio2UploadRecipeTest extends BasicRecipe {
     public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
-    public static final NameVersion PROJECT = new NameVersion("blackduck-common", "test");
+    public static final NameVersion PROJECT = new NameVersion("bdio2uploadtest-" + System.currentTimeMillis(), "test");
 
     private Optional<ProjectVersionWrapper> projectVersionWrapper;
 
     @AfterEach
     public void cleanup() throws IntegrationException {
-        if (projectVersionWrapper.isPresent()) {
-            deleteProject(projectVersionWrapper.get().getProjectView());
-        }
+        deleteProject(projectService.getProjectByName(PROJECT.getName()).orElseThrow(null));
         deleteCodeLocation(CODE_LOCATION_NAME);
     }
 
