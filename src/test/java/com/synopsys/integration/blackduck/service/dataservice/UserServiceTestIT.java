@@ -89,14 +89,12 @@ public class UserServiceTestIT {
 
     @Test
     public void testAddingUserToProject() throws IntegrationException {
-        String projectName = "user-group-project" + System.currentTimeMillis();
         ProjectView projectView = null;
-        UserView userView = null;
 
         try {
             projectView = createProjectView();
 
-            userView = createUserView(activeUser, true);
+            UserView userView = createUserView(activeUser, true);
 
             List<UserView> projectUsers = projectUsersService.getUsersForProject(projectView);
             assertFalse(projectUsers.contains(userView));
