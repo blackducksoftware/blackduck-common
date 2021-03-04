@@ -49,7 +49,7 @@ public class Bdio2UploadRecipeTest extends BasicRecipe {
 
     @AfterEach
     public void cleanup() throws IntegrationException {
-        deleteProject(projectService.getProjectByName(PROJECT.getName()).orElseThrow(null));
+        deleteProject(projectService.getProjectByName(PROJECT.getName()).orElse(null));
         deleteCodeLocation(CODE_LOCATION_NAME);
     }
 
