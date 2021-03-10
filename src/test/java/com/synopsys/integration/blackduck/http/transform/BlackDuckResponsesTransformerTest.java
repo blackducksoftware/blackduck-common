@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
@@ -22,6 +23,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
@@ -87,8 +89,9 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 100);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
-            new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
         requestBuilder
@@ -122,8 +125,9 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
         mockClientBehavior(blackDuckHttpClient, offsetsToResults, 100);
 
-        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
-            new PrintStreamIntLogger(System.out, LogLevel.INFO));
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+        BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
         requestBuilder
@@ -208,8 +212,9 @@ public class BlackDuckResponsesTransformerTest {
             BlackDuckHttpClient blackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
             mockClientBehavior(blackDuckHttpClient, offsetsToResults, 20);
 
-            BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(BlackDuckServicesFactory.createDefaultGson(), BlackDuckServicesFactory.createDefaultObjectMapper(),
-                new PrintStreamIntLogger(System.out, LogLevel.INFO));
+            Gson gson = BlackDuckServicesFactory.createDefaultGson();
+            BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+            BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
             BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
             requestBuilder

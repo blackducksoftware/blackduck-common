@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.contract.NotificationContentData;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
@@ -52,10 +51,10 @@ public class VerifyNotifications {
         assertEquals(getContents(bomComputedNotifications), getContents(bomComputedUserNotifications));
     }
 
-    private static List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationContentData<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
+    private static List<VersionBomCodeLocationBomComputedNotificationContent> getContents(List<? extends NotificationView<VersionBomCodeLocationBomComputedNotificationContent>> notifications) {
         return notifications
                    .stream()
-                   .map(NotificationContentData::getContent)
+                   .map(NotificationView::getContent)
                    .collect(Collectors.toList());
     }
 

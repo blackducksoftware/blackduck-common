@@ -1,33 +1,21 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
  *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
 package com.synopsys.integration.blackduck.bdio2;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -42,23 +30,39 @@ import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 
 public class Bdio2Factory {
+    public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, final Project project, final DependencyGraph dependencyGraph) {
         final List<Component> components = createAndLinkComponents(dependencyGraph, project);
         return new Bdio2Document(bdioMetadata, project, components);
     }
 
+    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime) {
+        return createBdioMetadata(codeLocationName, creationDateTime, DEFAULT_PRODUCTS);
+    }
+
+    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, Product product) {
+        return createBdioMetadata(codeLocationName, creationDateTime, addLists(DEFAULT_PRODUCTS, Arrays.asList(product)));
+    }
+
+    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, List<Product> products) {
+        ProductList productList =
+            addLists(DEFAULT_PRODUCTS, products)
+                .stream()
+                .collect(ProductList.toProductList());
+
+        return createBdioMetadata(codeLocationName, creationDateTime, productList);
+    }
+
+    @Deprecated
+    /**
+     * deprecated Please use the other createBdioMetadata methods that ask for lists of Products, a single Product, or no Product at all.
+     */
     public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, final ProductList.Builder productListBuilder) {
-        return new BdioMetadata()
-                   .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
-                   .name(codeLocationName)
-                   .creationDateTime(creationDateTime)
-                   .publisher(
-                       productListBuilder
-                           .addProduct(Product.java())
-                           .addProduct(Product.os())
-                           .build()
-                   );
+        DEFAULT_PRODUCTS
+            .forEach(productListBuilder::addProduct);
+
+        return createBdioMetadata(codeLocationName, creationDateTime, productListBuilder.build());
     }
 
     public Project createProject(final ExternalId projectExternalId, final String projectName, final String projectVersionName) {
@@ -70,6 +74,14 @@ public class Bdio2Factory {
 
     public List<Component> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
         return createAndLinkComponentsFromGraph(dependencyGraph, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>());
+    }
+
+    private BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, ProductList productList) {
+        return new BdioMetadata()
+                   .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
+                   .name(codeLocationName)
+                   .creationDateTime(creationDateTime)
+                   .publisher(productList);
     }
 
     private List<Component> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final DependencyFunction dependencyFunction, final Set<Dependency> dependencies, final Map<ExternalId, Component> existingComponents) {
@@ -103,4 +115,12 @@ public class Bdio2Factory {
     private interface DependencyFunction {
         BdioObject dependency(@Nullable com.blackducksoftware.bdio2.model.Dependency dependency);
     }
+
+    private List<Product> addLists(List<Product> list1, List<Product> list2) {
+        return Stream
+                   .concat(list1.stream(), list2.stream())
+                   .distinct()
+                   .collect(Collectors.toList());
+    }
+
 }

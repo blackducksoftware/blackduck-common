@@ -12,6 +12,7 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -51,6 +52,7 @@ public class BasicRecipe {
     protected NotificationService notificationService;
     protected CodeLocationCreationService codeLocationCreationService;
     protected PolicyRuleService policyRuleService;
+    protected Bdio2UploadService bdio2UploadService;
     protected UploadBatchRunner uploadRunner;
     protected BlackDuckRequestFactory blackDuckRequestFactory;
 
@@ -92,6 +94,7 @@ public class BasicRecipe {
         notificationService = blackDuckServicesFactory.createNotificationService();
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
+        bdio2UploadService = blackDuckServicesFactory.createBdio2UploadService();
 
         uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService);
     }

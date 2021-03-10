@@ -1,24 +1,9 @@
-/**
+/*
  * blackduck-common
  *
  * Copyright (c) 2021 Synopsys, Inc.
  *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
@@ -33,9 +18,8 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
@@ -60,10 +44,9 @@ public class ScanBatchRunner {
     public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
         OperatingSystemType operatingSystemType, ScanCommandRunner scanCommandRunner) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
-        SignatureScannerCertificateClient signatureScannerCertificateClient = new SignatureScannerCertificateClient(blackDuckHttpClient);
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, signatureScannerCertificateClient, blackDuckRequestFactory);
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, signatureScannerClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
 
         return new ScanBatchRunner(intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }

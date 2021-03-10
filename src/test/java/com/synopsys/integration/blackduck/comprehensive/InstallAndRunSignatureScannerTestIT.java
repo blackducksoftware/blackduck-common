@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.cert.Certificate;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
@@ -32,7 +33,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.http.client.SignatureScannerCertificateClient;
+import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -89,7 +90,8 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // first, run a scan with an install that will NOT update the embedded keystore, which should fail
         KeyStoreHelper noOpKeyStoreHelper = new NoOpKeyStoreHelper(blackDuckHttpClient, blackDuckRequestFactory);
-        ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, noOpKeyStoreHelper, blackDuckServerUrl, operatingSystemType);
+        ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, noOpKeyStoreHelper, blackDuckServerUrl,
+            operatingSystemType);
         ScanBatchRunner scanBatchRunnerWithout = ScanBatchRunner.createComplete(environmentVariables, installerWithoutKeyStoreManagement, scanPathsUtility, scanCommandRunner);
         SignatureScannerService signatureScannerServiceWithout = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWithout);
 
@@ -100,8 +102,8 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger, new SignatureScannerCertificateClient(blackDuckHttpClient), blackDuckRequestFactory);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType);
+        KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
+        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType);
         ScanBatchRunner scanBatchRunnerWith = ScanBatchRunner.createComplete(environmentVariables, installerWithKeyStoreManagement, scanPathsUtility, scanCommandRunner);
         SignatureScannerService signatureScannerServiceWith = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWith);
 
@@ -153,11 +155,12 @@ public class InstallAndRunSignatureScannerTestIT {
 
     public static class NoOpKeyStoreHelper extends KeyStoreHelper {
         public NoOpKeyStoreHelper(BlackDuckHttpClient blackDuckHttpClient, BlackDuckRequestFactory blackDuckRequestFactory) {
-            super(new SilentIntLogger(), new SignatureScannerCertificateClient(blackDuckHttpClient), blackDuckRequestFactory);
+            super(new SilentIntLogger());
+            //, new SignatureScannerClient(blackDuckHttpClient), blackDuckRequestFactory
         }
 
         @Override
-        public void updateKeyStoreWithServerCertificate(HttpUrl httpsServer, String keyStoreFilePath) {
+        public void updateKeyStoreWithServerCertificate(String alias, Certificate serverCertificate, String keyStoreFilePath) {
             // do nothing
         }
     }
