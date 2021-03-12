@@ -22,6 +22,7 @@ import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipl
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
+import com.synopsys.integration.blackduck.exception.LinkNotFoundException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -313,7 +314,7 @@ public class BlackDuckApiClient {
 
     private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder,
         ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
-        HttpUrl url = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
+        HttpUrl url = blackDuckView.getFirstLinkSafely(linkMultipleResponses.getLink()).orElseThrow(() -> new LinkNotFoundException("Could not find link: " + linkMultipleResponses.getLink()));
         Class<T> responseClass = linkMultipleResponses.getResponseClass();
         return getSpecialResponses(url, responseClass, requestBuilder, responsesTransformer);
     }

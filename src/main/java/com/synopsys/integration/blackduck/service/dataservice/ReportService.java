@@ -38,6 +38,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.exception.BomNotReadableException;
+import com.synopsys.integration.blackduck.exception.LinkNotFoundException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -126,7 +128,13 @@ public class ReportService extends DataService {
         reportData.setDistribution(version.getDistribution().toString());
         List<BomComponent> components = new ArrayList<>();
         logger.trace("Getting the Report Contents using the Aggregate Bom Rest Server");
-        List<ProjectVersionComponentView> bomEntries = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomEntries;
+        try {
+            bomEntries = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        } catch (LinkNotFoundException e) {
+            throw new BomNotReadableException("BOM could not be read.  This is likely because you lack sufficient permissions.  Please check your permissions.");
+        }
+
         boolean policyFailure = false;
         for (ProjectVersionComponentView ProjectVersionComponentView : bomEntries) {
             String policyStatus = ProjectVersionComponentView.getApprovalStatus().toString();
