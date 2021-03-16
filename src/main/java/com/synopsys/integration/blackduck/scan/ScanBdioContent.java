@@ -5,15 +5,15 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.developermode;
+package com.synopsys.integration.blackduck.scan;
 
 import com.synopsys.integration.util.Stringable;
 
-public class DeveloperModeBdioContent extends Stringable {
+public class ScanBdioContent extends Stringable {
     private String fileName;
     private String content;
 
-    public DeveloperModeBdioContent(final String fileName, final String content) {
+    public ScanBdioContent(final String fileName, final String content) {
         this.fileName = fileName;
         this.content = content;
     }

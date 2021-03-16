@@ -25,16 +25,17 @@ import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanB
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Reader;
-import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Uploader;
-import com.synopsys.integration.blackduck.developermode.RapidScanService;
-import com.synopsys.integration.blackduck.developermode.RapidScanWaiter;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
+import com.synopsys.integration.blackduck.scan.IntelligentPersistenceScanService;
+import com.synopsys.integration.blackduck.scan.RapidScanService;
+import com.synopsys.integration.blackduck.scan.RapidScanWaiter;
+import com.synopsys.integration.blackduck.scan.ScanBdio2Reader;
+import com.synopsys.integration.blackduck.scan.ScanBdio2Uploader;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
@@ -215,10 +216,16 @@ public class BlackDuckServicesFactory {
     }
 
     public RapidScanService createRapidScanService() {
-        RapidScanBdio2Reader bdio2Reader = new RapidScanBdio2Reader();
+        ScanBdio2Reader bdio2Reader = new ScanBdio2Reader();
         RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
-        RapidScanBdio2Uploader bdio2Uploader = new RapidScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory);
+        ScanBdio2Uploader bdio2Uploader = new ScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory, RapidScanService.CONTENT_TYPE);
         return new RapidScanService(bdio2Reader, bdio2Uploader, rapidScanWaiter);
+    }
+
+    public IntelligentPersistenceScanService createIntelligentPersistenceScanService() {
+        ScanBdio2Reader bdio2Reader = new ScanBdio2Reader();
+        ScanBdio2Uploader bdio2Uploader = new ScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory, IntelligentPersistenceScanService.CONTENT_TYPE);
+        return new IntelligentPersistenceScanService(bdio2Reader, bdio2Uploader);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

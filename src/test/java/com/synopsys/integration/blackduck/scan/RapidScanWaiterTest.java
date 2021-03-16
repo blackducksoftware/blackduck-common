@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.developermode;
+package com.synopsys.integration.blackduck.scan;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

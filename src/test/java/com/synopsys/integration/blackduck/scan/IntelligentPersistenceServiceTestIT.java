@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.developermode;
+package com.synopsys.integration.blackduck.scan;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -12,19 +12,15 @@ import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 
 @Tag("integration")
-public class RapidScanServiceTestIT {
-
+public class IntelligentPersistenceServiceTestIT {
     //TODO Uncomment when BlackDuck officially supports developer mode.
     //    @Test
-    //    public void testRapidScan() throws Exception {
+    //    public void testScan() throws Exception {
     //        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     //        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-    //        RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
+    //        IntelligentPersistenceScanService scanService = blackDuckServicesFactory.createIntelligentPersistenceScanService();
     //        File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
-    //        int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-    //        List<DeveloperScanComponentResultView> results = rapidScanService.performDeveloperScan(bdioFile, timeout, 5);
-    //        assertNotNull(results);
-    //        assertFalse(results.isEmpty());
+    //        scanService.performScan(bdioFile);
     //    }
 
     @Test
@@ -32,10 +28,9 @@ public class RapidScanServiceTestIT {
         try {
             IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-            RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
+            IntelligentPersistenceScanService scanService = blackDuckServicesFactory.createIntelligentPersistenceScanService();
             File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanMissingHeader.bdio").getFile());
-            int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            rapidScanService.performDeveloperScan(bdioFile, timeout);
+            scanService.performScan(bdioFile);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass
