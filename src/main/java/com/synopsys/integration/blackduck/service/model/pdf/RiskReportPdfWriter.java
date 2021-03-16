@@ -37,6 +37,7 @@ public class RiskReportPdfWriter {
     public static String BASIC_RED = "#b52b24";
     public static String SALMON_RED = "#eca4a0";
 
+    private String CRITICAL_RISK = "Critical Risk";
     private String HIGH_RISK = "High Risk";
     private String MED_RISK = "Medium Risk";
     private String LOW_RISK = "Low Risk";
@@ -138,19 +139,20 @@ public class RiskReportPdfWriter {
         float center = pageWidth / 2;
 
         float height = startingHeight - 40;
-        writeSummaryTable(center - 180, height, "Security Risk", reportData.getVulnerabilityRiskHighCount(), reportData.getVulnerabilityRiskMediumCount(), reportData.getVulnerabilityRiskLowCount(),
+        writeSummaryTable(center - 180, height, "Security Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getVulnerabilityRiskHighCount(), reportData.getVulnerabilityRiskMediumCount(), reportData.getVulnerabilityRiskLowCount(),
             reportData.getVulnerabilityRiskNoneCount(), reportData.getTotalComponents());
-        writeSummaryTable(center, height, "License Risk", reportData.getLicenseRiskHighCount(), reportData.getLicenseRiskMediumCount(), reportData.getLicenseRiskLowCount(), reportData.getLicenseRiskNoneCount(),
+        writeSummaryTable(center, height, "License Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getLicenseRiskHighCount(), reportData.getLicenseRiskMediumCount(), reportData.getLicenseRiskLowCount(), reportData.getLicenseRiskNoneCount(),
             reportData.getTotalComponents());
-        PDRectangle rectangle = writeSummaryTable(center + 180, height, "Operational Risk", reportData.getOperationalRiskHighCount(), reportData.getOperationalRiskMediumCount(), reportData.getOperationalRiskLowCount(),
+        PDRectangle rectangle = writeSummaryTable(center + 180, height, "Operational Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getOperationalRiskHighCount(), reportData.getOperationalRiskMediumCount(), reportData.getOperationalRiskLowCount(),
             reportData.getOperationalRiskNoneCount(), reportData.getTotalComponents());
         logger.trace("Finished writing the summary tables.");
         return rectangle;
     }
 
-    private PDRectangle writeSummaryTable(float centerX, float y, String title, int highCount, int mediumCount, int lowCount, int noneCount, int totalCount) throws IOException {
+    private PDRectangle writeSummaryTable(float centerX, float y, String title, int criticalCount, int highCount, int mediumCount, int lowCount, int noneCount, int totalCount) throws IOException {
         PDRectangle rectangle = pdfManager.writeTextCentered(centerX, y, title, boldFont, 14, Color.BLACK);
 
+        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, CRITICAL_RISK, criticalCount, totalCount, new Color(153, 0, 0));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, HIGH_RISK, highCount, totalCount, decode(BASIC_RED));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, MED_RISK, mediumCount, totalCount, decode(SALMON_RED));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, LOW_RISK, lowCount, totalCount, new Color(153, 153, 153));
