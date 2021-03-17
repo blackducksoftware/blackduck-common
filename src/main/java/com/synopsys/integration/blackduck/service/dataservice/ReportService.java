@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ReportView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ReportType;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.exception.BomNotReadableException;
-import com.synopsys.integration.blackduck.exception.LinkNotFoundException;
 import com.synopsys.integration.blackduck.exception.RiskReportException;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -131,7 +131,7 @@ public class ReportService extends DataService {
         List<ProjectVersionComponentView> bomEntries;
         try {
             bomEntries = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
-        } catch (LinkNotFoundException e) {
+        } catch (NoSuchElementException e) {
             throw new BomNotReadableException("BOM could not be read.  This is likely because you lack sufficient permissions.  Please check your permissions.");
         }
 
