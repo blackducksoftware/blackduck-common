@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.scan;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -22,16 +23,18 @@ public class ScanBdio2Uploader {
 
     private final BlackDuckApiClient blackDuckApiClient;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final BlackDuckPath scanPath;
     private final String contentType;
 
-    public ScanBdio2Uploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory, String contentType) {
+    public ScanBdio2Uploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory, BlackDuckPath scanPath, String contentType) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.scanPath = scanPath;
         this.contentType = contentType;
     }
 
     public HttpUrl start(ScanBdioContent header) throws IntegrationException {
-        HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH);
+        HttpUrl url = blackDuckApiClient.getUrl(scanPath);
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
                               .addHeader(HEADER_CONTENT_TYPE, contentType)
