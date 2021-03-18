@@ -13,7 +13,7 @@ public class ScanBdio2ReaderTest {
     @Test
     public void testFileDirectory() throws Exception {
         try {
-            File bdioFile = new File(getClass().getResource("/bdio/developer_scan/").getFile());
+            File bdioFile = new File(getClass().getResource("/bdio/scans/").getFile());
             ScanBdio2Reader reader = new ScanBdio2Reader();
             reader.readBdio2File(bdioFile);
             fail();
@@ -25,7 +25,7 @@ public class ScanBdio2ReaderTest {
     @Test
     public void testFileMissing() throws Exception {
         try {
-            File bdioFile = new File("/bdio/developer_scan/badPath.bdio");
+            File bdioFile = new File("/bdio/scans/badPath.bdio");
             ScanBdio2Reader reader = new ScanBdio2Reader();
             reader.readBdio2File(bdioFile);
             fail();
@@ -49,7 +49,7 @@ public class ScanBdio2ReaderTest {
 
     @Test
     public void testReadValidFile() throws Exception {
-        File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
+        File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());
         ScanBdio2Reader reader = new ScanBdio2Reader();
         List<ScanBdioContent> contents = reader.readBdio2File(bdioFile);
         assertFalse(contents.isEmpty());

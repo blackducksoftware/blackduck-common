@@ -216,16 +216,14 @@ public class BlackDuckServicesFactory {
     }
 
     public RapidScanService createRapidScanService() {
-        ScanBdio2Reader bdio2Reader = new ScanBdio2Reader();
         RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
         ScanBdio2Uploader bdio2Uploader = new ScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
-        return new RapidScanService(bdio2Reader, bdio2Uploader, rapidScanWaiter);
+        return new RapidScanService(new ScanBdio2Reader(), bdio2Uploader, rapidScanWaiter);
     }
 
     public IntelligentPersistenceScanService createIntelligentPersistenceScanService() {
-        ScanBdio2Reader bdio2Reader = new ScanBdio2Reader();
         ScanBdio2Uploader bdio2Uploader = new ScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH, IntelligentPersistenceScanService.CONTENT_TYPE);
-        return new IntelligentPersistenceScanService(bdio2Reader, bdio2Uploader);
+        return new IntelligentPersistenceScanService(new ScanBdio2Reader(), bdio2Uploader, createCodeLocationCreationService());
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

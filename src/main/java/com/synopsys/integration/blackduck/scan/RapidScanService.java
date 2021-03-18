@@ -8,9 +8,12 @@
 package com.synopsys.integration.blackduck.scan;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 
@@ -22,6 +25,19 @@ public class RapidScanService extends AbstractScanService {
     public RapidScanService(ScanBdio2Reader bdio2Reader, ScanBdio2Uploader bdio2Uploader, RapidScanWaiter rapidScanWaiter) {
         super(bdio2Reader, bdio2Uploader);
         this.rapidScanWaiter = rapidScanWaiter;
+    }
+
+    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performScan(uploadBatch, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    }
+
+    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        List<DeveloperScanComponentResultView> scanResults = new LinkedList<>();
+        List<UploadTarget> uploadTargets = uploadBatch.getUploadTargets();
+        for (UploadTarget uploadTarget : uploadTargets) {
+            scanResults.addAll(performScan(uploadTarget.getUploadFile(), timeoutInSeconds, waitIntervalInSeconds));
+        }
+        return scanResults;
     }
 
     public List<DeveloperScanComponentResultView> performScan(File bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {

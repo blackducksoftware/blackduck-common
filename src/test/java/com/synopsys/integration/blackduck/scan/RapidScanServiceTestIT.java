@@ -20,9 +20,24 @@ public class RapidScanServiceTestIT {
     //        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     //        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
     //        RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
-    //        File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanTest.bdio").getFile());
+    //        File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());
     //        int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
     //        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(bdioFile, timeout, 5);
+    //        assertNotNull(results);
+    //        assertFalse(results.isEmpty());
+    //    }
+    //
+    //    @Test
+    //    public void testScanBatch() throws Exception {
+    //        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
+    //        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+    //        RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
+    //        File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());
+    //        NameVersion projectNameVersion = new NameVersion("RapidScanTest", "1.0.0");
+    //        String codeLocationName = String.format("__CodeLocation_%s_%s", projectNameVersion.getName(), projectNameVersion.getVersion());
+    //        UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, codeLocationName, bdioFile);
+    //        int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
+    //        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(new UploadBatch(uploadTarget), timeout, 5);
     //        assertNotNull(results);
     //        assertFalse(results.isEmpty());
     //    }
@@ -33,7 +48,7 @@ public class RapidScanServiceTestIT {
             IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
             RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
-            File bdioFile = new File(getClass().getResource("/bdio/developer_scan/developerScanMissingHeader.bdio").getFile());
+            File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanMissingHeader.bdio").getFile());
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
             rapidScanService.performScan(bdioFile, timeout);
             fail();

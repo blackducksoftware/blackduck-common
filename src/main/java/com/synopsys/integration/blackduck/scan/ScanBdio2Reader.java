@@ -59,7 +59,7 @@ public class ScanBdio2Reader {
 
     private ScanBdioContent readEntryContent(ZipFile zipFile, ZipEntry entry) throws IntegrationException {
         String entryContent;
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         try (InputStream zipInputStream = zipFile.getInputStream(entry);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream)) {
