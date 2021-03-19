@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.scan;
+package com.synopsys.integration.blackduck.bdio2.stream;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,24 +23,24 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.synopsys.integration.exception.IntegrationException;
 
-public class ScanBdio2Reader {
+public class Bdio2ContentExtractor {
 
-    public List<ScanBdioContent> readBdio2File(File bdio2File) throws IntegrationException {
+    public List<BdioFileContent> readBdio2File(File bdio2File) throws IntegrationException {
         validateBdioFile(bdio2File);
-        List<ScanBdioContent> scanBdioContentList = new ArrayList<>();
+        List<BdioFileContent> bdioFileContentList = new ArrayList<>();
         try (ZipFile zipFile = new ZipFile(bdio2File)) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 String fileExtension = FilenameUtils.getExtension(entry.getName());
                 if ("jsonld".equals(fileExtension)) {
-                    scanBdioContentList.add(readEntryContent(zipFile, entry));
+                    bdioFileContentList.add(readEntryContent(zipFile, entry));
                 }
             }
         } catch (IOException ex) {
             throw new IntegrationException(String.format("Exception unzipping BDIO file. Path: %s", bdio2File.getAbsolutePath()), ex);
         }
-        return scanBdioContentList;
+        return bdioFileContentList;
     }
 
     private void validateBdioFile(File bdio2File) throws IllegalArgumentException {
@@ -57,7 +57,7 @@ public class ScanBdio2Reader {
         }
     }
 
-    private ScanBdioContent readEntryContent(ZipFile zipFile, ZipEntry entry) throws IntegrationException {
+    private BdioFileContent readEntryContent(ZipFile zipFile, ZipEntry entry) throws IntegrationException {
         String entryContent;
         byte[] buffer = new byte[4096];
         try (InputStream zipInputStream = zipFile.getInputStream(entry);
@@ -72,7 +72,7 @@ public class ScanBdio2Reader {
         } catch (IOException ex) {
             throw new IntegrationException(String.format("Error reading entry %s", entry.getName()), ex);
         }
-        return new ScanBdioContent(entry.getName(), entryContent);
+        return new BdioFileContent(entry.getName(), entryContent);
     }
 
 }

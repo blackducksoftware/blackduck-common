@@ -13,11 +13,12 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 
 @Tag("integration")
 public class IntelligentPersistenceServiceTestIT {
-    private static final String PROJECT_NAME = "jackson-core";
-    private static final String PROJECT_VERSION = "3.0.0-SNAPSHOT";
-    private static final String CODE_LOCATION_NAME = "jackson-core-master/jackson-core/com.fasterxml.jackson.core/jackson-core/3.0.0-SNAPSHOT maven/bom";
+    //TODO Uncomment when BlackDuck officially supports intelligent persistence mode.
 
-    //TODO Uncomment when BlackDuck officially supports developer mode.
+    //    private static final String PROJECT_NAME = "jackson-core";
+    //    private static final String PROJECT_VERSION = "3.0.0-SNAPSHOT";
+    //    private static final String CODE_LOCATION_NAME = "jackson-core-master/jackson-core/com.fasterxml.jackson.core/jackson-core/3.0.0-SNAPSHOT maven/bom";
+
     //    @Test
     //    public void testScan() throws Exception {
     //        IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
@@ -49,7 +50,7 @@ public class IntelligentPersistenceServiceTestIT {
     //        NameVersion projectNameVersion = new NameVersion(PROJECT_NAME, PROJECT_VERSION);
     //        UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, CODE_LOCATION_NAME, bdioFile);
     //        scanService.performScanAndWait(new UploadBatch(uploadTarget), 300L);
-    //        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(JAPANESE_CODE_LOCATION_NAME);
+    //        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME);
     //
     //        assertTrue(optionalCodeLocationView.isPresent());
     //    }

@@ -77,7 +77,13 @@ public class BasicRecipe {
          * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
-        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        BlackDuckHttpClient blackDuckHttpClient;
+        if (blackDuckServerConfig.getApiToken().isPresent()) {
+            blackDuckHttpClient = blackDuckServerConfig.createApiTokenBlackDuckHttpClient(logger);
+        } else {
+            blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        }
+
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
         gson = BlackDuckServicesFactory.createDefaultGson();
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();

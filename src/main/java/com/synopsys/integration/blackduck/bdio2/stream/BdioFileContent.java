@@ -5,15 +5,15 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.scan;
+package com.synopsys.integration.blackduck.bdio2.stream;
 
 import com.synopsys.integration.util.Stringable;
 
-public class ScanBdioContent extends Stringable {
+public class BdioFileContent extends Stringable {
     private String fileName;
     private String content;
 
-    public ScanBdioContent(final String fileName, final String content) {
+    public BdioFileContent(final String fileName, final String content) {
         this.fileName = fileName;
         this.content = content;
     }

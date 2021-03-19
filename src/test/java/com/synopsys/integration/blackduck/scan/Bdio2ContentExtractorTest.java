@@ -9,12 +9,15 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-public class ScanBdio2ReaderTest {
+import com.synopsys.integration.blackduck.bdio2.stream.Bdio2ContentExtractor;
+import com.synopsys.integration.blackduck.bdio2.stream.BdioFileContent;
+
+public class Bdio2ContentExtractorTest {
     @Test
     public void testFileDirectory() throws Exception {
         try {
             File bdioFile = new File(getClass().getResource("/bdio/scans/").getFile());
-            ScanBdio2Reader reader = new ScanBdio2Reader();
+            Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -26,7 +29,7 @@ public class ScanBdio2ReaderTest {
     public void testFileMissing() throws Exception {
         try {
             File bdioFile = new File("/bdio/scans/badPath.bdio");
-            ScanBdio2Reader reader = new ScanBdio2Reader();
+            Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -39,7 +42,7 @@ public class ScanBdio2ReaderTest {
         File bdioFile = Files.createTempFile("badExtension", "txt").toFile();
         bdioFile.deleteOnExit();
         try {
-            ScanBdio2Reader reader = new ScanBdio2Reader();
+            Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
             reader.readBdio2File(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
@@ -50,8 +53,8 @@ public class ScanBdio2ReaderTest {
     @Test
     public void testReadValidFile() throws Exception {
         File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());
-        ScanBdio2Reader reader = new ScanBdio2Reader();
-        List<ScanBdioContent> contents = reader.readBdio2File(bdioFile);
+        Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
+        List<BdioFileContent> contents = reader.readBdio2File(bdioFile);
         assertFalse(contents.isEmpty());
     }
 }
