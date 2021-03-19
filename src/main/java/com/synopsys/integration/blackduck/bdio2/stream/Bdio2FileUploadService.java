@@ -7,10 +7,10 @@
  */
 package com.synopsys.integration.blackduck.bdio2.stream;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -32,8 +32,8 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public HttpUrl uploadFile(File bdio2File) throws IntegrationException {
-        List<BdioFileContent> bdioFileContentList = bdio2Reader.readBdio2File(bdio2File);
+    public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
+        List<BdioFileContent> bdioFileContentList = bdio2Reader.readBdio2File(uploadTarget.getUploadFile());
         return uploadFiles(bdioFileContentList);
     }
 

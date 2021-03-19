@@ -7,9 +7,11 @@ import java.io.File;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
 public class RapidScanServiceTestIT {
@@ -49,8 +51,11 @@ public class RapidScanServiceTestIT {
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
             RapidScanService rapidScanService = blackDuckServicesFactory.createRapidScanService();
             File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanMissingHeader.bdio").getFile());
+            NameVersion projectNameVersion = new NameVersion("RapidScanTest", "1.0.0");
+            String codeLocationName = String.format("__CodeLocation_%s_%s", projectNameVersion.getName(), projectNameVersion.getVersion());
+            UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, codeLocationName, bdioFile);
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            rapidScanService.performScan(bdioFile, timeout);
+            rapidScanService.performScan(uploadTarget, timeout);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass
