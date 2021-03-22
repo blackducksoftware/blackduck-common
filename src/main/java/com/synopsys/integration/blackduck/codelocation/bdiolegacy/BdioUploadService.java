@@ -5,12 +5,15 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.codelocation.bdioupload;
+package com.synopsys.integration.blackduck.codelocation.bdiolegacy;
 
 import java.util.Set;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;

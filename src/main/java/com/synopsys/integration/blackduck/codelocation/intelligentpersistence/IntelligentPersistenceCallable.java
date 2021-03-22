@@ -10,8 +10,8 @@ package com.synopsys.integration.blackduck.codelocation.intelligentpersistence;
 import java.util.concurrent.Callable;
 
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadOutput;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
 import com.synopsys.integration.util.NameVersion;
 
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {

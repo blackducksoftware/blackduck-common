@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;

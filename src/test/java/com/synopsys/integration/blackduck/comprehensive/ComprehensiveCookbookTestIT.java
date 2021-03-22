@@ -35,11 +35,11 @@ import com.synopsys.integration.blackduck.api.manual.temporary.component.Project
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.Result;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadOutput;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.bdiolegacy.BdioUploadService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatch;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;

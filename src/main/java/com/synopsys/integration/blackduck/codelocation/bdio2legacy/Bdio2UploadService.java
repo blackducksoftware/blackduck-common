@@ -5,15 +5,15 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.codelocation.bdio2upload;
+package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
 import java.util.Set;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatchOutput;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -26,7 +26,8 @@ public class Bdio2UploadService extends DataService {
     private final UploadBdio2BatchRunner uploadBdio2BatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public Bdio2UploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UploadBdio2BatchRunner uploadBdio2BatchRunner, CodeLocationCreationService codeLocationCreationService) {
+    public Bdio2UploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UploadBdio2BatchRunner uploadBdio2BatchRunner,
+        CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.uploadBdio2BatchRunner = uploadBdio2BatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;

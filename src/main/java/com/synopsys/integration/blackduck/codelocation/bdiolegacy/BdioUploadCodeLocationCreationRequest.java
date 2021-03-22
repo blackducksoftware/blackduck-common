@@ -5,9 +5,11 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.codelocation.bdioupload;
+package com.synopsys.integration.blackduck.codelocation.bdiolegacy;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatchOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class BdioUploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
