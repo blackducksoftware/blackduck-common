@@ -13,4 +13,8 @@ public class BomNotReadableException extends IntegrationException {
     public BomNotReadableException() {
         super("BOM could not be read.  This is likely because you lack sufficient permissions.  Please check your permissions.");
     }
+
+    public BomNotReadableException(String message) {
+        super(message);
+    }
 }
