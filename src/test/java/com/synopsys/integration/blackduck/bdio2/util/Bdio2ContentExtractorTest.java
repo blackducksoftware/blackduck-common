@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.scan;
+package com.synopsys.integration.blackduck.bdio2.util;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -9,8 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.synopsys.integration.blackduck.bdio2.stream.Bdio2ContentExtractor;
-import com.synopsys.integration.blackduck.bdio2.stream.BdioFileContent;
+import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 
 public class Bdio2ContentExtractorTest {
     @Test
@@ -18,7 +17,7 @@ public class Bdio2ContentExtractorTest {
         try {
             File bdioFile = new File(getClass().getResource("/bdio/scans/").getFile());
             Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
-            reader.readBdio2File(bdioFile);
+            reader.extractContent(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
             // pass
@@ -30,7 +29,7 @@ public class Bdio2ContentExtractorTest {
         try {
             File bdioFile = new File("/bdio/scans/badPath.bdio");
             Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
-            reader.readBdio2File(bdioFile);
+            reader.extractContent(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
             // pass
@@ -43,7 +42,7 @@ public class Bdio2ContentExtractorTest {
         bdioFile.deleteOnExit();
         try {
             Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
-            reader.readBdio2File(bdioFile);
+            reader.extractContent(bdioFile);
             fail();
         } catch (IllegalArgumentException ex) {
             // pass
@@ -54,7 +53,7 @@ public class Bdio2ContentExtractorTest {
     public void testReadValidFile() throws Exception {
         File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());
         Bdio2ContentExtractor reader = new Bdio2ContentExtractor();
-        List<BdioFileContent> contents = reader.readBdio2File(bdioFile);
+        List<BdioFileContent> contents = reader.extractContent(bdioFile);
         assertFalse(contents.isEmpty());
     }
 }

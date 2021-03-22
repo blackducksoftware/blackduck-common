@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.bdio2;
+package com.synopsys.integration.blackduck.bdio2.util;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ import com.blackducksoftware.common.value.ProductList;
 import com.synopsys.integration.bdio.graph.DependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 
 public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
@@ -111,16 +112,16 @@ public class Bdio2Factory {
                    .namespace(dependency.getExternalId().getForge().getName());
     }
 
-    @FunctionalInterface
-    private interface DependencyFunction {
-        BdioObject dependency(@Nullable com.blackducksoftware.bdio2.model.Dependency dependency);
-    }
-
     private List<Product> addLists(List<Product> list1, List<Product> list2) {
         return Stream
                    .concat(list1.stream(), list2.stream())
                    .distinct()
                    .collect(Collectors.toList());
+    }
+
+    @FunctionalInterface
+    private interface DependencyFunction {
+        BdioObject dependency(@Nullable com.blackducksoftware.bdio2.model.Dependency dependency);
     }
 
 }

@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.bdio2.stream;
+package com.synopsys.integration.blackduck.bdio2.util;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,11 +21,12 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class Bdio2ContentExtractor {
 
-    public List<BdioFileContent> readBdio2File(File bdio2File) throws IntegrationException {
+    public List<BdioFileContent> extractContent(File bdio2File) throws IntegrationException {
         validateBdioFile(bdio2File);
         List<BdioFileContent> bdioFileContentList = new ArrayList<>();
         try (ZipFile zipFile = new ZipFile(bdio2File)) {

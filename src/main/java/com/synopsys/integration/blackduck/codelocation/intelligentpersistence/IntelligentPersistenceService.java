@@ -22,11 +22,12 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 
-public class IntelligentPersistenceService2 extends DataService {
+public class IntelligentPersistenceService extends DataService {
+    public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.intelligent-persistence-scan-1-ld-2+json";
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public IntelligentPersistenceService2(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
+    public IntelligentPersistenceService(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
         final IntLogger logger, final IntelligentPersistenceBatchRunner uploadBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
         super(blackDuckApiClient, blackDuckRequestFactory, logger);
         this.uploadBatchRunner = uploadBatchRunner;

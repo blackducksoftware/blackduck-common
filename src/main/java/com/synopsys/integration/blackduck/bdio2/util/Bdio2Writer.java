@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.bdio2;
+package com.synopsys.integration.blackduck.bdio2.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,6 +15,7 @@ import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioWriter;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
+import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 
 public class Bdio2Writer {
     public BdioWriter createBdioWriter(final OutputStream outputStream, final BdioMetadata bdioMetadata) {

@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.codelocation.signaturescanner;
+package com.synopsys.integration.blackduck.codelocation;
 
 import java.util.Arrays;
 import java.util.Date;

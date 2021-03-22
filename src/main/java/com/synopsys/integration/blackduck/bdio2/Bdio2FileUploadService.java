@@ -5,11 +5,13 @@
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.bdio2.stream;
+package com.synopsys.integration.blackduck.bdio2;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
+import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -22,18 +24,19 @@ import com.synopsys.integration.rest.HttpUrl;
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
 
-    private Bdio2ContentExtractor bdio2Reader;
-    private Bdio2StreamUploadService bdio2Uploader;
+    private Bdio2ContentExtractor bdio2Extractor;
+    private Bdio2StreamUploader bdio2Uploader;
 
-    public Bdio2FileUploadService(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
-        final IntLogger logger, final Bdio2ContentExtractor bdio2Reader, final Bdio2StreamUploadService bdio2Uploader) {
+    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory,
+        IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
         super(blackDuckApiClient, blackDuckRequestFactory, logger);
-        this.bdio2Reader = bdio2Reader;
+        this.bdio2Extractor = bdio2Extractor;
         this.bdio2Uploader = bdio2Uploader;
     }
 
     public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
-        List<BdioFileContent> bdioFileContentList = bdio2Reader.readBdio2File(uploadTarget.getUploadFile());
+        logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
+        List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
         return uploadFiles(bdioFileContentList);
     }
 
@@ -50,6 +53,7 @@ public class Bdio2FileUploadService extends DataService {
                                                    .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
                                                    .collect(Collectors.toList());
         int count = remainingFiles.size();
+        logger.debug("BDIO upload file count = " + count);
         HttpUrl url = bdio2Uploader.start(header);
         for (BdioFileContent content : remainingFiles) {
             bdio2Uploader.append(url, count, content);

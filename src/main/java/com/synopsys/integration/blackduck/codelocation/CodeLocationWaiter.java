@@ -10,7 +10,6 @@ package com.synopsys.integration.blackduck.codelocation;
 import java.util.Set;
 
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;

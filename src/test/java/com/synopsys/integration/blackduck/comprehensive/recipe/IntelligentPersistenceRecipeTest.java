@@ -1,16 +1,11 @@
 package com.synopsys.integration.blackduck.comprehensive.recipe;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,12 +23,10 @@ import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Factory;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Writer;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -41,10 +34,11 @@ import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class Bdio2UploadRecipeTest extends BasicRecipe {
-    public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
-    public static final NameVersion PROJECT = new NameVersion("bdio2uploadtest-" + UUID.randomUUID().toString(), "test");
-
+public class IntelligentPersistenceRecipeTest extends BasicRecipe {
+    private static final String PROJECT_NAME = "blackduck-common-junit-test";
+    private static final String PROJECT_VERSION = "0.0.1";
+    public static final NameVersion PROJECT = new NameVersion(PROJECT_NAME + UUID.randomUUID().toString(), PROJECT_VERSION + "-test");
+    private static final String CODE_LOCATION_NAME = "blackduck-common/junit/small-bdio2-junit-test/0.0.1 maven/bom";
     private Optional<ProjectVersionWrapper> projectVersionWrapper;
 
     @AfterEach
@@ -86,14 +80,16 @@ public class Bdio2UploadRecipeTest extends BasicRecipe {
         uploadBatch.addUploadTarget(UploadTarget.createDefault(PROJECT, CODE_LOCATION_NAME, bdio2File));
 
         // now all the setup is done, we can upload the bdio2 file
-        UploadBatchOutput uploadBatchOutput = bdio2UploadService.uploadBdioAndWait(uploadBatch, 120);
-        assertFalse(uploadBatchOutput.hasAnyFailures());
-
-        // verify that we now have a bom with 1 component
-        projectVersionWrapper = projectService.getProjectVersion(PROJECT);
-        assertTrue(projectVersionWrapper.isPresent());
-        List<ProjectVersionComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.get().getProjectVersionView());
-        assertEquals(1, bomComponents.size());
+        // FIXME Uncomment when BlackDuck officially supports intelligent persistence mode.
+        //        IntelligentPersistenceService intelligentPersistenceService = blackDuckServicesFactory.createIntelligentPersistenceService();
+        //        UploadBatchOutput uploadBatchOutput = intelligentPersistenceService.uploadBdioAndWait(uploadBatch, 120);
+        //        assertFalse(uploadBatchOutput.hasAnyFailures());
+        //
+        //        // verify that we now have a bom with 1 component
+        //        projectVersionWrapper = projectService.getProjectVersion(PROJECT);
+        //        assertTrue(projectVersionWrapper.isPresent());
+        //        List<ProjectVersionComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.get().getProjectVersionView());
+        //        assertEquals(1, bomComponents.size());
     }
 
     @NotNull
@@ -102,5 +98,4 @@ public class Bdio2UploadRecipeTest extends BasicRecipe {
         Dependency dependency = new Dependency(artifact, version, commonsLangId);
         return dependency;
     }
-
 }

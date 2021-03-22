@@ -9,7 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.intelligentpersistence;
 
 import java.util.concurrent.Callable;
 
-import com.synopsys.integration.blackduck.bdio2.stream.Bdio2FileUploadService;
+import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadTarget;
 import com.synopsys.integration.util.NameVersion;
