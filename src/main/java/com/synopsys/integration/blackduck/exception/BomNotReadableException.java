@@ -10,7 +10,7 @@ package com.synopsys.integration.blackduck.exception;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class BomNotReadableException extends IntegrationException {
-    public BomNotReadableException(String message) {
-        super(message);
+    public BomNotReadableException() {
+        super("BOM could not be read.  This is likely because you lack sufficient permissions.  Please check your permissions.");
     }
 }

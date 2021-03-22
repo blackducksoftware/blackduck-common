@@ -132,7 +132,7 @@ public class ReportService extends DataService {
         try {
             bomEntries = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
         } catch (NoSuchElementException e) {
-            throw new BomNotReadableException("BOM could not be read.  This is likely because you lack sufficient permissions.  Please check your permissions.");
+            throw new BomNotReadableException();
         }
 
         boolean policyFailure = false;
