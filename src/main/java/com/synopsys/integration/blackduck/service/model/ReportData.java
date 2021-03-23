@@ -100,6 +100,10 @@ public class ReportData {
         this.dateTimeOfLatestScan = dateTimeOfLatestScan;
     }
 
+    public int getVulnerabilityRiskCriticalCount() {
+        return securityRiskCounts.getCritical();
+    }
+
     public int getVulnerabilityRiskHighCount() {
         return securityRiskCounts.getHigh();
     }
