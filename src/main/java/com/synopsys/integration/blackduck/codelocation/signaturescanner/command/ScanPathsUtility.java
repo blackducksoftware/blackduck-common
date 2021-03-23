@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.function.ThrowingSupplier;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
@@ -88,13 +89,7 @@ public class ScanPathsUtility {
 
         final String pathToCacerts = findPathToCacerts(jreContentsDirectory);
 
-        final String pathToJavaExecutable;
-        final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
-        if (StringUtils.isNotBlank(bdsJavaHome)) {
-            pathToJavaExecutable = findPathToJavaExe(new File(bdsJavaHome));
-        } else {
-            pathToJavaExecutable = findPathToJavaExe(jreContentsDirectory);
-        }
+        final String pathToJavaExecutable = determinePathToJavaExecutable(jreContentsDirectory);
 
         final File libDirectory = findFirstFilteredFile(installDirectory, LIB_DIRECTORY_FILTER, "Could not find the 'lib' directory in %s.");
 
@@ -102,6 +97,18 @@ public class ScanPathsUtility {
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
         return new ScanPaths(pathToJavaExecutable, pathToCacerts, pathToOneJar, pathToScanExecutable, managedByLibrary);
+    }
+
+    private String determinePathToJavaExecutable(File jreContentsDirectory) throws BlackDuckIntegrationException {
+        ThrowingSupplier<String, BlackDuckIntegrationException> javaHomeSupplier = () -> findPathToJavaExe(jreContentsDirectory);
+        final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
+        if (StringUtils.isNotBlank(bdsJavaHome)) {
+            File bdsJavaHomeDirectory = new File(bdsJavaHome);
+            if (bdsJavaHomeDirectory.exists() && bdsJavaHomeDirectory.isDirectory()) {
+                javaHomeSupplier = () -> findPathToJavaExe(bdsJavaHomeDirectory);
+            }
+        }
+        return javaHomeSupplier.get();
     }
 
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws BlackDuckIntegrationException {
