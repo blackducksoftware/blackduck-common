@@ -13,8 +13,8 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadOutput;
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.rest.HttpUrl;

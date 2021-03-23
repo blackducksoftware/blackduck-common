@@ -8,8 +8,8 @@
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadBatchOutput;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class Bdio2UploadCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {

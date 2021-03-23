@@ -10,8 +10,8 @@ package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadOutput;
-import com.synopsys.integration.blackduck.codelocation.bdio.UploadTarget;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
+import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.rest.HttpUrl;
