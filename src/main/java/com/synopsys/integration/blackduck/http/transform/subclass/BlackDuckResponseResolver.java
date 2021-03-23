@@ -27,6 +27,10 @@ public class BlackDuckResponseResolver {
         addSubclassResolver(NotificationUserView.class, new NotificationUserViewSubclassResolver(gson));
     }
 
+    public <T extends BlackDuckResponse> T resolve(String json, Class<T> clazz) {
+        return resolve(gson.fromJson(json, JsonElement.class), clazz);
+    }
+
     public <T extends BlackDuckResponse> T resolve(JsonElement jsonElement, Class<T> clazz) {
         if (subclassResolvers.containsKey(clazz)) {
             BlackDuckResponseSubclassResolver subclassResolver = subclassResolvers.get(clazz);
