@@ -99,18 +99,6 @@ public class ScanPathsUtility {
         return new ScanPaths(pathToJavaExecutable, pathToCacerts, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
-    private String determinePathToJavaExecutable(File jreContentsDirectory) throws BlackDuckIntegrationException {
-        ThrowingSupplier<String, BlackDuckIntegrationException> javaHomeSupplier = () -> findPathToJavaExe(jreContentsDirectory);
-        final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
-        if (StringUtils.isNotBlank(bdsJavaHome)) {
-            File bdsJavaHomeDirectory = new File(bdsJavaHome);
-            if (bdsJavaHomeDirectory.exists() && bdsJavaHomeDirectory.isDirectory()) {
-                javaHomeSupplier = () -> findPathToJavaExe(bdsJavaHomeDirectory);
-            }
-        }
-        return javaHomeSupplier.get();
-    }
-
     public File createSpecificRunOutputDirectory(final File generalOutputDirectory) throws BlackDuckIntegrationException {
         final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS").withZone(ZoneOffset.UTC);
         final String timeStringPrefix = Instant.now().atZone(ZoneOffset.UTC).format(dateTimeFormatter);
@@ -213,6 +201,23 @@ public class ScanPathsUtility {
         }
 
         return potentialItems[0];
+    }
+
+    private String determinePathToJavaExecutable(File jreContentsDirectory) throws BlackDuckIntegrationException {
+        ThrowingSupplier<String, BlackDuckIntegrationException> javaHomeSupplier = () -> findPathToJavaExe(jreContentsDirectory);
+
+        final String bdsJavaHome = intEnvironmentVariables.getValue(BDS_JAVA_HOME);
+        if (StringUtils.isNotBlank(bdsJavaHome)) {
+            File bdsJavaHomeDirectory = new File(bdsJavaHome);
+            if (bdsJavaHomeDirectory.exists() && bdsJavaHomeDirectory.isDirectory()) {
+                javaHomeSupplier = () -> findPathToJavaExe(bdsJavaHomeDirectory);
+            } else {
+                logger.warn(
+                    String.format("The environment variable %s is set, but it cannot be used as a valid directory. It will be ignored and should either be corrected, or unset in the environment to avoid this warning.", BDS_JAVA_HOME));
+            }
+        }
+
+        return javaHomeSupplier.get();
     }
 
 }
