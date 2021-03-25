@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -135,16 +134,15 @@ public class RiskReportPdfWriter {
     }
 
     private PDRectangle writeSummaryTables(float pageWidth, float startingHeight, ReportData reportData) throws IOException {
-
         float center = pageWidth / 2;
 
         float height = startingHeight - 40;
-        writeSummaryTable(center - 180, height, "Security Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getVulnerabilityRiskHighCount(), reportData.getVulnerabilityRiskMediumCount(), reportData.getVulnerabilityRiskLowCount(),
-            reportData.getVulnerabilityRiskNoneCount(), reportData.getTotalComponents());
-        writeSummaryTable(center, height, "License Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getLicenseRiskHighCount(), reportData.getLicenseRiskMediumCount(), reportData.getLicenseRiskLowCount(), reportData.getLicenseRiskNoneCount(),
-            reportData.getTotalComponents());
-        PDRectangle rectangle = writeSummaryTable(center + 180, height, "Operational Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getOperationalRiskHighCount(), reportData.getOperationalRiskMediumCount(), reportData.getOperationalRiskLowCount(),
-            reportData.getOperationalRiskNoneCount(), reportData.getTotalComponents());
+        writeSummaryTable(center - 180, height, "Security Risk", reportData.getVulnerabilityRiskCriticalCount(), reportData.getVulnerabilityRiskHighCount(), reportData.getVulnerabilityRiskMediumCount(),
+            reportData.getVulnerabilityRiskLowCount(), reportData.getVulnerabilityRiskNoneCount(), reportData.getTotalComponents());
+        writeSummaryTable(center, height, "License Risk", -1, reportData.getLicenseRiskHighCount(), reportData.getLicenseRiskMediumCount(), reportData.getLicenseRiskLowCount(),
+            reportData.getLicenseRiskNoneCount(), reportData.getTotalComponents());
+        PDRectangle rectangle = writeSummaryTable(center + 180, height, "Operational Risk", -1, reportData.getOperationalRiskHighCount(), reportData.getOperationalRiskMediumCount(),
+            reportData.getOperationalRiskLowCount(), reportData.getOperationalRiskNoneCount(), reportData.getTotalComponents());
         logger.trace("Finished writing the summary tables.");
         return rectangle;
     }
@@ -152,7 +150,9 @@ public class RiskReportPdfWriter {
     private PDRectangle writeSummaryTable(float centerX, float y, String title, int criticalCount, int highCount, int mediumCount, int lowCount, int noneCount, int totalCount) throws IOException {
         PDRectangle rectangle = pdfManager.writeTextCentered(centerX, y, title, boldFont, 14, Color.BLACK);
 
-        rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, CRITICAL_RISK, criticalCount, totalCount, new Color(153, 0, 0));
+        if (criticalCount >= 0) {
+            rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, CRITICAL_RISK, criticalCount, totalCount, new Color(153, 0, 0));
+        }
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, HIGH_RISK, highCount, totalCount, decode(BASIC_RED));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, MED_RISK, mediumCount, totalCount, decode(SALMON_RED));
         rectangle = writeSummaryTableRow(centerX, rectangle.getLowerLeftY() - 14, LOW_RISK, lowCount, totalCount, new Color(153, 153, 153));
@@ -230,14 +230,8 @@ public class RiskReportPdfWriter {
             rowHeight = componentLicenseHeight;
         }
 
-        PDRectangle rowRectangle = null;
-        Color rowColor = Color.WHITE;
-        if (isOdd) {
-            rowColor = new Color(221, 221, 221);
-            rowRectangle = pdfManager.drawRectangle(10, y - rowHeight, pageWidth - 20, rowHeight, rowColor);
-        } else {
-            rowRectangle = pdfManager.drawRectangle(10, y - rowHeight, pageWidth - 20, rowHeight, rowColor);
-        }
+        Color rowColor = (isOdd) ? new Color(221, 221, 221) : Color.WHITE;
+        PDRectangle rowRectangle = pdfManager.drawRectangle(10, y - rowHeight, pageWidth - 20, rowHeight, rowColor);
 
         float rowUpperY = rowRectangle.getUpperRightY();
         if (StringUtils.isNotBlank(component.getPolicyStatus()) && component.getPolicyStatus().equalsIgnoreCase("IN_VIOLATION")) {
