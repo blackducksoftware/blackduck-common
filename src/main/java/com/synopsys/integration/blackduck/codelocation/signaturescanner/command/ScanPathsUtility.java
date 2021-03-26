@@ -212,8 +212,8 @@ public class ScanPathsUtility {
             if (bdsJavaHomeDirectory.exists() && bdsJavaHomeDirectory.isDirectory()) {
                 javaHomeSupplier = () -> findPathToJavaExe(bdsJavaHomeDirectory);
             } else {
-                logger.warn(
-                    String.format("The environment variable %s is set, but it cannot be used as a valid directory. It will be ignored and should either be corrected, or unset in the environment to avoid this warning.", BDS_JAVA_HOME));
+                String warningFormat = "The environment variable %s is set, but it cannot be used as a valid directory. It will be ignored and should either be corrected, or unset in the environment to avoid this warning.";
+                logger.warn(String.format(warningFormat, BDS_JAVA_HOME));
             }
         }
 

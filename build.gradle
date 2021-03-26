@@ -7,7 +7,7 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '54.0.2-SNAPSHOT'
+version = '54.1.0-SNAPSHOT'
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
 apply plugin: 'com.synopsys.integration.library'
@@ -18,7 +18,7 @@ versionFile.delete()
 versionFile << version
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.16'
+    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.17'
 
     api 'com.synopsys.integration:integration-reporting:2.0.2'
     api 'com.synopsys.integration:integration-bdio:22.1.0'
