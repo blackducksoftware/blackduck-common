@@ -15,26 +15,29 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
+import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
+import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaiter;
-import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
-import com.synopsys.integration.blackduck.codelocation.bdio2upload.UploadBdio2BatchRunner;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.BdioUploadService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
+import com.synopsys.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
+import com.synopsys.integration.blackduck.codelocation.bdio2legacy.UploadBdio2BatchRunner;
+import com.synopsys.integration.blackduck.codelocation.bdiolegacy.BdioUploadService;
+import com.synopsys.integration.blackduck.codelocation.bdiolegacy.UploadBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.binaryscanner.BinaryScanUploadService;
+import com.synopsys.integration.blackduck.codelocation.intelligentpersistence.IntelligentPersistenceBatchRunner;
+import com.synopsys.integration.blackduck.codelocation.intelligentpersistence.IntelligentPersistenceService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Reader;
-import com.synopsys.integration.blackduck.developermode.RapidScanBdio2Uploader;
-import com.synopsys.integration.blackduck.developermode.RapidScanService;
-import com.synopsys.integration.blackduck.developermode.RapidScanWaiter;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
+import com.synopsys.integration.blackduck.scan.RapidScanService;
+import com.synopsys.integration.blackduck.scan.RapidScanWaiter;
 import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
@@ -215,10 +218,17 @@ public class BlackDuckServicesFactory {
     }
 
     public RapidScanService createRapidScanService() {
-        RapidScanBdio2Reader bdio2Reader = new RapidScanBdio2Reader();
         RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
-        RapidScanBdio2Uploader bdio2Uploader = new RapidScanBdio2Uploader(blackDuckApiClient, blackDuckRequestFactory);
-        return new RapidScanService(bdio2Reader, bdio2Uploader, rapidScanWaiter);
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
+        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+        return new RapidScanService(bdio2FileUploadService, rapidScanWaiter);
+    }
+
+    public IntelligentPersistenceService createIntelligentPersistenceService() {
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH, IntelligentPersistenceService.CONTENT_TYPE);
+        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+        IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);
+        return new IntelligentPersistenceService(blackDuckApiClient, blackDuckRequestFactory, logger, batchRunner, createCodeLocationCreationService());
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

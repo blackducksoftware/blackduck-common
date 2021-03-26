@@ -23,6 +23,7 @@ import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLoc
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;

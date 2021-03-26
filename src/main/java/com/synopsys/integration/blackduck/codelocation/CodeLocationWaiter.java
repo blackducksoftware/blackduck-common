@@ -10,7 +10,6 @@ package com.synopsys.integration.blackduck.codelocation;
 import java.util.Set;
 
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.CodeLocationWaitJobTask;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
@@ -37,6 +36,10 @@ public class CodeLocationWaiter {
         long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckApiClient, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
             expectedNotificationCount);
+        logger.debug("Expected notification count " + expectedNotificationCount);
+        logger.debug("Expected code locations:");
+        codeLocationNames.forEach(codeLocation -> logger.debug(String.format("  Code Location -> %s", codeLocation)));
+        logger.debug("");
 
         // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
         // regardless of the timeout provided, we always want to check at least once

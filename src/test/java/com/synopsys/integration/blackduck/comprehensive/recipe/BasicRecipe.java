@@ -12,8 +12,8 @@ import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
-import com.synopsys.integration.blackduck.codelocation.bdio2upload.Bdio2UploadService;
-import com.synopsys.integration.blackduck.codelocation.bdioupload.UploadBatchRunner;
+import com.synopsys.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
+import com.synopsys.integration.blackduck.codelocation.bdiolegacy.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -77,7 +77,13 @@ public class BasicRecipe {
          * next, we need to create the pieces needed for the
          * BlackDuckServicesFactory, the wrapper to get/use all Black Duck API's
          */
-        BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        BlackDuckHttpClient blackDuckHttpClient;
+        if (blackDuckServerConfig.getApiToken().isPresent()) {
+            blackDuckHttpClient = blackDuckServerConfig.createApiTokenBlackDuckHttpClient(logger);
+        } else {
+            blackDuckHttpClient = blackDuckServerConfig.createCredentialsBlackDuckHttpClient(logger);
+        }
+
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
         gson = BlackDuckServicesFactory.createDefaultGson();
         objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
