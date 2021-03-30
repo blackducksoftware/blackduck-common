@@ -57,6 +57,7 @@ import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
 import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
+import com.synopsys.integration.blackduck.service.request.NotificationRequestFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
@@ -169,6 +170,10 @@ public class BlackDuckServicesFactory {
 
     public NotificationService createNotificationService() {
         return new NotificationService(blackDuckApiClient, blackDuckRequestFactory, logger);
+    }
+
+    public NotificationRequestFactory createNotificationRequestFactory() {
+        return new NotificationRequestFactory(blackDuckRequestFactory);
     }
 
     public PolicyRuleService createPolicyRuleService() {
