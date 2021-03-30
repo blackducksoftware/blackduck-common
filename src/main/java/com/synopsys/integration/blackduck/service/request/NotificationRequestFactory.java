@@ -14,7 +14,9 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
@@ -29,11 +31,16 @@ public class NotificationRequestFactory {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public BlackDuckRequestBuilder createRequestBuilderForAllNotificationTypes(Date startDate, Date endDate) {
-        return createRequestBuilderForNotificationTypes(startDate, endDate, ALL_NOTIFICATION_TYPES);
+    public BlackDuckApiRequestSpec<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate) {
+        return createRequestSpecForAllNotificationTypes(startDate, endDate, ALL_NOTIFICATION_TYPES);
     }
 
-    public BlackDuckRequestBuilder createRequestBuilderForNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
+    public BlackDuckApiRequestSpec<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
+        BlackDuckRequestBuilder requestBuilder = createRequestBuilderForNotificationTypes(startDate, endDate, notificationTypesToInclude);
+        return new BlackDuckApiRequestSpec<>(ApiDiscovery.NOTIFICATIONS_LINK, NotificationView.class, requestBuilder);
+    }
+
+    private BlackDuckRequestBuilder createRequestBuilderForNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
         SimpleDateFormat sdf = new SimpleDateFormat(RestConstants.JSON_DATE_FORMAT);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String startDateString = sdf.format(startDate);
