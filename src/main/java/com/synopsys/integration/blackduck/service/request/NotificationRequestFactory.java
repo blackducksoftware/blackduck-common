@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
@@ -31,13 +32,13 @@ public class NotificationRequestFactory {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
-    public BlackDuckApiRequestSpec<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate) {
+    public BlackDuckApiRequestSpec<BlackDuckPathMultipleResponses<NotificationView>> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate) {
         return createRequestSpecForAllNotificationTypes(startDate, endDate, ALL_NOTIFICATION_TYPES);
     }
 
-    public BlackDuckApiRequestSpec<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
+    public BlackDuckApiRequestSpec<BlackDuckPathMultipleResponses<NotificationView>> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
         BlackDuckRequestBuilder requestBuilder = createRequestBuilderForNotificationTypes(startDate, endDate, notificationTypesToInclude);
-        return new BlackDuckApiRequestSpec<>(ApiDiscovery.NOTIFICATIONS_LINK, NotificationView.class, requestBuilder);
+        return new BlackDuckApiRequestSpec<>(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
     }
 
     private BlackDuckRequestBuilder createRequestBuilderForNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {

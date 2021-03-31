@@ -7,27 +7,20 @@
  */
 package com.synopsys.integration.blackduck.service.request;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 
-public class BlackDuckApiRequestSpec<T extends BlackDuckResponse> {
-    private final BlackDuckPath path;
-    private final Class<T> responseClass;
+public class BlackDuckApiRequestSpec<T extends BlackDuckPathResponse<?>> {
+    private final T pathResponse;
     private final BlackDuckRequestBuilder requestBuilder;
 
-    public BlackDuckApiRequestSpec(BlackDuckPath path, Class<T> responseClass, BlackDuckRequestBuilder requestBuilder) {
-        this.path = path;
-        this.responseClass = responseClass;
+    public BlackDuckApiRequestSpec(T pathResponse, BlackDuckRequestBuilder requestBuilder) {
+        this.pathResponse = pathResponse;
         this.requestBuilder = requestBuilder;
     }
 
-    public BlackDuckPath getPath() {
-        return path;
-    }
-
-    public Class<T> getResponseClass() {
-        return responseClass;
+    public T getPathResponse() {
+        return pathResponse;
     }
 
     public BlackDuckRequestBuilder getRequestBuilder() {
