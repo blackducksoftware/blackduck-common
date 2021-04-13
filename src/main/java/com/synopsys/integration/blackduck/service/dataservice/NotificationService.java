@@ -65,12 +65,14 @@ public class NotificationService extends DataService {
 
     public List<NotificationView> getFilteredNotifications(Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude);
-        return blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
+        List<NotificationView> notificationViews = blackDuckApiClient.getAllResponses(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
+        return reallyFilterNotifications(notificationViews, notificationTypesToInclude);
     }
 
     public List<NotificationUserView> getFilteredUserNotifications(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
         BlackDuckRequestBuilder requestBuilder = prepareUserNotificationsRequest(user, startDate, endDate, notificationTypesToInclude);
-        return blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
+        List<NotificationUserView> notificationUserViews = blackDuckApiClient.getAllResponses(requestBuilder, NotificationUserView.class);
+        return reallyFilterNotifications(notificationUserViews, notificationTypesToInclude);
     }
 
     /**
@@ -138,6 +140,18 @@ public class NotificationService extends DataService {
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString)
                    .addBlackDuckFilter(notificationTypeFilter);
+    }
+
+    /*
+    ejk - We can not trust the filtering from the Black Duck API. There have
+    been at least 2 instances where the lack of filtering created customer
+    issues, so we will do this in perpetuity.
+    */
+    private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
+        return notifications
+                   .stream()
+                   .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
+                   .collect(Collectors.toList());
     }
 
 }
