@@ -147,7 +147,7 @@ public class NotificationService extends DataService {
     been at least 2 instances where the lack of filtering created customer
     issues, so we will do this in perpetuity.
     */
-    private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
+    private <T extends NotificationView> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
         return notifications
                    .stream()
                    .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
