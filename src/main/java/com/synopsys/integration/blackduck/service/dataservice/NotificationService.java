@@ -159,9 +159,9 @@ public class NotificationService extends DataService {
     }
 
     /*
-    We can not trust the filtering from the Black Duck API. There have been at
-    least 2 instances where the lack of filtering created customer issues, so
-    we will do this in perpetuity.
+    ejk - We can not trust the filtering from the Black Duck API. There have
+    been at least 2 instances where the lack of filtering created customer
+    issues, so we will do this in perpetuity.
     */
     private <T extends NotificationViewData> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
         return notifications
