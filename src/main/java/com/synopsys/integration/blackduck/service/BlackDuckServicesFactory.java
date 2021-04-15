@@ -51,7 +51,6 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectGetService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectMappingService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
-import com.synopsys.integration.blackduck.service.dataservice.ReportService;
 import com.synopsys.integration.blackduck.service.dataservice.RoleService;
 import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
@@ -66,6 +65,7 @@ import com.synopsys.integration.util.NoThreadExecutorService;
 
 public class BlackDuckServicesFactory {
     public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
+
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final Gson gson;
     private final ObjectMapper objectMapper;
@@ -192,10 +192,6 @@ public class BlackDuckServicesFactory {
     public ProjectUsersService createProjectUsersService() {
         UserGroupService userGroupService = createUserGroupService();
         return new ProjectUsersService(blackDuckApiClient, blackDuckRequestFactory, logger, userGroupService);
-    }
-
-    public ReportService createReportService(long timeoutInMilliseconds) {
-        return new ReportService(gson, blackDuckHttpClient.getBaseUrl(), blackDuckApiClient, blackDuckRequestFactory, logger, createProjectService(), createIntegrationEscapeUtil(), timeoutInMilliseconds);
     }
 
     public UserService createUserService() {
