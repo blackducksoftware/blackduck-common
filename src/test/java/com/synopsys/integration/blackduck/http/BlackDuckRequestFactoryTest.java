@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
@@ -20,7 +21,7 @@ public class BlackDuckRequestFactoryTest {
     @Test
     public void testFilterWithMultipleValues() throws IntegrationException {
         BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList("value1", "value2"));
-        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(BlackDuckServicesFactory.createDefaultGson());
         BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
         Request request = requestBuilder.build();
 

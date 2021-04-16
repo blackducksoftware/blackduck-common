@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.FileBodyContent;
@@ -19,6 +20,9 @@ import com.synopsys.integration.rest.body.MultipartBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
+/**
+ * A helper class to assist in creating all GET, POST, and PUT requests for Black Duck REST conversations.
+ */
 public class BlackDuckRequestFactory {
     public static final String LIMIT_PARAMETER = "limit";
     public static final String OFFSET_PARAMETER = "offset";
@@ -27,6 +31,12 @@ public class BlackDuckRequestFactory {
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;
+
+    private final Gson gson;
+
+    public BlackDuckRequestFactory(Gson gson) {
+        this.gson = gson;
+    }
 
     public Request createCommonGetRequest(HttpUrl url) {
         return createCommonGetRequestBuilder(url).getRequestBuilder().build();
@@ -86,6 +96,10 @@ public class BlackDuckRequestFactory {
                    .bodyContent(new MapBodyContent(bodyContentMap));
     }
 
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, Object bodyContent) {
+        return createCommonPostRequestBuilder(url, gson.toJson(bodyContent));
+    }
+
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
         return createRequestBuilder()
                    .url(url)
@@ -97,6 +111,10 @@ public class BlackDuckRequestFactory {
         return createRequestBuilder()
                    .method(HttpMethod.POST)
                    .bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+    }
+
+    public BlackDuckRequestBuilder createCommonPutRequestBuilder(HttpUrl url, Object bodyContent) {
+        return createCommonPutRequestBuilder(url, gson.toJson(bodyContent));
     }
 
     public BlackDuckRequestBuilder createCommonPutRequestBuilder(HttpUrl url, String bodyContent) {

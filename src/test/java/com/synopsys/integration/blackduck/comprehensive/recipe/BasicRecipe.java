@@ -5,8 +5,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -20,7 +18,6 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
@@ -38,13 +35,10 @@ public class BasicRecipe {
     public static final String PROJECT_VERSION_NAME = "0.0.1-SNAPSHOT";
     public static final IntHttpClientTestHelper restConnectionTestHelper = new IntHttpClientTestHelper();
 
-    protected Gson gson;
-    protected ObjectMapper objectMapper;
-    protected ExecutorService executorService;
+    protected ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
     protected IntLogger logger;
     protected BlackDuckServicesFactory blackDuckServicesFactory;
     protected BlackDuckApiClient blackDuckApiClient;
-    protected BlackDuckBucketService blackDuckBucketService;
     protected ProjectService projectService;
     protected ProjectUsersService projectUsersService;
     protected ProjectBomService projectBomService;
@@ -85,14 +79,9 @@ public class BasicRecipe {
         }
 
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
-        gson = BlackDuckServicesFactory.createDefaultGson();
-        objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-        executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
-        blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
 
-        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
+        blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, executorService, logger, blackDuckHttpClient);
         blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
-        blackDuckBucketService = blackDuckServicesFactory.createBlackDuckBucketService();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();

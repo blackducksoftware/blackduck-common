@@ -31,6 +31,7 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiRequestSingleSpec2;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.function.ThrowingBiFunction;
 import com.synopsys.integration.rest.HttpMethod;
@@ -63,14 +64,6 @@ public class BlackDuckApiClient {
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
-    }
-
-    public <T extends BlackDuckResponse> T transformResponse(Response response, Class<T> clazz) throws IntegrationException {
-        return blackDuckJsonTransformer.getResponse(response, clazz);
-    }
-
-    public String convertToJson(Object obj) {
-        return gson.toJson(obj);
     }
 
     public HttpUrl getUrl(BlackDuckPath path) throws IntegrationException {
@@ -161,6 +154,10 @@ public class BlackDuckApiClient {
         }
     }
 
+    public <T extends BlackDuckResponse> T getResponse(BlackDuckApiRequestSingleSpec2<T> requestSingleSpec) throws IntegrationException {
+        return blackDuckResponseTransformer.getResponse(requestSingleSpec.getRequest(), requestSingleSpec.getResponseClass());
+    }
+
     // ------------------------------------------------
     // getting responses from a uri
     // ------------------------------------------------
@@ -198,20 +195,6 @@ public class BlackDuckApiClient {
     public <T extends BlackDuckResponse> T getResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
         Request request = blackDuckRequestFactory.createCommonGetRequest(url);
         return blackDuckResponseTransformer.getResponse(request, responseClass);
-    }
-
-    // ------------------------------------------------
-    // getting responses from a LinkSingleResponse
-    // ------------------------------------------------
-
-    /**
-     * @deprecated This uses LinkSingleResponse incorrectly. Please use getResponse(HttpUrl url, Class<T> responseClass) instead.
-     */
-    @Deprecated
-    public <T extends BlackDuckResponse> T getResponse(LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
-        HttpUrl url = new HttpUrl(linkSingleResponse.getLink());
-        Request request = blackDuckRequestFactory.createCommonGetRequest(url);
-        return blackDuckResponseTransformer.getResponse(request, linkSingleResponse.getResponseClass());
     }
 
     // ------------------------------------------------

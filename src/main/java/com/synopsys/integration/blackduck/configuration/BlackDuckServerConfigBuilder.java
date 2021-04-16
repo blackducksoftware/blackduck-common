@@ -67,7 +67,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery = new BlackDuckMediaTypeDiscovery();
     private CookieHeaderParser cookieHeaderParser = new CookieHeaderParser();
     private ExecutorService executorService = new NoThreadExecutorService();
-    private BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+    private BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();

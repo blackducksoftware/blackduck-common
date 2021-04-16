@@ -55,7 +55,7 @@ public class BlackDuckApiClientTestIT {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
 
         BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
         assertNull(blackDuckMediaTypeDiscoveryVerifier.originalMediaType);

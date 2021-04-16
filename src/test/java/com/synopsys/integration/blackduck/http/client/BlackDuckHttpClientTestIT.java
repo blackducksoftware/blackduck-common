@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
@@ -26,6 +27,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBui
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiRequestSingleSpec2;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -47,7 +49,7 @@ public class BlackDuckHttpClientTestIT {
     private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
     private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
 
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private final String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
@@ -193,14 +195,10 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("read");
         apiTokenRequest.scopes.add("write");
 
-        ApiTokenView apiTokenView;
-        String json = blackDuckApiClient.convertToJson(apiTokenRequest);
-        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, json).build();
-        try (Response response = blackDuckApiClient.execute(request)) {
-            apiTokenView = blackDuckApiClient.transformResponse(response, ApiTokenView.class);
-        }
+        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, apiTokenRequest).build();
+        BlackDuckApiRequestSingleSpec2<ApiTokenView> apiTokenViewSpec = new BlackDuckApiRequestSingleSpec2<>(request, ApiTokenView.class);
 
-        return apiTokenView;
+        return blackDuckApiClient.getResponse(apiTokenViewSpec);
     }
 
     private void deleteByName(String name) throws IntegrationException {

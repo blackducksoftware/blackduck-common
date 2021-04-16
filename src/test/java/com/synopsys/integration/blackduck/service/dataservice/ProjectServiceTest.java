@@ -37,7 +37,7 @@ public class ProjectServiceTest {
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
-        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
         InputStream inputStream = getClass().getResourceAsStream("/json/pageOfProjectVersionViews.json");
 
         String pageJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);

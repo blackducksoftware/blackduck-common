@@ -44,7 +44,7 @@ public class BlackDuckApiClientTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_not_complete.json");
 
         String incompleteJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
@@ -66,7 +66,7 @@ public class BlackDuckApiClientTest {
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckRequestFactory blackDuckRequestFactory = BlackDuckServicesFactory.createDefaultRequestFactory();
+        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
         InputStream inputStream = getClass().getResourceAsStream("/json/ProjectVersionView_complete.json");
 
         String completeJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);

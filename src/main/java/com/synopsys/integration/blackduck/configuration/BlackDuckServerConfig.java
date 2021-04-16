@@ -182,7 +182,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(BlackDuckHttpClient blackDuckHttpClient, IntLogger logger) {
-        return new BlackDuckServicesFactory(intEnvironmentVariables, gson, objectMapper, executorService, blackDuckHttpClient, logger, blackDuckRequestFactory);
+        return new BlackDuckServicesFactory(intEnvironmentVariables, executorService, logger, blackDuckHttpClient, gson, objectMapper, blackDuckRequestFactory);
     }
 
     public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {

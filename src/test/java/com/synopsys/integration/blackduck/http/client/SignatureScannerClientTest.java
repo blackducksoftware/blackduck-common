@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.exception.IntegrationException;
@@ -42,7 +43,7 @@ import okhttp3.tls.HeldCertificate;
 @ExtendWith(TimingExtension.class)
 public class SignatureScannerClientTest {
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
-    private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory();
+    private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory(new Gson());
 
     private static final char[] KEYSTORE_PASSWORD = "changeit".toCharArray();
     private static final String CERTIFICATE_ALIAS = "bd-common-test-cert";

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.bdio.SimpleBdioFactory;
 import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
 import com.synopsys.integration.bdio.model.SimpleBdioDocument;
@@ -66,7 +67,7 @@ public class CodeLocationServiceTestIT {
     private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
     private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 

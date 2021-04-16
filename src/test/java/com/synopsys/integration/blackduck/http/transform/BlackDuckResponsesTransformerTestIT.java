@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -24,7 +25,7 @@ import com.synopsys.integration.rest.HttpUrl;
 class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory();
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }

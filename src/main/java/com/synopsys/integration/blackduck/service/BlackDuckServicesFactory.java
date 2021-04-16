@@ -8,6 +8,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -38,7 +39,6 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTrans
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.scan.RapidScanService;
 import com.synopsys.integration.blackduck.scan.RapidScanWaiter;
-import com.synopsys.integration.blackduck.service.bucket.BlackDuckBucketService;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
@@ -67,39 +67,22 @@ public class BlackDuckServicesFactory {
     public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();
 
     private final IntEnvironmentVariables intEnvironmentVariables;
+    private final ExecutorService executorService;
+    private final IntLogger logger;
+    private final BlackDuckHttpClient blackDuckHttpClient;
+
     private final Gson gson;
     private final ObjectMapper objectMapper;
-    private final ExecutorService executorService;
-    private final BlackDuckHttpClient blackDuckHttpClient;
-    private final IntLogger logger;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
+
     private final BlackDuckResponseResolver blackDuckResponseResolver;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final BlackDuckApiClient blackDuckApiClient;
 
-    public BlackDuckServicesFactory(
-        IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper, ExecutorService executorService, BlackDuckHttpClient blackDuckHttpClient, IntLogger logger,
-        BlackDuckRequestFactory blackDuckRequestFactory) {
-        this.intEnvironmentVariables = intEnvironmentVariables;
-        this.gson = gson;
-        this.objectMapper = objectMapper;
-        this.executorService = executorService;
-        this.blackDuckHttpClient = blackDuckHttpClient;
-        this.logger = logger;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
-
-        blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
-        blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
-        blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-
-        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
-    }
-
     public static Gson createDefaultGson() {
-        return BlackDuckServicesFactory.createDefaultGsonBuilder().create();
+        return createDefaultGsonBuilder().create();
     }
 
     public static ObjectMapper createDefaultObjectMapper() {
@@ -111,8 +94,31 @@ public class BlackDuckServicesFactory {
                    .setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
-    public static BlackDuckRequestFactory createDefaultRequestFactory() {
-        return new BlackDuckRequestFactory();
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient) {
+        this(intEnvironmentVariables, executorService, logger, blackDuckHttpClient, createDefaultGson(), createDefaultObjectMapper(), BlackDuckRequestFactory::new);
+    }
+
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson,
+        ObjectMapper objectMapper, Function<Gson, BlackDuckRequestFactory> blackDuckRequestFactoryCreator) {
+        this(intEnvironmentVariables, executorService, logger, blackDuckHttpClient, gson, objectMapper, blackDuckRequestFactoryCreator.apply(gson));
+    }
+
+    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson,
+        ObjectMapper objectMapper, BlackDuckRequestFactory blackDuckRequestFactory) {
+        this.intEnvironmentVariables = intEnvironmentVariables;
+        this.executorService = executorService;
+        this.logger = logger;
+        this.blackDuckHttpClient = blackDuckHttpClient;
+        this.gson = gson;
+        this.objectMapper = objectMapper;
+        this.blackDuckRequestFactory = blackDuckRequestFactory;
+
+        blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
+        blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
+        blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+
+        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
     }
 
     public BdioUploadService createBdioUploadService() {
@@ -121,10 +127,6 @@ public class BlackDuckServicesFactory {
 
     public Bdio2UploadService createBdio2UploadService() {
         return new Bdio2UploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService), createCodeLocationCreationService());
-    }
-
-    public BlackDuckBucketService createBlackDuckBucketService() {
-        return new BlackDuckBucketService(blackDuckApiClient, blackDuckRequestFactory, logger, executorService);
     }
 
     public SignatureScannerService createSignatureScannerService() {
