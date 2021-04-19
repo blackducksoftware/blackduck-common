@@ -29,6 +29,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorSingle;
+import com.synopsys.integration.blackduck.service.request.BlackDuckUrlFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -51,6 +52,7 @@ public class BlackDuckHttpClientTestIT {
 
     private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
+    private final BlackDuckUrlFactory blackDuckUrlFactory = new BlackDuckUrlFactory(blackDuckUrl);
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private final String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
     private final BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckApiClient();
@@ -187,8 +189,7 @@ public class BlackDuckHttpClientTestIT {
     // ******************************
     // WARNING!!!!
     private ApiTokenView getApiToken(String tokenName) throws IntegrationException, IOException {
-        HttpUrl blackDuckServerUrl = blackDuckUrl;
-        HttpUrl createApiTokenUrl = blackDuckServerUrl.appendRelativeUrl(BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
+        HttpUrl createApiTokenUrl = blackDuckUrlFactory.fromBlackDuckPath(BlackDuckHttpClientTestIT.API_TOKEN_LINK);
 
         ApiTokenRequest apiTokenRequest = new ApiTokenRequest();
         apiTokenRequest.name = tokenName;
@@ -198,7 +199,7 @@ public class BlackDuckHttpClientTestIT {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, apiTokenRequest);
         BlackDuckApiExchangeDescriptorSingle<ApiTokenView> apiTokenViewDescriptor = new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, ApiTokenView.class);
 
-        return blackDuckApiClient.getResponse(apiTokenViewSpec);
+        return blackDuckApiClient.getResponse(apiTokenViewDescriptor);
     }
 
     private void deleteByName(String name) throws IntegrationException {
