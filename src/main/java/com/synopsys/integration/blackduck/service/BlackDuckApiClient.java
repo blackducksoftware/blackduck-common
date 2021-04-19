@@ -80,7 +80,9 @@ public class BlackDuckApiClient {
 
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
         throws IntegrationException {
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit));
+        ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
+        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
@@ -88,7 +90,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, blackDuckResponsesTransformer::getAllResponses);
+        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, new TransformerDetails<>(requestBuilder, blackDuckResponsesTransformer::getAllResponses));
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, int totalLimit) throws IntegrationException {
@@ -96,7 +98,9 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit));
+        ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
+        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, transformerDetails);
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
@@ -125,7 +129,9 @@ public class BlackDuckApiClient {
 
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
         throws IntegrationException {
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit));
+        ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
+        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
@@ -133,7 +139,8 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, requestBuilder, blackDuckResponsesTransformer::getAllResponses);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, blackDuckResponsesTransformer::getAllResponses);
+        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, int totalLimit) throws IntegrationException {
@@ -141,7 +148,9 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, requestBuilder, (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit));
+        ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
+        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
     }
 
     public <T extends BlackDuckResponse> Optional<T> getResponse(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
@@ -288,28 +297,37 @@ public class BlackDuckApiClient {
         }
     }
 
-    private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder,
-        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+    private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, TransformerDetails<T> transformerDetails) throws IntegrationException {
         HttpUrl url = fullBlackDuckUrl(blackDuckPathMultipleResponses.getBlackDuckPath());
         Class<T> responseClass = blackDuckPathMultipleResponses.getResponseClass();
-        return getSpecialResponses(url, responseClass, requestBuilder, responsesTransformer);
+        return getSpecialResponses(url, responseClass, transformerDetails);
     }
 
-    private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder,
-        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
+    private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, TransformerDetails<T> transformerDetails) throws IntegrationException {
         HttpUrl url = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
         Class<T> responseClass = linkMultipleResponses.getResponseClass();
-        return getSpecialResponses(url, responseClass, requestBuilder, responsesTransformer);
+        return getSpecialResponses(url, responseClass, transformerDetails);
     }
 
-    private <T extends BlackDuckResponse> List<T> getSpecialResponses(HttpUrl httpUrl, Class<T> responseClass, BlackDuckRequestBuilder requestBuilder,
-        ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> responsesTransformer) throws IntegrationException {
-        requestBuilder.url(httpUrl);
-        return responsesTransformer.apply(new PagedRequest(requestBuilder), responseClass).getItems();
+    private <T extends BlackDuckResponse> List<T> getSpecialResponses(HttpUrl httpUrl, Class<T> responseClass, TransformerDetails<T> transformerDetails) throws IntegrationException {
+        transformerDetails.blackDuckRequestBuilder.url(httpUrl);
+        return transformerDetails.responsesTransformer.apply(new PagedRequest(transformerDetails.blackDuckRequestBuilder), responseClass).getItems();
     }
 
     private HttpUrl fullBlackDuckUrl(BlackDuckPath blackDuckPath) throws IntegrationException {
         return blackDuckPath.getFullBlackDuckUrl(blackDuckBaseUrl);
+    }
+
+    private interface ResponsesTransformer<T extends BlackDuckResponse> extends ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> {}
+
+    private class TransformerDetails<T extends BlackDuckResponse> {
+        public final BlackDuckRequestBuilder blackDuckRequestBuilder;
+        public final ResponsesTransformer<T> responsesTransformer;
+
+        public TransformerDetails(BlackDuckRequestBuilder blackDuckRequestBuilder, ResponsesTransformer<T> responsesTransformer) {
+            this.blackDuckRequestBuilder = blackDuckRequestBuilder;
+            this.responsesTransformer = responsesTransformer;
+        }
     }
 
 }
