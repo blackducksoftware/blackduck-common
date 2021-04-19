@@ -24,10 +24,11 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiRequestSingleSpec2;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorSingle;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -35,7 +36,6 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 import okhttp3.mockwebserver.MockWebServer;
@@ -195,8 +195,8 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("read");
         apiTokenRequest.scopes.add("write");
 
-        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, apiTokenRequest).build();
-        BlackDuckApiRequestSingleSpec2<ApiTokenView> apiTokenViewSpec = new BlackDuckApiRequestSingleSpec2<>(request, ApiTokenView.class);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, apiTokenRequest);
+        BlackDuckApiExchangeDescriptorSingle<ApiTokenView> apiTokenViewDescriptor = new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, ApiTokenView.class);
 
         return blackDuckApiClient.getResponse(apiTokenViewSpec);
     }

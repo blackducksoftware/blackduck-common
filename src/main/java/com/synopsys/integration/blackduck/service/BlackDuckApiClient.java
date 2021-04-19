@@ -31,7 +31,9 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiRequestSingleSpec2;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorSingle;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.function.ThrowingBiFunction;
 import com.synopsys.integration.rest.HttpMethod;
@@ -54,6 +56,7 @@ public class BlackDuckApiClient {
     private final HttpUrl blackDuckBaseUrl;
     private final Gson gson;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
 
     public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckRequestFactory blackDuckRequestFactory) {
@@ -64,10 +67,7 @@ public class BlackDuckApiClient {
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
-    }
-
-    public HttpUrl getUrl(BlackDuckPath path) throws IntegrationException {
-        return fullBlackDuckUrl(path);
+        this.blackDuckApiExchangeDescriptorFactory = new BlackDuckApiExchangeDescriptorFactory(blackDuckRequestFactory, blackDuckBaseUrl);
     }
 
     // ------------------------------------------------
@@ -81,8 +81,9 @@ public class BlackDuckApiClient {
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
         throws IntegrationException {
         ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit);
-        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, transformerDetails);
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckPath(blackDuckPathMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
@@ -90,7 +91,10 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, new TransformerDetails<>(requestBuilder, blackDuckResponsesTransformer::getAllResponses));
+        ResponsesTransformer<T> responsesTransformer = blackDuckResponsesTransformer::getAllResponses;
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckPath(blackDuckPathMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, int totalLimit) throws IntegrationException {
@@ -99,18 +103,19 @@ public class BlackDuckApiClient {
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
         ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit);
-        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
-        return getBlackDuckPathResponses(blackDuckPathMultipleResponses, transformerDetails);
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckPath(blackDuckPathMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(blackDuckPathMultipleResponses.getBlackDuckPath());
+        HttpUrl url = blackDuckPathMultipleResponses.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
         Class<T> responseClass = blackDuckPathMultipleResponses.getResponseClass();
         return getPageResponse(url, responseClass, blackDuckPageDefinition);
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(blackDuckPathSingleResponse.getBlackDuckPath());
+        HttpUrl url = blackDuckPathSingleResponse.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
         requestBuilder.url(url);
         return blackDuckResponseTransformer.getResponse(requestBuilder.build(), blackDuckPathSingleResponse.getResponseClass());
     }
@@ -130,8 +135,9 @@ public class BlackDuckApiClient {
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
         throws IntegrationException {
         ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, responseClass, predicate, totalLimit);
-        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckView(blackDuckView, linkMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
@@ -139,8 +145,10 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, blackDuckResponsesTransformer::getAllResponses);
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
+        ResponsesTransformer<T> responsesTransformer = blackDuckResponsesTransformer::getAllResponses;
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckView(blackDuckView, linkMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, int totalLimit) throws IntegrationException {
@@ -149,8 +157,9 @@ public class BlackDuckApiClient {
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
         ResponsesTransformer<T> responsesTransformer = (pagedRequest, responseClass) -> blackDuckResponsesTransformer.getSomeResponses(pagedRequest, responseClass, totalLimit);
-        TransformerDetails<T> transformerDetails = new TransformerDetails<>(requestBuilder, responsesTransformer);
-        return getBlackDuckViewResponses(blackDuckView, linkMultipleResponses, transformerDetails);
+        BlackDuckApiExchangeDescriptorMultiple<T> descriptorMultiple = blackDuckApiExchangeDescriptorFactory.fromBlackDuckView(blackDuckView, linkMultipleResponses, requestBuilder);
+        TransformerDetails<T> transformerDetails = new TransformerDetails<>(descriptorMultiple, responsesTransformer);
+        return getSpecialResponses(transformerDetails);
     }
 
     public <T extends BlackDuckResponse> Optional<T> getResponse(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
@@ -161,10 +170,6 @@ public class BlackDuckApiClient {
         } catch (NoSuchElementException e) {
             return Optional.empty();
         }
-    }
-
-    public <T extends BlackDuckResponse> T getResponse(BlackDuckApiRequestSingleSpec2<T> requestSingleSpec) throws IntegrationException {
-        return blackDuckResponseTransformer.getResponse(requestSingleSpec.getRequest(), requestSingleSpec.getResponseClass());
     }
 
     // ------------------------------------------------
@@ -207,16 +212,30 @@ public class BlackDuckApiClient {
     }
 
     // ------------------------------------------------
-    // handling generic post
+    // handling descriptors
     // ------------------------------------------------
-    public HttpUrl post(BlackDuckPath blackDuckPath, BlackDuckComponent blackDuckComponent) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(blackDuckPath);
-        return post(url, blackDuckComponent);
+    public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckApiExchangeDescriptorMultiple<T> blackDuckApiExchangeDescriptorMultiple) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckApiExchangeDescriptorMultiple.getBlackDuckRequestBuilder();
+        PagedRequest pagedRequest = new PagedRequest(blackDuckRequestBuilder);
+
+        Class<T> responseClass = blackDuckApiExchangeDescriptorMultiple.getResponseClass();
+
+        return blackDuckResponsesTransformer.getAllResponses(pagedRequest, responseClass).getItems();
     }
 
+    public <T extends BlackDuckResponse> T getResponse(BlackDuckApiExchangeDescriptorSingle<T> blackDuckApiExchangeDescriptorSingle) throws IntegrationException {
+        Request request = blackDuckApiExchangeDescriptorSingle.getBlackDuckRequestBuilder().build();
+
+        Class<T> responseClass = blackDuckApiExchangeDescriptorSingle.getResponseClass();
+
+        return blackDuckResponseTransformer.getResponse(request, responseClass);
+    }
+
+    // ------------------------------------------------
+    // handling generic post
+    // ------------------------------------------------
     public HttpUrl post(HttpUrl url, BlackDuckComponent blackDuckComponent) throws IntegrationException {
-        String json = gson.toJson(blackDuckComponent);
-        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(url, json).build();
+        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(url, blackDuckComponent).build();
         return executePostRequestAndRetrieveURL(request);
     }
 
@@ -258,22 +277,9 @@ public class BlackDuckApiClient {
         return execute(request);
     }
 
-    public Response get(BlackDuckPath path) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(path);
-        Request request = blackDuckRequestFactory.createCommonGetRequest(url);
-        return execute(request);
-    }
-
     // ------------------------------------------------
     // handling plain requests
     // ------------------------------------------------
-    public Response execute(BlackDuckPath path, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(path);
-        requestBuilder.url(url);
-        Request request = requestBuilder.build();
-        return execute(request);
-    }
-
     public Response execute(Request request) throws IntegrationException {
         Response response = blackDuckHttpClient.execute(request);
         blackDuckHttpClient.throwExceptionForError(response);
@@ -283,12 +289,6 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     // posting and getting location header
     // ------------------------------------------------
-    public HttpUrl executePostRequestAndRetrieveURL(BlackDuckPath path, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(path);
-        requestBuilder.url(url);
-        return executePostRequestAndRetrieveURL(requestBuilder.build());
-    }
-
     public HttpUrl executePostRequestAndRetrieveURL(Request request) throws IntegrationException {
         try (Response response = execute(request)) {
             return new HttpUrl(response.getHeaderValue("location"));
@@ -297,36 +297,28 @@ public class BlackDuckApiClient {
         }
     }
 
-    private <T extends BlackDuckResponse> List<T> getBlackDuckPathResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, TransformerDetails<T> transformerDetails) throws IntegrationException {
-        HttpUrl url = fullBlackDuckUrl(blackDuckPathMultipleResponses.getBlackDuckPath());
-        Class<T> responseClass = blackDuckPathMultipleResponses.getResponseClass();
-        return getSpecialResponses(url, responseClass, transformerDetails);
-    }
-
-    private <T extends BlackDuckResponse> List<T> getBlackDuckViewResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, TransformerDetails<T> transformerDetails) throws IntegrationException {
-        HttpUrl url = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
-        Class<T> responseClass = linkMultipleResponses.getResponseClass();
-        return getSpecialResponses(url, responseClass, transformerDetails);
-    }
-
-    private <T extends BlackDuckResponse> List<T> getSpecialResponses(HttpUrl httpUrl, Class<T> responseClass, TransformerDetails<T> transformerDetails) throws IntegrationException {
-        transformerDetails.blackDuckRequestBuilder.url(httpUrl);
-        return transformerDetails.responsesTransformer.apply(new PagedRequest(transformerDetails.blackDuckRequestBuilder), responseClass).getItems();
-    }
-
-    private HttpUrl fullBlackDuckUrl(BlackDuckPath blackDuckPath) throws IntegrationException {
-        return blackDuckPath.getFullBlackDuckUrl(blackDuckBaseUrl);
+    private <T extends BlackDuckResponse> List<T> getSpecialResponses(TransformerDetails<T> transformerDetails) throws IntegrationException {
+        Class<T> responseClass = transformerDetails.getResponseClass();
+        return transformerDetails.responsesTransformer.apply(new PagedRequest(transformerDetails.getBlackDuckRequestBuilder()), responseClass).getItems();
     }
 
     private interface ResponsesTransformer<T extends BlackDuckResponse> extends ThrowingBiFunction<PagedRequest, Class<T>, BlackDuckPageResponse<T>, IntegrationException> {}
 
-    private class TransformerDetails<T extends BlackDuckResponse> {
-        public final BlackDuckRequestBuilder blackDuckRequestBuilder;
+    private static class TransformerDetails<T extends BlackDuckResponse> {
+        public final BlackDuckApiExchangeDescriptorMultiple<T> blackDuckApiExchangeDescriptorMultiple;
         public final ResponsesTransformer<T> responsesTransformer;
 
-        public TransformerDetails(BlackDuckRequestBuilder blackDuckRequestBuilder, ResponsesTransformer<T> responsesTransformer) {
-            this.blackDuckRequestBuilder = blackDuckRequestBuilder;
+        public TransformerDetails(BlackDuckApiExchangeDescriptorMultiple<T> blackDuckApiExchangeDescriptorMultiple, ResponsesTransformer<T> responsesTransformer) {
+            this.blackDuckApiExchangeDescriptorMultiple = blackDuckApiExchangeDescriptorMultiple;
             this.responsesTransformer = responsesTransformer;
+        }
+
+        public Class<T> getResponseClass() {
+            return blackDuckApiExchangeDescriptorMultiple.getResponseClass();
+        }
+
+        public BlackDuckRequestBuilder getBlackDuckRequestBuilder() {
+            return blackDuckApiExchangeDescriptorMultiple.getBlackDuckRequestBuilder();
         }
     }
 

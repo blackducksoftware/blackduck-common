@@ -8,11 +8,12 @@
 package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.rest.request.Request;
 
-public class BlackDuckApiRequestSingleSpec2<T extends BlackDuckResponse> extends BlackDuckApiRequestSpec2<T> {
-    public BlackDuckApiRequestSingleSpec2(Request request, Class<T> responseClass) {
-        super(request, responseClass);
+public class BlackDuckApiExchangeDescriptorSingle<T extends BlackDuckResponse> extends BlackDuckApiExchangeDescriptor<T> {
+    public BlackDuckApiExchangeDescriptorSingle(BlackDuckRequestBuilder blackDuckRequestBuilder, Class<T> responseClass) {
+        super(blackDuckRequestBuilder, responseClass);
     }
 
 }

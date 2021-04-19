@@ -17,8 +17,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLic
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -28,8 +28,8 @@ import com.synopsys.integration.rest.response.Response;
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentDataService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public LicenseService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger, ComponentService componentDataService) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
         this.componentDataService = componentDataService;
     }
 
@@ -71,4 +71,5 @@ public class LicenseService extends DataService {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
+
 }

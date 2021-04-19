@@ -17,8 +17,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -30,8 +30,8 @@ import com.synopsys.integration.util.NameVersion;
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;
 
-    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ProjectGetService projectGetService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger, ProjectGetService projectGetService) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
         this.projectGetService = projectGetService;
     }
 
@@ -40,7 +40,8 @@ public class ProjectService extends DataService {
     }
 
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
-        HttpUrl projectUrl = blackDuckApiClient.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        HttpUrl projectCreateUrl = blackDuckApiFactories.blackDuckUrlFactory.fromBlackDuckPath(ApiDiscovery.PROJECTS_LINK);
+        HttpUrl projectUrl = blackDuckApiClient.post(projectCreateUrl, projectRequest);
         ProjectView projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
         if (null == projectRequest.getVersionRequest()) {
             return new ProjectVersionWrapper(projectView);
