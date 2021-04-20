@@ -12,9 +12,9 @@ import java.util.List;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.RoleView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -23,8 +23,8 @@ public class RoleService extends DataService {
     public static final String SERVER_SCOPE = "server";
     public static final String PROJECT_SCOPE = "project";
 
-    public RoleService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public RoleService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
     }
 
     public List<RoleView> getServerRoles() throws IntegrationException {
@@ -40,7 +40,7 @@ public class RoleService extends DataService {
     }
 
     private List<RoleView> getScopedRoles(BlackDuckRequestFilter scope) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder();
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckApiFactories.blackDuckRequestFactory.createCommonGetRequestBuilder();
         blackDuckRequestBuilder.addBlackDuckFilter(scope);
 
         return blackDuckApiClient.getAllResponses(ApiDiscovery.ROLES_LINK_RESPONSE, blackDuckRequestBuilder);

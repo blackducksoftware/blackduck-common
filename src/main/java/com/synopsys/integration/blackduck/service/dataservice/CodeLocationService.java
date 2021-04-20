@@ -23,8 +23,8 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.manual.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -34,8 +34,8 @@ public class CodeLocationService extends DataService {
     // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
     public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
 
-    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
@@ -73,7 +73,7 @@ public class CodeLocationService extends DataService {
 
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckApiFactories.blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
@@ -94,7 +94,7 @@ public class CodeLocationService extends DataService {
         return blackDuckApiClient.getResponse(url, ScanSummaryView.class);
     }
 
-    private CodeLocationView createFakeCodeLocationView(final HttpUrl codeLocationUrl) {
+    private CodeLocationView createFakeCodeLocationView(HttpUrl codeLocationUrl) {
         ResourceMetadata resourceMetadata = new ResourceMetadata();
         resourceMetadata.setHref(codeLocationUrl);
         CodeLocationView codeLocationView = new CodeLocationView();

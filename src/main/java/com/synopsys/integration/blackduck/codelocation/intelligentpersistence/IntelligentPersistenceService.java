@@ -14,8 +14,8 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationReque
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
@@ -27,9 +27,9 @@ public class IntelligentPersistenceService extends DataService {
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public IntelligentPersistenceService(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
-        final IntLogger logger, final IntelligentPersistenceBatchRunner uploadBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public IntelligentPersistenceService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories,
+        IntLogger logger, IntelligentPersistenceBatchRunner uploadBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
         this.uploadBatchRunner = uploadBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

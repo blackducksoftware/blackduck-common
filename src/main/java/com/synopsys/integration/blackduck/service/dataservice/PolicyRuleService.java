@@ -18,8 +18,8 @@ import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.exception.IntegrationException;
@@ -27,8 +27,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class PolicyRuleService extends DataService {
-    public PolicyRuleService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public PolicyRuleService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
@@ -46,7 +46,8 @@ public class PolicyRuleService extends DataService {
     }
 
     public HttpUrl createPolicyRule(PolicyRuleView policyRuleView) throws IntegrationException {
-        return blackDuckApiClient.post(ApiDiscovery.POLICY_RULES_LINK, policyRuleView);
+        HttpUrl policyRulesUrl = blackDuckApiFactories.blackDuckUrlFactory.fromBlackDuckPath(ApiDiscovery.POLICY_RULES_LINK);
+        return blackDuckApiClient.post(policyRulesUrl, policyRuleView);
     }
 
     /**

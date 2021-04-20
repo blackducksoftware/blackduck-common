@@ -16,16 +16,16 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionCompo
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionIssuesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.IssueRequest;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class IssueService extends DataService {
-    public IssueService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public IssueService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
     }
 
     public List<ProjectVersionIssuesView> getIssuesForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {

@@ -23,8 +23,8 @@ import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -33,12 +33,13 @@ import com.synopsys.integration.rest.HttpUrl;
 public class UserGroupService extends DataService {
     public static final BiPredicate<String, UserView> MATCHING_USERNAME = (username, userView) -> username.equalsIgnoreCase(userView.getUserName());
 
-    public UserGroupService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public UserGroupService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+        super(blackDuckApiClient, blackDuckApiFactories, logger);
     }
 
     public UserGroupView createUserGroup(UserGroupRequest userGroupRequest) throws IntegrationException {
-        HttpUrl userGroupUrl = blackDuckApiClient.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
+        HttpUrl userGroupsLinkUrl = blackDuckApiFactories.blackDuckUrlFactory.fromBlackDuckPath(ApiDiscovery.USERGROUPS_LINK);
+        HttpUrl userGroupUrl = blackDuckApiClient.post(userGroupsLinkUrl, userGroupRequest);
         UserGroupView userGroupView = blackDuckApiClient.getResponse(userGroupUrl, UserGroupView.class);
         return userGroupView;
     }

@@ -21,7 +21,10 @@ import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.CookieHeaderParser;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckUrlFactory;
 import com.synopsys.integration.builder.BuilderProperties;
 import com.synopsys.integration.builder.BuilderPropertyKey;
 import com.synopsys.integration.builder.BuilderStatus;
@@ -68,6 +71,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private CookieHeaderParser cookieHeaderParser = new CookieHeaderParser();
     private ExecutorService executorService = new NoThreadExecutorService();
     private BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
+    private BlackDuckUrlFactory blackDuckUrlFactory;
+    private BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -98,12 +103,21 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         } catch (IntegrationException e) {
         }
 
+        if (null == blackDuckUrlFactory) {
+            blackDuckUrlFactory = new BlackDuckUrlFactory(blackDuckUrl);
+        }
+
+        if (null == blackDuckApiExchangeDescriptorFactory) {
+            blackDuckApiExchangeDescriptorFactory = new BlackDuckApiExchangeDescriptorFactory(blackDuckRequestFactory, blackDuckUrl);
+        }
+
+        BlackDuckApiFactories blackDuckApiFactories = new BlackDuckApiFactories(blackDuckUrlFactory, blackDuckRequestFactory, blackDuckApiExchangeDescriptorFactory);
+
         NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
             return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery,
-                executorService,
-                blackDuckRequestFactory);
+                executorService, blackDuckApiFactories);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -112,8 +126,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             Credentials credentials = credentialsBuilder.build();
 
             return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery,
-                cookieHeaderParser, executorService,
-                blackDuckRequestFactory);
+                cookieHeaderParser, executorService, blackDuckApiFactories);
         }
     }
 
@@ -479,12 +492,28 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    public BlackDuckRequestFactory getRequestFactory() {
+    public BlackDuckRequestFactory getBlackDuckRequestFactory() {
         return blackDuckRequestFactory;
     }
 
-    public void setRequestFactory(BlackDuckRequestFactory blackDuckRequestFactory) {
+    public void setBlackDuckRequestFactory(BlackDuckRequestFactory blackDuckRequestFactory) {
         this.blackDuckRequestFactory = blackDuckRequestFactory;
+    }
+
+    public BlackDuckUrlFactory getBlackDuckUrlFactory() {
+        return blackDuckUrlFactory;
+    }
+
+    public void setBlackDuckUrlFactory(BlackDuckUrlFactory blackDuckUrlFactory) {
+        this.blackDuckUrlFactory = blackDuckUrlFactory;
+    }
+
+    public BlackDuckApiExchangeDescriptorFactory getBlackDuckApiExchangeDescriptorFactory() {
+        return blackDuckApiExchangeDescriptorFactory;
+    }
+
+    public void setBlackDuckApiExchangeDescriptorFactory(BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory) {
+        this.blackDuckApiExchangeDescriptorFactory = blackDuckApiExchangeDescriptorFactory;
     }
 
 }
