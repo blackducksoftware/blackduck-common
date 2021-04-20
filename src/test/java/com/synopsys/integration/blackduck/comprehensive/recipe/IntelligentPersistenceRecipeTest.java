@@ -49,34 +49,34 @@ public class IntelligentPersistenceRecipeTest extends BasicRecipe {
 
     @Test
     public void uploadBdio2() throws IOException, IntegrationException, InterruptedException {
-        final Bdio2Factory bdio2Factory = new Bdio2Factory();
+        Bdio2Factory bdio2Factory = new Bdio2Factory();
 
         // create the bdio2 metadata
-        final ZonedDateTime now = Instant.now().atZone(ZoneId.of("EST5EDT"));
-        final BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, now);
+        ZonedDateTime now = Instant.now().atZone(ZoneId.of("EST5EDT"));
+        BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, now);
 
         // create the bdio2 project
-        final ExternalIdFactory externalIdFactory = new ExternalIdFactory();
-        final ExternalId externalId = externalIdFactory.createMavenExternalId("com.synopsys.integration", PROJECT.getName(), PROJECT.getVersion());
-        final Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion());
+        ExternalIdFactory externalIdFactory = new ExternalIdFactory();
+        ExternalId externalId = externalIdFactory.createMavenExternalId("com.synopsys.integration", PROJECT.getName(), PROJECT.getVersion());
+        Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion());
 
         // create a graph of one dependency
-        final Dependency dependency = createDependency(externalIdFactory, "org.apache.commons", "commons-lang3", "3.11");
-        final MutableDependencyGraph dependencyGraph = new MutableMapDependencyGraph();
+        Dependency dependency = createDependency(externalIdFactory, "org.apache.commons", "commons-lang3", "3.11");
+        MutableDependencyGraph dependencyGraph = new MutableMapDependencyGraph();
         dependencyGraph.addChildToRoot(dependency);
 
         // now, with metadata, a project, and a graph, we can create a bdio2 document and write out the file
-        final Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project, dependencyGraph, 1);
+        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project, dependencyGraph, 1);
 
-        final File bdio2File = File.createTempFile("test_bdio2", ".bdio");
+        File bdio2File = File.createTempFile("test_bdio2", ".bdio");
         bdio2File.createNewFile();
         bdio2File.deleteOnExit();
 
-        final Bdio2Writer bdio2Writer = new Bdio2Writer();
+        Bdio2Writer bdio2Writer = new Bdio2Writer();
         bdio2Writer.writeBdioDocument(new FileOutputStream(bdio2File), bdio2Document);
 
         // using the file and the previously set values, we create the UploadBatch for uploading to Black Duck
-        final UploadBatch uploadBatch = new UploadBatch();
+        UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(PROJECT, CODE_LOCATION_NAME, bdio2File));
 
         // now all the setup is done, we can upload the bdio2 file
@@ -93,9 +93,9 @@ public class IntelligentPersistenceRecipeTest extends BasicRecipe {
     }
 
     @NotNull
-    private Dependency createDependency(final ExternalIdFactory externalIdFactory, final String group, final String artifact, final String version) {
-        final ExternalId commonsLangId = externalIdFactory.createMavenExternalId(group, artifact, version);
-        final Dependency dependency = new Dependency(artifact, version, commonsLangId);
+    private Dependency createDependency(ExternalIdFactory externalIdFactory, String group, String artifact, String version) {
+        ExternalId commonsLangId = externalIdFactory.createMavenExternalId(group, artifact, version);
+        Dependency dependency = new Dependency(artifact, version, commonsLangId);
         return dependency;
     }
 }
