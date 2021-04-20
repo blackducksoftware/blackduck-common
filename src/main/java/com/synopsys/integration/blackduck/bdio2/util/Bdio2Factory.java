@@ -33,8 +33,8 @@ import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
-    public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, final Project project, final DependencyGraph dependencyGraph) {
-        final List<Component> components = createAndLinkComponents(dependencyGraph, project);
+    public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, final Project project, final DependencyGraph dependencyGraph, final int numDirectLevels) {
+        final List<Component> components = createAndLinkComponents(dependencyGraph, project, numDirectLevels);
         return new Bdio2Document(bdioMetadata, project, components);
     }
 
@@ -42,12 +42,12 @@ public class Bdio2Factory {
         return createBdioMetadata(codeLocationName, creationDateTime, DEFAULT_PRODUCTS);
     }
 
-    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, Product product) {
+    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, final Product product) {
         return createBdioMetadata(codeLocationName, creationDateTime, addLists(DEFAULT_PRODUCTS, Arrays.asList(product)));
     }
 
-    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, List<Product> products) {
-        ProductList productList =
+    public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, final List<Product> products) {
+        final ProductList productList =
             addLists(DEFAULT_PRODUCTS, products)
                 .stream()
                 .collect(ProductList.toProductList());
@@ -73,11 +73,11 @@ public class Bdio2Factory {
                    .version(projectVersionName);
     }
 
-    public List<Component> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
-        return createAndLinkComponentsFromGraph(dependencyGraph, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>());
+    public List<Component> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project, final int numDirectLevels) {
+        return createAndLinkComponentsFromGraph(dependencyGraph, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), numDirectLevels, 1);
     }
 
-    private BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, ProductList productList) {
+    private BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, final ProductList productList) {
         return new BdioMetadata()
                    .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
                    .name(codeLocationName)
@@ -85,10 +85,13 @@ public class Bdio2Factory {
                    .publisher(productList);
     }
 
-    private List<Component> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final DependencyFunction dependencyFunction, final Set<Dependency> dependencies, final Map<ExternalId, Component> existingComponents) {
+    private List<Component> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final DependencyFunction dependencyFunction, final Set<Dependency> dependencies, final Map<ExternalId, Component> existingComponents,
+        final int numDirectLevels, final int curLevel) {
+        final boolean direct = curLevel <= numDirectLevels;
         final List<Component> addedComponents = new ArrayList<>();
 
         for (final Dependency dependency : dependencies) {
+            System.out.printf("%s/%s: direct=%b\n", dependency.getName(), dependency.getVersion(), direct);
             final Component component = componentFromDependency(dependency);
             dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
 
@@ -96,7 +99,7 @@ public class Bdio2Factory {
                 addedComponents.add(component);
 
                 existingComponents.put(dependency.getExternalId(), component);
-                final List<Component> children = createAndLinkComponentsFromGraph(dependencyGraph, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingComponents);
+                final List<Component> children = createAndLinkComponentsFromGraph(dependencyGraph, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingComponents, numDirectLevels, curLevel + 1);
                 addedComponents.addAll(children);
             }
         }
@@ -112,7 +115,7 @@ public class Bdio2Factory {
                    .namespace(dependency.getExternalId().getForge().getName());
     }
 
-    private List<Product> addLists(List<Product> list1, List<Product> list2) {
+    private List<Product> addLists(final List<Product> list1, final List<Product> list2) {
         return Stream
                    .concat(list1.stream(), list2.stream())
                    .distinct()
