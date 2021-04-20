@@ -93,7 +93,13 @@ public class Bdio2Factory {
         for (final Dependency dependency : dependencies) {
             System.out.printf("%s/%s: direct=%b\n", dependency.getName(), dependency.getVersion(), direct);
             final Component component = componentFromDependency(dependency);
-            dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
+            final com.blackducksoftware.bdio2.model.Dependency bdio2Dependency = new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component);
+            if (direct) {
+                // TODO: bdio2Dependency.dependencyType("something that indicates direct");
+            } else {
+                // TODO: bdio2Dependency.dependencyType("something that indicates transitive");
+            }
+            dependencyFunction.dependency(bdio2Dependency);
 
             if (!existingComponents.containsKey(dependency.getExternalId())) {
                 addedComponents.add(component);
