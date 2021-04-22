@@ -1,72 +1,89 @@
 package com.synopsys.integration.blackduck.service.request;
 
+import java.util.function.BiFunction;
+
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
+import com.synopsys.integration.blackduck.api.core.response.ApiResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathResponse;
 import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathSingleResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.LinkResponse;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckApiExchangeDescriptorFactory {
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
-    private final HttpUrl blackDuckBaseUrl;
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
 
-    public BlackDuckApiExchangeDescriptorFactory(BlackDuckRequestFactory blackDuckRequestFactory, HttpUrl blackDuckBaseUrl) {
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
-        this.blackDuckBaseUrl = blackDuckBaseUrl;
+    public BlackDuckApiExchangeDescriptorFactory(BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory) {
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromBlackDuckView(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) {
-        HttpUrl url = blackDuckView.getFirstLink(linkSingleResponse.getLink());
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
-        return new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, linkSingleResponse.getResponseClass());
+        return descriptorFromView(blackDuckView, linkSingleResponse, BlackDuckApiExchangeDescriptorSingle::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromBlackDuckView(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) {
-        HttpUrl url = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
-        return new BlackDuckApiExchangeDescriptorMultiple<>(blackDuckRequestBuilder, linkMultipleResponses.getResponseClass());
+        return descriptorFromView(blackDuckView, linkMultipleResponses, BlackDuckApiExchangeDescriptorMultiple::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromBlackDuckView(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        HttpUrl url = blackDuckView.getFirstLink(linkSingleResponse.getLink());
-        blackDuckRequestBuilder.url(url);
-        return new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, linkSingleResponse.getResponseClass());
+        return descriptorFromViewAndBuilder(blackDuckView, linkSingleResponse, blackDuckRequestBuilder, BlackDuckApiExchangeDescriptorSingle::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromBlackDuckView(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        HttpUrl url = blackDuckView.getFirstLink(linkMultipleResponses.getLink());
-        blackDuckRequestBuilder.url(url);
-        return new BlackDuckApiExchangeDescriptorMultiple<>(blackDuckRequestBuilder, linkMultipleResponses.getResponseClass());
+        return descriptorFromViewAndBuilder(blackDuckView, linkMultipleResponses, blackDuckRequestBuilder, BlackDuckApiExchangeDescriptorMultiple::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromBlackDuckPath(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
-        HttpUrl url = blackDuckPathSingleResponse.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
-        return new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, blackDuckPathSingleResponse.getResponseClass());
+        return descriptorFromPath(blackDuckPathSingleResponse, BlackDuckApiExchangeDescriptorSingle::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromBlackDuckPath(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
-        HttpUrl url = blackDuckPathMultipleResponses.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
-        return new BlackDuckApiExchangeDescriptorMultiple<>(blackDuckRequestBuilder, blackDuckPathMultipleResponses.getResponseClass());
+        return descriptorFromPath(blackDuckPathMultipleResponses, BlackDuckApiExchangeDescriptorMultiple::new);
     }
 
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromBlackDuckPath(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, BlackDuckRequestBuilder blackDuckRequestBuilder) throws IntegrationException {
-        HttpUrl url = blackDuckPathSingleResponse.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
-        blackDuckRequestBuilder.url(url);
-        return new BlackDuckApiExchangeDescriptorSingle<>(blackDuckRequestBuilder, blackDuckPathSingleResponse.getResponseClass());
+        return descriptorFromPathAndBuilder(blackDuckPathSingleResponse, blackDuckRequestBuilder, BlackDuckApiExchangeDescriptorSingle::new);
     }
 
-    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromBlackDuckPath(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder blackDuckRequestBuilder)
-        throws IntegrationException {
-        HttpUrl url = blackDuckPathMultipleResponses.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
+    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromBlackDuckPath(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder blackDuckRequestBuilder) throws IntegrationException {
+        return descriptorFromPathAndBuilder(blackDuckPathMultipleResponses, blackDuckRequestBuilder, BlackDuckApiExchangeDescriptorMultiple::new);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromView(BlackDuckView blackDuckView, LinkResponse<T> linkResponse, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        return descriptorFromViewAndBuilder(blackDuckView, linkResponse, blackDuckRequestBuilder, descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromViewAndBuilder(BlackDuckView blackDuckView, LinkResponse<T> linkResponse, BlackDuckRequestBuilder blackDuckRequestBuilder, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        HttpUrl url = blackDuckView.getFirstLink(linkResponse.getLink());
         blackDuckRequestBuilder.url(url);
-        return new BlackDuckApiExchangeDescriptorMultiple<>(blackDuckRequestBuilder, blackDuckPathMultipleResponses.getResponseClass());
+        return descriptor(blackDuckRequestBuilder, linkResponse, descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromPath(BlackDuckPathResponse<T> blackDuckPathResponse, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator)
+        throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        return descriptorFromPathAndBuilder(blackDuckPathResponse, blackDuckRequestBuilder, descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromPathAndBuilder(BlackDuckPathResponse<T> blackDuckPathResponse, BlackDuckRequestBuilder blackDuckRequestBuilder, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator)
+        throws IntegrationException {
+        BlackDuckPath blackDuckPath = blackDuckPathResponse.getBlackDuckPath();
+        blackDuckRequestBuilderFactory.populateUrl(blackDuckRequestBuilder, blackDuckPath);
+        return descriptor(blackDuckRequestBuilder, blackDuckPathResponse, descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptor(BlackDuckRequestBuilder blackDuckRequestBuilder, ApiResponse<T> apiResponse,
+        BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        blackDuckRequestBuilder.commonGet();
+        return descriptorCreator.apply(blackDuckRequestBuilder, apiResponse.getResponseClass());
     }
 
 }

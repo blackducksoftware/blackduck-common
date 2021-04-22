@@ -135,6 +135,7 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return connectionResult.isSuccess();
     }
 
+    //TODO create BlackDuckConnectionResult
     public ConnectionResult attemptConnection(IntLogger logger) {
         String errorMessage = null;
         Exception exception = null;

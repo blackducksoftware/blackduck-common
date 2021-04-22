@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -36,7 +37,7 @@ public interface BlackDuckHttpClient {
 
     void throwExceptionForError(Response response) throws IntegrationException;
 
-    HttpUrl getBaseUrl();
+    HttpUrl getBlackDuckUrl();
 
     String getUserAgentString();
 

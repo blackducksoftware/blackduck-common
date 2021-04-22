@@ -14,6 +14,7 @@ import org.apache.commons.collections4.map.LRUMap;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -80,8 +81,8 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     }
 
     @Override
-    public HttpUrl getBaseUrl() {
-        return blackDuckHttpClient.getBaseUrl();
+    public HttpUrl getBlackDuckUrl() {
+        return blackDuckHttpClient.getBlackDuckUrl();
     }
 
     @Override

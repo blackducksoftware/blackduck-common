@@ -21,14 +21,14 @@ public class PagedRequest {
 
     public PagedRequest(BlackDuckRequestBuilder requestBuilder) {
         this.requestBuilder = requestBuilder;
-        int offset = BlackDuckRequestFactory.DEFAULT_OFFSET;
-        int limit = BlackDuckRequestFactory.DEFAULT_LIMIT;
+        int offset = BlackDuckRequestBuilder.DEFAULT_OFFSET;
+        int limit = BlackDuckRequestBuilder.DEFAULT_LIMIT;
         if (requestBuilder.getQueryParameters() != null) {
-            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.OFFSET_PARAMETER)) {
-                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
+            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilder.OFFSET_PARAMETER)) {
+                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
             }
-            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.LIMIT_PARAMETER)) {
-                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
+            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilder.LIMIT_PARAMETER)) {
+                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestBuilder.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
             }
         }
 
@@ -56,8 +56,8 @@ public class PagedRequest {
         Set<String> offsetValue = new HashSet<>();
         offsetValue.add(String.valueOf(getOffset()));
 
-        request.getQueryParameters().put(BlackDuckRequestFactory.LIMIT_PARAMETER, limitValue);
-        request.getQueryParameters().put(BlackDuckRequestFactory.OFFSET_PARAMETER, offsetValue);
+        request.getQueryParameters().put(BlackDuckRequestBuilder.LIMIT_PARAMETER, limitValue);
+        request.getQueryParameters().put(BlackDuckRequestBuilder.OFFSET_PARAMETER, offsetValue);
         return request;
     }
 

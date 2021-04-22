@@ -13,6 +13,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -24,22 +25,22 @@ public class Bdio2StreamUploader {
     private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
 
     private final BlackDuckApiClient blackDuckApiClient;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final BlackDuckApiFactories blackDuckApiFactories;
     private final IntLogger logger;
     private final BlackDuckPath scanPath;
     private final String contentType;
 
-    public Bdio2StreamUploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory, final IntLogger logger, final BlackDuckPath scanPath, final String contentType) {
+    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger, BlackDuckPath scanPath, String contentType) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.blackDuckApiFactories = blackDuckApiFactories;
         this.logger = logger;
         this.scanPath = scanPath;
         this.contentType = contentType;
     }
 
     public HttpUrl start(BdioFileContent header) throws IntegrationException {
-        HttpUrl url = blackDuckApiClient.getUrl(scanPath);
-        Request request = blackDuckRequestFactory
+        HttpUrl url = blackDuckApiFactories.blackDuckUrlFactory.fromBlackDuckPath(scanPath);
+        Request request = blackDuckApiFactories.blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
                               .addHeader(HEADER_CONTENT_TYPE, contentType)
                               .build();
@@ -50,7 +51,7 @@ public class Bdio2StreamUploader {
 
     public void append(HttpUrl url, int count, BdioFileContent bdioFileContent) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
-        Request request = blackDuckRequestFactory
+        Request request = blackDuckApiFactories.blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, bdioFileContent.getContent())
                               .addHeader(HEADER_CONTENT_TYPE, contentType)
                               .addHeader(HEADER_X_BD_MODE, "append")
@@ -61,7 +62,7 @@ public class Bdio2StreamUploader {
 
     public void finish(HttpUrl url, int count) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
-        Request request = blackDuckRequestFactory
+        Request request = blackDuckApiFactories.blackDuckRequestFactory
                               .createCommonPutRequestBuilder(url, StringUtils.EMPTY)
                               .addHeader(HEADER_CONTENT_TYPE, contentType)
                               .addHeader(HEADER_X_BD_MODE, "finish")

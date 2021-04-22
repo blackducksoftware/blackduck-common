@@ -214,13 +214,13 @@ public class BlackDuckServicesFactory {
 
     public RapidScanService createRapidScanService() {
         RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckApiFactories.blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckApiFactories, logger, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
         Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckApiFactories, logger, new Bdio2ContentExtractor(), bdio2Uploader);
         return new RapidScanService(bdio2FileUploadService, rapidScanWaiter);
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckApiFactories.blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH,
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckApiFactories, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH,
             IntelligentPersistenceService.CONTENT_TYPE);
         Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckApiFactories, logger, new Bdio2ContentExtractor(), bdio2Uploader);
         IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);

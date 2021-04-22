@@ -25,6 +25,7 @@ import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -53,29 +54,25 @@ public class BlackDuckApiClient {
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
-    private final HttpUrl blackDuckBaseUrl;
-    private final Gson gson;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
 
-    public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, Gson gson, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckRequestFactory blackDuckRequestFactory) {
+    public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory) {
         this.blackDuckHttpClient = blackDuckHttpClient;
-        this.blackDuckBaseUrl = blackDuckHttpClient.getBaseUrl();
-        this.gson = gson;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
-        this.blackDuckApiExchangeDescriptorFactory = new BlackDuckApiExchangeDescriptorFactory(blackDuckRequestFactory, blackDuckBaseUrl);
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
+        this.blackDuckApiExchangeDescriptorFactory = new BlackDuckApiExchangeDescriptorFactory(blackDuckRequestBuilderFactory);
     }
 
     // ------------------------------------------------
     // getting responses from a 'path', which we define as something that looks like '/api/codelocations'
     // ------------------------------------------------
-    public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Predicate<T> predicate, int totalLimit)
-        throws IntegrationException {
-        return getSomeMatchingResponses(blackDuckPathMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder(), predicate, totalLimit);
+    public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, Predicate<T> predicate, int totalLimit) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createCommonGetRequestBuilder();
+        return getSomeMatchingResponses(blackDuckPathMultipleResponses, blackDuckRequestBuilder, predicate, totalLimit);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
@@ -87,7 +84,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses) throws IntegrationException {
-        return getAllResponses(blackDuckPathMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder());
+        return getAllResponses(blackDuckPathMultipleResponses, createCommonGetRequestBuilder());
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
@@ -98,7 +95,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, int totalLimit) throws IntegrationException {
-        return getSomeResponses(blackDuckPathMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder(), totalLimit);
+        return getSomeResponses(blackDuckPathMultipleResponses, createCommonGetRequestBuilder(), totalLimit);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
@@ -109,9 +106,10 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(BlackDuckPathMultipleResponses<T> blackDuckPathMultipleResponses, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        HttpUrl url = blackDuckPathMultipleResponses.getBlackDuckPath().getFullBlackDuckUrl(blackDuckBaseUrl);
+        BlackDuckPath blackDuckPath = blackDuckPathMultipleResponses.getBlackDuckPath();
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder(blackDuckPath);
         Class<T> responseClass = blackDuckPathMultipleResponses.getResponseClass();
-        return getPageResponse(url, responseClass, blackDuckPageDefinition);
+        return getPageResponse(blackDuckRequestBuilder, responseClass, blackDuckPageDefinition);
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
@@ -121,7 +119,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckPathSingleResponse<T> blackDuckPathSingleResponse) throws IntegrationException {
-        return getResponse(blackDuckPathSingleResponse, blackDuckRequestFactory.createCommonGetRequestBuilder());
+        return getResponse(blackDuckPathSingleResponse, createCommonGetRequestBuilder());
     }
 
     // ------------------------------------------------
@@ -129,7 +127,7 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, Predicate<T> predicate, int totalLimit)
         throws IntegrationException {
-        return getSomeMatchingResponses(blackDuckView, linkMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder(), predicate, totalLimit);
+        return getSomeMatchingResponses(blackDuckView, linkMultipleResponses, createCommonGetRequestBuilder(), predicate, totalLimit);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeMatchingResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, Predicate<T> predicate, int totalLimit)
@@ -141,7 +139,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses) throws IntegrationException {
-        return getAllResponses(blackDuckView, linkMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder());
+        return getAllResponses(blackDuckView, linkMultipleResponses, createCommonGetRequestBuilder());
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder) throws IntegrationException {
@@ -152,7 +150,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, int totalLimit) throws IntegrationException {
-        return getSomeResponses(blackDuckView, linkMultipleResponses, blackDuckRequestFactory.createCommonGetRequestBuilder(), totalLimit);
+        return getSomeResponses(blackDuckView, linkMultipleResponses, createCommonGetRequestBuilder(), totalLimit);
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckView blackDuckView, LinkMultipleResponses<T> linkMultipleResponses, BlackDuckRequestBuilder requestBuilder, int totalLimit) throws IntegrationException {
@@ -165,7 +163,7 @@ public class BlackDuckApiClient {
     public <T extends BlackDuckResponse> Optional<T> getResponse(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) throws IntegrationException {
         try {
             HttpUrl url = blackDuckView.getFirstLink(linkSingleResponse.getLink());
-            Request request = blackDuckRequestFactory.createCommonGetRequest(url);
+            Request request = blackDuckRequestBuilderFactory.createCommonGetRequest(url);
             return Optional.of(blackDuckResponseTransformer.getResponse(request, linkSingleResponse.getResponseClass()));
         } catch (NoSuchElementException e) {
             return Optional.empty();
@@ -176,17 +174,17 @@ public class BlackDuckApiClient {
     // getting responses from a uri
     // ------------------------------------------------
     public <T extends BlackDuckResponse> List<T> getAllResponses(HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(url);
         return blackDuckResponsesTransformer.getAllResponses(new PagedRequest(requestBuilder), responseClass).getItems();
     }
 
     public <T extends BlackDuckResponse> List<T> getSomeResponses(HttpUrl url, Class<T> responseClass, int totalLimit) throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(url);
         return blackDuckResponsesTransformer.getSomeResponses(new PagedRequest(requestBuilder), responseClass, totalLimit).getItems();
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(HttpUrl url, Class<T> responseClass, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(url);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(url);
         return getPageResponse(requestBuilder, responseClass, blackDuckPageDefinition);
     }
 
@@ -207,7 +205,7 @@ public class BlackDuckApiClient {
     }
 
     public <T extends BlackDuckResponse> T getResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        Request request = blackDuckRequestFactory.createCommonGetRequest(url);
+        Request request = blackDuckRequestBuilderFactory.createCommonGetRequest(url);
         return blackDuckResponseTransformer.getResponse(request, responseClass);
     }
 
@@ -235,7 +233,7 @@ public class BlackDuckApiClient {
     // handling generic post
     // ------------------------------------------------
     public HttpUrl post(HttpUrl url, BlackDuckComponent blackDuckComponent) throws IntegrationException {
-        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(url, blackDuckComponent).build();
+        Request request = blackDuckRequestBuilderFactory.createCommonPostRequestBuilder(url, blackDuckComponent).build();
         return executePostRequestAndRetrieveURL(request);
     }
 
@@ -262,7 +260,7 @@ public class BlackDuckApiClient {
         HttpUrl url = blackDuckView.getHref();
         // add the 'missing' pieces back from view that could have been lost
         String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
-        Request request = blackDuckRequestFactory.createCommonPutRequestBuilder(url, json).build();
+        Request request = blackDuckRequestBuilderFactory.createCommonPutRequestBuilder(url, json).build();
         try (Response response = execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -273,7 +271,7 @@ public class BlackDuckApiClient {
     // handling generic get
     // ------------------------------------------------
     public Response get(HttpUrl url) throws IntegrationException {
-        Request request = blackDuckRequestFactory.createCommonGetRequest(url);
+        Request request = blackDuckRequestBuilderFactory.createCommonGetRequest(url);
         return execute(request);
     }
 
@@ -295,6 +293,12 @@ public class BlackDuckApiClient {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+    }
+
+    private BlackDuckRequestBuilder createCommonGetRequestBuilder() {
+        return blackDuckRequestBuilderFactory
+                   .createBlackDuckRequestBuilder()
+                   .commonGet();
     }
 
     private <T extends BlackDuckResponse> List<T> getSpecialResponses(TransformerDetails<T> transformerDetails) throws IntegrationException {

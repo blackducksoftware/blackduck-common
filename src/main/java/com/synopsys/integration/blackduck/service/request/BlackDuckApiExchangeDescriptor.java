@@ -9,13 +9,15 @@ package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckApiExchangeDescriptor<T extends BlackDuckResponse> {
     private final BlackDuckRequestBuilder blackDuckRequestBuilder;
     private final Class<T> responseClass;
 
-    public BlackDuckApiExchangeDescriptor(BlackDuckRequestBuilder blackDuckRequestBuilder, Class<T> responseClass) {
+    public BlackDuckApiExchangeDescriptor(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
         this.blackDuckRequestBuilder = blackDuckRequestBuilder;
+        this.blackDuckRequestBuilder.url(url);
         this.responseClass = responseClass;
     }
 
