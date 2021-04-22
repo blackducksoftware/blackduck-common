@@ -95,9 +95,9 @@ public class Bdio2Factory {
             final Component component = componentFromDependency(dependency);
             final com.blackducksoftware.bdio2.model.Dependency bdio2Dependency = new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component);
             if (direct) {
-                // TODO: bdio2Dependency.dependencyType("something that indicates direct");
+                // TODO: bdio2Dependency.dependencyType("DIRECT");
             } else {
-                // TODO: bdio2Dependency.dependencyType("something that indicates transitive");
+                // TODO: bdio2Dependency.dependencyType("TRANSITIVE");
             }
             dependencyFunction.dependency(bdio2Dependency);
 
