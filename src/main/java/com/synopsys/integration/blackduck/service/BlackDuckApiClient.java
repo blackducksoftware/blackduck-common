@@ -58,13 +58,13 @@ public class BlackDuckApiClient {
     private final BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
 
     public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory) {
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
         this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
-        this.blackDuckApiExchangeDescriptorFactory = new BlackDuckApiExchangeDescriptorFactory(blackDuckRequestBuilderFactory);
+        this.blackDuckApiExchangeDescriptorFactory = blackDuckApiExchangeDescriptorFactory;
     }
 
     // ------------------------------------------------
@@ -204,11 +204,6 @@ public class BlackDuckApiClient {
         return blackDuckResponsesTransformer.getOnePageOfResponses(pagedRequest, responseClass);
     }
 
-    public <T extends BlackDuckResponse> T getResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        Request request = blackDuckRequestBuilderFactory.createCommonGetRequest(url);
-        return blackDuckResponseTransformer.getResponse(request, responseClass);
-    }
-
     // ------------------------------------------------
     // handling descriptors
     // ------------------------------------------------
@@ -227,14 +222,6 @@ public class BlackDuckApiClient {
         Class<T> responseClass = blackDuckApiExchangeDescriptorSingle.getResponseClass();
 
         return blackDuckResponseTransformer.getResponse(request, responseClass);
-    }
-
-    // ------------------------------------------------
-    // handling generic post
-    // ------------------------------------------------
-    public HttpUrl post(HttpUrl url, BlackDuckComponent blackDuckComponent) throws IntegrationException {
-        Request request = blackDuckRequestBuilderFactory.createCommonPostRequestBuilder(url, blackDuckComponent).build();
-        return executePostRequestAndRetrieveURL(request);
     }
 
     // ------------------------------------------------

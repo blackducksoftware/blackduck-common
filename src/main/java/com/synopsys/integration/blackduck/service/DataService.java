@@ -7,16 +7,20 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorFactory;
 import com.synopsys.integration.log.IntLogger;
 
 public class DataService {
     protected final BlackDuckApiClient blackDuckApiClient;
-    protected final BlackDuckApiFactories blackDuckApiFactories;
+    protected final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
+    protected final BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
     protected final IntLogger logger;
 
-    public DataService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger) {
+    public DataService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory, IntLogger logger) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckApiFactories = blackDuckApiFactories;
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
+        this.blackDuckApiExchangeDescriptorFactory = blackDuckApiExchangeDescriptorFactory;
         this.logger = logger;
     }
 

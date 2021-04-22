@@ -24,6 +24,22 @@ public class BlackDuckApiExchangeDescriptorFactory {
         this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
     }
 
+    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromUrlSingleResponse(HttpUrl url, Class<T> responseClass) {
+        return descriptorFromUrlAndClass(url, responseClass, BlackDuckApiExchangeDescriptorSingle::new);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromUrlMultipleResponses(HttpUrl url, Class<T> responseClass) {
+        return descriptorFromUrlAndClass(url, responseClass, BlackDuckApiExchangeDescriptorMultiple::new);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromUrl(HttpUrl url, LinkSingleResponse<T> linkSingleResponse) {
+        return descriptorFromUrl(url, linkSingleResponse, BlackDuckApiExchangeDescriptorSingle::new);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorMultiple<T> fromUrl(HttpUrl url, LinkMultipleResponses<T> linkMultipleResponses) {
+        return descriptorFromUrl(url, linkMultipleResponses, BlackDuckApiExchangeDescriptorMultiple::new);
+    }
+
     public <T extends BlackDuckResponse> BlackDuckApiExchangeDescriptorSingle<T> fromBlackDuckView(BlackDuckView blackDuckView, LinkSingleResponse<T> linkSingleResponse) {
         return descriptorFromView(blackDuckView, linkSingleResponse, BlackDuckApiExchangeDescriptorSingle::new);
     }
@@ -56,6 +72,18 @@ public class BlackDuckApiExchangeDescriptorFactory {
         return descriptorFromPathAndBuilder(blackDuckPathMultipleResponses, blackDuckRequestBuilder, BlackDuckApiExchangeDescriptorMultiple::new);
     }
 
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromUrlAndClass(HttpUrl url, Class<T> responseClass, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        blackDuckRequestBuilder.url(url);
+        return descriptor(blackDuckRequestBuilder, responseClass, descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromUrl(HttpUrl url, LinkResponse<T> linkResponse, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        blackDuckRequestBuilder.url(url);
+        return descriptor(blackDuckRequestBuilder, linkResponse, descriptorCreator);
+    }
+
     private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromView(BlackDuckView blackDuckView, LinkResponse<T> linkResponse, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
         return descriptorFromViewAndBuilder(blackDuckView, linkResponse, blackDuckRequestBuilder, descriptorCreator);
@@ -76,14 +104,19 @@ public class BlackDuckApiExchangeDescriptorFactory {
     private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptorFromPathAndBuilder(BlackDuckPathResponse<T> blackDuckPathResponse, BlackDuckRequestBuilder blackDuckRequestBuilder, BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator)
         throws IntegrationException {
         BlackDuckPath blackDuckPath = blackDuckPathResponse.getBlackDuckPath();
-        blackDuckRequestBuilderFactory.populateUrl(blackDuckRequestBuilder, blackDuckPath);
+        blackDuckRequestBuilder.url(blackDuckRequestBuilderFactory.getFullUrl(blackDuckPath));
         return descriptor(blackDuckRequestBuilder, blackDuckPathResponse, descriptorCreator);
     }
 
     private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptor(BlackDuckRequestBuilder blackDuckRequestBuilder, ApiResponse<T> apiResponse,
         BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
+        return descriptor(blackDuckRequestBuilder, apiResponse.getResponseClass(), descriptorCreator);
+    }
+
+    private <T extends BlackDuckResponse, D extends BlackDuckApiExchangeDescriptor<T>> D descriptor(BlackDuckRequestBuilder blackDuckRequestBuilder, Class<T> responseClass,
+        BiFunction<BlackDuckRequestBuilder, Class<T>, D> descriptorCreator) {
         blackDuckRequestBuilder.commonGet();
-        return descriptorCreator.apply(blackDuckRequestBuilder, apiResponse.getResponseClass());
+        return descriptorCreator.apply(blackDuckRequestBuilder, responseClass);
     }
 
 }

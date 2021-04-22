@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +59,18 @@ public class InstallAndRunSignatureScannerTestIT {
 
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
+    private File scannerDirectoryPath;
+
+    @BeforeEach
+    public void initEach() throws IOException {
+        scannerDirectoryPath = Files.createTempDirectory("testscanner").toFile();
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        FileUtils.deleteQuietly(scannerDirectoryPath);
+    }
+
     @Test
     public void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
         // here, we do not want to automatically trust the server's certificate
@@ -65,13 +79,8 @@ public class InstallAndRunSignatureScannerTestIT {
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
 
-        File scannerDirectoryPath = Files.createTempDirectory("testscanner").toFile();
-        scannerDirectoryPath.deleteOnExit();
-        scannerDirectoryPath.mkdirs();
         File installDirectory = new File(scannerDirectoryPath, "scanner_install");
-        installDirectory.deleteOnExit();
         File outputDirectory = new File(scannerDirectoryPath, "scanner_output");
-        outputDirectory.deleteOnExit();
 
         ScanBatch scanBatch = createScanBatch(blackDuckServerConfig, installDirectory, outputDirectory);
 
@@ -156,7 +165,6 @@ public class InstallAndRunSignatureScannerTestIT {
     public static class NoOpKeyStoreHelper extends KeyStoreHelper {
         public NoOpKeyStoreHelper(BlackDuckHttpClient blackDuckHttpClient, BlackDuckRequestFactory blackDuckRequestFactory) {
             super(new SilentIntLogger());
-            //, new SignatureScannerClient(blackDuckHttpClient), blackDuckRequestFactory
         }
 
         @Override

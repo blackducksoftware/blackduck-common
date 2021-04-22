@@ -30,16 +30,22 @@ public class BlackDuckRequestBuilderFactory {
         return new BlackDuckRequestBuilder(blackDuckPath.getFullBlackDuckUrl(blackDuckUrl));
     }
 
+    public BlackDuckRequestBuilder createPostObjectContentBlackDuckRequestBuilder(BlackDuckPath blackDuckPath, Object object) throws IntegrationException {
+        return createBlackDuckRequestBuilder(blackDuckPath)
+                   .post()
+                   .bodyContent(getStringBodyContent(object));
+    }
+
     public BlackDuckRequestBuilder createBlackDuckRequestBuilder(HttpUrl url) {
         return new BlackDuckRequestBuilder(url);
     }
 
-    public void populateUrl(BlackDuckRequestBuilder blackDuckRequestBuilder, BlackDuckPath blackDuckPath) throws IntegrationException {
-        blackDuckRequestBuilder.url(blackDuckPath.getFullBlackDuckUrl(blackDuckUrl));
+    public HttpUrl getFullUrl(BlackDuckPath blackDuckPath) throws IntegrationException {
+        return blackDuckPath.getFullBlackDuckUrl(blackDuckUrl);
     }
 
-    public void populateBodyContent(BlackDuckRequestBuilder blackDuckRequestBuilder, Object object) throws IntegrationException {
-        blackDuckRequestBuilder.bodyContent(new StringBodyContent(gson.toJson(object)));
+    public StringBodyContent getStringBodyContent(Object object) throws IntegrationException {
+        return new StringBodyContent(gson.toJson(object));
     }
 
 }

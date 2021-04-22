@@ -17,6 +17,7 @@ import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
+import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
 public final class BlackDuckRequestBuilder {
@@ -149,9 +150,21 @@ public final class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder postBodyContent(BodyContent bodyContent) {
+        post();
+        bodyContent(bodyContent);
+        return this;
+    }
+
     public BlackDuckRequestBuilder postMultipartBodyContent(Map<String, File> binaryParts, Map<String, String> textParts) {
         post();
         multipartBodyContent(binaryParts, textParts);
+        return this;
+    }
+
+    public BlackDuckRequestBuilder postStringContent(String content) {
+        post();
+        requestBuilder.bodyContent(new StringBodyContent(content));
         return this;
     }
 

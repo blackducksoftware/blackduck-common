@@ -30,6 +30,7 @@ import com.synopsys.integration.blackduck.codelocation.intelligentpersistence.In
 import com.synopsys.integration.blackduck.codelocation.intelligentpersistence.IntelligentPersistenceService;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
@@ -54,6 +55,7 @@ import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
 import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorFactory;
 import com.synopsys.integration.blackduck.service.request.NotificationRequestFactory;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
@@ -71,14 +73,14 @@ public class BlackDuckServicesFactory {
 
     private final Gson gson;
     private final ObjectMapper objectMapper;
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
+    private final BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory;
 
     private final BlackDuckResponseResolver blackDuckResponseResolver;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private final BlackDuckApiClient blackDuckApiClient;
-
-    public final BlackDuckApiFactories blackDuckApiFactories;
 
     public static Gson createDefaultGson() {
         return createDefaultGsonBuilder().create();
@@ -94,21 +96,22 @@ public class BlackDuckServicesFactory {
     }
 
     public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson,
-        ObjectMapper objectMapper, BlackDuckApiFactories blackDuckApiFactories) {
+        ObjectMapper objectMapper, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.executorService = executorService;
         this.logger = logger;
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.gson = gson;
         this.objectMapper = objectMapper;
-        this.blackDuckApiFactories = blackDuckApiFactories;
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
+        this.blackDuckApiExchangeDescriptorFactory = blackDuckApiExchangeDescriptorFactory;
 
         blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
-        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckApiFactories.blackDuckRequestFactory);
+        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestBuilderFactory, blackDuckApiExchangeDescriptorFactory);
     }
 
     public BdioUploadService createBdioUploadService() {

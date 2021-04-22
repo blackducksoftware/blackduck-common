@@ -17,21 +17,26 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.blackduck.service.BlackDuckApiFactories;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiExchangeDescriptorSingle;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.util.NameVersion;
 
 public class ProjectService extends DataService {
     private final ProjectGetService projectGetService;
 
-    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckApiFactories blackDuckApiFactories, IntLogger logger, ProjectGetService projectGetService) {
-        super(blackDuckApiClient, blackDuckApiFactories, logger);
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckApiExchangeDescriptorFactory blackDuckApiExchangeDescriptorFactory, IntLogger logger,
+        ProjectGetService projectGetService) {
+        super(blackDuckApiClient, blackDuckRequestBuilderFactory, blackDuckApiExchangeDescriptorFactory, logger);
         this.projectGetService = projectGetService;
     }
 
@@ -40,9 +45,10 @@ public class ProjectService extends DataService {
     }
 
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
-        HttpUrl projectCreateUrl = blackDuckApiFactories.blackDuckUrlFactory.fromBlackDuckPath(ApiDiscovery.PROJECTS_LINK);
-        HttpUrl projectUrl = blackDuckApiClient.post(projectCreateUrl, projectRequest);
-        ProjectView projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createPostObjectContentBlackDuckRequestBuilder(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        HttpUrl projectUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(blackDuckRequestBuilder.build());
+        BlackDuckApiExchangeDescriptorSingle<ProjectView> exchangeDescriptorSingle = blackDuckApiExchangeDescriptorFactory.fromUrlSingleResponse(projectUrl, ProjectView.class);
+        ProjectView projectView = blackDuckApiClient.getResponse(exchangeDescriptorSingle);
         if (null == projectRequest.getVersionRequest()) {
             return new ProjectVersionWrapper(projectView);
         }
@@ -59,8 +65,15 @@ public class ProjectService extends DataService {
         if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
             throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
         }
-        HttpUrl projectVersionUrl = blackDuckApiClient.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK), projectVersionRequest);
-        return blackDuckApiClient.getResponse(projectVersionUrl, ProjectVersionView.class);
+
+        HttpUrl versionsUrl = projectView.getFirstLink(ProjectView.VERSIONS_LINK);
+        StringBodyContent jsonContent = blackDuckRequestBuilderFactory.getStringBodyContent(projectVersionRequest);
+        BlackDuckApiExchangeDescriptorSingle<ProjectVersionView> exchangeDescriptorSingle = blackDuckApiExchangeDescriptorFactory.fromUrlSingleResponse(versionsUrl, ProjectVersionView.class);
+        exchangeDescriptorSingle
+            .getBlackDuckRequestBuilder()
+            .postBodyContent(jsonContent);
+
+        return blackDuckApiClient.getResponse(exchangeDescriptorSingle);
     }
 
     public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
@@ -128,7 +141,8 @@ public class ProjectService extends DataService {
             logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
             projectSyncModel.populateProjectView(projectView);
             blackDuckApiClient.put(projectView);
-            projectView = blackDuckApiClient.getResponse(projectView.getHref(), ProjectView.class);
+            BlackDuckApiExchangeDescriptorSingle<ProjectView> exchangeDescriptorSingle = blackDuckApiExchangeDescriptorFactory.fromUrlSingleResponse(projectView.getHref(), ProjectView.class);
+            projectView = blackDuckApiClient.getResponse(exchangeDescriptorSingle);
         }
         ProjectVersionView projectVersionView = null;
 
@@ -141,7 +155,8 @@ public class ProjectService extends DataService {
                     logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
                     projectSyncModel.populateProjectVersionView(projectVersionView);
                     blackDuckApiClient.put(projectVersionView);
-                    projectVersionView = blackDuckApiClient.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
+                    BlackDuckApiExchangeDescriptorSingle<ProjectVersionView> exchangeDescriptorSingle = blackDuckApiExchangeDescriptorFactory.fromUrlSingleResponse(projectVersionView.getHref(), ProjectVersionView.class);
+                    projectVersionView = blackDuckApiClient.getResponse(exchangeDescriptorSingle);
                 }
             } else {
                 logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));
