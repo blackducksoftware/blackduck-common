@@ -29,7 +29,15 @@ public class BlackDuckRequestBuilder {
         this.requestBuilder = requestBuilder;
     }
 
+    /**
+     * @deprecated
+     */
     public Request build() {
+        return requestBuilder.build();
+    }
+
+    public Request build(HttpUrl url) {
+        requestBuilder.url(url);
         return requestBuilder.build();
     }
 
@@ -37,6 +45,9 @@ public class BlackDuckRequestBuilder {
         return requestBuilder;
     }
 
+    /**
+     * @deprecated
+     */
     public BlackDuckRequestBuilder url(HttpUrl url) {
         requestBuilder.url(url);
         return this;
@@ -104,6 +115,9 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     public HttpUrl getUrl() {
         return requestBuilder.getUrl();
     }
