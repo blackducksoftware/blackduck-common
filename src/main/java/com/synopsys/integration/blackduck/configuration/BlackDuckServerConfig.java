@@ -133,17 +133,18 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public boolean canConnect(IntLogger logger) {
-        ConnectionResult connectionResult = attemptConnection(logger);
+        BlackDuckConnectionResult connectionResult = attemptConnection(logger);
         return connectionResult.isSuccess();
     }
 
-    public ConnectionResult attemptConnection(IntLogger logger) {
+    public BlackDuckConnectionResult attemptConnection(IntLogger logger) {
         String errorMessage = null;
         Exception exception = null;
         int httpStatusCode = 0;
 
+        BlackDuckHttpClient blackDuckHttpClient = null;
         try {
-            BlackDuckHttpClient blackDuckHttpClient = createBlackDuckHttpClient(logger);
+            blackDuckHttpClient = createBlackDuckHttpClient(logger);
             try (Response response = blackDuckHttpClient.attemptAuthentication()) {
                 // if you get an error response, you know that a connection could not be made
                 httpStatusCode = response.getStatusCode();
@@ -162,13 +163,13 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
             exception = e;
         }
 
-        if (null != errorMessage) {
+        if (null != errorMessage || null == blackDuckHttpClient) {
             logger.error(errorMessage);
-            return ConnectionResult.FAILURE(httpStatusCode, errorMessage, exception);
+            return BlackDuckConnectionResult.BLACK_DUCK_FAILURE(httpStatusCode, errorMessage, exception);
         }
 
         logger.info("A successful connection was made.");
-        return ConnectionResult.SUCCESS(httpStatusCode);
+        return BlackDuckConnectionResult.BLACK_DUCK_SUCCESS(httpStatusCode, blackDuckHttpClient);
     }
 
     public BlackDuckServicesFactory createBlackDuckServicesFactory(IntLogger logger) {
