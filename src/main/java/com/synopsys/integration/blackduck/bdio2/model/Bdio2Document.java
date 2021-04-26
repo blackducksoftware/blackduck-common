@@ -7,32 +7,22 @@
  */
 package com.synopsys.integration.blackduck.bdio2.model;
 
-import java.util.List;
-
 import com.blackducksoftware.bdio2.BdioMetadata;
-import com.blackducksoftware.bdio2.model.Component;
-import com.blackducksoftware.bdio2.model.Project;
 
 public class Bdio2Document {
     private final BdioMetadata bdioMetadata;
-    private final Project project;
-    private final List<Component> components;
+    private final Bdio2Project bdio2Project;
 
-    public Bdio2Document(final BdioMetadata bdioMetadata, final Project project, final List<Component> components) {
+    public Bdio2Document(final BdioMetadata bdioMetadata, Bdio2Project bdio2Project) {
         this.bdioMetadata = bdioMetadata;
-        this.project = project;
-        this.components = components;
+        this.bdio2Project = bdio2Project;
     }
 
     public BdioMetadata getBdioMetadata() {
         return bdioMetadata;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public List<Component> getComponents() {
-        return components;
+    public Bdio2Project getProject() {
+        return bdio2Project;
     }
 }

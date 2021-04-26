@@ -9,13 +9,12 @@ package com.synopsys.integration.blackduck.bdio2.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioWriter;
 import com.blackducksoftware.bdio2.model.Component;
-import com.blackducksoftware.bdio2.model.Project;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
+import com.synopsys.integration.blackduck.bdio2.model.Bdio2Project;
 
 public class Bdio2Writer {
     public BdioWriter createBdioWriter(final OutputStream outputStream, final BdioMetadata bdioMetadata) {
@@ -25,19 +24,25 @@ public class Bdio2Writer {
 
     public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) throws IOException {
         final BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
-        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getComponents());
+        writeBdioDocument(bdioWriter, bdio2Document.getProject());
     }
 
-    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final List<Component> components) throws IOException {
+    public void writeBdioDocument(final BdioWriter bdioWriter, Bdio2Project bdio2Project) throws IOException {
         bdioWriter.start();
+        writeBdio2Project(bdioWriter, bdio2Project);
+        bdioWriter.close();
+    }
 
-        for (Component component : components) {
+    private void writeBdio2Project(BdioWriter bdioWriter, Bdio2Project bdio2Project) throws IOException {
+        for (Component component : bdio2Project.getComponents()) {
             bdioWriter.next(component);
         }
 
         // We put the project node at the end of the document to be more inline with the way Black Duck produces BDIO 2.
-        bdioWriter.next(project);
+        bdioWriter.next(bdio2Project.getProject());
 
-        bdioWriter.close();
+        for (final Bdio2Project subproject : bdio2Project.getSubprojects()) {
+            writeBdio2Project(bdioWriter, subproject);
+        }
     }
 }

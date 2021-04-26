@@ -1,7 +1,5 @@
 package com.synopsys.integration.blackduck.comprehensive.recipe;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -23,11 +21,7 @@ import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Factory;
-import com.synopsys.integration.blackduck.bdio2.util.Bdio2Writer;
-import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
-import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.util.NameVersion;
@@ -66,18 +60,18 @@ public class IntelligentPersistenceRecipeTest extends BasicRecipe {
         dependencyGraph.addChildToRoot(dependency);
 
         // now, with metadata, a project, and a graph, we can create a bdio2 document and write out the file
-        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project, dependencyGraph);
-
-        File bdio2File = File.createTempFile("test_bdio2", ".bdio");
-        bdio2File.createNewFile();
-        bdio2File.deleteOnExit();
-
-        Bdio2Writer bdio2Writer = new Bdio2Writer();
-        bdio2Writer.writeBdioDocument(new FileOutputStream(bdio2File), bdio2Document);
-
-        // using the file and the previously set values, we create the UploadBatch for uploading to Black Duck
-        UploadBatch uploadBatch = new UploadBatch();
-        uploadBatch.addUploadTarget(UploadTarget.createDefault(PROJECT, CODE_LOCATION_NAME, bdio2File));
+        //        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project);
+        //
+        //        File bdio2File = File.createTempFile("test_bdio2", ".bdio");
+        //        bdio2File.createNewFile();
+        //        bdio2File.deleteOnExit();
+        //
+        //        Bdio2Writer bdio2Writer = new Bdio2Writer();
+        //        bdio2Writer.writeBdioDocument(new FileOutputStream(bdio2File), bdio2Document);
+        //
+        //        // using the file and the previously set values, we create the UploadBatch for uploading to Black Duck
+        //        UploadBatch uploadBatch = new UploadBatch();
+        //        uploadBatch.addUploadTarget(UploadTarget.createDefault(PROJECT, CODE_LOCATION_NAME, bdio2File));
 
         // now all the setup is done, we can upload the bdio2 file
         // FIXME Uncomment when BlackDuck officially supports intelligent persistence mode.

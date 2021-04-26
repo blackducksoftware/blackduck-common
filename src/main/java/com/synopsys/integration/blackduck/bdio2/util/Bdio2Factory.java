@@ -29,13 +29,13 @@ import com.synopsys.integration.bdio.graph.DependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
+import com.synopsys.integration.blackduck.bdio2.model.Bdio2Project;
 
 public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
-    public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, final Project project, final DependencyGraph dependencyGraph) {
-        final List<Component> components = createAndLinkComponents(dependencyGraph, project);
-        return new Bdio2Document(bdioMetadata, project, components);
+    public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, Bdio2Project bdio2Project) {
+        return new Bdio2Document(bdioMetadata, bdio2Project);
     }
 
     public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime) {
