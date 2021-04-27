@@ -1,9 +1,9 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
     ////////// START BUILDSCRIPT DEPENDENCY //////////
-dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.10.0" }
+    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.10.0" }
 
-////////// END BUILDSCRIPT DEPENDENCY //////////
+    ////////// END BUILDSCRIPT DEPENDENCY //////////
 }
 
 project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
@@ -21,7 +21,7 @@ versionFile.delete()
 versionFile << version
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.18'
+    api 'com.synopsys.integration:blackduck-common-api:2020.8.0.20'
 
     api 'com.synopsys.integration:integration-reporting:2.0.3'
     api 'com.synopsys.integration:integration-bdio:22.1.1'
