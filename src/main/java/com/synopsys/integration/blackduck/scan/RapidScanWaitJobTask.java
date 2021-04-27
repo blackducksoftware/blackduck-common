@@ -12,10 +12,12 @@ import java.io.IOException;
 import org.apache.http.HttpStatus;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckMediaTypes;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.WaitJobTask;
 
@@ -30,7 +32,10 @@ public class RapidScanWaitJobTask implements WaitJobTask {
 
     @Override
     public boolean isComplete() throws IntegrationException {
-        try (Response response = blackDuckApiClient.get(resultUrl)) {
+        Request.Builder requestBuilder = new Request.Builder(resultUrl);
+        requestBuilder.acceptMimeType(BlackDuckMediaTypes.APPLICATION_SCAN_V4);
+        Request request = requestBuilder.build();
+        try (Response response = blackDuckApiClient.execute(request)) {
             return response.isStatusCodeSuccess();
         } catch (IntegrationRestException ex) {
             if (HttpStatus.SC_NOT_FOUND == ex.getHttpStatusCode()) {
