@@ -11,7 +11,6 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckMediaTypes;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -49,7 +48,7 @@ public class RapidScanWaiter {
             throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
         Request.Builder requestBuilder = new Request.Builder(url);
-        requestBuilder.acceptMimeType(BlackDuckMediaTypes.APPLICATION_SCAN_V4);
+        requestBuilder.acceptMimeType(DeveloperScanComponentResultView.CURRENT_MEDIA_TYPE);
         BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder(requestBuilder);
         return blackDuckApiClient.getAllResponses(blackDuckRequestBuilder, DeveloperScanComponentResultView.class);
     }
