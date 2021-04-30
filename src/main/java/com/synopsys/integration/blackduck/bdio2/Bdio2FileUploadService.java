@@ -15,7 +15,7 @@ import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -28,9 +28,9 @@ public class Bdio2FileUploadService extends DataService {
     private Bdio2ContentExtractor bdio2Extractor;
     private Bdio2StreamUploader bdio2Uploader;
 
-    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory,
+    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory,
         IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
         this.bdio2Extractor = bdio2Extractor;
         this.bdio2Uploader = bdio2Uploader;
     }

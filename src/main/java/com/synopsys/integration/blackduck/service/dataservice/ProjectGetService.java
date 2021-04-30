@@ -17,7 +17,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -26,13 +26,13 @@ import com.synopsys.integration.log.IntLogger;
 public class ProjectGetService extends DataService {
     private UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
 
-    public ProjectGetService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+    public ProjectGetService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
     }
 
     public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         List<ProjectView> allProjectItems = blackDuckApiClient.getAllResponses(projectsResponses, requestBuilder);
         return allProjectItems;
@@ -40,7 +40,7 @@ public class ProjectGetService extends DataService {
 
     public List<ProjectView> getProjectMatches(String projectName, int limit) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
 
         List<ProjectView> projectItems = blackDuckApiClient.getSomeResponses(projectsResponses, requestBuilder, limit);
         return projectItems;
@@ -59,7 +59,7 @@ public class ProjectGetService extends DataService {
 
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(ProjectView projectView, String projectVersionName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
         Predicate<ProjectVersionView> predicate = projectVersionView -> projectVersionName.equals(projectVersionView.getVersionName());
 
         return blackDuckApiClient.getSomeMatchingResponses(projectView.metaVersionsLink(), requestBuilder, predicate, 1)

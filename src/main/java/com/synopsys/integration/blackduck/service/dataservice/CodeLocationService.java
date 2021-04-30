@@ -25,7 +25,7 @@ import com.synopsys.integration.blackduck.api.manual.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -36,8 +36,8 @@ public class CodeLocationService extends DataService {
     // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
     public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
 
-    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
@@ -76,7 +76,7 @@ public class CodeLocationService extends DataService {
 
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
                                                               .createCommonGetRequestBuilder(blackDuckQuery)
             .setBlackDuckPageDefinition(new BlackDuckPageDefinition(1, 0));
 

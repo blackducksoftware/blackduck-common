@@ -20,7 +20,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -39,7 +39,7 @@ public class ProjectServiceTest {
         ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
-        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
+        BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
         InputStream inputStream = getClass().getResourceAsStream("/json/pageOfProjectVersionViews.json");
 
         String pageJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
@@ -50,7 +50,7 @@ public class ProjectServiceTest {
         ProjectGetService projectGetService = Mockito.mock(ProjectGetService.class);
 
         ApiDiscovery apiDiscovery = new ApiDiscovery(new HttpUrl("https://synopsys.com"));
-        ProjectService projectService = new ProjectService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, projectGetService);
+        ProjectService projectService = new ProjectService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, projectGetService);
 
         ProjectView projectView = new ProjectView();
         projectView.setName("unit test");

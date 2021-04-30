@@ -7,10 +7,10 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.FILTER_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.LIMIT_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.OFFSET_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.Q_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory.FILTER_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory.LIMIT_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory.OFFSET_PARAMETER;
+import static com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory.Q_PARAMETER;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class BlackDuckRequestBuilder {
     private final Request.Builder requestBuilder;
 
     public BlackDuckRequestBuilder(Request.Builder requestBuilder) {
-        this.requestBuilder = requestBuilder;
+        this.requestBuilder = new Request.Builder(requestBuilder);
     }
 
     public BlackDuckRequestBuilder(BlackDuckRequestBuilder blackDuckRequestBuilder) {
@@ -37,18 +37,10 @@ public class BlackDuckRequestBuilder {
         return requestBuilder.build();
     }
 
-    public Request build(HttpUrl url) {
-        requestBuilder.url(url);
-        return requestBuilder.build();
-    }
-
     public Request.Builder getRequestBuilder() {
         return requestBuilder;
     }
 
-    /**
-     * @deprecated
-     */
     public BlackDuckRequestBuilder url(HttpUrl url) {
         requestBuilder.url(url);
         return this;
@@ -116,9 +108,6 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
-    /**
-     * @deprecated
-     */
     public HttpUrl getUrl() {
         return requestBuilder.getUrl();
     }

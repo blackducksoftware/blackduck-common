@@ -23,7 +23,7 @@ import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -38,8 +38,8 @@ public class NotificationService extends DataService {
 
     private UrlMultipleResponses<NotificationView> notificationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.NOTIFICATIONS_PATH);
 
-    public NotificationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+    public NotificationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
     }
 
     public List<NotificationView> getAllNotifications(Date startDate, Date endDate) throws IntegrationException {
@@ -113,7 +113,7 @@ public class NotificationService extends DataService {
     }
 
     private BlackDuckRequestBuilder createLatestDateRequestBuilder() {
-        return blackDuckRequestFactory
+        return blackDuckRequestBuilderFactory
                    .createCommonGetRequestBuilder()
                    .addBlackDuckFilter(createFilterForAllKnownTypes());
     }
@@ -138,7 +138,7 @@ public class NotificationService extends DataService {
         String endDateString = sdf.format(endDate);
 
         BlackDuckRequestFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
-        return blackDuckRequestFactory
+        return blackDuckRequestBuilderFactory
                    .createCommonGetRequestBuilder()
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString)

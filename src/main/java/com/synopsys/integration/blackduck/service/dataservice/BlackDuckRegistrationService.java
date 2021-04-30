@@ -12,7 +12,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.RegistrationView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
@@ -23,13 +23,13 @@ import com.synopsys.integration.rest.HttpUrl;
 public class BlackDuckRegistrationService extends DataService {
     private HttpUrl blackDuckUrl;
 
-    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, HttpUrl blackDuckUrl) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, HttpUrl blackDuckUrl) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
         this.blackDuckUrl = blackDuckUrl;
     }
 
     public String getRegistrationId() throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder();
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder();
         requestBuilder.acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
         UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.REGISTRATION_PATH);

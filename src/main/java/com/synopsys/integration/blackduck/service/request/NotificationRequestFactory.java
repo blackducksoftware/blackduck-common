@@ -19,7 +19,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
@@ -27,11 +27,11 @@ import com.synopsys.integration.rest.RestConstants;
 public class NotificationRequestFactory {
     private final List<String> ALL_NOTIFICATION_TYPES = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());
 
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final ApiDiscovery apiDiscovery;
 
-    public NotificationRequestFactory(BlackDuckRequestFactory blackDuckRequestFactory, ApiDiscovery apiDiscovery) {
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+    public NotificationRequestFactory(BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, ApiDiscovery apiDiscovery) {
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.apiDiscovery = apiDiscovery;
     }
 
@@ -52,7 +52,7 @@ public class NotificationRequestFactory {
         String endDateString = sdf.format(endDate);
 
         BlackDuckRequestFilter notificationTypeFilter = createFilterForNotificationsTypes(notificationTypesToInclude);
-        return blackDuckRequestFactory
+        return blackDuckRequestBuilderFactory
                    .createCommonGetRequestBuilder()
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString)

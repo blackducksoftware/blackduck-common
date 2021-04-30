@@ -19,7 +19,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -30,7 +30,7 @@ import com.synopsys.integration.rest.response.Response;
 
 public class SignatureScannerClientProxyTest {
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
-    private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory(new Gson());
+    private static final BlackDuckRequestBuilderFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestBuilderFactory(new Gson());
 
     private static final int MOCK_SERVER_STATUS_CODE = 500;
     private static final String MOCK_SERVER_HEADER_KEY = "MockServerKey";

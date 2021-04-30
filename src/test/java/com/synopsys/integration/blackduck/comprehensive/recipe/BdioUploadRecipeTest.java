@@ -59,7 +59,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         //in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
         IntLogger logger = new BufferedIntLogger();
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
@@ -84,7 +84,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         // in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
         IntLogger logger = new BufferedIntLogger();
 
-        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
+        UploadBatchRunner uploadBatchRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE);
         UploadBatch uploadBatch = new UploadBatch();
         uploadBatch.addUploadTarget(UploadTarget.createDefault(projectAndVersion, codeLocationName, file));
         BdioUploadCodeLocationCreationRequest scanRequest = new BdioUploadCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);

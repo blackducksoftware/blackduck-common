@@ -12,14 +12,12 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -27,7 +25,7 @@ class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(new Gson());
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }
@@ -74,7 +72,7 @@ class BlackDuckResponsesTransformerTestIT {
     }
 
     private BlackDuckRequestBuilder createRequestBuilder() throws IntegrationException {
-        return blackDuckRequestFactory.createCommonGetRequestBuilder(apiDiscovery.metaProjectsLink().getUrl());
+        return blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(apiDiscovery.metaProjectsLink().getUrl());
     }
 
     private BlackDuckResponsesTransformer createBlackDuckResponsesTransformer() {

@@ -24,7 +24,7 @@ import com.synopsys.integration.rest.request.Request;
 /**
  * A helper class to assist in creating all GET, POST, and PUT requests for Black Duck REST conversations.
  */
-public class BlackDuckRequestFactory {
+public class BlackDuckRequestBuilderFactory {
     public static final String LIMIT_PARAMETER = "limit";
     public static final String OFFSET_PARAMETER = "offset";
     public static final String Q_PARAMETER = "q";
@@ -35,7 +35,7 @@ public class BlackDuckRequestFactory {
 
     private final Gson gson;
 
-    public BlackDuckRequestFactory(Gson gson) {
+    public BlackDuckRequestBuilderFactory(Gson gson) {
         this.gson = gson;
     }
 

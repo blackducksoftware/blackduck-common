@@ -24,7 +24,7 @@ import com.synopsys.integration.blackduck.api.manual.temporary.component.Assigne
 import com.synopsys.integration.blackduck.api.manual.temporary.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.manual.temporary.view.AssignedUserView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -34,8 +34,8 @@ import com.synopsys.integration.rest.HttpUrl;
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;
 
-    public ProjectUsersService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UserGroupService userGroupService) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+    public ProjectUsersService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, UserGroupService userGroupService) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
         this.userGroupService = userGroupService;
     }
 
