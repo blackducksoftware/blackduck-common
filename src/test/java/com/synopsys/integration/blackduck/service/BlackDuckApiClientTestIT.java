@@ -49,8 +49,8 @@ public class BlackDuckApiClientTestIT {
         blackDuckServerConfigBuilder.setBlackDuckMediaTypeDiscovery(blackDuckMediaTypeDiscoveryVerifier);
 
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfigBuilder.build().createBlackDuckHttpClient(logger);
-        Gson gson = new Gson();
-        ObjectMapper objectMapper = new ObjectMapper();
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);

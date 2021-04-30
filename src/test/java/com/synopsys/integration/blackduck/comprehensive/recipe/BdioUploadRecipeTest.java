@@ -1,6 +1,7 @@
 package com.synopsys.integration.blackduck.comprehensive.recipe;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -50,6 +51,10 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
     @Test
     public void testBdioUpload() throws IntegrationException, InterruptedException {
+        // first we make sure that the code location doesn't already exist
+        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        assertFalse(optionalCodeLocationView.isPresent());
+
         File file = BasicRecipe.restConnectionTestHelper.getFile("bdio/hub_common_bdio_with_project_section.jsonld");
 
         //in this case we can upload the bdio and it will be mapped to a project and version because it has the Project information within the bdio file
@@ -71,6 +76,10 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
     @Test
     public void testBdioUploadAndMapToVersion() throws InterruptedException, IntegrationException {
+        // first we make sure that the code location doesn't already exist
+        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        assertFalse(optionalCodeLocationView.isPresent());
+
         File file = BasicRecipe.restConnectionTestHelper.getFile("bdio/hub_common_bdio_without_project_section.jsonld");
         // in this case we upload the bdio but we have to map it to a project and version ourselves since the Project information is missing in the bdio file
         IntLogger logger = new BufferedIntLogger();
@@ -83,7 +92,7 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         codeLocationCreationService.createCodeLocations(scanRequest);
 
         // now that the file is uploaded, we want to lookup the code location that was created by the upload. in this case we know the name of the code location that was specified in the bdio file
-        Optional<CodeLocationView> optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
+        optionalCodeLocationView = codeLocationService.getCodeLocationByName(codeLocationName);
         int maxAttempts = 6;
         int attempt = 0;
         while (!optionalCodeLocationView.isPresent() && attempt < maxAttempts) {
@@ -108,12 +117,15 @@ public class BdioUploadRecipeTest extends BasicRecipe {
 
         codeLocationService.mapCodeLocation(codeLocationView, projectVersionWrapper.get().getProjectVersionView());
 
-        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, new HashSet<>(Arrays.asList(codeLocationView.getName(), "pants")), 1, 3 * 60);
+        CodeLocationWaitResult waitResult = codeLocationCreationService.waitForCodeLocations(notificationTaskRange, projectAndVersion, new HashSet<>(Arrays.asList(codeLocationView.getName())), 1, 3 * 60);
         System.out.println("wait status: " + waitResult.getStatus());
         if (waitResult.getErrorMessage().isPresent()) {
             System.out.println(waitResult.getErrorMessage().get());
         }
         waitResult.getCodeLocationNames().stream().forEach(System.out::println);
+        assertEquals(CodeLocationWaitResult.Status.COMPLETE, waitResult.getStatus());
+        assertEquals(1, waitResult.getCodeLocationNames().size());
+        assertTrue(waitResult.getCodeLocationNames().contains(codeLocationName));
 
         versionCodeLocations = blackDuckApiClient.getAllResponses(projectVersionWrapper.get().getProjectVersionView().metaCodelocationsLink());
         CodeLocationView versionCodeLocation = versionCodeLocations.get(0);
