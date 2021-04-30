@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.bdiolegacy;
 
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
@@ -26,8 +27,8 @@ public class BdioUploadService extends DataService {
     private final UploadBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public BdioUploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UploadBatchRunner uploadBatchRunner, CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public BdioUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UploadBatchRunner uploadBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.uploadBatchRunner = uploadBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

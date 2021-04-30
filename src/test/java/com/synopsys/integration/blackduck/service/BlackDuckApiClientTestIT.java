@@ -57,11 +57,13 @@ public class BlackDuckApiClientTestIT {
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        ApiDiscovery apiDiscovery = new ApiDiscovery(blackDuckServerConfigBuilder.build().getBlackDuckUrl());
+
         assertNull(blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertNull(blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
-        List<ProjectView> projects = blackDuckApiClient.getSomeResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, 5);
+        List<ProjectView> projects = blackDuckApiClient.getSomeResponses(apiDiscovery.metaProjectsLink(), 5);
         assertTrue(projects.size() > 0);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);

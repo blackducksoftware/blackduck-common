@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
@@ -28,8 +29,8 @@ import com.synopsys.integration.rest.response.Response;
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;
 
-    public LicenseService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentDataService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public LicenseService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentDataService) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.componentDataService = componentDataService;
     }
 

@@ -91,8 +91,8 @@ public class InstallAndRunSignatureScannerTestIT {
         ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        HttpUrl blackDuckServerUrl = blackDuckHttpClient.getBaseUrl();
-        BlackDuckRequestFactory blackDuckRequestFactory = blackDuckServicesFactory.getRequestFactory();
+        HttpUrl blackDuckServerUrl = blackDuckHttpClient.getBlackDuckUrl();
+        BlackDuckRequestFactory blackDuckRequestFactory = blackDuckServicesFactory.getBlackDuckRequestFactory();
 
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, environmentVariables, operatingSystemType);
         ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, environmentVariables, scanPathsUtility, executorService);

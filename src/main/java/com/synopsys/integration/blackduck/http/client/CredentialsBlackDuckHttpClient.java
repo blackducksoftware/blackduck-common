@@ -33,9 +33,9 @@ public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final CookieHeaderParser cookieHeaderParser;
 
     public CredentialsBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, CookieHeaderParser cookieHeaderParser) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
         this.cookieHeaderParser = cookieHeaderParser;
 
@@ -51,7 +51,7 @@ public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword().orElse(null)));
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, Charsets.UTF_8);
 
-        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "j_spring_security_check", entity);
+        return authenticationSupport.attemptAuthentication(this, getBlackDuckUrl(), "j_spring_security_check", entity);
     }
 
     @Override

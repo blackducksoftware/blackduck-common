@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -36,18 +37,18 @@ import com.synopsys.integration.rest.response.Response;
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;
 
-    public ProjectBomService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public ProjectBomService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ComponentService componentService) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.componentService = componentService;
     }
 
     public List<ProjectVersionComponentView> getComponentsForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<ProjectVersionComponentView> ProjectVersionComponentViews = blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> ProjectVersionComponentViews = blackDuckApiClient.getAllResponses(projectVersionView.metaComponentsLink());
         return ProjectVersionComponentViews;
     }
 
     public List<ProjectVersionVulnerableBomComponentsView> getVulnerableComponentsForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<ProjectVersionVulnerableBomComponentsView> vulnerableBomComponentViews = blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.VULNERABLE_COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionVulnerableBomComponentsView> vulnerableBomComponentViews = blackDuckApiClient.getAllResponses(projectVersionView.metaVulnerableComponentsLink());
         return vulnerableBomComponentViews;
     }
 
@@ -71,7 +72,7 @@ public class ProjectBomService extends DataService {
     }
 
     public List<VersionBomComponentModel> getComponentsWithMatchedFilesForProjectVersion(ProjectVersionView version) throws IntegrationException {
-        List<ProjectVersionComponentView> bomComponents = blackDuckApiClient.getAllResponses(version, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomComponents = blackDuckApiClient.getAllResponses(version.metaComponentsLink());
         List<VersionBomComponentModel> modelBomComponents = new ArrayList<>(bomComponents.size());
         for (ProjectVersionComponentView component : bomComponents) {
             modelBomComponents.add(new VersionBomComponentModel(component, getMatchedFiles(component)));
@@ -80,7 +81,7 @@ public class ProjectBomService extends DataService {
     }
 
     public Optional<ProjectVersionPolicyStatusView> getPolicyStatusForVersion(ProjectVersionView version) throws IntegrationException {
-        return blackDuckApiClient.getResponse(version, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
+        return blackDuckApiClient.getResponseSafely(version.metaPolicyStatusLink());
     }
 
     //TODO investigate what variant is
@@ -126,7 +127,7 @@ public class ProjectBomService extends DataService {
 
     private List<ComponentMatchedFilesView> getMatchedFiles(ProjectVersionComponentView component) throws IntegrationException {
         List<ComponentMatchedFilesView> matchedFiles = new ArrayList<>(0);
-        List<ComponentMatchedFilesView> tempMatchedFiles = blackDuckApiClient.getAllResponses(component, ProjectVersionComponentView.MATCHED_FILES_LINK_RESPONSE);
+        List<ComponentMatchedFilesView> tempMatchedFiles = blackDuckApiClient.getAllResponses(component.metaMatchedFilesLink());
         if (tempMatchedFiles != null && !tempMatchedFiles.isEmpty()) {
             matchedFiles = tempMatchedFiles;
         }

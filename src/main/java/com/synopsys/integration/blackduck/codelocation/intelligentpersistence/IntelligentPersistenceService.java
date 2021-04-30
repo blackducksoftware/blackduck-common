@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.intelligentpersistence;
 
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationRequest;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
@@ -27,9 +28,9 @@ public class IntelligentPersistenceService extends DataService {
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public IntelligentPersistenceService(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory,
-        final IntLogger logger, final IntelligentPersistenceBatchRunner uploadBatchRunner, final CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public IntelligentPersistenceService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory,
+        IntLogger logger, IntelligentPersistenceBatchRunner uploadBatchRunner, CodeLocationCreationService codeLocationCreationService) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.uploadBatchRunner = uploadBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

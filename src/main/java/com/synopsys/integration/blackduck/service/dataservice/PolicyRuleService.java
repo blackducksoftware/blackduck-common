@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -27,16 +28,18 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class PolicyRuleService extends DataService {
-    public PolicyRuleService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    private UrlMultipleResponses<PolicyRuleView> policyRulesResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.POLICY_RULES_PATH);
+
+    public PolicyRuleService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public List<PolicyRuleView> getAllPolicyRules() throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(policyRulesResponses);
     }
 
     public Optional<PolicyRuleView> getPolicyRuleViewByName(String policyRuleName) throws IntegrationException {
-        List<PolicyRuleView> allPolicyRules = blackDuckApiClient.getAllResponses(ApiDiscovery.POLICY_RULES_LINK_RESPONSE);
+        List<PolicyRuleView> allPolicyRules = blackDuckApiClient.getAllResponses(policyRulesResponses);
         for (PolicyRuleView policyRule : allPolicyRules) {
             if (policyRuleName.equals(policyRule.getName())) {
                 return Optional.of(policyRule);
@@ -46,7 +49,7 @@ public class PolicyRuleService extends DataService {
     }
 
     public HttpUrl createPolicyRule(PolicyRuleView policyRuleView) throws IntegrationException {
-        return blackDuckApiClient.post(ApiDiscovery.POLICY_RULES_LINK, policyRuleView);
+        return blackDuckApiClient.post(policyRulesResponses.getUrl(), policyRuleView);
     }
 
     /**

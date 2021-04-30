@@ -46,7 +46,7 @@ public class ScanBatchRunner {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, signatureScannerClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBaseUrl(), operatingSystemType);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, signatureScannerClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBlackDuckUrl(), operatingSystemType);
 
         return new ScanBatchRunner(intEnvironmentVariables, scannerZipInstaller, scanPathsUtility, scanCommandRunner, null);
     }

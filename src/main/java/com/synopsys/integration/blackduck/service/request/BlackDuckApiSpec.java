@@ -1,24 +1,32 @@
+/*
+ * blackduck-common
+ *
+ * Copyright (c) 2021 Synopsys, Inc.
+ *
+ * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ */
 package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckApiSpec<T extends BlackDuckResponse> {
-    private final Request request;
-    private final Class<T> responseClass;
+    private final UrlResponse<T> urlResponse;
+    private final BlackDuckRequestBuilder blackDuckRequestBuilder;
 
     public BlackDuckApiSpec(UrlResponse<T> urlResponse, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        request = blackDuckRequestBuilder.build(urlResponse.getUrl());
-        responseClass = urlResponse.getResponseClass();
+        this.urlResponse = urlResponse;
+        this.blackDuckRequestBuilder = blackDuckRequestBuilder;
     }
 
-    public Request getRequest() {
-        return request;
+    public UrlResponse<T> getUrlResponse() {
+        return urlResponse;
     }
 
-    public Class<T> getResponseClass() {
-        return responseClass;
+    public BlackDuckRequestBuilder getBlackDuckRequestBuilder() {
+        return blackDuckRequestBuilder;
     }
 
 }

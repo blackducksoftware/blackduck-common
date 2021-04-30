@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.codelocation.Result;
@@ -107,7 +106,7 @@ public class BinaryScanUploadServiceTestIT {
     }
 
     private BinaryScanData createBinaryScanData(BlackDuckServices blackDuckServices, BinaryScan binaryScan) throws IntegrationException {
-        UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckServices.userService.findCurrentUser();
         Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 

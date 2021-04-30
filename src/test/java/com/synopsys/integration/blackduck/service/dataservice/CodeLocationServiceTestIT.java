@@ -67,7 +67,7 @@ public class CodeLocationServiceTestIT {
     private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
     private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
+    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(BlackDuckServicesFactory.createDefaultGson());
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 
@@ -145,7 +145,7 @@ public class CodeLocationServiceTestIT {
             // Verify code location now exists using getSomeMatchingResponses()
             Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
             BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(2, 0);
-            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, blackDuckRequestBuilder, nameMatcherPredicate, 1);
+            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(blackDuckServices.apiDiscovery.metaCodelocationsLink(), blackDuckRequestBuilder, nameMatcherPredicate, 1);
 
             assertEquals(1, foundCodeLocation.size(), String.format("Matching code locations should be 1 but is %d", foundCodeLocation.size()));
             assertEquals(codeLocationToValidate, foundCodeLocation.get(0).getName(), "Found code location does not equal expected");
@@ -202,15 +202,11 @@ public class CodeLocationServiceTestIT {
 
     private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, List<String> codeLocationNames) throws IntegrationException {
         Predicate<CodeLocationView> toDelete = (codeLocationView -> codeLocationNames.contains(codeLocationView.getName()));
-        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, toDelete, codeLocationNames.size());
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(blackDuckServices.apiDiscovery.metaCodelocationsLink(), toDelete, codeLocationNames.size());
 
         for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
             blackDuckServices.blackDuckApiClient.delete(codeLocationToDelete);
         }
-    }
-
-    private static class UserViewWithPassword extends UserView {
-        public String password;
     }
 
 }

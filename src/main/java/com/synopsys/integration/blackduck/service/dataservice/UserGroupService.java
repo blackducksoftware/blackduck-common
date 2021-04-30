@@ -33,19 +33,19 @@ import com.synopsys.integration.rest.HttpUrl;
 public class UserGroupService extends DataService {
     public static final BiPredicate<String, UserView> MATCHING_USERNAME = (username, userView) -> username.equalsIgnoreCase(userView.getUserName());
 
-    public UserGroupService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public UserGroupService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public UserGroupView createUserGroup(UserGroupRequest userGroupRequest) throws IntegrationException {
-        HttpUrl userGroupUrl = blackDuckApiClient.post(ApiDiscovery.USERGROUPS_LINK, userGroupRequest);
+        HttpUrl userGroupUrl = blackDuckApiClient.post(apiDiscovery.metaUsergroupsLink().getUrl(), userGroupRequest);
         UserGroupView userGroupView = blackDuckApiClient.getResponse(userGroupUrl, UserGroupView.class);
         return userGroupView;
     }
 
     public Optional<UserView> getUserByUsername(String username) throws IntegrationException {
         Predicate<UserView> predicate = userView -> MATCHING_USERNAME.test(username, userView);
-        List<UserView> matchingUsers = blackDuckApiClient.getSomeMatchingResponses(ApiDiscovery.USERS_LINK_RESPONSE, predicate, 1);
+        List<UserView> matchingUsers = blackDuckApiClient.getSomeMatchingResponses(apiDiscovery.metaUsersLink(), predicate, 1);
         if (!matchingUsers.isEmpty()) {
             return Optional.ofNullable(matchingUsers.get(0));
         }
@@ -64,7 +64,7 @@ public class UserGroupService extends DataService {
 
     public List<ProjectView> getProjectsForUser(UserView userView) throws IntegrationException {
         logger.debug("Attempting to get the assigned projects for User: " + userView.getUserName());
-        List<AssignedProjectView> assignedProjectViews = blackDuckApiClient.getAllResponses(userView, UserView.PROJECTS_LINK_RESPONSE);
+        List<AssignedProjectView> assignedProjectViews = blackDuckApiClient.getAllResponses(userView.metaProjectsLink());
 
         List<ProjectView> resolvedProjectViews = new ArrayList<>();
         for (AssignedProjectView assigned : assignedProjectViews) {
@@ -87,7 +87,7 @@ public class UserGroupService extends DataService {
     }
 
     public List<RoleAssignmentView> getRolesForUser(UserView userView) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(userView, UserView.ROLES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(userView.metaRolesLink());
     }
 
     public List<RoleAssignmentView> getInheritedRolesForUser(String username) throws IntegrationException {
@@ -99,7 +99,7 @@ public class UserGroupService extends DataService {
     }
 
     public List<RoleAssignmentView> getInheritedRolesForUser(UserView userView) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(userView, UserView.INHERITED_ROLES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(userView.metaInheritedRolesLink());
     }
 
     public List<RoleAssignmentView> getAllRolesForUser(String username) throws IntegrationException {
@@ -118,7 +118,7 @@ public class UserGroupService extends DataService {
     }
 
     public Optional<UserGroupView> getGroupByName(String groupName) throws IntegrationException {
-        List<UserGroupView> allGroups = blackDuckApiClient.getAllResponses(ApiDiscovery.USERGROUPS_LINK_RESPONSE);
+        List<UserGroupView> allGroups = blackDuckApiClient.getAllResponses(apiDiscovery.metaUsergroupsLink());
         for (UserGroupView group : allGroups) {
             if (group.getName().equalsIgnoreCase(groupName)) {
                 return Optional.of(group);

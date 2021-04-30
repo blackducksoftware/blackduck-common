@@ -10,6 +10,8 @@ package com.synopsys.integration.blackduck.bdio2;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -24,13 +26,15 @@ public class Bdio2StreamUploader {
     private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
 
     private final BlackDuckApiClient blackDuckApiClient;
+    private final ApiDiscovery apiDiscovery;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
     private final IntLogger logger;
     private final BlackDuckPath scanPath;
     private final String contentType;
 
-    public Bdio2StreamUploader(final BlackDuckApiClient blackDuckApiClient, final BlackDuckRequestFactory blackDuckRequestFactory, final IntLogger logger, final BlackDuckPath scanPath, final String contentType) {
+    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath, String contentType) {
         this.blackDuckApiClient = blackDuckApiClient;
+        this.apiDiscovery = apiDiscovery;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
         this.logger = logger;
         this.scanPath = scanPath;
@@ -38,7 +42,7 @@ public class Bdio2StreamUploader {
     }
 
     public HttpUrl start(BdioFileContent header) throws IntegrationException {
-        HttpUrl url = blackDuckApiClient.getUrl(scanPath);
+        HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         Request request = blackDuckRequestFactory
                               .createCommonPostRequestBuilder(url, header.getContent())
                               .addHeader(HEADER_CONTENT_TYPE, contentType)

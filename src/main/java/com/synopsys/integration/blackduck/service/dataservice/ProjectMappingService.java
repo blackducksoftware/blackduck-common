@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 
 import java.util.List;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
@@ -20,12 +21,12 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class ProjectMappingService extends DataService {
-    public ProjectMappingService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public ProjectMappingService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public void populateApplicationId(ProjectView projectView, String applicationId) throws IntegrationException {
-        List<ProjectMappingView> projectMappings = blackDuckApiClient.getAllResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE);
+        List<ProjectMappingView> projectMappings = blackDuckApiClient.getAllResponses(projectView.metaProjectMappingsLink());
         boolean canCreate = projectMappings.isEmpty();
         if (canCreate) {
             if (!projectView.hasLink(ProjectView.PROJECT_MAPPINGS_LINK)) {
@@ -45,7 +46,7 @@ public class ProjectMappingService extends DataService {
     }
 
     public List<ProjectMappingView> getProjectMappings(ProjectView projectView) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(projectView, ProjectView.PROJECT_MAPPINGS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(projectView.metaProjectMappingsLink());
     }
 
 }

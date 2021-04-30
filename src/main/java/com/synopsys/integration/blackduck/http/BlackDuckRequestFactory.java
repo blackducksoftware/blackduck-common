@@ -14,6 +14,7 @@ import java.util.Optional;
 import com.google.gson.Gson;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContent;
 import com.synopsys.integration.rest.body.FileBodyContent;
 import com.synopsys.integration.rest.body.MapBodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
@@ -83,34 +84,41 @@ public class BlackDuckRequestFactory {
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, File bodyContentFile) {
-        return createRequestBuilder()
-                   .url(url)
-                   .method(HttpMethod.POST)
-                   .bodyContent(new FileBodyContent(bodyContentFile));
+        return createCommonPostRequestBuilder(new FileBodyContent(bodyContentFile))
+                   .url(url);
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, Map<String, String> bodyContentMap) {
-        return createRequestBuilder()
-                   .url(url)
-                   .method(HttpMethod.POST)
-                   .bodyContent(new MapBodyContent(bodyContentMap));
+        return createCommonPostRequestBuilder(new MapBodyContent(bodyContentMap))
+                   .url(url);
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, Object bodyContent) {
-        return createCommonPostRequestBuilder(url, gson.toJson(bodyContent));
+        return createCommonPostRequestBuilder(gson.toJson(bodyContent))
+                   .url(url);
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(HttpUrl url, String bodyContent) {
-        return createRequestBuilder()
-                   .url(url)
-                   .method(HttpMethod.POST)
-                   .bodyContent(new StringBodyContent(bodyContent));
+        return createCommonPostRequestBuilder(new StringBodyContent(bodyContent))
+                   .url(url);
+    }
+
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(Object bodyContent) {
+        return createCommonPostRequestBuilder(gson.toJson(bodyContent));
+    }
+
+    public BlackDuckRequestBuilder createCommonPostRequestBuilder(String bodyContent) {
+        return createCommonPostRequestBuilder(new StringBodyContent(bodyContent));
     }
 
     public BlackDuckRequestBuilder createCommonPostRequestBuilder(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
+        return createCommonPostRequestBuilder(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+    }
+
+    private BlackDuckRequestBuilder createCommonPostRequestBuilder(BodyContent bodyContent) {
         return createRequestBuilder()
                    .method(HttpMethod.POST)
-                   .bodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+                   .bodyContent(bodyContent);
     }
 
     public BlackDuckRequestBuilder createCommonPutRequestBuilder(HttpUrl url, Object bodyContent) {

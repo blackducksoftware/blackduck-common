@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.service.dataservice;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.RegistrationView;
@@ -22,8 +23,8 @@ import com.synopsys.integration.rest.HttpUrl;
 public class BlackDuckRegistrationService extends DataService {
     private HttpUrl blackDuckUrl;
 
-    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, HttpUrl blackDuckUrl) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, HttpUrl blackDuckUrl) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.blackDuckUrl = blackDuckUrl;
     }
 
@@ -31,12 +32,14 @@ public class BlackDuckRegistrationService extends DataService {
         BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder();
         requestBuilder.acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
-        RegistrationView registrationView = blackDuckApiClient.getResponse(ApiDiscovery.REGISTRATION_LINK_RESPONSE, requestBuilder);
+        UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.REGISTRATION_PATH);
+        RegistrationView registrationView = blackDuckApiClient.getResponse(registrationResponse, requestBuilder);
         return registrationView.getRegistrationId();
     }
 
     public BlackDuckServerData getBlackDuckServerData() throws IntegrationException {
-        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_VERSION_LINK_RESPONSE);
+        UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_VERSION_PATH);
+        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
         String registrationId = null;
         try {
             // We need to wrap this because this will most likely fail unless they are running as an admin

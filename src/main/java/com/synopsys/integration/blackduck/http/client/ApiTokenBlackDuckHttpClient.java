@@ -31,9 +31,9 @@ public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final String apiToken;
 
     public ApiTokenBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
+        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.gson = gson;
         this.apiToken = apiToken;
 
@@ -47,7 +47,7 @@ public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
 
-        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
+        return authenticationSupport.attemptAuthentication(this, getBlackDuckUrl(), "api/tokens/authenticate", headers);
     }
 
     @Override

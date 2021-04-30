@@ -189,7 +189,7 @@ public class CodeLocationWaiterTest {
             Mockito.when(mockProjectService.getProjectVersion(testProjectAndVersion)).thenReturn(Optional.of(projectVersionWrapper));
 
             mockBlackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
-            Mockito.when(mockBlackDuckApiClient.getAllResponses(mockProjectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE)).thenReturn(codeLocationViewsToReturn);
+            Mockito.when(mockBlackDuckApiClient.getAllResponses(mockProjectVersionView.metaCodelocationsLink())).thenReturn(codeLocationViewsToReturn);
         }
     }
 

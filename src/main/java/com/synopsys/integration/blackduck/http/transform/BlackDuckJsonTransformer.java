@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
@@ -47,6 +48,9 @@ public class BlackDuckJsonTransformer {
 
     public <T extends BlackDuckResponse> T getResponse(Response response, Class<T> clazz) throws IntegrationException {
         String json = response.getContentString();
+        if (BlackDuckStringResponse.class.equals(clazz)) {
+            return (T)new BlackDuckStringResponse(json);
+        }
         return getResponseAs(json, clazz);
     }
 

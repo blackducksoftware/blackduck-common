@@ -20,7 +20,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
@@ -61,7 +61,6 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.util.NameVersion;
 
@@ -73,12 +72,15 @@ public class ComprehensiveCookbookTestIT {
     private final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private final BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
     private final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, new SilentIntLogger());
+    private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+    private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
+
+    public ComprehensiveCookbookTestIT() throws IntegrationException {}
 
     @Test
     public void createProjectVersion() throws Exception {
         String testProjectName = intHttpClientTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         IntLogger logger = blackDuckServicesFactory.getLogger();
@@ -87,7 +89,7 @@ public class ComprehensiveCookbookTestIT {
         intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckApiClient, testProjectName);
 
         // get the count of all projects now
-        int projectCount = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCount = blackDuckApiClient.getAllResponses(apiDiscovery.metaProjectsLink()).size();
 
         // create the project
         ProjectRequest projectRequest = new ProjectRequest();
@@ -100,10 +102,10 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(apiDiscovery.metaProjectsLink()).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
-        int projectVersionCount = blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size();
+        int projectVersionCount = blackDuckApiClient.getAllResponses(projectItem.metaVersionsLink()).size();
 
         ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
         projectVersionRequest.setDistribution(ProjectVersionDistributionType.INTERNAL);
@@ -116,14 +118,13 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectVersionItemFromName.isPresent());
         assertEquals(projectVersionItem.toString(), projectVersionItemFromName.get().toString());
 
-        assertTrue(blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE).size() > projectVersionCount);
+        assertTrue(blackDuckApiClient.getAllResponses(projectItem.metaVersionsLink()).size() > projectVersionCount);
     }
 
     @Test
     public void createProjectVersionSingleCall() throws Exception {
         String testProjectName = intHttpClientTestHelper.getProperty("TEST_CREATE_PROJECT");
 
-        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         IntLogger logger = blackDuckServicesFactory.getLogger();
@@ -132,7 +133,7 @@ public class ComprehensiveCookbookTestIT {
         intHttpClientTestHelper.deleteIfProjectExists(logger, projectService, blackDuckApiClient, testProjectName);
 
         // get the count of all projects now
-        int projectCount = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCount = blackDuckApiClient.getAllResponses(apiDiscovery.metaProjectsLink()).size();
 
         String versionName = "RestConnectionTest";
         ProjectVersionDistributionType distribution = ProjectVersionDistributionType.INTERNAL;
@@ -152,7 +153,7 @@ public class ComprehensiveCookbookTestIT {
         assertTrue(projectItemFromName.isPresent());
         assertEquals(projectItem.toString(), projectItemFromName.get().toString());
 
-        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE).size();
+        int projectCountAfterCreate = blackDuckApiClient.getAllResponses(apiDiscovery.metaProjectsLink()).size();
         assertTrue(projectCountAfterCreate > projectCount);
 
         Optional<ProjectVersionView> projectVersionItem = projectService.getProjectVersion(projectItem, versionName);
@@ -178,7 +179,7 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
-        UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckServices.userService.findCurrentUser();
         Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
@@ -212,7 +213,7 @@ public class ComprehensiveCookbookTestIT {
 
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
-        UserView currentUser = blackDuckServices.blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = blackDuckServices.userService.findCurrentUser();
         Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
@@ -253,17 +254,17 @@ public class ComprehensiveCookbookTestIT {
 
     @Test
     public void testGettingAllProjects() throws IntegrationException {
-        assertGettingAll(ApiDiscovery.PROJECTS_LINK_RESPONSE, "project");
+        assertGettingAll(apiDiscovery.metaProjectsLink(), "project");
     }
 
     @Test
     public void testGettingAllCodeLocations() throws IntegrationException {
-        assertGettingAll(ApiDiscovery.CODELOCATIONS_LINK_RESPONSE, "code location");
+        assertGettingAll(apiDiscovery.metaCodelocationsLink(), "code location");
     }
 
     @Test
     public void testGettingAllUsers() throws IntegrationException {
-        assertGettingAll(ApiDiscovery.USERS_LINK_RESPONSE, "user");
+        assertGettingAll(apiDiscovery.metaUsersLink(), "user");
     }
 
     @Test
@@ -272,10 +273,10 @@ public class ComprehensiveCookbookTestIT {
             BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
             BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
 
-            List<ProjectView> allProjects = blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+            List<ProjectView> allProjects = blackDuckApiClient.getAllResponses(apiDiscovery.metaProjectsLink());
             System.out.println(String.format("project count: %d", allProjects.size()));
             for (ProjectView projectItem : allProjects) {
-                List<ProjectVersionView> allProjectVersions = blackDuckApiClient.getAllResponses(projectItem, ProjectView.VERSIONS_LINK_RESPONSE);
+                List<ProjectVersionView> allProjectVersions = blackDuckApiClient.getAllResponses(projectItem.metaVersionsLink());
                 System.out.println(projectItem.toString());
                 System.out.println(String.format("version count: %d", allProjectVersions.size()));
                 for (ProjectVersionView projectVersionItem : allProjectVersions) {
@@ -285,17 +286,15 @@ public class ComprehensiveCookbookTestIT {
         }
     }
 
-    private <T extends BlackDuckResponse> void assertGettingAll(BlackDuckPathMultipleResponses<T> pathResponses, String labelForOutput) throws IntegrationException {
+    private <T extends BlackDuckResponse> void assertGettingAll(UrlMultipleResponses<T> urlResponses, String labelForOutput) throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
 
-        HttpUrl baseUrl = blackDuckServicesFactory.getBlackDuckHttpClient().getBaseUrl();
-        HttpUrl getUrl = baseUrl.appendRelativeUrl(pathResponses.getBlackDuckPath().getPath());
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
-        requestBuilder.url(getUrl);
+        requestBuilder.url(urlResponses.getUrl());
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
 
-        BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, pathResponses.getResponseClass());
+        BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, urlResponses.getResponseClass());
         if (pageResponse.getTotalCount() > 0) {
             assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
 
@@ -324,7 +323,7 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(projectVersion);
 
         // check that we have components in the BOM
-        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersion, ProjectVersionView.COMPONENTS_LINK_RESPONSE);
+        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersion.metaComponentsLink());
         assertTrue(bomComponents.size() > 0);
 
         // Look for testComponent in BOM

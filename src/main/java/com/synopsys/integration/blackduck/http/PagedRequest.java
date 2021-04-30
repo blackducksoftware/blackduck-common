@@ -7,70 +7,43 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.synopsys.integration.rest.request.Request;
 
 public class PagedRequest {
-    private final BlackDuckRequestBuilder requestBuilder;
-    private final int offset;
-    private final int limit;
+    private final BlackDuckRequestBuilder blackDuckRequestBuilder;
+    private final BlackDuckPageDefinition blackDuckPageDefinition;
 
-    public PagedRequest(BlackDuckRequestBuilder requestBuilder) {
-        this.requestBuilder = requestBuilder;
+    public PagedRequest(BlackDuckRequestBuilder blackDuckRequestBuilder) {
+        this.blackDuckRequestBuilder = blackDuckRequestBuilder;
         int offset = BlackDuckRequestFactory.DEFAULT_OFFSET;
         int limit = BlackDuckRequestFactory.DEFAULT_LIMIT;
-        if (requestBuilder.getQueryParameters() != null) {
-            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.OFFSET_PARAMETER)) {
-                offset = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
+        if (blackDuckRequestBuilder.getQueryParameters() != null) {
+            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.OFFSET_PARAMETER)) {
+                offset = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
             }
-            if (requestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.LIMIT_PARAMETER)) {
-                limit = NumberUtils.toInt(requestBuilder.getQueryParameters().get(BlackDuckRequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
+            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestFactory.LIMIT_PARAMETER)) {
+                limit = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
             }
         }
 
-        this.offset = offset;
-        this.limit = limit;
-    }
-
-    public PagedRequest(BlackDuckRequestBuilder requestBuilder, int offset, int limit) {
-        this.requestBuilder = requestBuilder;
-        this.offset = offset;
-        this.limit = limit;
-    }
-
-    public PagedRequest(BlackDuckRequestBuilder requestBuilder, BlackDuckPageDefinition blackDuckPageDefinition) {
-        this.requestBuilder = requestBuilder;
-        this.offset = blackDuckPageDefinition.getOffset();
-        this.limit = blackDuckPageDefinition.getLimit();
+        this.blackDuckPageDefinition = new BlackDuckPageDefinition(limit, offset);
     }
 
     public Request createRequest() {
-        Request request = requestBuilder.getRequestBuilder().build();
-        Set<String> limitValue = new HashSet<>();
-        limitValue.add(String.valueOf(getLimit()));
-
-        Set<String> offsetValue = new HashSet<>();
-        offsetValue.add(String.valueOf(getOffset()));
-
-        request.getQueryParameters().put(BlackDuckRequestFactory.LIMIT_PARAMETER, limitValue);
-        request.getQueryParameters().put(BlackDuckRequestFactory.OFFSET_PARAMETER, offsetValue);
+        Request request = blackDuckRequestBuilder
+                              .setBlackDuckPageDefinition(blackDuckPageDefinition)
+                              .build();
         return request;
     }
 
-    public BlackDuckRequestBuilder getRequestBuilder() {
-        return requestBuilder;
+    public BlackDuckRequestBuilder getBlackDuckRequestBuilder() {
+        return blackDuckRequestBuilder;
     }
 
-    public int getLimit() {
-        return limit;
-    }
-
-    public int getOffset() {
-        return offset;
+    public BlackDuckPageDefinition getBlackDuckPageDefinition() {
+        return blackDuckPageDefinition;
     }
 
 }

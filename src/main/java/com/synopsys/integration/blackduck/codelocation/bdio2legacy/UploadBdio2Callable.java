@@ -10,6 +10,7 @@ package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -21,13 +22,15 @@ import com.synopsys.integration.util.NameVersion;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
+    private final ApiDiscovery apiDiscovery;
     private final BlackDuckRequestFactory blackDuckRequestFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, UploadTarget uploadTarget) {
+    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, UploadTarget uploadTarget) {
         this.blackDuckApiClient = blackDuckApiClient;
+        this.apiDiscovery = apiDiscovery;
         this.blackDuckRequestFactory = blackDuckRequestFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
@@ -37,7 +40,7 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     @Override
     public UploadOutput call() {
         try {
-            HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
+            HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
             Request request = blackDuckRequestFactory
                                   .createCommonPostRequestBuilder(url, uploadTarget.getUploadFile())
                                   .acceptMimeType(uploadTarget.getMediaType()).build();

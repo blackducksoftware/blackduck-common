@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionIssuesView;
@@ -24,18 +25,18 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class IssueService extends DataService {
-    public IssueService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public IssueService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public List<ProjectVersionIssuesView> getIssuesForProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.ISSUES_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(projectVersionView.metaIssuesLink());
     }
 
     public Optional<IssueView> getIssueByKey(ProjectVersionView projectVersionView, String issueKey) throws IntegrationException {
         Predicate<ProjectVersionIssuesView> issueKeyEquals = (issue -> issue.getIssueId().equals(issueKey));
 
-        List<ProjectVersionIssuesView> bomComponentIssues = blackDuckApiClient.getSomeMatchingResponses(projectVersionView, ProjectVersionView.ISSUES_LINK_RESPONSE, issueKeyEquals, 1);
+        List<ProjectVersionIssuesView> bomComponentIssues = blackDuckApiClient.getSomeMatchingResponses(projectVersionView.metaIssuesLink(), issueKeyEquals, 1);
         Optional<ProjectVersionIssuesView> projectVersionIssuesViewOptional = bomComponentIssues.stream().findAny();
 
         if (projectVersionIssuesViewOptional.isPresent()) {

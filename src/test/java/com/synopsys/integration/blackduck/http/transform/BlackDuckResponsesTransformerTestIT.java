@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
@@ -25,6 +26,7 @@ import com.synopsys.integration.rest.HttpUrl;
 class BlackDuckResponsesTransformerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+    private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
     private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
@@ -36,7 +38,7 @@ class BlackDuckResponsesTransformerTestIT {
         BlackDuckRequestBuilder requestBuilder = createRequestBuilder();
 
         PagedRequest defaultPagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(defaultPagedRequest, ApiDiscovery.PROJECTS_LINK_RESPONSE.getResponseClass());
+        BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(defaultPagedRequest, apiDiscovery.metaProjectsLink().getResponseClass());
         Assertions.assertEquals(responses.getTotalCount(), responses.getItems().size());
     }
 
@@ -46,11 +48,12 @@ class BlackDuckResponsesTransformerTestIT {
         BlackDuckRequestBuilder requestBuilder = createRequestBuilder();
 
         PagedRequest defaultPagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(defaultPagedRequest, ApiDiscovery.PROJECTS_LINK_RESPONSE.getResponseClass());
+        BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(defaultPagedRequest, apiDiscovery.metaProjectsLink().getResponseClass());
         Assertions.assertEquals(responses.getTotalCount(), responses.getItems().size());
 
-        PagedRequest limitedPagedRequest = new PagedRequest(requestBuilder, 0, 2);
-        BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getOnePageOfResponses(limitedPagedRequest, ApiDiscovery.PROJECTS_LINK_RESPONSE.getResponseClass());
+        requestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(2,0));
+        PagedRequest limitedPagedRequest = new PagedRequest(requestBuilder);
+        BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getOnePageOfResponses(limitedPagedRequest, apiDiscovery.metaProjectsLink().getResponseClass());
         Assertions.assertEquals(2, limitedResponses.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 2 projects for this test to pass.");
     }
 
@@ -59,19 +62,19 @@ class BlackDuckResponsesTransformerTestIT {
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = createBlackDuckResponsesTransformer();
         BlackDuckRequestBuilder requestBuilder = createRequestBuilder();
 
-        PagedRequest oversizePagedRequest = new PagedRequest(requestBuilder, 0, 5);
-        BlackDuckPageResponse<ProjectView> underPageSizeResponse = blackDuckResponsesTransformer.getSomeResponses(oversizePagedRequest, ApiDiscovery.PROJECTS_LINK_RESPONSE.getResponseClass(), 2);
+        requestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(5,0));
+        PagedRequest oversizePagedRequest = new PagedRequest(requestBuilder);
+        BlackDuckPageResponse<ProjectView> underPageSizeResponse = blackDuckResponsesTransformer.getSomeResponses(oversizePagedRequest, apiDiscovery.metaProjectsLink().getResponseClass(), 2);
         Assertions.assertEquals(2, underPageSizeResponse.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 5 projects for this test to pass.");
 
-        PagedRequest limitedPagedRequest = new PagedRequest(requestBuilder, 0, 2);
-        BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getSomeResponses(limitedPagedRequest, ApiDiscovery.PROJECTS_LINK_RESPONSE.getResponseClass(), 5);
+        requestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(2,0));
+        PagedRequest limitedPagedRequest = new PagedRequest(requestBuilder);
+        BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getSomeResponses(limitedPagedRequest, apiDiscovery.metaProjectsLink().getResponseClass(), 5);
         Assertions.assertEquals(5, limitedResponses.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 5 projects for this test to pass.");
     }
 
     private BlackDuckRequestBuilder createRequestBuilder() throws IntegrationException {
-        String blackDuckBaseUrl = intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL);
-        HttpUrl url = new HttpUrl(blackDuckBaseUrl).appendRelativeUrl(ApiDiscovery.PROJECTS_LINK_RESPONSE.getBlackDuckPath().getPath());
-        return blackDuckRequestFactory.createCommonGetRequestBuilder(url);
+        return blackDuckRequestFactory.createCommonGetRequestBuilder(apiDiscovery.metaProjectsLink().getUrl());
     }
 
     private BlackDuckResponsesTransformer createBlackDuckResponsesTransformer() {

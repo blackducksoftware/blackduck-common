@@ -42,4 +42,5 @@ public class RapidScanWaitJobTask implements WaitJobTask {
             throw new BlackDuckIntegrationException(ex.getMessage(), ex);
         }
     }
+
 }

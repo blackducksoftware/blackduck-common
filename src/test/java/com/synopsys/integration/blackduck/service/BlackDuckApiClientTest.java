@@ -2,11 +2,14 @@ package com.synopsys.integration.blackduck.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -27,6 +30,7 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransf
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.function.ThrowingSupplier;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.request.Request;
@@ -50,10 +54,15 @@ public class BlackDuckApiClientTest {
         String incompleteJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         ProjectVersionView projectVersionViewWithMissingLink = blackDuckJsonTransformer.getResponseAs(incompleteJson, ProjectVersionView.class);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
-        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionViewWithMissingLink, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
-        assertFalse(ProjectVersionPolicyStatusView.isPresent());
+        try {
+            blackDuckApiClient.getResponse(projectVersionViewWithMissingLink.metaPolicyStatusLink());
+            fail();
+        } catch (NoSuchElementException e) {
+            assertTrue(e.getMessage().contains(ProjectVersionView.POLICY_STATUS_LINK));
+            assertTrue(e.getMessage().contains("not found"));
+        }
     }
 
     @Test
@@ -79,11 +88,10 @@ public class BlackDuckApiClientTest {
 
         Mockito.when(blackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
 
-        Optional<ProjectVersionPolicyStatusView> ProjectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionView, ProjectVersionView.POLICY_STATUS_LINK_RESPONSE);
-        assertTrue(ProjectVersionPolicyStatusView.isPresent());
-        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, ProjectVersionPolicyStatusView.get().getOverallStatus());
+        ProjectVersionPolicyStatusView projectVersionPolicyStatusView = blackDuckApiClient.getResponse(projectVersionView.metaPolicyStatusLink());
+        assertEquals(ProjectVersionComponentPolicyStatusType.IN_VIOLATION, projectVersionPolicyStatusView.getOverallStatus());
     }
 
 }

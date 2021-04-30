@@ -29,9 +29,10 @@ public class BlackDuckRequestBuilder {
         this.requestBuilder = requestBuilder;
     }
 
-    /**
-     * @deprecated
-     */
+    public BlackDuckRequestBuilder(BlackDuckRequestBuilder blackDuckRequestBuilder) {
+        this.requestBuilder = new Request.Builder(blackDuckRequestBuilder.build());
+    }
+
     public Request build() {
         return requestBuilder.build();
     }

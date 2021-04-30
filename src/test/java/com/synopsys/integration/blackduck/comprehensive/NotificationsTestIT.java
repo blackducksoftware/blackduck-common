@@ -28,6 +28,7 @@ import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
+import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
@@ -49,11 +50,12 @@ public class NotificationsTestIT {
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
         NotificationService notificationService = blackDuckServicesFactory.createNotificationService();
+        UserService userService = blackDuckServicesFactory.createUserService();
 
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
         ProjectSyncModel projectSyncModel2 = ProjectSyncModel.createWithDefaults(projectName, projectVersion2Name);
 
-        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = userService.findCurrentUser();
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
         Date endDate = Date.from(startDate.toInstant().plus(1, ChronoUnit.DAYS));
         List<String> notificationTypes = new ArrayList<>();

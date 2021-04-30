@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
@@ -27,6 +28,7 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 
 public class ProjectServiceTest {
     @Disabled
@@ -47,12 +49,13 @@ public class ProjectServiceTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         ProjectGetService projectGetService = Mockito.mock(ProjectGetService.class);
 
-        ProjectService projectService = new ProjectService(blackDuckApiClient, blackDuckRequestFactory, logger, projectGetService);
+        ApiDiscovery apiDiscovery = new ApiDiscovery(new HttpUrl("https://synopsys.com"));
+        ProjectService projectService = new ProjectService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, projectGetService);
 
         ProjectView projectView = new ProjectView();
         projectView.setName("unit test");
 
-        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.eq(projectView), Mockito.eq(ProjectView.VERSIONS_LINK_RESPONSE))).thenReturn(projectVersionViews);
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.eq(projectView.metaVersionsLink()))).thenReturn(projectVersionViews);
 
         Optional<ProjectVersionView> projectVersionView = projectService.getNewestProjectVersion(projectView);
         assertTrue(projectVersionView.isPresent());

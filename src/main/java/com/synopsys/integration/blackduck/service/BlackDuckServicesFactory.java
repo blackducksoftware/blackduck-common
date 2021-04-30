@@ -16,6 +16,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.synopsys.integration.blackduck.api.core.HttpUrlTypeAdapter;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
@@ -58,6 +60,7 @@ import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.blackduck.service.request.NotificationRequestFactory;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
@@ -79,10 +82,14 @@ public class BlackDuckServicesFactory {
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
+    private final ApiDiscovery apiDiscovery;
     private final BlackDuckApiClient blackDuckApiClient;
 
     public static Gson createDefaultGson() {
-        return createDefaultGsonBuilder().create();
+        return createDefaultGsonBuilder()
+                   .registerTypeAdapter(HttpUrl.class, new HttpUrlTypeAdapter())
+                   .setLenient()
+                   .create();
     }
 
     public static ObjectMapper createDefaultObjectMapper() {
@@ -117,16 +124,18 @@ public class BlackDuckServicesFactory {
         blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        apiDiscovery = new ApiDiscovery(blackDuckHttpClient.getBlackDuckUrl());
 
-        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
     }
 
     public BdioUploadService createBdioUploadService() {
-        return new BdioUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService), createCodeLocationCreationService());
+        return new BdioUploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, executorService),
+            createCodeLocationCreationService());
     }
 
     public Bdio2UploadService createBdio2UploadService() {
-        return new Bdio2UploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService), createCodeLocationCreationService());
+        return new Bdio2UploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, executorService), createCodeLocationCreationService());
     }
 
     public SignatureScannerService createSignatureScannerService() {
@@ -135,103 +144,105 @@ public class BlackDuckServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(ScanBatchRunner scanBatchRunner) {
-        return new SignatureScannerService(blackDuckApiClient, blackDuckRequestFactory, logger, scanBatchRunner, createCodeLocationCreationService());
+        return new SignatureScannerService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, scanBatchRunner, createCodeLocationCreationService());
     }
 
     public BinaryScanUploadService createBinaryScanUploadService() {
-        return new BinaryScanUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new BinaryScanBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService), createCodeLocationCreationService());
+        return new BinaryScanUploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, new BinaryScanBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, executorService),
+            createCodeLocationCreationService());
     }
 
     public CodeLocationCreationService createCodeLocationCreationService() {
         ProjectService projectService = createProjectService();
         NotificationService notificationService = createNotificationService();
+        UserService userService = createUserService();
         CodeLocationWaiter codeLocationWaiter = new CodeLocationWaiter(logger, blackDuckApiClient, projectService, notificationService);
 
-        return new CodeLocationCreationService(blackDuckApiClient, blackDuckRequestFactory, logger, codeLocationWaiter, notificationService);
+        return new CodeLocationCreationService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, codeLocationWaiter, notificationService, userService);
     }
 
     public CodeLocationService createCodeLocationService() {
-        return new CodeLocationService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new CodeLocationService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public ComponentService createComponentService() {
-        return new ComponentService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new ComponentService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public BlackDuckRegistrationService createBlackDuckRegistrationService() {
-        return new BlackDuckRegistrationService(blackDuckApiClient, blackDuckRequestFactory, logger, blackDuckHttpClient.getBaseUrl());
+        return new BlackDuckRegistrationService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, blackDuckHttpClient.getBlackDuckUrl());
     }
 
     public IssueService createIssueService() {
-        return new IssueService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new IssueService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public LicenseService createLicenseService() {
-        return new LicenseService(blackDuckApiClient, blackDuckRequestFactory, logger, createComponentService());
+        return new LicenseService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, createComponentService());
     }
 
     public NotificationService createNotificationService() {
-        return new NotificationService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new NotificationService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public NotificationRequestFactory createNotificationRequestFactory() {
-        return new NotificationRequestFactory(blackDuckRequestFactory);
+        return new NotificationRequestFactory(blackDuckRequestFactory, apiDiscovery);
     }
 
     public PolicyRuleService createPolicyRuleService() {
-        return new PolicyRuleService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new PolicyRuleService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public ProjectService createProjectService() {
-        ProjectGetService projectGetService = new ProjectGetService(blackDuckApiClient, blackDuckRequestFactory, logger);
-        return new ProjectService(blackDuckApiClient, blackDuckRequestFactory, logger, projectGetService);
+        ProjectGetService projectGetService = new ProjectGetService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
+        return new ProjectService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, projectGetService);
     }
 
     public ProjectBomService createProjectBomService() {
-        return new ProjectBomService(blackDuckApiClient, blackDuckRequestFactory, logger, createComponentService());
+        return new ProjectBomService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, createComponentService());
     }
 
     public ProjectUsersService createProjectUsersService() {
         UserGroupService userGroupService = createUserGroupService();
-        return new ProjectUsersService(blackDuckApiClient, blackDuckRequestFactory, logger, userGroupService);
+        return new ProjectUsersService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, userGroupService);
     }
 
     public UserService createUserService() {
-        return new UserService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new UserService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public RoleService createRoleService() {
-        return new RoleService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new RoleService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public UserRoleService createUserRoleService() {
-        return new UserRoleService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new UserRoleService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public UserGroupService createUserGroupService() {
-        return new UserGroupService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new UserGroupService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public ProjectMappingService createProjectMappingService() {
-        return new ProjectMappingService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new ProjectMappingService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public TagService createTagService() {
-        return new TagService(blackDuckApiClient, blackDuckRequestFactory, logger);
+        return new TagService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public RapidScanService createRapidScanService() {
         RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
-        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_DEVELOPER_MODE_PATH, RapidScanService.CONTENT_TYPE);
+        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
         return new RapidScanService(bdio2FileUploadService, rapidScanWaiter);
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH, IntelligentPersistenceService.CONTENT_TYPE);
-        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH, IntelligentPersistenceService.CONTENT_TYPE);
+        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
         IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);
-        return new IntelligentPersistenceService(blackDuckApiClient, blackDuckRequestFactory, logger, batchRunner, createCodeLocationCreationService());
+        return new IntelligentPersistenceService(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger, batchRunner, createCodeLocationCreationService());
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
@@ -262,8 +273,12 @@ public class BlackDuckServicesFactory {
         return blackDuckApiClient;
     }
 
-    public BlackDuckRequestFactory getRequestFactory() {
+    public BlackDuckRequestFactory getBlackDuckRequestFactory() {
         return blackDuckRequestFactory;
+    }
+
+    public ApiDiscovery getApiDiscovery() {
+        return apiDiscovery;
     }
 
     @Override

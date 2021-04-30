@@ -80,8 +80,8 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     }
 
     @Override
-    public HttpUrl getBaseUrl() {
-        return blackDuckHttpClient.getBaseUrl();
+    public HttpUrl getBlackDuckUrl() {
+        return blackDuckHttpClient.getBlackDuckUrl();
     }
 
     @Override

@@ -36,7 +36,7 @@ public interface BlackDuckHttpClient {
 
     void throwExceptionForError(Response response) throws IntegrationException;
 
-    HttpUrl getBaseUrl();
+    HttpUrl getBlackDuckUrl();
 
     String getUserAgentString();
 

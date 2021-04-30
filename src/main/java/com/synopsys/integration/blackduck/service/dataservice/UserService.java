@@ -10,6 +10,8 @@ package com.synopsys.integration.blackduck.service.dataservice;
 import java.util.List;
 import java.util.Optional;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.UserRequest;
@@ -25,8 +27,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class UserService extends DataService {
-    public UserService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public UserService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
     }
 
     public UserRequest createUserRequest(String username, String password, String firstName, String lastName) {
@@ -40,31 +42,45 @@ public class UserService extends DataService {
     }
 
     public UserView createUser(UserRequest userRequest) throws IntegrationException {
-        HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
+        HttpUrl createUserUrl = apiDiscovery.getUrl(ApiDiscovery.USERS_PATH);
+        HttpUrl userUrl = blackDuckApiClient.post(createUserUrl, userRequest);
         return blackDuckApiClient.getResponse(userUrl, UserView.class);
     }
 
+    public UserView findCurrentUser() throws IntegrationException {
+        UrlSingleResponse<UserView> currentUserResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_USER_PATH);
+        return blackDuckApiClient.getResponse(currentUserResponse);
+    }
+
     public BlackDuckPageResponse<UserView> findUsersByEmail(String emailSearchTerm, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        HttpUrl usersUrl = blackDuckApiClient.getUrl(ApiDiscovery.USERS_LINK);
+        UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
+
         Optional<BlackDuckQuery> usernameQuery = BlackDuckQuery.createQuery("email", emailSearchTerm);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(usersUrl, usernameQuery);
-        return blackDuckApiClient.getPageResponse(blackDuckRequestBuilder, UserView.class, blackDuckPageDefinition);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory
+                                                              .createCommonGetRequestBuilder(usernameQuery)
+                                                              .setBlackDuckPageDefinition(blackDuckPageDefinition);
+
+        return blackDuckApiClient.getPageResponse(usersResponse, blackDuckRequestBuilder);
     }
 
     public Optional<UserView> findUserByUsername(String username) throws IntegrationException {
-        HttpUrl usersUrl = blackDuckApiClient.getUrl(ApiDiscovery.USERS_LINK);
+        UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
+
         Optional<BlackDuckQuery> usernameQuery = BlackDuckQuery.createQuery("userName", username);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(usersUrl, usernameQuery);
-        List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(blackDuckRequestBuilder, UserView.class, 1);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestFactory.createCommonGetRequestBuilder(usernameQuery);
+
+        List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(usersResponse, blackDuckRequestBuilder, 1);
         return foundUsers.stream().findFirst();
     }
 
     public List<UserView> getAllUsers() throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
+        return blackDuckApiClient.getAllResponses(usersResponse);
     }
 
     public BlackDuckPageResponse<UserView> getPageOfUsers(BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        return blackDuckApiClient.getPageResponse(ApiDiscovery.USERS_LINK_RESPONSE, blackDuckPageDefinition);
+        UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
+        return blackDuckApiClient.getPageResponse(usersResponse, blackDuckPageDefinition);
     }
 
 }

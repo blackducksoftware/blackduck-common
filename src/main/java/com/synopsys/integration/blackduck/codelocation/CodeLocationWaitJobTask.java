@@ -105,7 +105,7 @@ public class CodeLocationWaitJobTask implements WaitJobTask {
     }
 
     private Map<String, String> retrieveCodeLocations(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<CodeLocationView> codeLocationViews = blackDuckApiClient.getAllResponses(projectVersionView, ProjectVersionView.CODELOCATIONS_LINK_RESPONSE);
+        List<CodeLocationView> codeLocationViews = blackDuckApiClient.getAllResponses(projectVersionView.metaCodelocationsLink());
         return codeLocationViews
                    .stream()
                    .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))

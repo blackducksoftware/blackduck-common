@@ -193,7 +193,7 @@ public class ProjectServiceTestIT {
 
         Optional<ProjectVersionWrapper> projectVersionWrapper = ProjectServiceTestIT.projectService.getProjectVersion(projectName, projectVersionName);
         ProjectServiceTestIT.project = projectVersionWrapper.get().getProjectView();
-        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project.metaVersionsLink());
         assertEquals(1, projectVersionViews.size());
 
         Optional<ProjectVersionView> latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
@@ -205,7 +205,7 @@ public class ProjectServiceTestIT {
 
         ProjectServiceTestIT.projectService.createProjectVersion(ProjectServiceTestIT.project, projectVersionRequest);
 
-        List<ProjectVersionView> projectVersionViewsAfterUpdate = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViewsAfterUpdate = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project.metaVersionsLink());
         assertEquals(2, projectVersionViewsAfterUpdate.size());
 
         latestProjectVersionView = ProjectServiceTestIT.projectService.getNewestProjectVersion(ProjectServiceTestIT.project);
@@ -234,7 +234,7 @@ public class ProjectServiceTestIT {
         HttpUrl projectUrl = ProjectServiceTestIT.project.getHref();
         HttpUrl projectVersionUrl = projectVersionView.getHref();
 
-        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        List<ProjectVersionView> projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project.metaVersionsLink());
         assertEquals(1, projectVersionViews.size());
 
         ProjectServiceTestIT.project.setCloneCategories(Arrays.asList(ProjectCloneCategoriesType.COMPONENT_DATA));
@@ -247,7 +247,7 @@ public class ProjectServiceTestIT {
         projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
         ProjectServiceTestIT.projectService.createProjectVersion(ProjectServiceTestIT.project, projectVersionRequest);
 
-        projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project, ProjectView.VERSIONS_LINK_RESPONSE);
+        projectVersionViews = ProjectServiceTestIT.blackDuckApiClient.getAllResponses(ProjectServiceTestIT.project.metaVersionsLink());
         assertEquals(2, projectVersionViews.size());
     }
 

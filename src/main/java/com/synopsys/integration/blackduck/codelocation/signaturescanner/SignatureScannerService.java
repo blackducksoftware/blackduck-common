@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
@@ -24,9 +25,9 @@ public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public SignatureScannerService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger,
+    public SignatureScannerService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger,
         ScanBatchRunner scanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

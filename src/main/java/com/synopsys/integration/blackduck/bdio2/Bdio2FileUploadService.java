@@ -10,6 +10,7 @@ package com.synopsys.integration.blackduck.bdio2;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
@@ -27,9 +28,9 @@ public class Bdio2FileUploadService extends DataService {
     private Bdio2ContentExtractor bdio2Extractor;
     private Bdio2StreamUploader bdio2Uploader;
 
-    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory,
+    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestFactory blackDuckRequestFactory,
         IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+        super(blackDuckApiClient, apiDiscovery, blackDuckRequestFactory, logger);
         this.bdio2Extractor = bdio2Extractor;
         this.bdio2Uploader = bdio2Uploader;
     }

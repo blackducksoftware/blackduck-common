@@ -24,7 +24,7 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
     }
 
     @Override
-    public UploadOutput call() throws Exception {
+    public UploadOutput call() {
         NameVersion projectAndVersion = uploadTarget.getProjectAndVersion();
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
@@ -35,4 +35,5 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, ex);
         }
     }
+
 }

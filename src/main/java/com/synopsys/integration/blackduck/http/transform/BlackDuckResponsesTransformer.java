@@ -17,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
@@ -46,7 +48,7 @@ public class BlackDuckResponsesTransformer {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, pagedRequest.getLimit(), alwaysTrue());
+        return getInternalMatchingResponse(pagedRequest, clazz, pagedRequest.getBlackDuckPageDefinition().getLimit(), alwaysTrue());
     }
 
     private <T extends BlackDuckResponse> Predicate<T> alwaysTrue() {
@@ -56,7 +58,6 @@ public class BlackDuckResponsesTransformer {
     private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(PagedRequest pagedRequest, Class<T> clazz, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
-        int currentOffset = pagedRequest.getOffset();
         Request request = pagedRequest.createRequest();
         try (Response initialResponse = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
@@ -68,10 +69,9 @@ public class BlackDuckResponsesTransformer {
             totalCount = blackDuckPageResponse.getTotalCount();
             int totalItemsToRetrieve = Math.min(totalCount, maxToReturn);
 
-            while (allResponses.size() < totalItemsToRetrieve && currentOffset < totalCount) {
-                currentOffset += pagedRequest.getLimit();
-                PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
-                request = offsetPagedRequest.createRequest();
+            while (allResponses.size() < totalItemsToRetrieve && pagedRequest.getBlackDuckPageDefinition().getOffset() < totalCount) {
+                pagedRequest = nextPage(pagedRequest);
+                request = pagedRequest.createRequest();
                 try (Response response = blackDuckHttpClient.execute(request)) {
                     blackDuckHttpClient.throwExceptionForError(response);
                     String jsonResponse = response.getContentString();
@@ -87,6 +87,17 @@ public class BlackDuckResponsesTransformer {
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }
+    }
+
+    private PagedRequest nextPage(PagedRequest pagedRequest) {
+        int oldOffset = pagedRequest.getBlackDuckPageDefinition().getOffset();
+        int limit = pagedRequest.getBlackDuckPageDefinition().getLimit();
+        int newOffset = oldOffset + limit;
+
+        BlackDuckRequestBuilder oldRequestBuilder = pagedRequest.getBlackDuckRequestBuilder();
+        oldRequestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(limit, newOffset));
+
+        return new PagedRequest(pagedRequest.getBlackDuckRequestBuilder());
     }
 
     @NotNull
