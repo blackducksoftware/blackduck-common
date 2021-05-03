@@ -104,6 +104,10 @@ public class BomComponent {
         this.license = license;
     }
 
+    public int getSecurityRiskCriticalCount() {
+        return securityRiskCounts.getCritical();
+    }
+
     public int getSecurityRiskHighCount() {
         return securityRiskCounts.getHigh();
     }

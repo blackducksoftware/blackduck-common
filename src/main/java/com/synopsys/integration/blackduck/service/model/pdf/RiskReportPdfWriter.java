@@ -185,9 +185,11 @@ public class RiskReportPdfWriter {
         pdfManager.writeText(50, rowY, "Component", boldFont, 12, textColor);
         pdfManager.writeText(190, rowY, "Version", boldFont, 12, textColor);
         pdfManager.writeText(310, rowY, "License", boldFont, 12, textColor);
-        pdfManager.writeText(430, rowY, "H", boldFont, 12, textColor);
-        pdfManager.writeText(470, rowY, "M", boldFont, 12, textColor);
-        pdfManager.writeText(510, rowY, "L", boldFont, 12, textColor);
+
+        pdfManager.writeText(430, rowY, "C", boldFont, 12, textColor);
+        pdfManager.writeText(460, rowY, "H", boldFont, 12, textColor);
+        pdfManager.writeText(490, rowY, "M", boldFont, 12, textColor);
+        pdfManager.writeText(520, rowY, "L", boldFont, 12, textColor);
         pdfManager.writeText(550, rowY, "Opt R", boldFont, 12, textColor);
 
         boolean isOdd = false;
@@ -257,9 +259,10 @@ public class RiskReportPdfWriter {
 
         pdfManager.writeWrappedVerticalCenteredText(290, rowUpperY, componentLicenseWidth, rowHeight, componentLicenseTextLines, font, fontSize, textColor);
 
-        pdfManager.writeTextCentered(434, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskHighCount()), font, fontSize, textColor);
-        pdfManager.writeTextCentered(477, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskMediumCount()), font, fontSize, textColor);
-        pdfManager.writeTextCentered(520, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskLowCount()), font, fontSize, textColor);
+        pdfManager.writeTextCentered(434, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskCriticalCount()), font, fontSize, textColor);
+        pdfManager.writeTextCentered(464, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskHighCount()), font, fontSize, textColor);
+        pdfManager.writeTextCentered(494, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskMediumCount()), font, fontSize, textColor);
+        pdfManager.writeTextCentered(524, rowUpperY, rowHeight, String.valueOf(component.getSecurityRiskLowCount()), font, fontSize, textColor);
 
         Risk operationalRisk = getOperationalRisk(component, rowColor);
 
