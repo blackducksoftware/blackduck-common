@@ -15,7 +15,9 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -81,7 +83,11 @@ public class ProjectBomService extends DataService {
     }
 
     public Optional<ProjectVersionPolicyStatusView> getPolicyStatusForVersion(ProjectVersionView version) throws IntegrationException {
-        return blackDuckApiClient.getResponseSafely(version.metaPolicyStatusLink());
+        if (version.metaPolicyStatusLinkSafely().isPresent()) {
+            return Optional.ofNullable(blackDuckApiClient.getResponse(version.metaPolicyStatusLink()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     //TODO investigate what variant is
@@ -118,7 +124,11 @@ public class ProjectBomService extends DataService {
     }
 
     public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
-        Request request = blackDuckRequestBuilderFactory.createCommonPostRequestBuilder(projectVersionComponentsUrl, "{\"component\": \"" + componentVersionUrl.string() + "\"}").build();
+        Request request = blackDuckRequestBuilderFactory
+                              .createBlackDuckRequestBuilder()
+                              .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}")
+                              .url(projectVersionComponentsUrl)
+                              .build();
         try (Response response = blackDuckApiClient.execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

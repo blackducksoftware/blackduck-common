@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.deprecated.response.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
@@ -62,7 +63,7 @@ public class ComponentService extends DataService {
         String componentQuery = String.format("%s|%s", forge, originId);
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
 
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
 
         UrlMultipleResponses<ComponentsView> componentsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.COMPONENTS_PATH);
         List<ComponentsView> allSearchResults = blackDuckApiClient.getAllResponses(componentsResponses, blackDuckRequestBuilder);
@@ -104,14 +105,19 @@ public class ComponentService extends DataService {
     }
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder()
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
+                                                     .createCommonGet()
                                                      .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(componentVersion.metaVulnerabilitiesLink(), requestBuilder);
+        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(componentVersion.metaVulnerabilitiesLink(), blackDuckRequestBuilder);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
     public Optional<ComponentVersionUpgradeGuidanceView> getUpgradeGuidance(ComponentVersionView componentVersionView) throws IntegrationException {
-        return blackDuckApiClient.getResponseSafely(componentVersionView.metaUpgradeGuidanceLink());
+        if (componentVersionView.metaUpgradeGuidanceLinkSafely().isPresent()) {
+            return Optional.ofNullable(blackDuckApiClient.getResponse(componentVersionView.metaUpgradeGuidanceLink()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private Optional<ComponentVersionRemediatingView> simplyRetrieveRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {

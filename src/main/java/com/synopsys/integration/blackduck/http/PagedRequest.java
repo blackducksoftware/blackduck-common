@@ -17,14 +17,14 @@ public class PagedRequest {
 
     public PagedRequest(BlackDuckRequestBuilder blackDuckRequestBuilder) {
         this.blackDuckRequestBuilder = blackDuckRequestBuilder;
-        int offset = BlackDuckRequestBuilderFactory.DEFAULT_OFFSET;
-        int limit = BlackDuckRequestBuilderFactory.DEFAULT_LIMIT;
+        int offset = BlackDuckRequestBuilder.DEFAULT_OFFSET;
+        int limit = BlackDuckRequestBuilder.DEFAULT_LIMIT;
         if (blackDuckRequestBuilder.getQueryParameters() != null) {
-            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilderFactory.OFFSET_PARAMETER)) {
-                offset = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestBuilderFactory.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
+            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilder.OFFSET_PARAMETER)) {
+                offset = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().orElse(null), offset);
             }
-            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilderFactory.LIMIT_PARAMETER)) {
-                limit = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestBuilderFactory.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
+            if (blackDuckRequestBuilder.getQueryParameters().containsKey(BlackDuckRequestBuilder.LIMIT_PARAMETER)) {
+                limit = NumberUtils.toInt(blackDuckRequestBuilder.getQueryParameters().get(BlackDuckRequestBuilder.LIMIT_PARAMETER).stream().findFirst().orElse(null), limit);
             }
         }
 

@@ -53,9 +53,12 @@ public class UploadCallable implements Callable<UploadOutput> {
             }
 
             UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaSingleResponse(BlackDuckApiClient.BOMIMPORT_PATH);
-            Request request = blackDuckRequestBuilderFactory.createCommonPostRequestBuilder(jsonPayload)
-                .acceptMimeType(uploadTarget.getMediaType())
-                .build(stringResponse.getUrl());
+            Request request = blackDuckRequestBuilderFactory
+                                  .createBlackDuckRequestBuilder()
+                                  .postString(jsonPayload)
+                                  .acceptMimeType(uploadTarget.getMediaType())
+                                  .url(stringResponse.getUrl())
+                                  .build();
 
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();

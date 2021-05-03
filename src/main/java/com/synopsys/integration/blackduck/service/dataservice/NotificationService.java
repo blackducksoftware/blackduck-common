@@ -113,9 +113,7 @@ public class NotificationService extends DataService {
     }
 
     private BlackDuckRequestBuilder createLatestDateRequestBuilder() {
-        return blackDuckRequestBuilderFactory
-                   .createCommonGetRequestBuilder()
-                   .addBlackDuckFilter(createFilterForAllKnownTypes());
+        return blackDuckRequestBuilderFactory.createCommonGet(createFilterForAllKnownTypes());
     }
 
     private List<String> getAllKnownNotificationTypes() {
@@ -139,7 +137,8 @@ public class NotificationService extends DataService {
 
         BlackDuckRequestFilter notificationTypeFilter = createFilterForSpecificTypes(notificationTypesToInclude);
         return blackDuckRequestBuilderFactory
-                   .createCommonGetRequestBuilder()
+                   .createBlackDuckRequestBuilder()
+                   .commonGet()
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString)
                    .addBlackDuckFilter(notificationTypeFilter);

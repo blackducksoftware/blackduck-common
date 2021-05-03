@@ -87,8 +87,7 @@ public class BlackDuckServicesFactory {
 
     public static Gson createDefaultGson() {
         return createDefaultGsonBuilder()
-                   .registerTypeAdapter(HttpUrl.class, new HttpUrlTypeAdapter())
-                   .setLenient()
+//                   .registerTypeAdapter(HttpUrl.class, new HttpUrlTypeAdapter())
                    .create();
     }
 
@@ -135,7 +134,8 @@ public class BlackDuckServicesFactory {
     }
 
     public Bdio2UploadService createBdio2UploadService() {
-        return new Bdio2UploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, executorService), createCodeLocationCreationService());
+        return new Bdio2UploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, executorService),
+            createCodeLocationCreationService());
     }
 
     public SignatureScannerService createSignatureScannerService() {
@@ -239,7 +239,8 @@ public class BlackDuckServicesFactory {
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH, IntelligentPersistenceService.CONTENT_TYPE);
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, BlackDuckApiClient.SCAN_INTELLIGENT_PERSISTENCE_MODE_PATH,
+            IntelligentPersistenceService.CONTENT_TYPE);
         Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, new Bdio2ContentExtractor(), bdio2Uploader);
         IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);
         return new IntelligentPersistenceService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger, batchRunner, createCodeLocationCreationService());

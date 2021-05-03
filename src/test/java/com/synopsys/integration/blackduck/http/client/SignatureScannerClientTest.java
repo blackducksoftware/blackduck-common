@@ -72,7 +72,10 @@ public class SignatureScannerClientTest {
 
         HttpUrl httpsServer = new HttpUrl(destinationMockServerUrl);
 
-        BLACK_DUCK_DEFAULT_REQUEST = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
+        BLACK_DUCK_DEFAULT_REQUEST = BLACK_DUCK_REQUEST_FACTORY
+                                         .createCommonGet()
+                                         .url(httpsServer)
+                                         .build();
 
         DEFAULT_KEYSTORE = createEmptyKeyStoreWithCertificate(LOCALHOST_CERTIFICATE.certificate());
     }

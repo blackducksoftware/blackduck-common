@@ -290,7 +290,7 @@ public class ComprehensiveCookbookTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(new Request.Builder());
+        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(gson, new Request.Builder());
         requestBuilder.url(urlResponses.getUrl());
         PagedRequest pagedRequest = new PagedRequest(requestBuilder);
 

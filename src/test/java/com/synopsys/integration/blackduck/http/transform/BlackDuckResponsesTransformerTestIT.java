@@ -72,7 +72,9 @@ class BlackDuckResponsesTransformerTestIT {
     }
 
     private BlackDuckRequestBuilder createRequestBuilder() throws IntegrationException {
-        return blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(apiDiscovery.metaProjectsLink().getUrl());
+        return blackDuckRequestBuilderFactory
+                   .createCommonGet()
+                   .url(apiDiscovery.metaProjectsLink().getUrl());
     }
 
     private BlackDuckResponsesTransformer createBlackDuckResponsesTransformer() {

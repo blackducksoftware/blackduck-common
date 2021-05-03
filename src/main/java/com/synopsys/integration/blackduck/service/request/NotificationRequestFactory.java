@@ -52,11 +52,9 @@ public class NotificationRequestFactory {
         String endDateString = sdf.format(endDate);
 
         BlackDuckRequestFilter notificationTypeFilter = createFilterForNotificationsTypes(notificationTypesToInclude);
-        return blackDuckRequestBuilderFactory
-                   .createCommonGetRequestBuilder()
+        return blackDuckRequestBuilderFactory.createCommonGet(notificationTypeFilter)
                    .addQueryParameter("startDate", startDateString)
-                   .addQueryParameter("endDate", endDateString)
-                   .addBlackDuckFilter(notificationTypeFilter);
+                   .addQueryParameter("endDate", endDateString);
     }
 
     private BlackDuckRequestFilter createFilterForNotificationsTypes(List<String> notificationTypesToInclude) {

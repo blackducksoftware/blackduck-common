@@ -22,7 +22,11 @@ public class BlackDuckRequestBuilderFactoryTest {
     public void testFilterWithMultipleValues() throws IntegrationException {
         BlackDuckRequestFilter blackDuckRequestFilter = BlackDuckRequestFilter.createFilterWithMultipleValues("KEY1", Arrays.asList("value1", "value2"));
         BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(BlackDuckServicesFactory.createDefaultGson());
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(new HttpUrl("http://www.url.com/api/something"), Optional.empty(), blackDuckRequestFilter, 1, 0);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
+                                                     .createCommonGet(Optional.empty())
+                                                     .addBlackDuckFilter(blackDuckRequestFilter)
+                                                     .setBlackDuckPageDefinition(new BlackDuckPageDefinition(1, 0))
+                                                     .url(new HttpUrl("http://www.url.com/api/something"));
         Request request = requestBuilder.build();
 
         assertTrue(request.getQueryParameters().containsKey("filter"));

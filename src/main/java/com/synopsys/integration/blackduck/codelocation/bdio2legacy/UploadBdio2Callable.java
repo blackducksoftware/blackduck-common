@@ -42,8 +42,11 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
         try {
             HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
             Request request = blackDuckRequestBuilderFactory
-                                  .createCommonPostRequestBuilder(url, uploadTarget.getUploadFile())
-                                  .acceptMimeType(uploadTarget.getMediaType()).build();
+                                  .createBlackDuckRequestBuilder()
+                                  .postFile(uploadTarget.getUploadFile())
+                                  .acceptMimeType(uploadTarget.getMediaType())
+                                  .url(url)
+                                  .build();
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);

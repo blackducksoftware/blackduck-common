@@ -69,7 +69,7 @@ public class SignatureScannerClientProxyTest {
     public void noProxyTest() throws IntegrationException {
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
-        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
+        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGet().url(httpsServer).build();
         Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 
@@ -84,7 +84,7 @@ public class SignatureScannerClientProxyTest {
     public void withProxyTest() throws IntegrationException {
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
-        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
+        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGet().url(httpsServer).build();
         Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 

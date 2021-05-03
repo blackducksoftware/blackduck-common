@@ -195,7 +195,9 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("read");
         apiTokenRequest.scopes.add("write");
 
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonPostRequestBuilder(apiTokenRequest);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
+                                                              .createBlackDuckRequestBuilder()
+                                                              .postObject(apiTokenRequest);
 
         return blackDuckApiClient.getResponse(tokenResponse, blackDuckRequestBuilder);
     }

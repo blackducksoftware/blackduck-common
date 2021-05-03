@@ -29,7 +29,9 @@ public class BlackDuckRegistrationService extends DataService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder();
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
+                                                     .createBlackDuckRequestBuilder()
+                                                     .commonGet();
         requestBuilder.acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
         UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.REGISTRATION_PATH);

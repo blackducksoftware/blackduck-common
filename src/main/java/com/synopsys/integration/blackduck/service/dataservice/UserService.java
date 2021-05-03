@@ -56,8 +56,7 @@ public class UserService extends DataService {
         UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
 
         Optional<BlackDuckQuery> usernameQuery = BlackDuckQuery.createQuery("email", emailSearchTerm);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                              .createCommonGetRequestBuilder(usernameQuery)
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(usernameQuery)
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
 
         return blackDuckApiClient.getPageResponse(usersResponse, blackDuckRequestBuilder);
@@ -67,7 +66,7 @@ public class UserService extends DataService {
         UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
 
         Optional<BlackDuckQuery> usernameQuery = BlackDuckQuery.createQuery("userName", username);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(usernameQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(usernameQuery);
 
         List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(usersResponse, blackDuckRequestBuilder, 1);
         return foundUsers.stream().findFirst();

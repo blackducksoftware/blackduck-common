@@ -54,8 +54,10 @@ public class BinaryScanCallable implements Callable<BinaryScanOutput> {
 
             UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaSingleResponse(BlackDuckApiClient.UPLOADS_PATH);
             Request request = blackDuckRequestBuilderFactory
-                                  .createCommonPostRequestBuilder(binaryParts, textParts)
-                                  .build(stringResponse.getUrl());
+                                  .createBlackDuckRequestBuilder()
+                                  .postMultipart(binaryParts, textParts)
+                                  .url(stringResponse.getUrl())
+                                  .build();
             try (Response response = blackDuckApiClient.execute(request)) {
                 return BinaryScanOutput.FROM_RESPONSE(projectAndVersion, codeLocationName, response);
             }

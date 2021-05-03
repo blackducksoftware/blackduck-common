@@ -32,7 +32,10 @@ public class ProjectGetService extends DataService {
 
     public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
+                                                     .createBlackDuckRequestBuilder()
+                                                     .commonGet()
+                                                     .addBlackDuckQuery(blackDuckQuery);
 
         List<ProjectView> allProjectItems = blackDuckApiClient.getAllResponses(projectsResponses, requestBuilder);
         return allProjectItems;
@@ -40,7 +43,10 @@ public class ProjectGetService extends DataService {
 
     public List<ProjectView> getProjectMatches(String projectName, int limit) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", projectName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
+                                                     .createBlackDuckRequestBuilder()
+                                                     .commonGet()
+                                                     .addBlackDuckQuery(blackDuckQuery);
 
         List<ProjectView> projectItems = blackDuckApiClient.getSomeResponses(projectsResponses, requestBuilder, limit);
         return projectItems;
@@ -59,7 +65,10 @@ public class ProjectGetService extends DataService {
 
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(ProjectView projectView, String projectVersionName) throws IntegrationException {
         Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("versionName", projectVersionName);
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder(blackDuckQuery);
+        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
+                                                     .createBlackDuckRequestBuilder()
+                                                     .commonGet()
+                                                     .addBlackDuckQuery(blackDuckQuery);
         Predicate<ProjectVersionView> predicate = projectVersionView -> projectVersionName.equals(projectVersionView.getVersionName());
 
         return blackDuckApiClient.getSomeMatchingResponses(projectView.metaVersionsLink(), requestBuilder, predicate, 1)

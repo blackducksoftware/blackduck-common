@@ -41,8 +41,7 @@ public class RoleService extends DataService {
     }
 
     private List<RoleView> getScopedRoles(BlackDuckRequestFilter scope) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGetRequestBuilder();
-        blackDuckRequestBuilder.addBlackDuckFilter(scope);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(scope);
 
         UrlMultipleResponses<RoleView> roleResponses = apiDiscovery.metaRolesLink();
         return blackDuckApiClient.getAllResponses(roleResponses, blackDuckRequestBuilder);
