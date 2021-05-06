@@ -24,6 +24,10 @@ public class BlackDuckRequestBuilderFactory {
         return new BlackDuckRequestBuilder(gson, new Request.Builder());
     }
 
+    public BlackDuckRequestBuilder createBlackDuckRequestBuilder(Request request) {
+        return new BlackDuckRequestBuilder(gson, new Request.Builder(request));
+    }
+
     public BlackDuckRequestBuilder createCommonGet() {
         return new BlackDuckRequestBuilder(gson, new Request.Builder())
                    .commonGet();

@@ -21,10 +21,10 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
-import com.synopsys.integration.blackduck.http.PagedRequest;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -45,11 +45,11 @@ public class BlackDuckResponsesTransformerTest {
     }
 
     private void assertMatching(int limit) throws IOException, IntegrationException {
-        MockedClient mockedClient = new MockedClient().invoke();
-        PagedRequest pagedRequest = mockedClient.getPagedRequest();
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.getBlackDuckResponsesTransformer();
+        MockedClient mockedClient = new MockedClient();
+        BlackDuckRequest<ProjectView> blackDuckRequest = mockedClient.blackDuckRequest;
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.blackDuckResponsesTransformer;
 
-        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         int listCount = allPagesResponse.getItems().size();
 
         // we go through every item to ensure we match across page boundaries
@@ -58,7 +58,8 @@ public class BlackDuckResponsesTransformerTest {
             String customErrorMessage = String.format("Failed for limit %d, test %d of %d, testing:", limit, i, listCount - 1);
 
             Predicate<ProjectView> predicate = httpUrl -> myTestUrl.equalsIgnoreCase(httpUrl.getHref().string());
-            BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, ProjectView.class, predicate, limit);
+            BlackDuckRequest<ProjectView> innerBlackDuckRequest = new MockedClient().blackDuckRequest;
+            BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getSomeMatchingResponses(innerBlackDuckRequest, predicate, limit);
 
             assertEquals(69, matchedResponse.getTotalCount(), String.format("%s total response retrieved", customErrorMessage));
             assertEquals(1, matchedResponse.getItems().size(), String.format("%s match count returned", customErrorMessage));
@@ -70,12 +71,12 @@ public class BlackDuckResponsesTransformerTest {
 
     @Test
     public void testNoMatchingAcrossAllPages() throws IOException, IntegrationException {
-        MockedClient mockedClient = new MockedClient().invoke();
-        PagedRequest pagedRequest = mockedClient.getPagedRequest();
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.getBlackDuckResponsesTransformer();
+        MockedClient mockedClient = new MockedClient();
+        BlackDuckRequest<ProjectView> blackDuckRequest = mockedClient.blackDuckRequest;
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.blackDuckResponsesTransformer;
         String myTestUrl = "https://www.no-match.com";
         Predicate<ProjectView> predicate = httpUrl -> myTestUrl.equalsIgnoreCase(httpUrl.getHref().string());
-        BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getSomeMatchingResponses(pagedRequest, ProjectView.class, predicate, 1);
+        BlackDuckPageResponse<ProjectView> matchedResponse = blackDuckResponsesTransformer.getSomeMatchingResponses(blackDuckRequest, predicate, 1);
 
         assertEquals(69, matchedResponse.getTotalCount());
         assertEquals(0, matchedResponse.getItems().size(), "Should not have received any matched responses.");
@@ -93,26 +94,27 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(gson, new Request.Builder());
-        requestBuilder
+        BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        blackDuckRequestBuilder
             .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
             .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
 
-        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
         assertEquals(69, allPagesResponse.getItems().size());
     }
 
     @Test
     public void testGettingAllMultiplePagesTotal() throws IntegrationException, IOException {
-        MockedClient mockedClient = new MockedClient().invoke();
-        PagedRequest pagedRequest = mockedClient.getPagedRequest();
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.getBlackDuckResponsesTransformer();
+        MockedClient mockedClient = new MockedClient();
+        BlackDuckRequest<ProjectView> blackDuckRequest = mockedClient.blackDuckRequest;
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.blackDuckResponsesTransformer;
 
-        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
         assertEquals(69, allPagesResponse.getItems().size());
     }
@@ -129,26 +131,27 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(gson, new Request.Builder());
-        requestBuilder
+        BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        blackDuckRequestBuilder
             .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
             .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
 
-        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(pagedRequest, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
         assertEquals(69, allPagesResponse.getItems().size());
     }
 
     @Test
     public void testGettingOnePageMultiplePagesTotal() throws IOException, IntegrationException {
-        MockedClient mockedClient = new MockedClient().invoke();
-        PagedRequest pagedRequest = mockedClient.getPagedRequest();
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.getBlackDuckResponsesTransformer();
+        MockedClient mockedClient = new MockedClient();
+        BlackDuckRequest<ProjectView> blackDuckRequest = mockedClient.blackDuckRequest;
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = mockedClient.blackDuckResponsesTransformer;
 
-        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(pagedRequest, ProjectView.class);
+        BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
         assertEquals(20, allPagesResponse.getItems().size());
     }
@@ -191,18 +194,10 @@ public class BlackDuckResponsesTransformerTest {
     }
 
     private class MockedClient {
-        private PagedRequest pagedRequest;
+        private BlackDuckRequest<ProjectView> blackDuckRequest;
         private BlackDuckResponsesTransformer blackDuckResponsesTransformer;
 
-        public PagedRequest getPagedRequest() {
-            return pagedRequest;
-        }
-
-        public BlackDuckResponsesTransformer getBlackDuckResponsesTransformer() {
-            return blackDuckResponsesTransformer;
-        }
-
-        public MockedClient invoke() throws IOException, IntegrationException {
+        public MockedClient() throws IOException, IntegrationException {
             Map<String, String> offsetsToResults = new HashMap<>();
             offsetsToResults.put("0", "projectViews_page_1_of_4.json");
             offsetsToResults.put("20", "projectViews_page_2_of_4.json");
@@ -216,14 +211,14 @@ public class BlackDuckResponsesTransformerTest {
             BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
             BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-            BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(gson, new Request.Builder());
-            requestBuilder
+            BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
+            BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+            blackDuckRequestBuilder
                 .url(new HttpUrl("https://blackduckserver.com/api/projects"))
                 .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "20")
                 .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-            pagedRequest = new PagedRequest(requestBuilder);
-            blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-            return this;
+            blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+            blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
         }
     }
 

@@ -13,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
@@ -26,10 +27,11 @@ public class BlackDuckResponseTransformer {
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> T getResponse(Request request, Class<T> clazz) throws IntegrationException {
+    public <T extends BlackDuckResponse> T getResponse(BlackDuckRequest<T> blackDuckRequest) throws IntegrationException {
+        Request request = blackDuckRequest.getRequest();
         try (Response response = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(response);
-            return blackDuckJsonTransformer.getResponse(response, clazz);
+            return blackDuckJsonTransformer.getResponse(response, blackDuckRequest.getResponseClass());
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }

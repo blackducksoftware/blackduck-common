@@ -86,9 +86,7 @@ public class BlackDuckServicesFactory {
     private final BlackDuckApiClient blackDuckApiClient;
 
     public static Gson createDefaultGson() {
-        return createDefaultGsonBuilder()
-//                   .registerTypeAdapter(HttpUrl.class, new HttpUrlTypeAdapter())
-                   .create();
+        return createDefaultGsonBuilder().create();
     }
 
     public static ObjectMapper createDefaultObjectMapper() {
@@ -122,7 +120,7 @@ public class BlackDuckServicesFactory {
         blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
+        blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
         apiDiscovery = new ApiDiscovery(blackDuckHttpClient.getBlackDuckUrl());
 
         blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestBuilderFactory);
@@ -250,12 +248,16 @@ public class BlackDuckServicesFactory {
         return new IntegrationEscapeUtil();
     }
 
-    public BlackDuckHttpClient getBlackDuckHttpClient() {
-        return blackDuckHttpClient;
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
     public IntLogger getLogger() {
         return logger;
+    }
+
+    public BlackDuckHttpClient getBlackDuckHttpClient() {
+        return blackDuckHttpClient;
     }
 
     public Gson getGson() {
@@ -270,16 +272,32 @@ public class BlackDuckServicesFactory {
         return intEnvironmentVariables;
     }
 
-    public BlackDuckApiClient getBlackDuckApiClient() {
-        return blackDuckApiClient;
+    public BlackDuckRequestBuilderFactory getBlackDuckRequestBuilderFactory() {
+        return blackDuckRequestBuilderFactory;
     }
 
-    public BlackDuckRequestBuilderFactory getBlackDuckRequestFactory() {
-        return blackDuckRequestBuilderFactory;
+    public BlackDuckResponseResolver getBlackDuckResponseResolver() {
+        return blackDuckResponseResolver;
+    }
+
+    public BlackDuckJsonTransformer getBlackDuckJsonTransformer() {
+        return blackDuckJsonTransformer;
+    }
+
+    public BlackDuckResponseTransformer getBlackDuckResponseTransformer() {
+        return blackDuckResponseTransformer;
+    }
+
+    public BlackDuckResponsesTransformer getBlackDuckResponsesTransformer() {
+        return blackDuckResponsesTransformer;
     }
 
     public ApiDiscovery getApiDiscovery() {
         return apiDiscovery;
+    }
+
+    public BlackDuckApiClient getBlackDuckApiClient() {
+        return blackDuckApiClient;
     }
 
     @Override

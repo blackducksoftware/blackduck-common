@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.scan;
 
 import java.util.List;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -45,6 +46,8 @@ public class RapidScanWaiter {
         if (!allCompleted) {
             throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
         }
-        return blackDuckApiClient.getAllResponses(url, DeveloperScanComponentResultView.class);
+
+        UrlMultipleResponses<DeveloperScanComponentResultView> resultResponses = new UrlMultipleResponses<>(url, DeveloperScanComponentResultView.class);
+        return blackDuckApiClient.getAllResponses(resultResponses);
     }
 }

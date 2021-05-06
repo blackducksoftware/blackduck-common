@@ -85,7 +85,7 @@ public class BasicRecipe {
         blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, executorService, logger, blackDuckHttpClient);
         blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-        blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestFactory();
+        blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();

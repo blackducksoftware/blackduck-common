@@ -48,7 +48,7 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.PagedRequest;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
@@ -58,6 +58,7 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
@@ -68,12 +69,10 @@ import com.synopsys.integration.util.NameVersion;
 @ExtendWith(TimingExtension.class)
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
-    private final Gson gson = BlackDuckServicesFactory.createDefaultGson();
-    private final ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
-    private final BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
-    private final BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, new SilentIntLogger());
-    private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+    private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(new SilentIntLogger());
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
+    private final BlackDuckResponsesTransformer blackDuckResponsesTransformer = blackDuckServicesFactory.getBlackDuckResponsesTransformer();
 
     public ComprehensiveCookbookTestIT() throws IntegrationException {}
 
@@ -287,14 +286,10 @@ public class ComprehensiveCookbookTestIT {
     }
 
     private <T extends BlackDuckResponse> void assertGettingAll(UrlMultipleResponses<T> urlResponses, String labelForOutput) throws IntegrationException {
-        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckServicesFactory.getBlackDuckHttpClient(), blackDuckJsonTransformer);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        BlackDuckRequest<T> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, urlResponses);
 
-        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder(gson, new Request.Builder());
-        requestBuilder.url(urlResponses.getUrl());
-        PagedRequest pagedRequest = new PagedRequest(requestBuilder);
-
-        BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(pagedRequest, urlResponses.getResponseClass());
+        BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         if (pageResponse.getTotalCount() > 0) {
             assertEquals(pageResponse.getTotalCount(), pageResponse.getItems().size());
 

@@ -49,7 +49,7 @@ public class BlackDuckHttpClientTestIT {
 
     private final BlackDuckServicesFactory blackDuckServicesFactory = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestFactory();
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
     private final BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();

@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
@@ -57,9 +58,22 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder setLimitAndOffset(int limit, int offset) {
+        return setBlackDuckPageDefinition(new BlackDuckPageDefinition(limit, offset));
+    }
+
     public BlackDuckRequestBuilder setBlackDuckPageDefinition(BlackDuckPageDefinition blackDuckPageDefinition) {
-        requestBuilder.setQueryParameter(LIMIT_PARAMETER, String.valueOf(blackDuckPageDefinition.getLimit()));
-        requestBuilder.setQueryParameter(OFFSET_PARAMETER, String.valueOf(blackDuckPageDefinition.getOffset()));
+        setLimit(blackDuckPageDefinition.getLimit());
+        return setOffset(blackDuckPageDefinition.getOffset());
+    }
+
+    public BlackDuckRequestBuilder setLimit(int limit) {
+        requestBuilder.setQueryParameter(LIMIT_PARAMETER, String.valueOf(limit));
+        return this;
+    }
+
+    public BlackDuckRequestBuilder setOffset(int offset) {
+        requestBuilder.setQueryParameter(OFFSET_PARAMETER, String.valueOf(offset));
         return this;
     }
 

@@ -10,72 +10,82 @@ package com.synopsys.integration.blackduck.http.transform;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.PagedRequest;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
+import com.synopsys.integration.blackduck.service.request.PagingEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
+    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
+    private final PagingEditor pagingEditor = new PagingEditor();
 
-    public BlackDuckResponsesTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
+    public BlackDuckResponsesTransformer(BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
+        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeMatchingResponses(PagedRequest pagedRequest, Class<T> clazz, Predicate<T> predicate, int totalLimit) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, totalLimit, predicate);
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeMatchingResponses(BlackDuckRequest<T> blackDuckRequest, Predicate<T> predicate, int totalLimit) throws IntegrationException {
+        return getInternalMatchingResponse(blackDuckRequest, totalLimit, predicate);
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, Integer.MAX_VALUE, alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(BlackDuckRequest<T> blackDuckRequest) throws IntegrationException {
+        return getInternalMatchingResponse(blackDuckRequest, Integer.MAX_VALUE, alwaysTrue());
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, totalLimit, alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeResponses(BlackDuckRequest<T> blackDuckRequest, int totalLimit) throws IntegrationException {
+        return getInternalMatchingResponse(blackDuckRequest, totalLimit, alwaysTrue());
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, pagedRequest.getBlackDuckPageDefinition().getLimit(), alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(BlackDuckRequest<T> blackDuckRequest) throws IntegrationException {
+        return getInternalMatchingResponse(blackDuckRequest, getLimit(blackDuckRequest.getRequest()), alwaysTrue());
     }
 
     private <T extends BlackDuckResponse> Predicate<T> alwaysTrue() {
         return (blackDuckResponse) -> true;
     }
 
-    private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(PagedRequest pagedRequest, Class<T> clazz, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
+    private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(BlackDuckRequest<T> blackDuckRequest, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
-        Request request = pagedRequest.createRequest();
+        Request request = blackDuckRequest.getRequest(pagingEditor);
+        int limit = getLimit(request);
+        int offset = getOffset(request);
         try (Response initialResponse = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
             String initialJsonResponse = initialResponse.getContentString();
-            BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, clazz);
+            BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, blackDuckRequest.getResponseClass());
 
             allResponses.addAll(this.matchPredicate(blackDuckPageResponse, predicate));
 
             totalCount = blackDuckPageResponse.getTotalCount();
             int totalItemsToRetrieve = Math.min(totalCount, maxToReturn);
 
-            while (allResponses.size() < totalItemsToRetrieve && pagedRequest.getBlackDuckPageDefinition().getOffset() < totalCount) {
-                pagedRequest = nextPage(pagedRequest);
-                request = pagedRequest.createRequest();
+            while (allResponses.size() < totalItemsToRetrieve && offset < totalCount) {
+                offset = offset + limit;
+                blackDuckRequest = nextPage(blackDuckRequest, offset);
+                request = blackDuckRequest.getRequest();
                 try (Response response = blackDuckHttpClient.execute(request)) {
                     blackDuckHttpClient.throwExceptionForError(response);
                     String jsonResponse = response.getContentString();
-                    blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
+                    blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, blackDuckRequest.getResponseClass());
                     allResponses.addAll(this.matchPredicate(blackDuckPageResponse, predicate));
                 } catch (IOException e) {
                     throw new BlackDuckIntegrationException(e);
@@ -89,15 +99,11 @@ public class BlackDuckResponsesTransformer {
         }
     }
 
-    private PagedRequest nextPage(PagedRequest pagedRequest) {
-        int oldOffset = pagedRequest.getBlackDuckPageDefinition().getOffset();
-        int limit = pagedRequest.getBlackDuckPageDefinition().getLimit();
-        int newOffset = oldOffset + limit;
+    private <T extends BlackDuckResponse> BlackDuckRequest<T> nextPage(BlackDuckRequest<T> blackDuckRequest, int offset) {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder(blackDuckRequest.getRequest());
+        blackDuckRequestBuilder.setOffset(offset);
 
-        BlackDuckRequestBuilder oldRequestBuilder = pagedRequest.getBlackDuckRequestBuilder();
-        oldRequestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(limit, newOffset));
-
-        return new PagedRequest(pagedRequest.getBlackDuckRequestBuilder());
+        return new BlackDuckRequest<>(blackDuckRequestBuilder, blackDuckRequest.getResponseClass());
     }
 
     @NotNull
@@ -111,6 +117,18 @@ public class BlackDuckResponsesTransformer {
                    .stream()
                    .filter(predicate)
                    .collect(Collectors.toList());
+    }
+
+    public int getLimit(Request request) {
+        return retrieveValue(request.getQueryParameters()::get, BlackDuckRequestBuilder.LIMIT_PARAMETER, BlackDuckRequestBuilder.DEFAULT_LIMIT);
+    }
+
+    public int getOffset(Request request) {
+        return retrieveValue(request.getQueryParameters()::get, BlackDuckRequestBuilder.OFFSET_PARAMETER, BlackDuckRequestBuilder.DEFAULT_OFFSET);
+    }
+
+    private int retrieveValue(Function<String, Set<String>> valueCollection, String key, int defaultValue) {
+        return NumberUtils.toInt(valueCollection.apply(key).stream().findFirst().orElse(Integer.toString(defaultValue)));
     }
 
 }
