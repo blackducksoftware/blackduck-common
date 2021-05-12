@@ -30,10 +30,10 @@ public class RapidScanWaiterTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
 
-        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(expectedResults);
-
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
 
         long timeoutInSeconds = 2;
@@ -49,9 +49,11 @@ public class RapidScanWaiterTest {
         HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
+
         Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 1;
         int waitInSeconds = 2;
@@ -69,9 +71,11 @@ public class RapidScanWaiterTest {
         HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
+
         Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
