@@ -30,6 +30,7 @@ public class RapidScanServiceTestIT {
     //        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(uploadTarget, timeout, 5);
     //        assertNotNull(results);
     //        assertFalse(results.isEmpty());
+    //        assertNotNull(results.get(0).getViolatingPolicyNames());
     //    }
     //
     //    @Test
@@ -45,6 +46,7 @@ public class RapidScanServiceTestIT {
     //        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(new UploadBatch(uploadTarget), timeout, 5);
     //        assertNotNull(results);
     //        assertFalse(results.isEmpty());
+    //        assertNotNull(results.get(0).getViolatingPolicyNames());
     //    }
 
     @Test

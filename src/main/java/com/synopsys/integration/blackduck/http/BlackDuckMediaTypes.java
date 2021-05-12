@@ -9,5 +9,4 @@ package com.synopsys.integration.blackduck.http;
 
 public class BlackDuckMediaTypes {
     public final static String VULNERABILITY_REQUEST_SERVICE_V1 = "application/vnd.blackducksoftware.list-1+json";
-
 }
