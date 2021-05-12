@@ -13,11 +13,11 @@ public class BlackDuckUrl {
         this.url = url;
     }
 
-    public String parseId(List<String> searchTerms) {
+    public String parseId(List<BlackDuckUrlSearchTerm> searchTerms) {
         String searching = url.string();
         int afterLastTermIndex = -1;
-        for (String term : searchTerms) {
-            afterLastTermIndex = searching.indexOf(term, afterLastTermIndex) + 1;
+        for (BlackDuckUrlSearchTerm searchTerm : searchTerms) {
+            afterLastTermIndex = searching.indexOf(searchTerm.getTerm(), afterLastTermIndex) + 1;
         }
         int afterFirstSlashIndex = searching.indexOf('/', afterLastTermIndex) + 1;
         int secondSlashIndex = searching.indexOf('/', afterFirstSlashIndex);
