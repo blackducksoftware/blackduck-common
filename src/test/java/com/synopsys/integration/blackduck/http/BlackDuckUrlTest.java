@@ -25,6 +25,18 @@ public class BlackDuckUrlTest {
     }
 
     @Test
+    public void testParsingComponentVersionIdsWithTokens() throws IntegrationException {
+        HttpUrl componentVersion = new HttpUrl("https://blackduckserver/api/"
+                                                   + "components/07731f32-a0f0-4485-8d90-1f0bbdc8185d/"
+                                                   + "versions/cf1fd627-04db-4754-be67-dc0127c772d2");
+
+        BlackDuckUrl blackDuckUrl = new BlackDuckUrl(componentVersion);
+
+        assertEquals("07731f32-a0f0-4485-8d90-1f0bbdc8185d", blackDuckUrl.parseId(Arrays.asList(BlackDuckUrlSearchTerm.COMPONENTS)));
+        assertEquals("cf1fd627-04db-4754-be67-dc0127c772d2", blackDuckUrl.parseId(Arrays.asList(BlackDuckUrlSearchTerm.COMPONENTS, BlackDuckUrlSearchTerm.VERSIONS)));
+    }
+
+    @Test
     public void testParsingBomComponentVersionIds() throws IntegrationException {
         HttpUrl bomComponentVersionMatchedFiles = new HttpUrl("https://blackduckserver/api/"
                                                                   + "projects/687f92c5-a90f-4d16-9f30-573ac27b8eae/"
