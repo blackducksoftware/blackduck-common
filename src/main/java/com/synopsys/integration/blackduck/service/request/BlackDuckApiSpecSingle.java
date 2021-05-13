@@ -14,8 +14,8 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 public class BlackDuckApiSpecSingle<T extends BlackDuckResponse> extends BlackDuckApiSpec<T> {
     private final UrlSingleResponse<T> urlSingleResponse;
 
-    public BlackDuckApiSpecSingle(UrlSingleResponse<T> urlSingleResponse, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        super(urlSingleResponse, blackDuckRequestBuilder);
+    public BlackDuckApiSpecSingle(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlSingleResponse<T> urlSingleResponse) {
+        super(new BlackDuckRequest<T>());
         this.urlSingleResponse = urlSingleResponse;
     }
 

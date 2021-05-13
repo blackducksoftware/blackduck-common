@@ -14,19 +14,17 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
-import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.RestConstants;
 
 public class NotificationRequestFactory {
-    private final List<String> ALL_NOTIFICATION_TYPES = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());
-
     private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final ApiDiscovery apiDiscovery;
 
@@ -35,14 +33,13 @@ public class NotificationRequestFactory {
         this.apiDiscovery = apiDiscovery;
     }
 
-    public BlackDuckApiSpecMultiple<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate) throws IntegrationException {
+    public BlackDuckRequest<NotificationView> createRequestForAllNotificationTypes(Date startDate, Date endDate) {
         return createRequestSpecForAllNotificationTypes(startDate, endDate, ALL_NOTIFICATION_TYPES);
     }
 
-    public BlackDuckApiSpecMultiple<NotificationView> createRequestSpecForAllNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) throws IntegrationException {
+    public BlackDuckRequest<NotificationView> createRequestForAllNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
         BlackDuckRequestBuilder requestBuilder = createRequestBuilderForNotificationTypes(startDate, endDate, notificationTypesToInclude);
-        UrlMultipleResponses<NotificationView> notificationsResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.NOTIFICATIONS_PATH);
-        return new BlackDuckApiSpecMultiple<>(notificationsResponse, requestBuilder);
+        return new BlackDuckApiRequestSpec<>(ApiDiscovery.NOTIFICATIONS_LINK_RESPONSE, requestBuilder);
     }
 
     private BlackDuckRequestBuilder createRequestBuilderForNotificationTypes(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
@@ -52,7 +49,8 @@ public class NotificationRequestFactory {
         String endDateString = sdf.format(endDate);
 
         BlackDuckRequestFilter notificationTypeFilter = createFilterForNotificationsTypes(notificationTypesToInclude);
-        return blackDuckRequestBuilderFactory.createCommonGet(notificationTypeFilter)
+        return blackDuckRequestBuilderFactory
+                   .createCommonGet(notificationTypeFilter)
                    .addQueryParameter("startDate", startDateString)
                    .addQueryParameter("endDate", endDateString);
     }

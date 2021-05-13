@@ -15,8 +15,8 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 public class BlackDuckApiSpecMultiple<T extends BlackDuckResponse> extends BlackDuckApiSpec<T> {
     private final UrlMultipleResponses<T> urlMultipleResponses;
 
-    public BlackDuckApiSpecMultiple(UrlMultipleResponses<T> urlMultipleResponses, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        super(urlMultipleResponses, blackDuckRequestBuilder);
+    public BlackDuckApiSpecMultiple(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlMultipleResponses<T> urlMultipleResponses) {
+        super(new BlackDuckRequest<T>(blackDuckRequestBuilder, urlMultipleResponses));
         this.urlMultipleResponses = urlMultipleResponses;
     }
 

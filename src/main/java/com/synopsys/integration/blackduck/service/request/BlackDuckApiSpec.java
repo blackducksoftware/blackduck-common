@@ -8,25 +8,16 @@
 package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckApiSpec<T extends BlackDuckResponse> {
-    private final UrlResponse<T> urlResponse;
-    private final BlackDuckRequestBuilder blackDuckRequestBuilder;
+    private final BlackDuckRequest<T> blackDuckRequest;
 
-    public BlackDuckApiSpec(UrlResponse<T> urlResponse, BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        this.urlResponse = urlResponse;
-        this.blackDuckRequestBuilder = blackDuckRequestBuilder;
+    public BlackDuckApiSpec(BlackDuckRequest<T> blackDuckRequest) {
+        this.blackDuckRequest = blackDuckRequest;
     }
 
-    public UrlResponse<T> getUrlResponse() {
-        return urlResponse;
-    }
-
-    public BlackDuckRequestBuilder getBlackDuckRequestBuilder() {
-        return blackDuckRequestBuilder;
+    public BlackDuckRequest<T> getBlackDuckRequest() {
+        return blackDuckRequest;
     }
 
 }
