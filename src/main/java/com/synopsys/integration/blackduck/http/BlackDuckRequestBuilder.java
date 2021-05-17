@@ -9,11 +9,17 @@ package com.synopsys.integration.blackduck.http;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecSingle;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
@@ -49,6 +55,14 @@ public class BlackDuckRequestBuilder {
         return requestBuilder.build();
     }
 
+    public <T extends BlackDuckResponse> BlackDuckApiSpecMultiple<T> buildApiSpecMultiple(UrlMultipleResponses<T> urlMultipleResponses) {
+        return new BlackDuckApiSpecMultiple<>(this, urlMultipleResponses);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckApiSpecSingle<T> buildApiSpecSingle(UrlSingleResponse<T> urlSingleResponse) {
+        return new BlackDuckApiSpecSingle<>(this, urlSingleResponse);
+    }
+
     public Request.Builder getRequestBuilder() {
         return requestBuilder;
     }
@@ -77,10 +91,8 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
-    public BlackDuckRequestBuilder addBlackDuckQuery(Optional<BlackDuckQuery> blackDuckQuery) {
-        if (blackDuckQuery.isPresent()) {
-            requestBuilder.addQueryParameter(Q_PARAMETER, blackDuckQuery.get().getParameter());
-        }
+    public BlackDuckRequestBuilder addBlackDuckQuery(BlackDuckQuery blackDuckQuery) {
+        requestBuilder.addQueryParameter(Q_PARAMETER, blackDuckQuery.getParameter());
         return this;
     }
 
@@ -133,8 +145,20 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder apply(BlackDuckRequestBuilderEditor editor) {
+        editor.edit(this);
+        return this;
+    }
+
+    public BlackDuckRequestBuilder apply(List<BlackDuckRequestBuilderEditor> editors) {
+        for (BlackDuckRequestBuilderEditor editor : editors) {
+            editor.edit(this);
+        }
+        return this;
+    }
+
     public BlackDuckRequestBuilder commonGet() {
-        setBlackDuckPageDefinition(new BlackDuckPageDefinition(DEFAULT_LIMIT, DEFAULT_OFFSET));
+        setLimitAndOffset(DEFAULT_LIMIT, DEFAULT_OFFSET);
         return get();
     }
 

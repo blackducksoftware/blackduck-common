@@ -33,14 +33,12 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class ComponentService extends DataService {
-    public static final String REMEDIATING_LINK = "remediating";
-    public static final LinkSingleResponse<RemediationOptionsView> REMEDIATION_OPTIONS_LINK_RESPONSE = new LinkSingleResponse<>(REMEDIATING_LINK, RemediationOptionsView.class);
-
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT =
         (list) ->
             Optional.ofNullable(list)
@@ -53,6 +51,8 @@ public class ComponentService extends DataService {
                 .filter(notEmptyList -> notEmptyList.size() == 1)
                 .map(listOfSingleElement -> listOfSingleElement.get(0));
 
+    private final UrlMultipleResponses<ComponentsView> componentsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.COMPONENTS_PATH);
+
     public ComponentService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
         super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
     }
@@ -61,13 +61,12 @@ public class ComponentService extends DataService {
         String forge = externalId.getForge().getName();
         String originId = externalId.createExternalId();
         String componentQuery = String.format("%s|%s", forge, originId);
-        Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("id", componentQuery);
+        BlackDuckQuery blackDuckQuery = new BlackDuckQuery("id", componentQuery);
 
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
 
-        UrlMultipleResponses<ComponentsView> componentsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.COMPONENTS_PATH);
-        List<ComponentsView> allSearchResults = blackDuckApiClient.getAllResponses(componentsResponses, blackDuckRequestBuilder);
-        return allSearchResults;
+        BlackDuckApiSpecMultiple<ComponentsView> componentsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, componentsResponses);
+        return blackDuckApiClient.getAllResponses(componentsSpec);
     }
 
     public Optional<ComponentsView> getSingleOrEmptyResult(ExternalId externalId) throws IntegrationException {
@@ -108,7 +107,9 @@ public class ComponentService extends DataService {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
                                                      .createCommonGet()
                                                      .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
-        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(componentVersion.metaVulnerabilitiesLink(), blackDuckRequestBuilder);
+
+        BlackDuckApiSpecMultiple<VulnerabilityView> vulnerabilitySpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, componentVersion.metaVulnerabilitiesLink());
+        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(vulnerabilitySpec);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 
@@ -118,11 +119,6 @@ public class ComponentService extends DataService {
         } else {
             return Optional.empty();
         }
-    }
-
-    private Optional<ComponentVersionRemediatingView> simplyRetrieveRemediationInformation(ComponentVersionView componentVersionView) throws IntegrationException {
-        HttpUrl remediatingUrl = componentVersionView.getHref().appendRelativeUrl(ComponentService.REMEDIATING_LINK);
-        return Optional.ofNullable(blackDuckApiClient.getResponse(remediatingUrl, ComponentVersionRemediatingView.class));
     }
 
 }

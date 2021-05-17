@@ -55,7 +55,7 @@ public class CodeLocationWaiterTest {
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
         NotificationUserView first = createTestNotification("one");
         NotificationUserView second = createTestNotification("two");
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first, second));
+        Mockito.when(mockNotificationService.getAllUserNotifications(Mockito.any(), Mockito.any())).thenReturn(Arrays.asList(first, second));
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
@@ -96,7 +96,7 @@ public class CodeLocationWaiterTest {
         };
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenAnswer(eventuallyFindBoth);
+        Mockito.when(mockNotificationService.getAllUserNotifications(Mockito.any(), Mockito.any())).thenAnswer(eventuallyFindBoth);
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
@@ -117,7 +117,7 @@ public class CodeLocationWaiterTest {
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
         NotificationUserView first = createTestNotification("one");
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Arrays.asList(first));
+        Mockito.when(mockNotificationService.getAllUserNotifications(Mockito.any(), Mockito.any())).thenReturn(Arrays.asList(first));
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));
@@ -141,7 +141,7 @@ public class CodeLocationWaiterTest {
         Mockito.when(mockProjectService.getProjectVersion(Mockito.any())).thenReturn(Optional.empty());
 
         NotificationService mockNotificationService = Mockito.mock(NotificationService.class);
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyList())).thenReturn(Collections.emptyList());
+        Mockito.when(mockNotificationService.getAllUserNotifications(Mockito.any(), Mockito.any())).thenReturn(Collections.emptyList());
 
         NotificationTaskRange notificationTaskRange = createTestRange();
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList("one", "two"));

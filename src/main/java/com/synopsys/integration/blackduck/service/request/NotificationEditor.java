@@ -8,6 +8,7 @@
 package com.synopsys.integration.blackduck.service.request;
 
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -18,13 +19,22 @@ import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.Notif
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.rest.RestConstants;
+import com.synopsys.integration.util.Stringable;
 
-public class NotificationEditor implements BlackDuckRequestBuilderEditor {
+public class NotificationEditor extends Stringable implements BlackDuckRequestBuilderEditor {
     public static final List<String> ALL_NOTIFICATION_TYPES = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());
 
     private final Date startDate;
     private final Date endDate;
     private final List<String> notificationTypesToInclude;
+
+    public NotificationEditor(OffsetDateTime start, OffsetDateTime end) {
+        this(Date.from(start.toInstant()), Date.from(end.toInstant()));
+    }
+
+    public NotificationEditor(OffsetDateTime start, OffsetDateTime end, List<String> notificationTypesToInclude) {
+        this(Date.from(start.toInstant()), Date.from(end.toInstant()), notificationTypesToInclude);
+    }
 
     public NotificationEditor(Date startDate, Date endDate) {
         this(startDate, endDate, ALL_NOTIFICATION_TYPES);

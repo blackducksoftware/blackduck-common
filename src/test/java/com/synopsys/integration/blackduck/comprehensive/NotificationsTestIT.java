@@ -31,6 +31,7 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
@@ -79,7 +80,8 @@ public class NotificationsTestIT {
         long duration = 0;
 
         while ((foundKeys.size() < expectedKeys.size()) && duration < FIVE_MINUTES) {
-            List<NotificationUserView> notifications = notificationService.getFilteredUserNotifications(currentUser, startDate, endDate, notificationTypes);
+            NotificationEditor notificationEditor = new NotificationEditor(startDate, endDate, notificationTypes);
+            List<NotificationUserView> notifications = notificationService.getAllUserNotifications(currentUser, notificationEditor);
             for (NotificationUserView notificationUserView : notifications) {
                 if (notificationUserView instanceof ProjectNotificationUserView) {
                     ProjectNotificationContent content = ((ProjectNotificationUserView) notificationUserView).getContent();

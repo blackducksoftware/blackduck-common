@@ -7,30 +7,14 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 public class BlackDuckQuery {
     private final String q;
 
-    public static Optional<BlackDuckQuery> createQuery(String parameter) {
-        if (StringUtils.isNotBlank(parameter)) {
-            return Optional.of(new BlackDuckQuery(parameter));
-        }
-
-        return Optional.empty();
+    public BlackDuckQuery(String prefix, String parameter) {
+        this(prefix + ":" + parameter);
     }
 
-    public static Optional<BlackDuckQuery> createQuery(String prefix, String parameter) {
-        if (StringUtils.isNotBlank(parameter)) {
-            return Optional.of(new BlackDuckQuery(prefix + ":" + parameter));
-        }
-
-        return Optional.empty();
-    }
-
-    private BlackDuckQuery(String parameter) {
+    public BlackDuckQuery(String parameter) {
         q = parameter;
     }
 

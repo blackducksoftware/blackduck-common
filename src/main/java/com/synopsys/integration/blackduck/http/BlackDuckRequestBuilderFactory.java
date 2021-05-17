@@ -10,6 +10,7 @@ package com.synopsys.integration.blackduck.http;
 import java.util.Optional;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
@@ -24,6 +25,10 @@ public class BlackDuckRequestBuilderFactory {
         return new BlackDuckRequestBuilder(gson, new Request.Builder());
     }
 
+    public BlackDuckRequestBuilder createBlackDuckRequestBuilder(BlackDuckRequest blackDuckRequest) {
+        return new BlackDuckRequestBuilder(gson, new Request.Builder(blackDuckRequest.getRequest()));
+    }
+
     public BlackDuckRequestBuilder createBlackDuckRequestBuilder(Request request) {
         return new BlackDuckRequestBuilder(gson, new Request.Builder(request));
     }
@@ -33,7 +38,7 @@ public class BlackDuckRequestBuilderFactory {
                    .commonGet();
     }
 
-    public BlackDuckRequestBuilder createCommonGet(Optional<BlackDuckQuery> blackDuckQuery) {
+    public BlackDuckRequestBuilder createCommonGet(BlackDuckQuery blackDuckQuery) {
         return new BlackDuckRequestBuilder(gson, new Request.Builder())
                    .commonGet()
                    .addBlackDuckQuery(blackDuckQuery);

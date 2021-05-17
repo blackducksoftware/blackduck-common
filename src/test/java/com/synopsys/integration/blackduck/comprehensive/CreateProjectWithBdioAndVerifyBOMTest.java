@@ -34,6 +34,7 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -176,8 +177,9 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private boolean waitForNotifications(Date userStartDate, Date endDate, Set<String> expectedCodeLocationUrls) throws InterruptedException, IntegrationException {
         WaitJobTask findNotificationsForAllCodeLocationUrls = () -> {
+            NotificationEditor notificationEditor = new NotificationEditor(userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
             List<NotificationUserView> filteredUserNotifications = blackDuckServices.notificationService
-                                                                       .getFilteredUserNotifications(currentUser, userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+                                                                       .getAllUserNotifications(currentUser, notificationEditor);
             Set<String> foundCodeLocationUrls = filteredUserNotifications
                                                     .stream()
                                                     .map(notificationView -> (VersionBomCodeLocationBomComputedNotificationUserView) notificationView)

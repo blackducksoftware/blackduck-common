@@ -45,6 +45,7 @@ import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -145,8 +146,9 @@ public class CodeLocationServiceTestIT {
             Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
             BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
                                                                   .createCommonGet()
-                                                                  .setBlackDuckPageDefinition(new BlackDuckPageDefinition(2, 0));
-            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(blackDuckServices.apiDiscovery.metaCodelocationsLink(), blackDuckRequestBuilder, nameMatcherPredicate, 1);
+                                                                  .setLimit(2);
+            BlackDuckApiSpecMultiple<CodeLocationView> codeLocationSpec = blackDuckRequestBuilder.buildApiSpecMultiple(blackDuckServices.apiDiscovery.metaCodelocationsLink());
+            List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(codeLocationSpec, nameMatcherPredicate, 1);
 
             assertEquals(1, foundCodeLocation.size(), String.format("Matching code locations should be 1 but is %d", foundCodeLocation.size()));
             assertEquals(codeLocationToValidate, foundCodeLocation.get(0).getName(), "Found code location does not equal expected");

@@ -31,6 +31,7 @@ import com.synopsys.integration.blackduck.service.dataservice.NotificationServic
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
@@ -90,8 +91,8 @@ public class CodeLocationWaitJobTaskTest {
 
         Mockito.when(mockBlackDuckApiClient.getAllResponses(Mockito.eq(codeLocationResponses))).thenReturn(Arrays.asList(foundCodeLocationView));
 
-        Mockito.when(mockNotificationService.getFilteredUserNotifications(userView, notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name())))
-            .thenReturn(getExpectedNotifications());
+        NotificationEditor notificationEditor = new NotificationEditor(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+        Mockito.when(mockNotificationService.getAllUserNotifications(userView, notificationEditor)).thenReturn(getExpectedNotifications());
 
         assertTrue(codeLocationWaitJobTask.isComplete());
     }

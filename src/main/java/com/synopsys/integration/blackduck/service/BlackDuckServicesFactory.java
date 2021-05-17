@@ -16,7 +16,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.synopsys.integration.blackduck.api.core.HttpUrlTypeAdapter;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
@@ -58,9 +57,7 @@ import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
 import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
-import com.synopsys.integration.blackduck.service.request.NotificationRequestFactory;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.IntegrationEscapeUtil;
@@ -181,10 +178,6 @@ public class BlackDuckServicesFactory {
 
     public NotificationService createNotificationService() {
         return new NotificationService(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
-    }
-
-    public NotificationRequestFactory createNotificationRequestFactory() {
-        return new NotificationRequestFactory(blackDuckRequestBuilderFactory, apiDiscovery);
     }
 
     public PolicyRuleService createPolicyRuleService() {

@@ -35,7 +35,7 @@ class BlackDuckResponsesTransformerTestIT {
     void getAllResponses() throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createBlackDuckRequestBuilder();
 
-        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink().getResponseClass());
+        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink());
         BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         Assertions.assertEquals(responses.getTotalCount(), responses.getItems().size());
     }
@@ -44,12 +44,12 @@ class BlackDuckResponsesTransformerTestIT {
     void getResponsesWithAll() throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createBlackDuckRequestBuilder();
 
-        BlackDuckRequest<ProjectView> defaultBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink().getResponseClass());
+        BlackDuckRequest<ProjectView> defaultBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink());
         BlackDuckPageResponse<ProjectView> responses = blackDuckResponsesTransformer.getAllResponses(defaultBlackDuckRequest);
         Assertions.assertEquals(responses.getTotalCount(), responses.getItems().size());
 
         blackDuckRequestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(2, 0));
-        BlackDuckRequest<ProjectView> limitedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink().getResponseClass());
+        BlackDuckRequest<ProjectView> limitedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink());
         BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getOnePageOfResponses(limitedBlackDuckRequest);
         Assertions.assertEquals(2, limitedResponses.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 2 projects for this test to pass.");
     }
@@ -59,12 +59,12 @@ class BlackDuckResponsesTransformerTestIT {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createBlackDuckRequestBuilder();
 
         blackDuckRequestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(5, 0));
-        BlackDuckRequest<ProjectView> oversizedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink().getResponseClass());
+        BlackDuckRequest<ProjectView> oversizedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink());
         BlackDuckPageResponse<ProjectView> underPageSizeResponse = blackDuckResponsesTransformer.getSomeResponses(oversizedBlackDuckRequest, 2);
         Assertions.assertEquals(2, underPageSizeResponse.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 5 projects for this test to pass.");
 
         blackDuckRequestBuilder.setBlackDuckPageDefinition(new BlackDuckPageDefinition(2, 0));
-        BlackDuckRequest<ProjectView> limitedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink().getResponseClass());
+        BlackDuckRequest<ProjectView> limitedBlackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink());
         BlackDuckPageResponse<ProjectView> limitedResponses = blackDuckResponsesTransformer.getSomeResponses(limitedBlackDuckRequest, 5);
         Assertions.assertEquals(5, limitedResponses.getItems().size(), "Too many projects were returned. Note: Black Duck must have more than 5 projects for this test to pass.");
     }

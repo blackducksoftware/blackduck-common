@@ -15,7 +15,7 @@ public class BlackDuckApiSpecSingle<T extends BlackDuckResponse> extends BlackDu
     private final UrlSingleResponse<T> urlSingleResponse;
 
     public BlackDuckApiSpecSingle(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlSingleResponse<T> urlSingleResponse) {
-        super(new BlackDuckRequest<T>());
+        super(blackDuckRequestBuilder, urlSingleResponse);
         this.urlSingleResponse = urlSingleResponse;
     }
 

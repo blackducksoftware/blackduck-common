@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 
-public class PagingEditor implements BlackDuckRequestBuilderEditor {
+public class PagingDefaultsEditor implements BlackDuckRequestBuilderEditor {
     @Override
     public void edit(BlackDuckRequestBuilder blackDuckRequestBuilder) {
         Function<String, Boolean> contains = blackDuckRequestBuilder.getQueryParameters()::containsKey;

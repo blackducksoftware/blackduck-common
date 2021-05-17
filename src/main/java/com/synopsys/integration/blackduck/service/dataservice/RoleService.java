@@ -17,12 +17,15 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 public class RoleService extends DataService {
     public static final String SERVER_SCOPE = "server";
     public static final String PROJECT_SCOPE = "project";
+
+    private final UrlMultipleResponses<RoleView> rolesResponses = apiDiscovery.metaRolesLink();
 
     public RoleService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
         super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
@@ -42,9 +45,9 @@ public class RoleService extends DataService {
 
     private List<RoleView> getScopedRoles(BlackDuckRequestFilter scope) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(scope);
+        BlackDuckApiSpecMultiple<RoleView> roleSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, rolesResponses);
 
-        UrlMultipleResponses<RoleView> roleResponses = apiDiscovery.metaRolesLink();
-        return blackDuckApiClient.getAllResponses(roleResponses, blackDuckRequestBuilder);
+        return blackDuckApiClient.getAllResponses(roleSpec);
     }
 
     private BlackDuckRequestFilter createScopeFilter(String scope) {

@@ -28,6 +28,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -36,12 +37,13 @@ public class CodeLocationService extends DataService {
     // as of at least 2019.6.0, code location names in Black Duck are case-insensitive
     public static final BiPredicate<String, CodeLocationView> NAME_MATCHER = (codeLocationName, codeLocationView) -> codeLocationName.equalsIgnoreCase(codeLocationView.getName());
 
+    private final UrlMultipleResponses<CodeLocationView> codeLocationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.CODELOCATIONS_PATH);
+
     public CodeLocationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
         super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
-        UrlMultipleResponses<CodeLocationView> codeLocationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.CODELOCATIONS_PATH);
         return blackDuckApiClient.getAllResponses(codeLocationsResponses);
     }
 
@@ -75,13 +77,13 @@ public class CodeLocationService extends DataService {
     }
 
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
-        Optional<BlackDuckQuery> blackDuckQuery = BlackDuckQuery.createQuery("name", codeLocationName);
+        BlackDuckQuery blackDuckQuery = new BlackDuckQuery("name", codeLocationName);
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
 
         Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
-        UrlMultipleResponses<CodeLocationView> codeLocationResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.CODELOCATIONS_PATH);
-        return blackDuckApiClient.getSomeMatchingResponses(codeLocationResponse, blackDuckRequestBuilder, predicate, 1)
+        BlackDuckApiSpecMultiple<CodeLocationView> codeLocationSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, codeLocationsResponses);
+        return blackDuckApiClient.getSomeMatchingResponses(codeLocationSpec, predicate, 1)
                    .stream()
                    .findFirst();
     }

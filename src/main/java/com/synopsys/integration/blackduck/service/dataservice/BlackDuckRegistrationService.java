@@ -16,12 +16,15 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
+import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecSingle;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckRegistrationService extends DataService {
-    private HttpUrl blackDuckUrl;
+    private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();
+    private final UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaCurrentVersionLink();
+    private final HttpUrl blackDuckUrl;
 
     public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, HttpUrl blackDuckUrl) {
         super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
@@ -29,19 +32,17 @@ public class BlackDuckRegistrationService extends DataService {
     }
 
     public String getRegistrationId() throws IntegrationException {
-        BlackDuckRequestBuilder requestBuilder = blackDuckRequestBuilderFactory
-                                                     .createBlackDuckRequestBuilder()
-                                                     .commonGet();
-        requestBuilder.acceptMimeType("application/vnd.blackducksoftware.status-4+json");
+        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
+                                                              .createCommonGet()
+                                                              .acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
-        UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.REGISTRATION_PATH);
-        RegistrationView registrationView = blackDuckApiClient.getResponse(registrationResponse, requestBuilder);
+        BlackDuckApiSpecSingle<RegistrationView> registrationSpec = new BlackDuckApiSpecSingle<>(blackDuckRequestBuilder, registrationResponse);
+        RegistrationView registrationView = blackDuckApiClient.getResponse(registrationSpec);
         return registrationView.getRegistrationId();
     }
 
     public BlackDuckServerData getBlackDuckServerData() throws IntegrationException {
-        UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_VERSION_PATH);
-        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
+        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(apiDiscovery.metaCurrentVersionLink());
         String registrationId = null;
         try {
             // We need to wrap this because this will most likely fail unless they are running as an admin

@@ -9,14 +9,13 @@ package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 
 public class BlackDuckApiSpecMultiple<T extends BlackDuckResponse> extends BlackDuckApiSpec<T> {
     private final UrlMultipleResponses<T> urlMultipleResponses;
 
     public BlackDuckApiSpecMultiple(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlMultipleResponses<T> urlMultipleResponses) {
-        super(new BlackDuckRequest<T>(blackDuckRequestBuilder, urlMultipleResponses));
+        super(blackDuckRequestBuilder, urlMultipleResponses);
         this.urlMultipleResponses = urlMultipleResponses;
     }
 

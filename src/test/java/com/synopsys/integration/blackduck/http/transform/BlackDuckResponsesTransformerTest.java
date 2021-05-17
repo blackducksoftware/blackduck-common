@@ -97,10 +97,9 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
         blackDuckRequestBuilder
-            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
             .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
@@ -134,10 +133,9 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
         blackDuckRequestBuilder
-            .url(new HttpUrl("https://blackduckserver.com/api/projects"))
             .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
             .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+        BlackDuckRequest<ProjectView> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(blackDuckRequest);
@@ -214,10 +212,9 @@ public class BlackDuckResponsesTransformerTest {
             BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
             BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
             blackDuckRequestBuilder
-                .url(new HttpUrl("https://blackduckserver.com/api/projects"))
                 .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "20")
                 .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-            blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, ProjectView.class);
+            blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
             blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
         }
     }
