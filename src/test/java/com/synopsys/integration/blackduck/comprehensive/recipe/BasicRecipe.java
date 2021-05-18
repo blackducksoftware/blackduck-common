@@ -53,7 +53,7 @@ public class BasicRecipe {
     protected BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
 
     @BeforeEach
-    public void startRecipe() {
+    public void startRecipe() throws IntegrationException {
         /*
          * the integration logger used to display log messages from our code
          * within a 3rd party integration environment

@@ -61,7 +61,7 @@ public class ScanPathsUtility {
      * @param directory
      * @throws BlackDuckIntegrationException
      */
-    public ScanPaths determineSignatureScannerPaths(final File directory) throws BlackDuckIntegrationException {
+    public ScanPaths searchForScanPaths(final File directory) throws BlackDuckIntegrationException {
         if (directory == null) {
             throw new IllegalArgumentException("null is not a valid directory");
         }
