@@ -51,8 +51,6 @@ public class ScannerZipInstallerTest {
         assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
         assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
 
-        File downloadTarget = new File(signatureScannerDownloadPath);
-
         IntLogger logger = new BufferedIntLogger();
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
@@ -69,9 +67,10 @@ public class ScannerZipInstallerTest {
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType);
+        File downloadTarget = new File(signatureScannerDownloadPath);
 
-        scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType, downloadTarget);
+        scannerZipInstaller.installOrUpdateScanner();
 
         ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
@@ -106,7 +105,7 @@ public class ScannerZipInstallerTest {
             KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
             ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl("http://www.synopsys.com"),
-                OperatingSystemType.MAC);
+                OperatingSystemType.MAC, downloadTarget);
 
             try {
                 ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
@@ -114,7 +113,7 @@ public class ScannerZipInstallerTest {
             } catch (BlackDuckIntegrationException e) {
             }
 
-            scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+            scannerZipInstaller.installOrUpdateScanner();
 
             ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
             assertTrue(scanPaths.isManagedByLibrary());

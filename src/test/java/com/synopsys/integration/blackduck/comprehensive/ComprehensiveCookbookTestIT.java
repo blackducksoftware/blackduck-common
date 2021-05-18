@@ -224,13 +224,12 @@ public class ComprehensiveCookbookTestIT {
         // perform the scan
         ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
         scanBatchBuilder.fromBlackDuckServerConfig(blackDuckServices.blackDuckServerConfig);
-        scanBatchBuilder.installDirectory(installDirectory);
         scanBatchBuilder.outputDirectory(outputDirectory);
         scanBatchBuilder.projectAndVersionNames(projectName, projectVersionName);
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget(scanFile.getAbsolutePath(), codeLocationName));
         ScanBatch scanBatch = scanBatchBuilder.build();
 
-        SignatureScannerService signatureScannerService = blackDuckServices.blackDuckServicesFactory.createSignatureScannerService();
+        SignatureScannerService signatureScannerService = blackDuckServices.blackDuckServicesFactory.createSignatureScannerService(installDirectory);
         ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
 
         for (ScanCommandOutput scanCommandOutput : scanBatchOutput) {

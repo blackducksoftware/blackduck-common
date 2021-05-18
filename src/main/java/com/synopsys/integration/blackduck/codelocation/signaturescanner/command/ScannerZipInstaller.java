@@ -26,7 +26,7 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
 
-public class ScannerZipInstaller {
+public class ScannerZipInstaller implements ScannerInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";
     public static final String WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-windows.zip";
     public static final String MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-macosx.zip";
@@ -41,9 +41,10 @@ public class ScannerZipInstaller {
     private final KeyStoreHelper keyStoreHelper;
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
+    private final File installDirectory;
 
     public ScannerZipInstaller(IntLogger logger, SignatureScannerClient signatureScannerClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
-        OperatingSystemType operatingSystemType) {
+        OperatingSystemType operatingSystemType, File installDirectory) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
@@ -55,6 +56,7 @@ public class ScannerZipInstaller {
         this.keyStoreHelper = keyStoreHelper;
         this.blackDuckServerUrl = blackDuckServerUrl;
         this.operatingSystemType = operatingSystemType;
+        this.installDirectory = installDirectory;
     }
 
     /**
@@ -64,7 +66,19 @@ public class ScannerZipInstaller {
      * downloaded or found successfully, otherwise an Optional.empty will be
      * returned and the log will contain details concerning the failure.
      */
-    public void installOrUpdateScanner(File installDirectory) throws BlackDuckIntegrationException {
+    @Override
+    public File installOrUpdateScanner() throws BlackDuckIntegrationException {
+        if (installDirectory.exists()) {
+            try {
+                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+                if (!scanPaths.isManagedByLibrary()) {
+                    return installDirectory;
+                }
+            } catch (BlackDuckIntegrationException ignored) {
+                // a valid scanPaths could not be found so we will need to attempt an install
+            }
+        }
+
         File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
@@ -83,6 +97,7 @@ public class ScannerZipInstaller {
         }
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
+        return installDirectory;
     }
 
     private File retrieveVersionFile(File scannerExpansionDirectory) throws IOException {

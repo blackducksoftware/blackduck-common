@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.service;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
@@ -133,8 +134,8 @@ public class BlackDuckServicesFactory {
             createCodeLocationCreationService());
     }
 
-    public SignatureScannerService createSignatureScannerService() {
-        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, executorService);
+    public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {
+        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, executorService, signatureScannerInstallDirectory);
         return createSignatureScannerService(scanBatchRunner);
     }
 
