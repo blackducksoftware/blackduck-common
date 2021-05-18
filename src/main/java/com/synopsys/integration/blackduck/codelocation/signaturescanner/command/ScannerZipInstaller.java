@@ -70,7 +70,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
     public File installOrUpdateScanner() throws BlackDuckIntegrationException {
         if (installDirectory.exists()) {
             try {
-                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(installDirectory);
+                ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(installDirectory);
                 if (!scanPaths.isManagedByLibrary()) {
                     return installDirectory;
                 }
@@ -155,7 +155,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
             long lastModifiedOnServer = response.getLastModified();
             versionFile.setLastModified(lastModifiedOnServer);
 
-            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scannerExpansionDirectory.getParentFile());
+            ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
             File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
             File oneJar = new File(scanPaths.getPathToOneJar());
             File scanExecutable = new File(scanPaths.getPathToScanExecutable());

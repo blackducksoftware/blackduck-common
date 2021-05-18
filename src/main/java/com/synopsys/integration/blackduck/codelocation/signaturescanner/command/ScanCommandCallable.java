@@ -52,7 +52,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     public ScanCommandOutput call() {
         String commandToExecute = "command_not_yet_configured";
         try {
-            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(scanCommand.getSignatureScannerInstallDirectory());
+            ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scanCommand.getSignatureScannerInstallDirectory());
 
             List<String> cmd = scanCommand.createCommandForProcessBuilder(logger, scanPaths, scanCommand.getOutputDirectory().getAbsolutePath());
             cmd.add(scanCommand.getTargetPath());

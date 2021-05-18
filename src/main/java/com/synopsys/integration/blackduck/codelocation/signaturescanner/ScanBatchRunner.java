@@ -58,8 +58,8 @@ public class ScanBatchRunner {
     }
 
     public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
-        ScanCommandRunner scanCommandRunner, ScannerZipInstaller scannerZipInstaller) {
-        return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerZipInstaller);
+        ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {
+        return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerInstaller);
     }
 
     public ScanBatchRunner(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {

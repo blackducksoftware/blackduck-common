@@ -72,7 +72,7 @@ public class ScannerZipInstallerTest {
         ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType, downloadTarget);
         scannerZipInstaller.installOrUpdateScanner();
 
-        ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+        ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
@@ -108,14 +108,14 @@ public class ScannerZipInstallerTest {
                 OperatingSystemType.MAC, downloadTarget);
 
             try {
-                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+                ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
                 fail("Should have thrown");
             } catch (BlackDuckIntegrationException e) {
             }
 
             scannerZipInstaller.installOrUpdateScanner();
 
-            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+            ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
             assertTrue(scanPaths.isManagedByLibrary());
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
