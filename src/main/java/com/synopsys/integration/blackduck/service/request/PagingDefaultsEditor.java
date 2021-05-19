@@ -12,6 +12,11 @@ import java.util.function.Function;
 
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 
+/**
+ * Often, a request to Black Duck will need to have defaults set for paging. If
+ * explicit values have not already been set, this will add the defaults to the
+ * BlackDuckRequestBuilder.
+ */
 public class PagingDefaultsEditor implements BlackDuckRequestBuilderEditor {
     @Override
     public void edit(BlackDuckRequestBuilder blackDuckRequestBuilder) {

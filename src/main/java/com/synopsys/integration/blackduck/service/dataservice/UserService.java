@@ -22,7 +22,8 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -61,16 +62,16 @@ public class UserService extends DataService {
                                                               .createCommonGet(emailQuery)
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
 
-        BlackDuckApiSpecMultiple<UserView> usersSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, usersResponse);
-        return blackDuckApiClient.getPageResponse(usersSpec);
+        BlackDuckRequest<UserView, UrlMultipleResponses<UserView>> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);
+        return blackDuckApiClient.getPageResponse(requestMultiple);
     }
 
     public Optional<UserView> findUserByUsername(String username) throws IntegrationException {
         BlackDuckQuery usernameQuery = new BlackDuckQuery("userName", username);
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(usernameQuery);
 
-        BlackDuckApiSpecMultiple<UserView> usersSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, usersResponse);
-        List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(usersSpec, 1);
+        BlackDuckMultipleRequest<UserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);
+        List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
         return foundUsers.stream().findFirst();
     }
 
@@ -83,8 +84,8 @@ public class UserService extends DataService {
                                                               .createCommonGet()
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
 
-        BlackDuckApiSpecMultiple<UserView> apiSpecMultiple = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, usersResponse);
-        return blackDuckApiClient.getPageResponse(apiSpecMultiple);
+        BlackDuckMultipleRequest<UserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);
+        return blackDuckApiClient.getPageResponse(requestMultiple);
     }
 
 }

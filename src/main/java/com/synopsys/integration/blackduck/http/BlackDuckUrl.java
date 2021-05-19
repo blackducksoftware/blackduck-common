@@ -13,6 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.rest.HttpUrl;
 
+/**
+ * A url of the form:
+ * https://{black_duck_hostname}/api/{searchTerm1}/{searchTerm1Id}/
+ * {searchTerm2}/{searchTerm2Id}/{searchTerm3}/{searchTerm3Id}...
+ */
 public class BlackDuckUrl {
     private final HttpUrl url;
 

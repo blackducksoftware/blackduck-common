@@ -7,6 +7,8 @@
  */
 package com.synopsys.integration.blackduck.service.request;
 
+import java.util.function.BiFunction;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -14,19 +16,21 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
 /**
- * Intended to be an immutable, valid packaging of an HTTP request to Black Duck and how to consider the response.
+ * The total picture of a Black Duck interaction. Intended to be an immutable,
+ * valid packaging of an HTTP request to Black Duck and how to consider and
+ * handle the response.
  */
-public class BlackDuckRequest<T extends BlackDuckResponse> {
+public class BlackDuckRequest<T extends BlackDuckResponse, U extends UrlResponse<T>> {
     private final BlackDuckRequestBuilder blackDuckRequestBuilder;
-    private final UrlResponse<T> urlResponse;
+    private final U urlResponse;
 
-    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
+    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass, BiFunction<HttpUrl, Class<T>, U> urlResponseCreator) {
         this.blackDuckRequestBuilder = blackDuckRequestBuilder
                                            .url(url);
-        this.urlResponse = new UrlResponse<>(url, responseClass);
+        this.urlResponse = urlResponseCreator.apply(url, responseClass);
     }
 
-    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlResponse<T> urlResponse) {
+    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, U urlResponse) {
         this.blackDuckRequestBuilder = blackDuckRequestBuilder
                                            .url(urlResponse.getUrl());
         this.urlResponse = urlResponse;
@@ -36,7 +40,7 @@ public class BlackDuckRequest<T extends BlackDuckResponse> {
         return blackDuckRequestBuilder.build();
     }
 
-    public UrlResponse<T> getUrlResponse() {
+    public U getUrlResponse() {
         return urlResponse;
     }
 

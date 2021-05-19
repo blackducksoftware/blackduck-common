@@ -17,7 +17,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
@@ -45,9 +45,9 @@ public class RoleService extends DataService {
 
     private List<RoleView> getScopedRoles(BlackDuckRequestFilter scope) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(scope);
-        BlackDuckApiSpecMultiple<RoleView> roleSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, rolesResponses);
+        BlackDuckMultipleRequest<RoleView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(rolesResponses);
 
-        return blackDuckApiClient.getAllResponses(roleSpec);
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     private BlackDuckRequestFilter createScopeFilter(String scope) {

@@ -9,6 +9,10 @@ package com.synopsys.integration.blackduck.service.request;
 
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 
+/**
+ * This will allow for encapsulating multiple related changes to the
+ * BlackDuckRequestBuilder.
+ */
 public interface BlackDuckRequestBuilderEditor {
     void edit(BlackDuckRequestBuilder blackDuckRequestBuilder);
 

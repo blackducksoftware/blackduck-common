@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
@@ -27,11 +28,11 @@ public class BlackDuckResponseTransformer {
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> T getResponse(BlackDuckRequest<T> blackDuckRequest) throws IntegrationException {
-        Request request = blackDuckRequest.getRequest();
+    public <T extends BlackDuckResponse> T getResponse(BlackDuckRequest<T, UrlSingleResponse<T>> requestSingle) throws IntegrationException {
+        Request request = requestSingle.getRequest();
         try (Response response = blackDuckHttpClient.execute(request)) {
             blackDuckHttpClient.throwExceptionForError(response);
-            return blackDuckJsonTransformer.getResponse(response, blackDuckRequest.getResponseClass());
+            return blackDuckJsonTransformer.getResponse(response, requestSingle.getResponseClass());
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);
         }

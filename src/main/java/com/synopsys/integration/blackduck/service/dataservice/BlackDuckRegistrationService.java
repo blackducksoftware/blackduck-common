@@ -16,7 +16,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecSingle;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -36,8 +36,9 @@ public class BlackDuckRegistrationService extends DataService {
                                                               .createCommonGet()
                                                               .acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
-        BlackDuckApiSpecSingle<RegistrationView> registrationSpec = new BlackDuckApiSpecSingle<>(blackDuckRequestBuilder, registrationResponse);
-        RegistrationView registrationView = blackDuckApiClient.getResponse(registrationSpec);
+        BlackDuckSingleRequest<RegistrationView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(registrationResponse);
+        RegistrationView registrationView = blackDuckApiClient.getResponse(requestSingle);
+
         return registrationView.getRegistrationId();
     }
 

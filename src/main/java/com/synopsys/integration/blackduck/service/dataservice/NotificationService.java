@@ -26,7 +26,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -45,28 +45,28 @@ public class NotificationService extends DataService {
 
     public List<NotificationView> getAllNotifications(NotificationEditor notificationEditor) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
-        BlackDuckApiSpecMultiple<NotificationView> notificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, notificationsResponses);
-        return blackDuckApiClient.getAllResponses(notificationsSpec);
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     public List<NotificationUserView> getAllUserNotifications(UserView userView, NotificationEditor notificationEditor) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
-        BlackDuckApiSpecMultiple<NotificationUserView> userNotificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, userNotificationsResponses.apply(userView));
-        return blackDuckApiClient.getAllResponses(userNotificationsSpec);
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     public BlackDuckPageResponse<NotificationView> getPageOfNotifications(NotificationEditor notificationEditor, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor)
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
-        BlackDuckApiSpecMultiple<NotificationView> notificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, notificationsResponses);
-        return blackDuckApiClient.getPageResponse(notificationsSpec);
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        return blackDuckApiClient.getPageResponse(requestMultiple);
     }
 
     public BlackDuckPageResponse<NotificationUserView> getPageOfUserNotifications(UserView userView, NotificationEditor notificationEditor, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor)
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
-        BlackDuckApiSpecMultiple<NotificationUserView> userNotificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, userNotificationsResponses.apply(userView));
-        return blackDuckApiClient.getPageResponse(userNotificationsSpec);
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        return blackDuckApiClient.getPageResponse(requestMultiple);
     }
 
     /**
@@ -75,8 +75,8 @@ public class NotificationService extends DataService {
      */
     public Date getLatestNotificationDate() throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
-        BlackDuckApiSpecMultiple<NotificationView> notificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, notificationsResponses);
-        List<NotificationView> notifications = blackDuckApiClient.getSomeResponses(notificationsSpec, 1);
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        List<NotificationView> notifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
         return getFirstCreatedAtDate(notifications);
     }
 
@@ -86,8 +86,8 @@ public class NotificationService extends DataService {
      */
     public Date getLatestUserNotificationDate(UserView userView) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
-        BlackDuckApiSpecMultiple<NotificationUserView> userNotificationsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, userView.metaNotificationsLink());
-        List<NotificationUserView> userNotifications = blackDuckApiClient.getSomeResponses(userNotificationsSpec, 1);
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        List<NotificationUserView> userNotifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
         return getFirstCreatedAtDate(userNotifications);
     }
 

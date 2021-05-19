@@ -58,6 +58,7 @@ import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -286,7 +287,7 @@ public class ComprehensiveCookbookTestIT {
 
     private <T extends BlackDuckResponse> void assertGettingAll(UrlMultipleResponses<T> urlResponses, String labelForOutput) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
-        BlackDuckRequest<T> blackDuckRequest = new BlackDuckRequest<>(blackDuckRequestBuilder, urlResponses);
+        BlackDuckMultipleRequest<T> blackDuckRequest = blackDuckRequestBuilder.buildBlackDuckRequest(urlResponses);
 
         BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         if (pageResponse.getTotalCount() > 0) {

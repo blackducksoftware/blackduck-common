@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
@@ -19,6 +22,8 @@ import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.exception.IntegrationException;
 
+@Tag("integration")
+@ExtendWith(TimingExtension.class)
 public class LicenseTest {
     private IntHttpClientTestHelper helper = new IntHttpClientTestHelper();
 

@@ -28,7 +28,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecSingle;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -199,9 +199,9 @@ public class BlackDuckHttpClientTestIT {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
                                                               .createBlackDuckRequestBuilder()
                                                               .postObject(apiTokenRequest);
-        BlackDuckApiSpecSingle<ApiTokenView> apiTokenSpec = blackDuckRequestBuilder.buildApiSpecSingle(tokenResponse);
+        BlackDuckSingleRequest<ApiTokenView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(tokenResponse);
 
-        return blackDuckApiClient.getResponse(apiTokenSpec);
+        return blackDuckApiClient.getResponse(requestSingle);
     }
 
     private void deleteByName(String name) throws IntegrationException {

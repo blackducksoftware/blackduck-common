@@ -15,12 +15,8 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.LinkSingleResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.api.generated.deprecated.response.RemediationOptionsView;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionRemediatingView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -33,7 +29,7 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -64,9 +60,9 @@ public class ComponentService extends DataService {
         BlackDuckQuery blackDuckQuery = new BlackDuckQuery("id", componentQuery);
 
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
+        BlackDuckMultipleRequest<ComponentsView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(componentsResponses);
 
-        BlackDuckApiSpecMultiple<ComponentsView> componentsSpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, componentsResponses);
-        return blackDuckApiClient.getAllResponses(componentsSpec);
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     public Optional<ComponentsView> getSingleOrEmptyResult(ExternalId externalId) throws IntegrationException {
@@ -105,11 +101,11 @@ public class ComponentService extends DataService {
 
     public ComponentVersionVulnerabilities getComponentVersionVulnerabilities(ComponentVersionView componentVersion) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                     .createCommonGet()
-                                                     .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
+                                                              .createCommonGet()
+                                                              .acceptMimeType(BlackDuckMediaTypes.VULNERABILITY_REQUEST_SERVICE_V1);
 
-        BlackDuckApiSpecMultiple<VulnerabilityView> vulnerabilitySpec = new BlackDuckApiSpecMultiple<>(blackDuckRequestBuilder, componentVersion.metaVulnerabilitiesLink());
-        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(vulnerabilitySpec);
+        BlackDuckMultipleRequest<VulnerabilityView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(componentVersion.metaVulnerabilitiesLink());
+        List<VulnerabilityView> vulnerabilityList = blackDuckApiClient.getAllResponses(requestMultiple);
         return new ComponentVersionVulnerabilities(componentVersion, vulnerabilityList);
     }
 

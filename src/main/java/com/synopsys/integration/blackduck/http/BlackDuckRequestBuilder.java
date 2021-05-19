@@ -11,16 +11,15 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecMultiple;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiSpecSingle;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
@@ -55,12 +54,12 @@ public class BlackDuckRequestBuilder {
         return requestBuilder.build();
     }
 
-    public <T extends BlackDuckResponse> BlackDuckApiSpecMultiple<T> buildApiSpecMultiple(UrlMultipleResponses<T> urlMultipleResponses) {
-        return new BlackDuckApiSpecMultiple<>(this, urlMultipleResponses);
+    public <T extends BlackDuckResponse> BlackDuckMultipleRequest<T> buildBlackDuckRequest(UrlMultipleResponses<T> urlMultipleResponses) {
+        return new BlackDuckMultipleRequest<>(this, urlMultipleResponses);
     }
 
-    public <T extends BlackDuckResponse> BlackDuckApiSpecSingle<T> buildApiSpecSingle(UrlSingleResponse<T> urlSingleResponse) {
-        return new BlackDuckApiSpecSingle<>(this, urlSingleResponse);
+    public <T extends BlackDuckResponse> BlackDuckSingleRequest<T> buildBlackDuckRequest(UrlSingleResponse<T> urlSingleResponse) {
+        return new BlackDuckSingleRequest<>(this, urlSingleResponse);
     }
 
     public Request.Builder getRequestBuilder() {
