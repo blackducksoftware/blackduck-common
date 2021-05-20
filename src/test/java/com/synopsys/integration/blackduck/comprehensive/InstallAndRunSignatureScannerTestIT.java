@@ -49,6 +49,7 @@ import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.WaitJobConfig;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -120,7 +121,8 @@ public class InstallAndRunSignatureScannerTestIT {
         // finally, verify the code location exists and then delete it to clean up
         CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
-        WaitJob waitJob = WaitJob.create(logger, 120, System.currentTimeMillis(), 10, () -> {
+        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, 120, System.currentTimeMillis(), 10);
+        WaitJob<Boolean> waitJob = WaitJob.createSimpleWait(waitJobConfig, "codeLocationTest", () -> {
             return codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME).isPresent();
         });
         waitJob.waitFor();

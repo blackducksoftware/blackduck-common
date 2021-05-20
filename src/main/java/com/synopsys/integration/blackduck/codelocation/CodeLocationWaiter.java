@@ -64,7 +64,7 @@ public class CodeLocationWaiter {
         };
 
         WaitJobConfig waitJobConfig = new WaitJobConfig(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds);
-        WaitJobTask waitJobTask = new WaitJobTask("", initializer, codeLocationWaitJobChecker, taskCompleter, timeoutHandler);
+        WaitJobTask waitJobTask = new WaitJobTask("codeLocationWait", initializer, codeLocationWaitJobChecker, taskCompleter, timeoutHandler);
         WaitJob<CodeLocationWaitResult> waitJob = new WaitJob<>(waitJobConfig, waitJobTask);
 
         return waitJob.waitFor();

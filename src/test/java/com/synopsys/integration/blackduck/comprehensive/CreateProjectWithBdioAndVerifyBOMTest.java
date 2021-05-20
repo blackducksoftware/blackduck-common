@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import static com.synopsys.integration.wait.WaitJobInitializer.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,9 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.WaitJobChecker;
+import com.synopsys.integration.wait.WaitJobConfig;
+import com.synopsys.integration.wait.WaitJobInitializer;
 import com.synopsys.integration.wait.WaitJobTask;
 
 @Tag("integration")
@@ -71,6 +76,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final UserView currentUser = blackDuckServices.userService.findCurrentUser();
     private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
+    private final WaitJobConfig waitJobConfig = new WaitJobConfig(waitLogger, TEN_MINUTES, WaitJobConfig.CURRENT_TIME_SUPPLIER, THIRTY_SECONDS);
     private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
 
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
@@ -146,13 +152,13 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     }
 
     private boolean waitForProject() throws InterruptedException, IntegrationException {
-        WaitJobTask findProjectTask = () -> blackDuckServices.projectService.getProjectVersion(PROJECT_NAME, PROJECT_VERSION_NAME).isPresent();
-        return WaitJob.createUsingSystemTimeWhenInvoked(waitLogger, FIVE_MINUTES, THIRTY_SECONDS, "wait for project", findProjectTask).waitFor();
+        WaitJobChecker findProjectTask = () -> blackDuckServices.projectService.getProjectVersion(PROJECT_NAME, PROJECT_VERSION_NAME).isPresent();
+        return WaitJob.createSimpleWait(waitJobConfig, "wait for project", findProjectTask).waitFor();
     }
 
     private boolean waitForCodeLocations(Set<String> expectedCodeLocationNames, ProjectVersionView projectVersionView) throws InterruptedException, IntegrationException {
         Predicate<CodeLocationView> nameInSet = (codeLocationView) -> expectedCodeLocationNames.contains(codeLocationView.getName());
-        WaitJobTask findAllCodeLocationNames = () -> {
+        WaitJobChecker findAllCodeLocationNames = () -> {
             List<CodeLocationView> codeLocationViews = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(projectVersionView.metaCodelocationsLink(), nameInSet, expectedCodeLocationNames.size());
             Set<String> foundCodeLocationNames = codeLocationViews
                                                      .stream()
@@ -163,7 +169,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
             return expectedCodeLocationNames.equals(foundCodeLocationNames);
         };
-        return WaitJob.createUsingSystemTimeWhenInvoked(waitLogger, TEN_MINUTES, THIRTY_SECONDS, "wait for code locations", findAllCodeLocationNames).waitFor();
+        return WaitJob.createSimpleWait(waitJobConfig, "wait for code locations", findAllCodeLocationNames).waitFor();
     }
 
     private void printOutCodeLocations(List<CodeLocationView> codeLocationViews) {
@@ -176,7 +182,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     }
 
     private boolean waitForNotifications(Date userStartDate, Date endDate, Set<String> expectedCodeLocationUrls) throws InterruptedException, IntegrationException {
-        WaitJobTask findNotificationsForAllCodeLocationUrls = () -> {
+        WaitJobChecker findNotificationsForAllCodeLocationUrls = () -> {
             NotificationEditor notificationEditor = new NotificationEditor(userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
             List<NotificationUserView> filteredUserNotifications = blackDuckServices.notificationService
                                                                        .getAllUserNotifications(currentUser, notificationEditor);
@@ -191,7 +197,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
             return expectedCodeLocationUrls.equals(foundCodeLocationUrls);
         };
-        return WaitJob.createUsingSystemTimeWhenInvoked(waitLogger, TEN_MINUTES, THIRTY_SECONDS, "wait for notifications", findNotificationsForAllCodeLocationUrls).waitFor();
+        return WaitJob.createSimpleWait(waitJobConfig, "wait for notifications", findNotificationsForAllCodeLocationUrls).waitFor();
     }
 
     private UploadTarget createUploadTarget(String codeLocationName, String bdioFilename) {
