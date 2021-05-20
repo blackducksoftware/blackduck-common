@@ -18,6 +18,7 @@ versionFile.delete()
 versionFile << version
 
 dependencies {
+    api 'com.synopsys.integration:integration-common:24.3.1-SNAPSHOT'
     api 'com.synopsys.integration:blackduck-common-api:2020.8.0.22-SNAPSHOT'
 
     api 'com.synopsys.integration:integration-bdio:22.1.1'

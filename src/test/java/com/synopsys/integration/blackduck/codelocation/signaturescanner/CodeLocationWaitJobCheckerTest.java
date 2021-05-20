@@ -25,7 +25,7 @@ import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLoc
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitJobTask;
+import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitJobChecker;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
@@ -38,12 +38,12 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 
-public class CodeLocationWaitJobTaskTest {
+public class CodeLocationWaitJobCheckerTest {
     private final HttpUrl codeLocationsUrl = new HttpUrl("https://synopsys.com/codelocations");
     private final UrlMultipleResponses<CodeLocationView> codeLocationResponses = new UrlMultipleResponses<>(codeLocationsUrl, CodeLocationView.class);
     private final HttpUrl codeLocationUrl = new HttpUrl("https://synopsys.com/codelocations/2.71828182845");
 
-    public CodeLocationWaitJobTaskTest() throws IntegrationException {}
+    public CodeLocationWaitJobCheckerTest() throws IntegrationException {}
 
     @Test
     public void testMultipleNotificationsExpected() throws ParseException, IntegrationException {
@@ -64,7 +64,7 @@ public class CodeLocationWaitJobTaskTest {
         String codeLocationName = "GraceIsButGloryBegunAndGloryIsButGracePerfected";
         Set<String> codeLocationNames = new HashSet<>(Arrays.asList(codeLocationName));
 
-        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, mockBlackDuckApiClient, mockProjectService, mockNotificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, 2);
+        CodeLocationWaitJobChecker codeLocationWaitJobChecker = new CodeLocationWaitJobChecker(logger, mockBlackDuckApiClient, mockProjectService, mockNotificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames, 2);
 
         ProjectView projectView = new ProjectView();
 
@@ -94,7 +94,7 @@ public class CodeLocationWaitJobTaskTest {
         NotificationEditor notificationEditor = new NotificationEditor(notificationTaskRange.getStartDate(), notificationTaskRange.getEndDate(), Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
         Mockito.when(mockNotificationService.getAllUserNotifications(userView, notificationEditor)).thenReturn(getExpectedNotifications());
 
-        assertTrue(codeLocationWaitJobTask.isComplete());
+        assertTrue(codeLocationWaitJobChecker.isComplete());
     }
 
     private List<NotificationUserView> getExpectedNotifications() {

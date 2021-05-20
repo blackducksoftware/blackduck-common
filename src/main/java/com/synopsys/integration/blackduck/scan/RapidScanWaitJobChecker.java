@@ -19,13 +19,13 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.wait.WaitJobTask;
+import com.synopsys.integration.wait.WaitJobChecker;
 
-public class RapidScanWaitJobTask implements WaitJobTask {
+public class RapidScanWaitJobChecker implements WaitJobChecker {
     private HttpUrl resultUrl;
     private BlackDuckApiClient blackDuckApiClient;
 
-    public RapidScanWaitJobTask(BlackDuckApiClient blackDuckApiClient, HttpUrl resultUrl) {
+    public RapidScanWaitJobChecker(BlackDuckApiClient blackDuckApiClient, HttpUrl resultUrl) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.resultUrl = resultUrl;
     }
