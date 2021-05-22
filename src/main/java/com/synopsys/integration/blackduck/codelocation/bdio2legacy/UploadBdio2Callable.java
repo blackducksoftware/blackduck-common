@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
@@ -23,15 +23,13 @@ import com.synopsys.integration.util.NameVersion;
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, UploadTarget uploadTarget) {
+    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, UploadTarget uploadTarget) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
-        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -41,8 +39,7 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     public UploadOutput call() {
         try {
             HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
-            Request request = blackDuckRequestBuilderFactory
-                                  .createBlackDuckRequestBuilder()
+            Request request = new BlackDuckRequestBuilder()
                                   .postFile(uploadTarget.getUploadFile())
                                   .acceptMimeType(uploadTarget.getMediaType())
                                   .url(url)

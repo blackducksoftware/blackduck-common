@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -43,7 +43,7 @@ import okhttp3.tls.HeldCertificate;
 @ExtendWith(TimingExtension.class)
 public class SignatureScannerClientTest {
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
-    private static final BlackDuckRequestBuilderFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestBuilderFactory(new Gson());
+    private static final Gson gson = new Gson();
 
     private static final char[] KEYSTORE_PASSWORD = "changeit".toCharArray();
     private static final String CERTIFICATE_ALIAS = "bd-common-test-cert";
@@ -72,8 +72,8 @@ public class SignatureScannerClientTest {
 
         HttpUrl httpsServer = new HttpUrl(destinationMockServerUrl);
 
-        BLACK_DUCK_DEFAULT_REQUEST = BLACK_DUCK_REQUEST_FACTORY
-                                         .createCommonGet()
+        BLACK_DUCK_DEFAULT_REQUEST = new BlackDuckRequestBuilder()
+                                         .commonGet()
                                          .url(httpsServer)
                                          .build();
 
@@ -118,7 +118,7 @@ public class SignatureScannerClientTest {
     @Test
     public void getCertWithContext() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
-        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, ProxyInfo.NO_PROXY_INFO, sslContext);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, gson, 10, ProxyInfo.NO_PROXY_INFO, sslContext);
 
         Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
         Response response = optionalResponse.orElse(null);
@@ -133,7 +133,7 @@ public class SignatureScannerClientTest {
     @Test
     public void getCertTrustTrue() throws IntegrationException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, IOException {
         SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(DEFAULT_KEYSTORE, (x509Certificates, s) -> true).build();
-        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, true, ProxyInfo.NO_PROXY_INFO);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, gson, 10, true, ProxyInfo.NO_PROXY_INFO);
 
         Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(BLACK_DUCK_DEFAULT_REQUEST, -5L);
         Response response = optionalResponse.orElse(null);

@@ -27,14 +27,12 @@ import com.synopsys.integration.util.NameVersion;
  * Connection to the Black Duck application which authenticates using the API token feature
  */
 public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
-    private final Gson gson;
     private final String apiToken;
 
     public ApiTokenBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
+        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, String apiToken,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
-        this.gson = gson;
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.apiToken = apiToken;
 
         if (StringUtils.isBlank(apiToken)) {
@@ -52,7 +50,7 @@ public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
 
     @Override
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
-        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, gson, this, "bearerToken");
+        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, getGson(), this, "bearerToken");
     }
 
 }

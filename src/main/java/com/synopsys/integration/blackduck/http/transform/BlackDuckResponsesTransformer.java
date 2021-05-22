@@ -23,22 +23,17 @@ import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
-import com.synopsys.integration.blackduck.service.request.PagingDefaultsEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
-    private final PagingDefaultsEditor pagingDefaultsEditor = new PagingDefaultsEditor();
 
-    public BlackDuckResponsesTransformer(BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
-        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
+    public BlackDuckResponsesTransformer(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
@@ -66,9 +61,7 @@ public class BlackDuckResponsesTransformer {
     private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
-        BlackDuckRequestBuilder blackDuckRequestBuilder = createBuilder(requestMultiple);
-        blackDuckRequestBuilder.apply(pagingDefaultsEditor);
-        Request request = blackDuckRequestBuilder.build();
+        Request request = requestMultiple.getRequest();
 
         int limit = getLimit(request);
         int offset = getOffset(request);
@@ -104,14 +97,10 @@ public class BlackDuckResponsesTransformer {
     }
 
     private <T extends BlackDuckResponse> BlackDuckRequest<T, UrlMultipleResponses<T>> nextPage(BlackDuckRequest<T, UrlMultipleResponses<T>> blackDuckRequest, int offset) {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = createBuilder(blackDuckRequest);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder(blackDuckRequest);
         blackDuckRequestBuilder.setOffset(offset);
 
         return new BlackDuckRequest<>(blackDuckRequestBuilder, blackDuckRequest.getUrlResponse());
-    }
-
-    private BlackDuckRequestBuilder createBuilder(BlackDuckRequest<?, ?> blackDuckRequest) {
-        return blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder(blackDuckRequest);
     }
 
     @NotNull

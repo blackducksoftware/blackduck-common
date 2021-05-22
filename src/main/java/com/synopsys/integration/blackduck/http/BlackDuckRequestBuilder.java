@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
 import com.synopsys.integration.rest.HttpMethod;
@@ -26,6 +26,7 @@ import com.synopsys.integration.rest.body.BodyContent;
 import com.synopsys.integration.rest.body.FileBodyContent;
 import com.synopsys.integration.rest.body.MapBodyContent;
 import com.synopsys.integration.rest.body.MultipartBodyContent;
+import com.synopsys.integration.rest.body.ObjectBodyContent;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
@@ -39,15 +40,25 @@ public class BlackDuckRequestBuilder {
     public static final int DEFAULT_OFFSET = 0;
 
     private final Request.Builder requestBuilder;
-    private final Gson gson;
 
-    public BlackDuckRequestBuilder(BlackDuckRequestBuilder blackDuckRequestBuilder) {
-        this(blackDuckRequestBuilder.gson, blackDuckRequestBuilder.requestBuilder);
+    public BlackDuckRequestBuilder() {
+        this.requestBuilder = new Request.Builder();
     }
 
-    public BlackDuckRequestBuilder(Gson gson, Request.Builder requestBuilder) {
-        this.gson = gson;
+    public BlackDuckRequestBuilder(Request.Builder requestBuilder) {
         this.requestBuilder = new Request.Builder(requestBuilder);
+    }
+
+    public BlackDuckRequestBuilder(Request request) {
+        this(new Request.Builder(request));
+    }
+
+    public BlackDuckRequestBuilder(BlackDuckRequest<?, ?> blackDuckRequest) {
+        this.requestBuilder = new Request.Builder(blackDuckRequest.getRequest());
+    }
+
+    public BlackDuckRequestBuilder(BlackDuckRequestBuilder blackDuckRequestBuilder) {
+        this(blackDuckRequestBuilder.requestBuilder);
     }
 
     public Request build() {
@@ -182,7 +193,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public BlackDuckRequestBuilder postObject(Object bodyContent) {
-        return postBodyContent(new StringBodyContent(gson.toJson(bodyContent)));
+        return postBodyContent(new ObjectBodyContent(bodyContent));
     }
 
     public BlackDuckRequestBuilder postBodyContent(BodyContent bodyContent) {
@@ -199,7 +210,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public BlackDuckRequestBuilder putObject(Object bodyContent) {
-        return putBodyContent(new StringBodyContent(gson.toJson(bodyContent)));
+        return putBodyContent(new ObjectBodyContent(bodyContent));
     }
 
     public BlackDuckRequestBuilder putBodyContent(BodyContent bodyContent) {

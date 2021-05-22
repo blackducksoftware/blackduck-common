@@ -14,6 +14,7 @@ import org.apache.commons.collections4.map.LRUMap;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -112,6 +113,11 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     @Override
     public IntLogger getLogger() {
         return blackDuckHttpClient.getLogger();
+    }
+
+    @Override
+    public Gson getGson() {
+        return blackDuckHttpClient.getGson();
     }
 
 }

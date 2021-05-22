@@ -14,7 +14,6 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.TagView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -22,8 +21,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class TagService extends DataService {
-    public TagService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public TagService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public List<TagView> getAllTags(ProjectView projectView) throws IntegrationException {

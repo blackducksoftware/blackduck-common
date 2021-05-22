@@ -18,7 +18,6 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.log.IntLogger;
 
@@ -26,14 +25,12 @@ public class UploadBdio2BatchRunner {
     private final IntLogger logger;
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final ExecutorService executorService;
 
-    public UploadBdio2BatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, ExecutorService executorService) {
+    public UploadBdio2BatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
-        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.executorService = executorService;
     }
 
@@ -68,7 +65,7 @@ public class UploadBdio2BatchRunner {
     private List<UploadBdio2Callable> createCallables(UploadBatch uploadBatch) {
         return uploadBatch.getUploadTargets()
                    .stream()
-                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, uploadTarget))
+                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, uploadTarget))
                    .collect(Collectors.toList());
     }
 

@@ -15,9 +15,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -25,7 +23,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionCompo
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionVulnerableBomComponentsView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
@@ -39,8 +37,8 @@ import com.synopsys.integration.rest.response.Response;
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;
 
-    public ProjectBomService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, ComponentService componentService) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public ProjectBomService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, ComponentService componentService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.componentService = componentService;
     }
 
@@ -124,8 +122,7 @@ public class ProjectBomService extends DataService {
     }
 
     public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
-        Request request = blackDuckRequestBuilderFactory
-                              .createBlackDuckRequestBuilder()
+        Request request = new BlackDuckRequestBuilder()
                               .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}")
                               .url(projectVersionComponentsUrl)
                               .build();

@@ -14,6 +14,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.exception.BlackDuckApiException;
 import com.synopsys.integration.blackduck.useragent.BlackDuckCommon;
@@ -32,30 +33,32 @@ import com.synopsys.integration.rest.support.AuthenticationSupport;
 import com.synopsys.integration.util.NameVersion;
 
 public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpClient implements BlackDuckHttpClient {
+    private final Gson gson;
     private final HttpUrl blackDuckUrl;
     private final BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
     private final String userAgentString;
 
     protected final AuthenticationSupport authenticationSupport;
 
-    public DefaultBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport,
+    public DefaultBlackDuckHttpClient(IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, new UserAgentItem(solutionDetails), BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
+        this(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, new UserAgentItem(solutionDetails), BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
     }
 
-    public DefaultBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, UserAgentItem solutionUserAgentItem, AuthenticationSupport authenticationSupport,
+    public DefaultBlackDuckHttpClient(IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, UserAgentItem solutionUserAgentItem, AuthenticationSupport authenticationSupport,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        this(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionUserAgentItem, BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
+        this(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionUserAgentItem, BlackDuckCommon.createUserAgentItem(), authenticationSupport, blackDuckMediaTypeDiscovery);
     }
 
-    public DefaultBlackDuckHttpClient(IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, UserAgentItem solutionUserAgentItem, UserAgentItem blackDuckCommonUserAgentItem,
+    public DefaultBlackDuckHttpClient(IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, UserAgentItem solutionUserAgentItem, UserAgentItem blackDuckCommonUserAgentItem,
         AuthenticationSupport authenticationSupport, BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo);
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo);
 
         if (null == blackDuckUrl) {
             throw new IllegalArgumentException("A Black Duck url is required, but was not provided.");
         }
 
+        this.gson = gson;
         this.blackDuckUrl = blackDuckUrl;
         this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
 
@@ -123,6 +126,10 @@ public abstract class DefaultBlackDuckHttpClient extends AuthenticatingIntHttpCl
     @Override
     public HttpClientBuilder getHttpClientBuilder() {
         return getClientBuilder();
+    }
+
+    public Gson getGson() {
+        return gson;
     }
 
     @Override

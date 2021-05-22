@@ -39,7 +39,6 @@ import com.synopsys.integration.blackduck.comprehensive.BlackDuckServices;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -66,7 +65,6 @@ public class CodeLocationServiceTestIT {
     private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
     private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
     private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(BlackDuckServicesFactory.createDefaultGson());
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 
@@ -143,8 +141,8 @@ public class CodeLocationServiceTestIT {
 
             // Verify code location now exists using getSomeMatchingResponses()
             Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
-            BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                                  .createCommonGet()
+            BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                                  .commonGet()
                                                                   .setLimit(2);
             BlackDuckMultipleRequest<CodeLocationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(blackDuckServices.apiDiscovery.metaCodelocationsLink());
             List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(requestMultiple, nameMatcherPredicate, 1);

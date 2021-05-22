@@ -22,7 +22,6 @@ import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestFilter;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -39,8 +38,8 @@ public class NotificationService extends DataService {
     private final UrlMultipleResponses<NotificationView> notificationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.NOTIFICATIONS_PATH);
     private final Function<UserView, UrlMultipleResponses<NotificationUserView>> userNotificationsResponses = (userView) -> userView.metaNotificationsLink();
 
-    public NotificationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public NotificationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public List<NotificationView> getAllNotifications(NotificationEditor notificationEditor) throws IntegrationException {
@@ -106,7 +105,9 @@ public class NotificationService extends DataService {
     }
 
     private BlackDuckRequestBuilder createLatestDateRequestBuilder() {
-        return blackDuckRequestBuilderFactory.createCommonGet(createFilterForAllKnownTypes());
+        return new BlackDuckRequestBuilder()
+                   .commonGet()
+                   .addBlackDuckFilter(createFilterForAllKnownTypes());
     }
 
     private List<String> getAllKnownNotificationTypes() {
@@ -128,7 +129,7 @@ public class NotificationService extends DataService {
     }
 
     private BlackDuckRequestBuilder createNotificationRequestBuilder(NotificationEditor notificationEditor) {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet();
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
         notificationEditor.edit(blackDuckRequestBuilder);
         return blackDuckRequestBuilder;
     }

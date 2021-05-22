@@ -17,24 +17,24 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 
 public class ProjectGetService extends DataService {
     private final UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
 
-    public ProjectGetService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public ProjectGetService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
         BlackDuckQuery blackDuckQuery = new BlackDuckQuery("name", projectName);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(blackDuckQuery);
         BlackDuckMultipleRequest<ProjectView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(projectsResponses);
 
         return blackDuckApiClient.getAllResponses(requestMultiple);
@@ -42,7 +42,9 @@ public class ProjectGetService extends DataService {
 
     public List<ProjectView> getProjectMatches(String projectName, int limit) throws IntegrationException {
         BlackDuckQuery blackDuckQuery = new BlackDuckQuery("name", projectName);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(blackDuckQuery);
         BlackDuckMultipleRequest<ProjectView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(projectsResponses);
 
         return blackDuckApiClient.getSomeResponses(requestMultiple, limit);
@@ -61,7 +63,9 @@ public class ProjectGetService extends DataService {
 
     public Optional<ProjectVersionView> getProjectVersionViewByProjectVersionName(ProjectView projectView, String projectVersionName) throws IntegrationException {
         BlackDuckQuery blackDuckQuery = new BlackDuckQuery("versionName", projectVersionName);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(blackDuckQuery);
 
         BlackDuckMultipleRequest<ProjectVersionView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(projectView.metaVersionsLink());
         Predicate<ProjectVersionView> predicate = projectVersionView -> projectVersionName.equals(projectVersionView.getVersionName());

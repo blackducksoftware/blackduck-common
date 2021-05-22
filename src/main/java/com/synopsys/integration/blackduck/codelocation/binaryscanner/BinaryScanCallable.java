@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
@@ -27,15 +27,13 @@ import com.synopsys.integration.util.NameVersion;
 public class BinaryScanCallable implements Callable<BinaryScanOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final BinaryScan binaryScan;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public BinaryScanCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, BinaryScan binaryScan) {
+    public BinaryScanCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BinaryScan binaryScan) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
-        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.binaryScan = binaryScan;
         this.projectAndVersion = new NameVersion(binaryScan.getProjectName(), binaryScan.getProjectVersion());
         this.codeLocationName = binaryScan.getCodeLocationName();
@@ -52,9 +50,8 @@ public class BinaryScanCallable implements Callable<BinaryScanOutput> {
             Map<String, File> binaryParts = new HashMap<>();
             binaryParts.put("fileupload", binaryScan.getBinaryFile());
 
-            UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaSingleResponse(BlackDuckApiClient.UPLOADS_PATH);
-            Request request = blackDuckRequestBuilderFactory
-                                  .createBlackDuckRequestBuilder()
+            UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaUploadsLink();
+            Request request = new BlackDuckRequestBuilder()
                                   .postMultipart(binaryParts, textParts)
                                   .url(stringResponse.getUrl())
                                   .build();

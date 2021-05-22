@@ -14,7 +14,6 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationServi
 import com.synopsys.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
 import com.synopsys.integration.blackduck.codelocation.bdiolegacy.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -50,7 +49,6 @@ public class BasicRecipe {
     protected PolicyRuleService policyRuleService;
     protected Bdio2UploadService bdio2UploadService;
     protected UploadBatchRunner uploadRunner;
-    protected BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
 
     @BeforeEach
     public void startRecipe() throws IntegrationException {
@@ -85,7 +83,6 @@ public class BasicRecipe {
         blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, executorService, logger, blackDuckHttpClient);
         blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-        blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();
@@ -95,7 +92,7 @@ public class BasicRecipe {
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         bdio2UploadService = blackDuckServicesFactory.createBdio2UploadService();
 
-        uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, executorService);
+        uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, executorService);
     }
 
     public ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {

@@ -31,9 +31,9 @@ import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.wait.WaitJobChecker;
+import com.synopsys.integration.wait.WaitJobCondition;
 
-public class CodeLocationWaitJobChecker implements WaitJobChecker {
+public class CodeLocationWaitJobCondition implements WaitJobCondition {
     private final IntLogger logger;
     private final BlackDuckApiClient blackDuckApiClient;
     private final ProjectService projectService;
@@ -47,7 +47,7 @@ public class CodeLocationWaitJobChecker implements WaitJobChecker {
 
     private final Set<String> foundCodeLocationNames = new HashSet<>();
 
-    public CodeLocationWaitJobChecker(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
+    public CodeLocationWaitJobCondition(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
         NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount) {
         this.logger = logger;
         this.blackDuckApiClient = blackDuckApiClient;

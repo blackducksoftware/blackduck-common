@@ -10,13 +10,8 @@ package com.synopsys.integration.blackduck.service.request;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckSingleRequest<T extends BlackDuckResponse> extends BlackDuckRequest<T, UrlSingleResponse<T>> {
-    public BlackDuckSingleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
-        super(blackDuckRequestBuilder, url, responseClass, UrlSingleResponse::new);
-    }
-
     public BlackDuckSingleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlSingleResponse<T> urlResponse) {
         super(blackDuckRequestBuilder, urlResponse);
     }

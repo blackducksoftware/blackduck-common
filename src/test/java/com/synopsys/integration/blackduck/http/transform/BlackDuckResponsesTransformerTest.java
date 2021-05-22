@@ -17,15 +17,14 @@ import org.mockito.Mockito;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
@@ -95,13 +94,11 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
-        blackDuckRequestBuilder
-            .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
-            .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        BlackDuckMultipleRequest<ProjectView> blackDuckRequest = new BlackDuckMultipleRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
+                                                              .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
+        BlackDuckMultipleRequest<ProjectView> blackDuckRequest = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
@@ -131,13 +128,11 @@ public class BlackDuckResponsesTransformerTest {
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-        BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
-        blackDuckRequestBuilder
-            .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
-            .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-        BlackDuckMultipleRequest<ProjectView> blackDuckRequest = new BlackDuckMultipleRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
-        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "100")
+                                                              .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
+        BlackDuckMultipleRequest<ProjectView> blackDuckRequest = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
+        BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
 
         BlackDuckPageResponse<ProjectView> allPagesResponse = blackDuckResponsesTransformer.getOnePageOfResponses(blackDuckRequest);
         assertEquals(69, allPagesResponse.getTotalCount());
@@ -193,8 +188,8 @@ public class BlackDuckResponsesTransformerTest {
     }
 
     private class MockedClient {
-        private BlackDuckMultipleRequest<ProjectView> blackDuckRequest;
-        private BlackDuckResponsesTransformer blackDuckResponsesTransformer;
+        private final BlackDuckMultipleRequest<ProjectView> blackDuckRequest;
+        private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
 
         public MockedClient() throws IOException, IntegrationException {
             Map<String, String> offsetsToResults = new HashMap<>();
@@ -210,13 +205,11 @@ public class BlackDuckResponsesTransformerTest {
             BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
             BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, BlackDuckServicesFactory.createDefaultObjectMapper(), blackDuckResponseResolver, new PrintStreamIntLogger(System.out, LogLevel.INFO));
 
-            BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = new BlackDuckRequestBuilderFactory(gson);
-            BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
-            blackDuckRequestBuilder
-                .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "20")
-                .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
-            blackDuckRequest = new BlackDuckMultipleRequest<>(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
-            blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckRequestBuilderFactory, blackDuckHttpClient, blackDuckJsonTransformer);
+            BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                                  .addQueryParameter(BlackDuckRequestBuilder.LIMIT_PARAMETER, "20")
+                                                                  .addQueryParameter(BlackDuckRequestBuilder.OFFSET_PARAMETER, "0");
+            blackDuckRequest = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, new HttpUrl("https://blackduckserver.com/api/projects"), ProjectView.class);
+            blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         }
     }
 

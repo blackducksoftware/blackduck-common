@@ -10,13 +10,8 @@ package com.synopsys.integration.blackduck.service.request;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.rest.HttpUrl;
 
 public class BlackDuckMultipleRequest<T extends BlackDuckResponse> extends BlackDuckRequest<T, UrlMultipleResponses<T>> {
-    public BlackDuckMultipleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
-        super(blackDuckRequestBuilder, url, responseClass, UrlMultipleResponses::new);
-    }
-
     public BlackDuckMultipleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlMultipleResponses<T> urlResponse) {
         super(blackDuckRequestBuilder, urlResponse);
     }

@@ -12,7 +12,6 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.RegistrationView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
@@ -26,14 +25,14 @@ public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaCurrentVersionLink();
     private final HttpUrl blackDuckUrl;
 
-    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, HttpUrl blackDuckUrl) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, HttpUrl blackDuckUrl) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.blackDuckUrl = blackDuckUrl;
     }
 
     public String getRegistrationId() throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                              .createCommonGet()
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
                                                               .acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
         BlackDuckSingleRequest<RegistrationView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(registrationResponse);

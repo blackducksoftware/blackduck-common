@@ -5,19 +5,15 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
@@ -27,7 +23,6 @@ class BlackDuckResponsesTransformerTestIT {
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer = blackDuckServicesFactory.getBlackDuckResponsesTransformer();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
 
     BlackDuckResponsesTransformerTestIT() throws IntegrationException {
     }
@@ -71,8 +66,8 @@ class BlackDuckResponsesTransformerTestIT {
     }
 
     private BlackDuckRequestBuilder createBlackDuckRequestBuilder() throws IntegrationException {
-        return blackDuckRequestBuilderFactory
-                   .createCommonGet()
+        return new BlackDuckRequestBuilder()
+                   .commonGet()
                    .url(apiDiscovery.metaProjectsLink().getUrl());
     }
 

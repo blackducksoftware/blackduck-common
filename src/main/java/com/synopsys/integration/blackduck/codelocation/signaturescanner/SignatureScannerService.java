@@ -13,7 +13,6 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationWaitResult;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
@@ -25,9 +24,9 @@ public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
-    public SignatureScannerService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger,
+    public SignatureScannerService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger,
         ScanBatchRunner scanBatchRunner, CodeLocationCreationService codeLocationCreationService) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.scanBatchRunner = scanBatchRunner;
         this.codeLocationCreationService = codeLocationCreationService;
     }

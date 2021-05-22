@@ -24,7 +24,6 @@ import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.UserService;
@@ -50,7 +49,6 @@ public class BlackDuckHttpClientTestIT {
 
     private final BlackDuckServicesFactory blackDuckServicesFactory = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
     private final BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
@@ -196,8 +194,7 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("read");
         apiTokenRequest.scopes.add("write");
 
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                              .createBlackDuckRequestBuilder()
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
                                                               .postObject(apiTokenRequest);
         BlackDuckSingleRequest<ApiTokenView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(tokenResponse);
 

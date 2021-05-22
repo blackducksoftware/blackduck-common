@@ -24,7 +24,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.manual.view.ScanSummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
@@ -38,8 +37,8 @@ public class CodeLocationService extends DataService {
 
     private final UrlMultipleResponses<CodeLocationView> codeLocationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.CODELOCATIONS_PATH);
 
-    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public CodeLocationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public List<CodeLocationView> getAllCodeLocations() throws IntegrationException {
@@ -77,7 +76,9 @@ public class CodeLocationService extends DataService {
 
     public Optional<CodeLocationView> getCodeLocationByName(String codeLocationName) throws IntegrationException {
         BlackDuckQuery blackDuckQuery = new BlackDuckQuery("name", codeLocationName);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(blackDuckQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(blackDuckQuery);
 
         Predicate<CodeLocationView> predicate = codeLocationView -> NAME_MATCHER.test(codeLocationName, codeLocationView);
 
@@ -94,12 +95,12 @@ public class CodeLocationService extends DataService {
     }
 
     public ScanSummaryView getScanSummaryViewById(String scanSummaryId) throws IntegrationException {
-        String uri = BlackDuckApiClient.SCANSUMMARIES_PATH.getPath() + "/" + scanSummaryId;
+        String uri = ApiDiscovery.SCAN_SUMMARIES_PATH.getPath() + "/" + scanSummaryId;
         HttpUrl url = new HttpUrl(uri);
         return blackDuckApiClient.getResponse(url, ScanSummaryView.class);
     }
 
-    private CodeLocationView createFakeCodeLocationView(final HttpUrl codeLocationUrl) {
+    private CodeLocationView createFakeCodeLocationView(HttpUrl codeLocationUrl) {
         ResourceMetadata resourceMetadata = new ResourceMetadata();
         resourceMetadata.setHref(codeLocationUrl);
         CodeLocationView codeLocationView = new CodeLocationView();

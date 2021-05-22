@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -49,5 +50,7 @@ public interface BlackDuckHttpClient {
     ProxyInfo getProxyInfo();
 
     IntLogger getLogger();
+
+    Gson getGson();
 
 }

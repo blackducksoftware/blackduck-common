@@ -18,6 +18,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -33,9 +34,9 @@ public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final CookieHeaderParser cookieHeaderParser;
 
     public CredentialsBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
+        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
         BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, CookieHeaderParser cookieHeaderParser) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
         this.credentials = credentials;
         this.cookieHeaderParser = cookieHeaderParser;
 

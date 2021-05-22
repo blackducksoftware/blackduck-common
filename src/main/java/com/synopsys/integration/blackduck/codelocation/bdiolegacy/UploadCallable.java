@@ -18,7 +18,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
@@ -27,15 +27,13 @@ import com.synopsys.integration.util.NameVersion;
 public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, UploadTarget uploadTarget) {
+    public UploadCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, UploadTarget uploadTarget) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
-        this.blackDuckRequestBuilderFactory = blackDuckRequestBuilderFactory;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -52,9 +50,8 @@ public class UploadCallable implements Callable<UploadOutput> {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
             }
 
-            UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaSingleResponse(BlackDuckApiClient.BOMIMPORT_PATH);
-            Request request = blackDuckRequestBuilderFactory
-                                  .createBlackDuckRequestBuilder()
+            UrlSingleResponse<BlackDuckStringResponse> stringResponse = new UrlSingleResponse<>(apiDiscovery.metaBomImportLink().getUrl(), BlackDuckStringResponse.class);
+            Request request = new BlackDuckRequestBuilder()
                                   .postString(jsonPayload)
                                   .acceptMimeType(uploadTarget.getMediaType())
                                   .url(stringResponse.getUrl())

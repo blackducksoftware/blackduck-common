@@ -7,11 +7,12 @@
  */
 package com.synopsys.integration.blackduck.service.request;
 
-import java.util.function.BiFunction;
-
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.request.Request;
 
@@ -21,18 +22,25 @@ import com.synopsys.integration.rest.request.Request;
  * handle the response.
  */
 public class BlackDuckRequest<T extends BlackDuckResponse, U extends UrlResponse<T>> {
+    private static final PagingDefaultsEditor pagingDefaultsEditor = new PagingDefaultsEditor();
+
     private final BlackDuckRequestBuilder blackDuckRequestBuilder;
     private final U urlResponse;
 
-    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass, BiFunction<HttpUrl, Class<T>, U> urlResponseCreator) {
-        this.blackDuckRequestBuilder = blackDuckRequestBuilder
-                                           .url(url);
-        this.urlResponse = urlResponseCreator.apply(url, responseClass);
+    public static <T extends BlackDuckResponse> BlackDuckRequest<T, UrlSingleResponse<T>> createSingleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
+        return new BlackDuckSingleRequest(blackDuckRequestBuilder, new UrlSingleResponse(url, responseClass));
+    }
+
+    public static <T extends BlackDuckResponse> BlackDuckMultipleRequest<T> createMultipleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) {
+        return new BlackDuckMultipleRequest(blackDuckRequestBuilder, new UrlMultipleResponses(url, responseClass));
     }
 
     public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, U urlResponse) {
-        this.blackDuckRequestBuilder = blackDuckRequestBuilder
-                                           .url(urlResponse.getUrl());
+        if (HttpMethod.GET == blackDuckRequestBuilder.getMethod()) {
+            blackDuckRequestBuilder.apply(pagingDefaultsEditor);
+        }
+
+        this.blackDuckRequestBuilder = blackDuckRequestBuilder.url(urlResponse.getUrl());
         this.urlResponse = urlResponse;
     }
 

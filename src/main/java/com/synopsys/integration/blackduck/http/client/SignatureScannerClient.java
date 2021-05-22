@@ -18,6 +18,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.client.IntHttpClient;
@@ -31,15 +32,15 @@ public class SignatureScannerClient extends IntHttpClient {
     private Certificate serverCertificate;
 
     public SignatureScannerClient(BlackDuckHttpClient blackDuckHttpClient) {
-        super(blackDuckHttpClient.getLogger(), blackDuckHttpClient.getTimeoutInSeconds(), blackDuckHttpClient.isAlwaysTrustServerCertificate(), blackDuckHttpClient.getProxyInfo());
+        super(blackDuckHttpClient.getLogger(), blackDuckHttpClient.getGson(), blackDuckHttpClient.getTimeoutInSeconds(), blackDuckHttpClient.isAlwaysTrustServerCertificate(), blackDuckHttpClient.getProxyInfo());
     }
 
-    public SignatureScannerClient(IntLogger logger, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo) {
-        super(logger, timeoutInSeconds, alwaysTrustServerCertificate, proxyInfo);
+    public SignatureScannerClient(IntLogger logger, Gson gson, int timeoutInSeconds, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo) {
+        super(logger, gson, timeoutInSeconds, alwaysTrustServerCertificate, proxyInfo);
     }
 
-    public SignatureScannerClient(IntLogger logger, int timeoutInSeconds, ProxyInfo proxyInfo, SSLContext sslContext) {
-        super(logger, timeoutInSeconds, proxyInfo, sslContext);
+    public SignatureScannerClient(IntLogger logger, Gson gson, int timeoutInSeconds, ProxyInfo proxyInfo, SSLContext sslContext) {
+        super(logger, gson, timeoutInSeconds, proxyInfo, sslContext);
     }
 
     @Override

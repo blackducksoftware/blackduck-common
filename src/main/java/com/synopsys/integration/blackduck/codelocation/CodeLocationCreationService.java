@@ -16,7 +16,6 @@ import java.util.Set;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
@@ -33,8 +32,8 @@ public class CodeLocationCreationService extends DataService {
     private final NotificationService notificationService;
     private final UserService userService;
 
-    public CodeLocationCreationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService, UserService userService) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public CodeLocationCreationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService, UserService userService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.codeLocationWaiter = codeLocationWaiter;
         this.notificationService = notificationService;
         this.userService = userService;

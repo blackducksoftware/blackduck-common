@@ -19,7 +19,6 @@ import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckQuery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
@@ -32,8 +31,8 @@ public class UserService extends DataService {
     private final UrlSingleResponse<UserView> currentUserResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_USER_PATH);
     private final UrlMultipleResponses<UserView> usersResponse = apiDiscovery.metaMultipleResponses(ApiDiscovery.USERS_PATH);
 
-    public UserService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public UserService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public UserRequest createUserRequest(String username, String password, String firstName, String lastName) {
@@ -58,8 +57,9 @@ public class UserService extends DataService {
 
     public BlackDuckPageResponse<UserView> findUsersByEmail(String emailSearchTerm, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
         BlackDuckQuery emailQuery = new BlackDuckQuery("email", emailSearchTerm);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                              .createCommonGet(emailQuery)
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(emailQuery)
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
 
         BlackDuckRequest<UserView, UrlMultipleResponses<UserView>> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);
@@ -68,7 +68,9 @@ public class UserService extends DataService {
 
     public Optional<UserView> findUserByUsername(String username) throws IntegrationException {
         BlackDuckQuery usernameQuery = new BlackDuckQuery("userName", username);
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createCommonGet(usernameQuery);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckQuery(usernameQuery);
 
         BlackDuckMultipleRequest<UserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);
         List<UserView> foundUsers = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
@@ -80,8 +82,8 @@ public class UserService extends DataService {
     }
 
     public BlackDuckPageResponse<UserView> getPageOfUsers(BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory
-                                                              .createCommonGet()
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
                                                               .setBlackDuckPageDefinition(blackDuckPageDefinition);
 
         BlackDuckMultipleRequest<UserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(usersResponse);

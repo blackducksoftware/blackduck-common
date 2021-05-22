@@ -18,7 +18,6 @@ import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
@@ -29,11 +28,11 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 
 public class ProjectService extends DataService {
-    private UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
+    private final UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
     private final ProjectGetService projectGetService;
 
-    public ProjectService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory, IntLogger logger, ProjectGetService projectGetService) {
-        super(blackDuckApiClient, apiDiscovery, blackDuckRequestBuilderFactory, logger);
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, ProjectGetService projectGetService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.projectGetService = projectGetService;
     }
 

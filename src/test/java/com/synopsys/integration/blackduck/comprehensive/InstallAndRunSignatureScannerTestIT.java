@@ -32,7 +32,6 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
@@ -112,7 +111,8 @@ public class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType, installDirectory);
+        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType,
+            installDirectory);
         ScanBatchRunner scanBatchRunnerWith = ScanBatchRunner.createComplete(environmentVariables, scanPathsUtility, scanCommandRunner, installerWithKeyStoreManagement);
         SignatureScannerService signatureScannerServiceWith = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWith);
 
@@ -121,10 +121,8 @@ public class InstallAndRunSignatureScannerTestIT {
         // finally, verify the code location exists and then delete it to clean up
         CodeLocationService codeLocationService = blackDuckServicesFactory.createCodeLocationService();
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
-        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, 120, System.currentTimeMillis(), 10);
-        WaitJob<Boolean> waitJob = WaitJob.createSimpleWait(waitJobConfig, "codeLocationTest", () -> {
-            return codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME).isPresent();
-        });
+        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "codeLocationTest", 120, System.currentTimeMillis(), 10);
+        WaitJob<Boolean> waitJob = WaitJob.createSimpleWait(waitJobConfig, () -> codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME).isPresent());
         waitJob.waitFor();
 
         Optional<CodeLocationView> codeLocationViewOptional = codeLocationService.getCodeLocationByName(CODE_LOCATION_NAME);

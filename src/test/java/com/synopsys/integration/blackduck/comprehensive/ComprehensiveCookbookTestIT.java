@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
@@ -48,22 +46,17 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilderFactory;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
-import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
@@ -71,7 +64,6 @@ import com.synopsys.integration.util.NameVersion;
 public class ComprehensiveCookbookTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(new SilentIntLogger());
-    private final BlackDuckRequestBuilderFactory blackDuckRequestBuilderFactory = blackDuckServicesFactory.getBlackDuckRequestBuilderFactory();
     private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer = blackDuckServicesFactory.getBlackDuckResponsesTransformer();
 
@@ -286,7 +278,7 @@ public class ComprehensiveCookbookTestIT {
     }
 
     private <T extends BlackDuckResponse> void assertGettingAll(UrlMultipleResponses<T> urlResponses, String labelForOutput) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = blackDuckRequestBuilderFactory.createBlackDuckRequestBuilder();
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder();
         BlackDuckMultipleRequest<T> blackDuckRequest = blackDuckRequestBuilder.buildBlackDuckRequest(urlResponses);
 
         BlackDuckPageResponse<T> pageResponse = blackDuckResponsesTransformer.getAllResponses(blackDuckRequest);
