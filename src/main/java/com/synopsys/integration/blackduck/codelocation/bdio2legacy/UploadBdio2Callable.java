@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -15,8 +14,9 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
@@ -39,15 +39,15 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     public UploadOutput call() {
         try {
             HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
-            Request request = new BlackDuckRequestBuilder()
-                                  .postFile(uploadTarget.getUploadFile())
-                                  .acceptMimeType(uploadTarget.getMediaType())
-                                  .url(url)
-                                  .build();
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postFile(uploadTarget.getUploadFile())
+                                                   .acceptMimeType(uploadTarget.getMediaType())
+                                                   .buildBlackDuckResponseRequest(url);
+
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
-            } catch (IOException e) {
+            } catch (IntegrationException e) {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
             }
         } catch (Exception e) {

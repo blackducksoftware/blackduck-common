@@ -25,10 +25,10 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransforme
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 @ExtendWith(TimingExtension.class)
@@ -79,7 +79,7 @@ public class BlackDuckApiClientTest {
         Response mockedResponse = Mockito.mock(Response.class);
         Mockito.when(mockedResponse.getContentString()).thenReturn(responseContentString);
 
-        Mockito.when(blackDuckHttpClient.execute(Mockito.any(Request.class))).thenReturn(mockedResponse);
+        Mockito.when(blackDuckHttpClient.execute(Mockito.any(BlackDuckRequest.class))).thenReturn(mockedResponse);
 
         BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer);
 

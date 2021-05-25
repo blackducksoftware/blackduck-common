@@ -18,9 +18,9 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
@@ -51,10 +51,9 @@ public class BinaryScanCallable implements Callable<BinaryScanOutput> {
             binaryParts.put("fileupload", binaryScan.getBinaryFile());
 
             UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaUploadsLink();
-            Request request = new BlackDuckRequestBuilder()
-                                  .postMultipart(binaryParts, textParts)
-                                  .url(stringResponse.getUrl())
-                                  .build();
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postMultipart(binaryParts, textParts)
+                                                   .buildBlackDuckResponseRequest(stringResponse.getUrl());
             try (Response response = blackDuckApiClient.execute(request)) {
                 return BinaryScanOutput.FROM_RESPONSE(projectAndVersion, codeLocationName, response);
             }

@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -30,9 +29,8 @@ public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final String apiToken;
 
     public ApiTokenBlackDuckHttpClient(
-        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, String apiToken,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, String apiToken) {
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport);
         this.apiToken = apiToken;
 
         if (StringUtils.isBlank(apiToken)) {

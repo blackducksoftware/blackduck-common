@@ -11,12 +11,11 @@ import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class RapidScanWaiterTest {
@@ -30,7 +29,7 @@ public class RapidScanWaiterTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
 
-        Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(expectedResults);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
 
@@ -50,7 +49,7 @@ public class RapidScanWaiterTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
 
-        Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
 
@@ -72,7 +71,7 @@ public class RapidScanWaiterTest {
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
 
-        Mockito.when(blackDuckApiClient.execute(Mockito.any(Request.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
 

@@ -16,7 +16,6 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponseTransformer {
@@ -29,8 +28,7 @@ public class BlackDuckResponseTransformer {
     }
 
     public <T extends BlackDuckResponse> T getResponse(BlackDuckRequest<T, UrlSingleResponse<T>> requestSingle) throws IntegrationException {
-        Request request = requestSingle.getRequest();
-        try (Response response = blackDuckHttpClient.execute(request)) {
+        try (Response response = blackDuckHttpClient.execute(requestSingle)) {
             blackDuckHttpClient.throwExceptionForError(response);
             return blackDuckJsonTransformer.getResponse(response, requestSingle.getResponseClass());
         } catch (IOException e) {

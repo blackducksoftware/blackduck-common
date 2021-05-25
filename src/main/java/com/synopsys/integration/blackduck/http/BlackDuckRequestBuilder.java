@@ -16,10 +16,14 @@ import java.util.Set;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckResponseResponse;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckStringRequest;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
@@ -73,8 +77,12 @@ public class BlackDuckRequestBuilder {
         return new BlackDuckSingleRequest<>(this, urlSingleResponse);
     }
 
-    public Request.Builder getRequestBuilder() {
-        return requestBuilder;
+    public BlackDuckStringRequest buildBlackDuckStringRequest(HttpUrl url) {
+        return new BlackDuckStringRequest(this, new UrlSingleResponse<>(url, BlackDuckStringResponse.class));
+    }
+
+    public BlackDuckResponseRequest buildBlackDuckResponseRequest(HttpUrl url) {
+        return new BlackDuckResponseRequest(this, new UrlSingleResponse<>(url, BlackDuckResponseResponse.class));
     }
 
     public BlackDuckRequestBuilder url(HttpUrl url) {

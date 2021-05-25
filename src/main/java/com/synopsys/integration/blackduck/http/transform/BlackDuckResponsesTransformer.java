@@ -26,7 +26,6 @@ import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
@@ -51,7 +50,7 @@ public class BlackDuckResponsesTransformer {
     }
 
     public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple) throws IntegrationException {
-        return getInternalMatchingResponse(requestMultiple, getLimit(requestMultiple.getRequest()), alwaysTrue());
+        return getInternalMatchingResponse(requestMultiple, getLimit(requestMultiple), alwaysTrue());
     }
 
     private <T extends BlackDuckResponse> Predicate<T> alwaysTrue() {
@@ -61,11 +60,10 @@ public class BlackDuckResponsesTransformer {
     private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
-        Request request = requestMultiple.getRequest();
 
-        int limit = getLimit(request);
-        int offset = getOffset(request);
-        try (Response initialResponse = blackDuckHttpClient.execute(request)) {
+        int limit = getLimit(requestMultiple);
+        int offset = getOffset(requestMultiple);
+        try (Response initialResponse = blackDuckHttpClient.execute(requestMultiple)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
             String initialJsonResponse = initialResponse.getContentString();
             BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, requestMultiple.getResponseClass());
@@ -78,8 +76,7 @@ public class BlackDuckResponsesTransformer {
             while (allResponses.size() < totalItemsToRetrieve && offset < totalCount) {
                 offset = offset + limit;
                 requestMultiple = nextPage(requestMultiple, offset);
-                request = requestMultiple.getRequest();
-                try (Response response = blackDuckHttpClient.execute(request)) {
+                try (Response response = blackDuckHttpClient.execute(requestMultiple)) {
                     blackDuckHttpClient.throwExceptionForError(response);
                     String jsonResponse = response.getContentString();
                     blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, requestMultiple.getResponseClass());
@@ -116,12 +113,12 @@ public class BlackDuckResponsesTransformer {
                    .collect(Collectors.toList());
     }
 
-    public int getLimit(Request request) {
-        return retrieveValue(request.getQueryParameters()::get, BlackDuckRequestBuilder.LIMIT_PARAMETER, BlackDuckRequestBuilder.DEFAULT_LIMIT);
+    public int getLimit(BlackDuckRequest<?, ?> blackDuckRequest) {
+        return retrieveValue(blackDuckRequest.getRequest().getQueryParameters()::get, BlackDuckRequestBuilder.LIMIT_PARAMETER, BlackDuckRequestBuilder.DEFAULT_LIMIT);
     }
 
-    public int getOffset(Request request) {
-        return retrieveValue(request.getQueryParameters()::get, BlackDuckRequestBuilder.OFFSET_PARAMETER, BlackDuckRequestBuilder.DEFAULT_OFFSET);
+    public int getOffset(BlackDuckRequest<?, ?> blackDuckRequest) {
+        return retrieveValue(blackDuckRequest.getRequest().getQueryParameters()::get, BlackDuckRequestBuilder.OFFSET_PARAMETER, BlackDuckRequestBuilder.DEFAULT_OFFSET);
     }
 
     private int retrieveValue(Function<String, Set<String>> valueCollection, String key, int defaultValue) {

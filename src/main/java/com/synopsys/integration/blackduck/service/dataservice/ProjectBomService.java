@@ -28,10 +28,10 @@ import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.synopsys.integration.blackduck.service.model.VersionBomComponentModel;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class ProjectBomService extends DataService {
@@ -122,10 +122,9 @@ public class ProjectBomService extends DataService {
     }
 
     public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
-        Request request = new BlackDuckRequestBuilder()
-                              .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}")
-                              .url(projectVersionComponentsUrl)
-                              .build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                               .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}")
+                                               .buildBlackDuckResponseRequest(projectVersionComponentsUrl);
         try (Response response = blackDuckApiClient.execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

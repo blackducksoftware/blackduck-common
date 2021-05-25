@@ -16,4 +16,9 @@ public class BlackDuckSingleRequest<T extends BlackDuckResponse> extends BlackDu
         super(blackDuckRequestBuilder, urlResponse);
     }
 
+    public BlackDuckSingleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlSingleResponse<T> urlResponse, PagingDefaultsEditor pagingDefaultsEditor,
+        AcceptHeaderEditor acceptHeaderEditor) {
+        super(blackDuckRequestBuilder, urlResponse, pagingDefaultsEditor, acceptHeaderEditor);
+    }
+
 }

@@ -17,7 +17,6 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.http.BlackDuckPageDefinition;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -25,10 +24,10 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransforme
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckApiClient {
@@ -80,6 +79,10 @@ public class BlackDuckApiClient {
         return blackDuckResponsesTransformer.getOnePageOfResponses(requestMultiple);
     }
 
+    public <T extends BlackDuckResponse> T getResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
+        return getResponse(new UrlSingleResponse<>(url, responseClass));
+    }
+
     public <T extends BlackDuckResponse> T getResponse(UrlSingleResponse<T> urlSingleResponse) throws IntegrationException {
         BlackDuckRequest<T, UrlSingleResponse<T>> requestSingle = new BlackDuckRequest<>(new BlackDuckRequestBuilder().commonGet(), urlSingleResponse);
         return getResponse(requestSingle);
@@ -90,44 +93,12 @@ public class BlackDuckApiClient {
     }
 
     // ------------------------------------------------
-    // getting responses from a BlackDuckRequestBuilder
-    // ------------------------------------------------
-    public <T extends BlackDuckResponse> List<T> getAllResponses(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, url, responseClass);
-        return blackDuckResponsesTransformer.getAllResponses(requestMultiple).getItems();
-    }
-
-    public <T extends BlackDuckResponse> List<T> getSomeResponses(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass, int totalLimit) throws IntegrationException {
-        BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, url, responseClass);
-        return blackDuckResponsesTransformer.getSomeResponses(requestMultiple, totalLimit).getItems();
-    }
-
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass, BlackDuckPageDefinition blackDuckPageDefinition)
-        throws IntegrationException {
-        blackDuckRequestBuilder.setBlackDuckPageDefinition(blackDuckPageDefinition);
-        BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, url, responseClass);
-        return blackDuckResponsesTransformer.getOnePageOfResponses(requestMultiple);
-    }
-
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getPageResponse(BlackDuckRequestBuilder blackDuckRequestBuilder, HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple = BlackDuckRequest.createMultipleRequest(blackDuckRequestBuilder, url, responseClass);
-        return blackDuckResponsesTransformer.getOnePageOfResponses(requestMultiple);
-    }
-
-    public <T extends BlackDuckResponse> T getResponse(HttpUrl url, Class<T> responseClass) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
-        BlackDuckRequest<T, UrlSingleResponse<T>> requestSingle = BlackDuckRequest.createSingleRequest(blackDuckRequestBuilder, url, responseClass);
-        return blackDuckResponseTransformer.getResponse(requestSingle);
-    }
-
-    // ------------------------------------------------
     // handling generic post
     // ------------------------------------------------
     public HttpUrl post(HttpUrl url, BlackDuckComponent blackDuckComponent) throws IntegrationException {
-        Request request = new BlackDuckRequestBuilder()
-                              .postObject(blackDuckComponent)
-                              .url(url)
-                              .build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                               .postObject(blackDuckComponent)
+                                               .buildBlackDuckResponseRequest(url);
         return executePostRequestAndRetrieveURL(request);
     }
 
@@ -140,7 +111,9 @@ public class BlackDuckApiClient {
     }
 
     public void delete(HttpUrl url) throws IntegrationException {
-        Request request = new Request.Builder(url, HttpMethod.DELETE).build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                               .method(HttpMethod.DELETE)
+                                               .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -154,10 +127,9 @@ public class BlackDuckApiClient {
         HttpUrl url = blackDuckView.getHref();
         // add the 'missing' pieces back from view that could have been lost
         String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
-        Request request = new BlackDuckRequestBuilder()
-                              .putString(json)
-                              .url(url)
-                              .build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                               .putString(json)
+                                               .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
@@ -168,15 +140,14 @@ public class BlackDuckApiClient {
     // handling generic get
     // ------------------------------------------------
     public Response get(HttpUrl url) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = createCommonGetRequestBuilder(url);
-        Request request = blackDuckRequestBuilder.build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder().buildBlackDuckResponseRequest(url);
         return execute(request);
     }
 
     // ------------------------------------------------
     // handling plain requests
     // ------------------------------------------------
-    public Response execute(Request request) throws IntegrationException {
+    public Response execute(BlackDuckResponseRequest request) throws IntegrationException {
         Response response = blackDuckHttpClient.execute(request);
         blackDuckHttpClient.throwExceptionForError(response);
         return response;
@@ -185,7 +156,7 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     // posting and getting location header
     // ------------------------------------------------
-    public HttpUrl executePostRequestAndRetrieveURL(Request request) throws IntegrationException {
+    public HttpUrl executePostRequestAndRetrieveURL(BlackDuckResponseRequest request) throws IntegrationException {
         try (Response response = execute(request)) {
             return new HttpUrl(response.getHeaderValue("location"));
         } catch (IOException e) {

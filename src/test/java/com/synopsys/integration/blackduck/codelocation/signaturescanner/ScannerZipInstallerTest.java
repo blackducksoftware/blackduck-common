@@ -69,7 +69,8 @@ public class ScannerZipInstallerTest {
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType, downloadTarget);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType,
+            downloadTarget);
         scannerZipInstaller.installOrUpdateScanner();
 
         ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
@@ -91,8 +92,8 @@ public class ScannerZipInstallerTest {
         Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
 
-        BlackDuckHttpClient mockBlackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
-        Mockito.when(mockBlackDuckHttpClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+        SignatureScannerClient mockScannerClient = Mockito.mock(SignatureScannerClient.class);
+        Mockito.when(mockScannerClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
 
         IntLogger logger = new BufferedIntLogger();
         Path tempDirectory = Files.createTempDirectory(null);

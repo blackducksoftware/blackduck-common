@@ -16,4 +16,9 @@ public class BlackDuckMultipleRequest<T extends BlackDuckResponse> extends Black
         super(blackDuckRequestBuilder, urlResponse);
     }
 
+    public BlackDuckMultipleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlMultipleResponses<T> urlResponse, PagingDefaultsEditor pagingDefaultsEditor,
+        AcceptHeaderEditor acceptHeaderEditor) {
+        super(blackDuckRequestBuilder, urlResponse, pagingDefaultsEditor, acceptHeaderEditor);
+    }
+
 }

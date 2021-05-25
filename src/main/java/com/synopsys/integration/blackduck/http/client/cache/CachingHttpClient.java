@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.http.client.cache;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.apache.commons.collections4.map.LRUMap;
@@ -15,7 +14,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
@@ -39,20 +41,16 @@ public class CachingHttpClient implements BlackDuckHttpClient {
     }
 
     @Override
-    public Response execute(Request request) throws IntegrationException {
+    public <T extends BlackDuckResponse, U extends UrlResponse<T>> Response execute(BlackDuckRequest<T, U> blackDuckRequest) throws IntegrationException {
+        Request request = blackDuckRequest.getRequest();
         if (HttpMethod.GET == request.getMethod() && cache.containsKey(request)) {
             return cache.get(request);
         }
-        Response response = blackDuckHttpClient.execute(request);
+        Response response = blackDuckHttpClient.execute(blackDuckRequest);
 
         // the usage of the response will determine whether or not it is cached, because we can only cache responses IFF they are retrieved by string content
         CacheableResponse cacheableResponse = new CacheableResponse(request, response, cache);
         return cacheableResponse;
-    }
-
-    @Override
-    public Optional<Response> executeGetRequestIfModifiedSince(Request getRequest, long timeToCheck) throws IntegrationException, IOException {
-        return blackDuckHttpClient.executeGetRequestIfModifiedSince(getRequest, timeToCheck);
     }
 
     @Override

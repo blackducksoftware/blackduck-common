@@ -11,6 +11,7 @@ import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
@@ -22,7 +23,8 @@ import com.synopsys.integration.rest.request.Request;
  * handle the response.
  */
 public class BlackDuckRequest<T extends BlackDuckResponse, U extends UrlResponse<T>> {
-    private static final PagingDefaultsEditor pagingDefaultsEditor = new PagingDefaultsEditor();
+    private static final PagingDefaultsEditor DEFAULT_PAGING_DEFAULTS_EDITOR = new PagingDefaultsEditor();
+    private static final AcceptHeaderEditor DEFAULT_ACCEPT_HEADER_EDITOR = new AcceptHeaderEditor(new BlackDuckMediaTypeDiscovery());
 
     private final BlackDuckRequestBuilder blackDuckRequestBuilder;
     private final U urlResponse;
@@ -36,12 +38,17 @@ public class BlackDuckRequest<T extends BlackDuckResponse, U extends UrlResponse
     }
 
     public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, U urlResponse) {
-        if (HttpMethod.GET == blackDuckRequestBuilder.getMethod()) {
-            blackDuckRequestBuilder.apply(pagingDefaultsEditor);
-        }
+        this(blackDuckRequestBuilder, urlResponse, DEFAULT_PAGING_DEFAULTS_EDITOR, DEFAULT_ACCEPT_HEADER_EDITOR);
+    }
 
+    public BlackDuckRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, U urlResponse, PagingDefaultsEditor pagingDefaultsEditor, AcceptHeaderEditor acceptHeaderEditor) {
         this.blackDuckRequestBuilder = blackDuckRequestBuilder.url(urlResponse.getUrl());
         this.urlResponse = urlResponse;
+
+        if (HttpMethod.GET == blackDuckRequestBuilder.getMethod()) {
+            blackDuckRequestBuilder.apply(pagingDefaultsEditor);
+            blackDuckRequestBuilder.apply(acceptHeaderEditor);
+        }
     }
 
     public Request getRequest() {

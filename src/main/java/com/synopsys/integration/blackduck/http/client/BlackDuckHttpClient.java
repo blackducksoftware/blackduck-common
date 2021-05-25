@@ -7,25 +7,24 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.ErrorResponse;
 import com.synopsys.integration.rest.response.Response;
 
 public interface BlackDuckHttpClient {
-    Response execute(Request request) throws IntegrationException;
-
-    Optional<Response> executeGetRequestIfModifiedSince(Request getRequest, long timeToCheck) throws IntegrationException, IOException;
+    <T extends BlackDuckResponse, U extends UrlResponse<T>> Response execute(BlackDuckRequest<T, U> blackDuckRequest) throws IntegrationException;
 
     Response attemptAuthentication() throws IntegrationException;
 

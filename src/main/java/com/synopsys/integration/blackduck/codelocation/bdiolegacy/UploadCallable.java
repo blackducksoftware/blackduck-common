@@ -20,7 +20,7 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
@@ -51,11 +51,10 @@ public class UploadCallable implements Callable<UploadOutput> {
             }
 
             UrlSingleResponse<BlackDuckStringResponse> stringResponse = new UrlSingleResponse<>(apiDiscovery.metaBomImportLink().getUrl(), BlackDuckStringResponse.class);
-            Request request = new BlackDuckRequestBuilder()
-                                  .postString(jsonPayload)
-                                  .acceptMimeType(uploadTarget.getMediaType())
-                                  .url(stringResponse.getUrl())
-                                  .build();
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postString(jsonPayload)
+                                                   .acceptMimeType(uploadTarget.getMediaType())
+                                                   .buildBlackDuckResponseRequest(stringResponse.getUrl());
 
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();

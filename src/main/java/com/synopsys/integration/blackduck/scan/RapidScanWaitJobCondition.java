@@ -13,17 +13,18 @@ import org.apache.http.HttpStatus;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.WaitJobCondition;
 
 public class RapidScanWaitJobCondition implements WaitJobCondition {
-    private HttpUrl resultUrl;
-    private BlackDuckApiClient blackDuckApiClient;
+    private final HttpUrl resultUrl;
+    private final BlackDuckApiClient blackDuckApiClient;
 
     public RapidScanWaitJobCondition(BlackDuckApiClient blackDuckApiClient, HttpUrl resultUrl) {
         this.blackDuckApiClient = blackDuckApiClient;
@@ -32,9 +33,9 @@ public class RapidScanWaitJobCondition implements WaitJobCondition {
 
     @Override
     public boolean isComplete() throws IntegrationException {
-        Request.Builder requestBuilder = new Request.Builder(resultUrl);
-        requestBuilder.acceptMimeType(DeveloperScanComponentResultView.CURRENT_MEDIA_TYPE);
-        Request request = requestBuilder.build();
+        BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                               .acceptMimeType(DeveloperScanComponentResultView.CURRENT_MEDIA_TYPE)
+                                               .buildBlackDuckResponseRequest(resultUrl);
         try (Response response = blackDuckApiClient.execute(request)) {
             return response.isStatusCodeSuccess();
         } catch (IntegrationRestException ex) {

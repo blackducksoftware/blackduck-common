@@ -29,7 +29,6 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 @ExtendWith(TimingExtension.class)
@@ -157,12 +156,12 @@ public class BlackDuckResponsesTransformerTest {
             Response response = Mockito.mock(Response.class);
             Mockito.when(response.getContentString()).thenReturn(getText(entry.getValue()));
 
-            ArgumentMatcher<Request> argRequest = createRequestMatcher(new HttpUrl("https://blackduckserver.com/api/projects"), Integer.parseInt(entry.getKey()), limit);
+            ArgumentMatcher<BlackDuckRequest> argRequest = createRequestMatcher(new HttpUrl("https://blackduckserver.com/api/projects"), Integer.parseInt(entry.getKey()), limit);
             Mockito.when(blackDuckHttpClient.execute(Mockito.argThat(argRequest))).thenReturn(response);
         }
 
-        ArgumentMatcher<Request> unknownOffsetRequest = request -> {
-            String requestOffset = request.getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().get();
+        ArgumentMatcher<BlackDuckRequest> unknownOffsetRequest = request -> {
+            String requestOffset = request.getRequest().getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().get();
             return !knownsOffsets.contains(requestOffset);
         };
         Response response = Mockito.mock(Response.class);
@@ -170,12 +169,12 @@ public class BlackDuckResponsesTransformerTest {
         Mockito.when(blackDuckHttpClient.execute(Mockito.argThat(unknownOffsetRequest))).thenReturn(response);
     }
 
-    private ArgumentMatcher<Request> createRequestMatcher(HttpUrl url, int offset, int limit) {
-        return new ArgumentMatcher<Request>() {
+    private ArgumentMatcher<BlackDuckRequest> createRequestMatcher(HttpUrl url, int offset, int limit) {
+        return new ArgumentMatcher<BlackDuckRequest>() {
             @Override
-            public boolean matches(Request request) {
+            public boolean matches(BlackDuckRequest request) {
                 if (null != request && request.getUrl().equals(url)) {
-                    String requestOffset = request.getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().get();
+                    String requestOffset = request.getRequest().getQueryParameters().get(BlackDuckRequestBuilder.OFFSET_PARAMETER).stream().findFirst().get();
                     return requestOffset.equals(Integer.toString(offset));
                 }
                 return false;
