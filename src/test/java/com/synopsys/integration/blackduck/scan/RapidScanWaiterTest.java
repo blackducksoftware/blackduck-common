@@ -9,16 +9,16 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.response.Response;
 
 public class RapidScanWaiterTest {
-
     @Test
     public void testWaitSuccess() throws Exception {
         List<DeveloperScanComponentResultView> expectedResults = new ArrayList<>();
@@ -28,11 +28,11 @@ public class RapidScanWaiterTest {
         HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
-        Mockito.when(blackDuckApiClient.getUrl(Mockito.any())).thenReturn(url);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
-        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(HttpUrl.class), Mockito.eq(DeveloperScanComponentResultView.class))).thenReturn(expectedResults);
+
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(expectedResults);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(true);
-        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(expectedResults);
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
 
         long timeoutInSeconds = 2;
@@ -48,9 +48,11 @@ public class RapidScanWaiterTest {
         HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
+
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
-        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 1;
         int waitInSeconds = 2;
@@ -68,9 +70,11 @@ public class RapidScanWaiterTest {
         HttpUrl url = Mockito.mock(HttpUrl.class);
         BlackDuckApiClient blackDuckApiClient = Mockito.mock(BlackDuckApiClient.class);
         Response response = Mockito.mock(Response.class);
-        Mockito.when(blackDuckApiClient.get(Mockito.any(HttpUrl.class))).thenReturn(response);
+
+        Mockito.when(blackDuckApiClient.execute(Mockito.any(BlackDuckResponseRequest.class))).thenReturn(response);
         Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
-        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(BlackDuckPathMultipleResponses.class))).thenReturn(new ArrayList<>());
+        Mockito.when(blackDuckApiClient.getAllResponses(Mockito.any(UrlMultipleResponses.class))).thenReturn(new ArrayList<>());
+
         RapidScanWaiter waiter = new RapidScanWaiter(logger, blackDuckApiClient);
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
@@ -81,4 +85,5 @@ public class RapidScanWaiterTest {
             // pass
         }
     }
+
 }

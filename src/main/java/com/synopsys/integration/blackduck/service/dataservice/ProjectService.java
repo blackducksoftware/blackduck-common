@@ -11,13 +11,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
@@ -28,19 +28,20 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
 
 public class ProjectService extends DataService {
+    private final UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
     private final ProjectGetService projectGetService;
 
-    public ProjectService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, ProjectGetService projectGetService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, ProjectGetService projectGetService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.projectGetService = projectGetService;
     }
 
     public List<ProjectView> getAllProjects() throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(projectsResponses);
     }
 
     public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
-        HttpUrl projectUrl = blackDuckApiClient.post(ApiDiscovery.PROJECTS_LINK, projectRequest);
+        HttpUrl projectUrl = blackDuckApiClient.post(projectsResponses.getUrl(), projectRequest);
         ProjectView projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
         if (null == projectRequest.getVersionRequest()) {
             return new ProjectVersionWrapper(projectView);
@@ -51,7 +52,7 @@ public class ProjectService extends DataService {
     }
 
     public List<ProjectVersionView> getAllProjectVersions(ProjectView projectView) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(projectView, ProjectView.VERSIONS_LINK_RESPONSE);
+        return blackDuckApiClient.getAllResponses(projectView.metaVersionsLink());
     }
 
     public ProjectVersionView createProjectVersion(ProjectView projectView, ProjectVersionRequest projectVersionRequest) throws IntegrationException {

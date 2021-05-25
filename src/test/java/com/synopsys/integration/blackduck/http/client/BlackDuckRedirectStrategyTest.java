@@ -10,12 +10,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -28,6 +30,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckRedirectStrategyTest {
+    private final Gson gson = new Gson();
+
     @Test
     public void testSimpleRedirect() throws IOException, IntegrationException, InterruptedException {
         // we need two servers - one to redirect to the other
@@ -38,7 +42,7 @@ public class BlackDuckRedirectStrategyTest {
         String redirectingServerUrl = startRedirectingServer(redirectingServer, destinationUrl);
 
         IntLogger testLogger = new BufferedIntLogger();
-        IntHttpClient redirectingClient = new IntHttpClient(testLogger, 120, false, ProxyInfo.NO_PROXY_INFO) {
+        IntHttpClient redirectingClient = new IntHttpClient(testLogger, gson, 120, false, ProxyInfo.NO_PROXY_INFO) {
             @Override
             public void addToHttpClientBuilder(HttpClientBuilder httpClientBuilder, RequestConfig.Builder defaultRequestConfigBuilder) {
                 super.addToHttpClientBuilder(httpClientBuilder, defaultRequestConfigBuilder);
@@ -48,7 +52,7 @@ public class BlackDuckRedirectStrategyTest {
 
         Request requestToRedirectingServer = new Request.Builder(new HttpUrl(redirectingServerUrl))
                                                  .method(HttpMethod.POST)
-                                                 .bodyContent(new StringBodyContent("the initial request payload"))
+                                                 .bodyContent(new StringBodyContent("the initial request payload", BodyContentConverter.DEFAULT))
                                                  .build();
         Response response = redirectingClient.execute(requestToRedirectingServer);
 

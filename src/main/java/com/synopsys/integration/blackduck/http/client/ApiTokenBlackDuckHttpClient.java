@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -27,14 +26,11 @@ import com.synopsys.integration.util.NameVersion;
  * Connection to the Black Duck application which authenticates using the API token feature
  */
 public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
-    private final Gson gson;
     private final String apiToken;
 
     public ApiTokenBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, Gson gson, AuthenticationSupport authenticationSupport, String apiToken,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
-        this.gson = gson;
+        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, String apiToken) {
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport);
         this.apiToken = apiToken;
 
         if (StringUtils.isBlank(apiToken)) {
@@ -47,12 +43,12 @@ public class ApiTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         Map<String, String> headers = new HashMap<>();
         headers.put(AuthenticationSupport.AUTHORIZATION_HEADER, "token " + apiToken);
 
-        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "api/tokens/authenticate", headers);
+        return authenticationSupport.attemptAuthentication(this, getBlackDuckUrl(), "api/tokens/authenticate", headers);
     }
 
     @Override
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
-        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, gson, this, "bearerToken");
+        authenticationSupport.completeTokenAuthenticationRequest(request, response, logger, getGson(), this, "bearerToken");
     }
 
 }

@@ -69,9 +69,9 @@ public class ScanPathsTest {
 
     @Test
     public void testSignatureScannerPathsInstalledByUs() throws Exception {
-        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.searchForScanPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.searchForScanPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.searchForScanPaths(linuxSetup);
 
         assertScanPathsOk(macScanPaths, true);
         assertScanPathsOk(windowsScanPaths, true);
@@ -80,9 +80,9 @@ public class ScanPathsTest {
 
     @Test
     public void testSignatureScannerPathsInstalledByThem() throws Exception {
-        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(new File(macSetup, getScannerPath()));
-        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(new File(windowsSetup, getScannerPath()));
-        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(new File(linuxSetup, getScannerPath()));
+        ScanPaths macScanPaths = macScanPathsUtility.searchForScanPaths(new File(macSetup, getScannerPath()));
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.searchForScanPaths(new File(windowsSetup, getScannerPath()));
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.searchForScanPaths(new File(linuxSetup, getScannerPath()));
 
         assertScanPathsOk(macScanPaths, false);
         assertScanPathsOk(windowsScanPaths, false);
@@ -104,9 +104,9 @@ public class ScanPathsTest {
     public void testJavaExecutablePathWithPackagedJre() throws Exception {
         intEnvironmentVariables.put(BDS_JAVA_HOME, null);
 
-        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.searchForScanPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.searchForScanPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.searchForScanPaths(linuxSetup);
 
         assertThat(macScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "mac_setup" + File.separator + getScannerPath()));
         assertThat(windowsScanPaths.getPathToJavaExecutable(), startsWith(tempDirectory + File.separator + "windows_setup" + File.separator + getScannerPath()));
@@ -117,9 +117,9 @@ public class ScanPathsTest {
     public void testJavaExecutablePathWithBdsJavaHome() throws Exception {
         intEnvironmentVariables.put(BDS_JAVA_HOME, bdsJavaHomeDirectory.getAbsolutePath());
 
-        ScanPaths macScanPaths = macScanPathsUtility.determineSignatureScannerPaths(macSetup);
-        ScanPaths windowsScanPaths = windowsScanPathsUtility.determineSignatureScannerPaths(windowsSetup);
-        ScanPaths linuxScanPaths = linuxScanPathsUtility.determineSignatureScannerPaths(linuxSetup);
+        ScanPaths macScanPaths = macScanPathsUtility.searchForScanPaths(macSetup);
+        ScanPaths windowsScanPaths = windowsScanPathsUtility.searchForScanPaths(windowsSetup);
+        ScanPaths linuxScanPaths = linuxScanPathsUtility.searchForScanPaths(linuxSetup);
 
         assertThat(macScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java"));
         assertThat(windowsScanPaths.getPathToJavaExecutable(), is(bdsJavaHomeDirectory + File.separator + "bin" + File.separator + "java.exe"));

@@ -18,6 +18,7 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.WaitJobConfig;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;
@@ -34,34 +35,19 @@ public class CodeLocationWaiter {
 
     public CodeLocationWaitResult checkCodeLocationsAddedToBom(UserView userView, NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount,
         long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        CodeLocationWaitJobTask codeLocationWaitJobTask = new CodeLocationWaitJobTask(logger, blackDuckApiClient, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
-            expectedNotificationCount);
         logger.debug("Expected notification count " + expectedNotificationCount);
         logger.debug("Expected code locations:");
         codeLocationNames.forEach(codeLocation -> logger.debug(String.format("  Code Location -> %s", codeLocation)));
         logger.debug("");
 
-        // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
-        // regardless of the timeout provided, we always want to check at least once
-        boolean allCompleted = codeLocationWaitJobTask.isComplete();
+        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "code location", timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds);
+        CodeLocationWaitJobCondition waitJobCondition = new CodeLocationWaitJobCondition(logger, blackDuckApiClient, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
+            expectedNotificationCount);
+        CodeLocationWaitJobCompleter waitJobCompleter = new CodeLocationWaitJobCompleter(logger, waitJobCondition, waitJobConfig);
 
-        // waitInterval needs to be less than the timeout
-        if (waitIntervalInSeconds > timeoutInSeconds) {
-            waitIntervalInSeconds = (int) timeoutInSeconds;
-        }
+        WaitJob<CodeLocationWaitResult> waitJob = new WaitJob<>(waitJobConfig, waitJobCondition, waitJobCompleter);
 
-        if (!allCompleted) {
-            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds, codeLocationWaitJobTask);
-            allCompleted = waitJob.waitFor();
-        }
-
-        if (!allCompleted) {
-            return CodeLocationWaitResult
-                       .PARTIAL(codeLocationWaitJobTask.getFoundCodeLocationNames(), String.format("It was not possible to verify the code locations were added to the BOM within the timeout (%ds) provided.", timeoutInSeconds));
-        } else {
-            logger.info("All code locations have been added to the BOM.");
-            return CodeLocationWaitResult.COMPLETE(codeLocationWaitJobTask.getFoundCodeLocationNames());
-        }
+        return waitJob.waitFor();
     }
 
 }

@@ -13,12 +13,13 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -29,11 +30,13 @@ public class CodeLocationCreationService extends DataService {
 
     private final CodeLocationWaiter codeLocationWaiter;
     private final NotificationService notificationService;
+    private final UserService userService;
 
-    public CodeLocationCreationService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public CodeLocationCreationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, CodeLocationWaiter codeLocationWaiter, NotificationService notificationService, UserService userService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.codeLocationWaiter = codeLocationWaiter;
         this.notificationService = notificationService;
+        this.userService = userService;
     }
 
     public <T extends CodeLocationBatchOutput> CodeLocationCreationData<T> createCodeLocations(CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
@@ -65,7 +68,7 @@ public class CodeLocationCreationService extends DataService {
 
     public CodeLocationWaitResult waitForCodeLocations(NotificationTaskRange notificationTaskRange, NameVersion projectAndVersion, Set<String> codeLocationNames,
         int expectedNotificationCount, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = userService.findCurrentUser();
         return codeLocationWaiter.checkCodeLocationsAddedToBom(currentUser, notificationTaskRange, projectAndVersion, codeLocationNames, expectedNotificationCount, timeoutInSeconds, waitIntervalInSeconds);
     }
 
@@ -74,7 +77,8 @@ public class CodeLocationCreationService extends DataService {
         LocalDateTime localStartTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(startTime), ZoneOffset.UTC);
         LocalDateTime threeDaysLater = localStartTime.plusDays(3);
 
-        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UrlSingleResponse<UserView> userResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_USER_PATH);
+        UserView currentUser = blackDuckApiClient.getResponse(userResponse);
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
         Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 

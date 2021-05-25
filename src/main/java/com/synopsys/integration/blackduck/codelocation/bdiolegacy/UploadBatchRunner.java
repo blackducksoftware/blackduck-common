@@ -13,24 +13,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.log.IntLogger;
 
 public class UploadBatchRunner {
     private final IntLogger logger;
     private final BlackDuckApiClient blackDuckApiClient;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final ApiDiscovery apiDiscovery;
     private final ExecutorService executorService;
 
-    public UploadBatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, ExecutorService executorService) {
+    public UploadBatchRunner(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, ExecutorService executorService) {
         this.logger = logger;
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.apiDiscovery = apiDiscovery;
         this.executorService = executorService;
     }
 
@@ -65,7 +65,7 @@ public class UploadBatchRunner {
     private List<UploadCallable> createCallables(UploadBatch uploadBatch) {
         List<UploadCallable> callables = uploadBatch.getUploadTargets()
                                              .stream()
-                                             .map(uploadTarget -> new UploadCallable(blackDuckApiClient, blackDuckRequestFactory, uploadTarget))
+                                             .map(uploadTarget -> new UploadCallable(blackDuckApiClient, apiDiscovery, uploadTarget))
                                              .collect(Collectors.toList());
 
         return callables;

@@ -7,28 +7,32 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
+import org.apache.http.entity.ContentType;
+
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final ApiDiscovery apiDiscovery;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, UploadTarget uploadTarget) {
+    public UploadBdio2Callable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, UploadTarget uploadTarget) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.apiDiscovery = apiDiscovery;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -37,14 +41,15 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     @Override
     public UploadOutput call() {
         try {
-            HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.SCAN_DATA_PATH);
-            Request request = blackDuckRequestFactory
-                                  .createCommonPostRequestBuilder(url, uploadTarget.getUploadFile())
-                                  .acceptMimeType(uploadTarget.getMediaType()).build();
+            HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postFile(uploadTarget.getUploadFile(), ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
+                                                   .buildBlackDuckResponseRequest(url);
+
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
-            } catch (IOException e) {
+            } catch (IntegrationException e) {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
             }
         } catch (Exception e) {

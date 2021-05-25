@@ -28,7 +28,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;
     public static final int MINIMUM_MEMORY_IN_MEGABYTES = 256;
 
-    private File installDirectory;
     private File outputDirectory;
     private boolean cleanupOutput;
 
@@ -60,7 +59,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     @Override
     protected ScanBatch buildWithoutValidation() {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
-        return new ScanBatch(installDirectory, outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
+        return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
             projectName, projectVersionName, scanTargets);
     }
@@ -150,15 +149,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public ScanBatchBuilder projectAndVersionNames(String projectName, String projectVersionName) {
         this.projectName = projectName;
         this.projectVersionName = projectVersionName;
-        return this;
-    }
-
-    public File getInstallDirectory() {
-        return installDirectory;
-    }
-
-    public ScanBatchBuilder installDirectory(File installDirectory) {
-        this.installDirectory = installDirectory;
         return this;
     }
 

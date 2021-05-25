@@ -18,19 +18,29 @@ import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
+import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 
 public class VerifyNotifications {
     public static void verify(UserView currentUser, NotificationService notificationService, Date userStartDate, Date systemStartDate) throws IntegrationException {
         Date endDate = Date.from(new Date().toInstant().plus(7, ChronoUnit.DAYS));
 
-        List<NotificationView> allNotifications = notificationService.getAllNotifications(systemStartDate, endDate);
-        List<NotificationUserView> allUserNotifications = notificationService.getAllUserNotifications(currentUser, userStartDate, endDate);
-        List<NotificationView> filteredNotifications = notificationService.getFilteredNotifications(systemStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
-        List<NotificationUserView> filteredUserNotifications = notificationService.getFilteredUserNotifications(currentUser, userStartDate, endDate, Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name()));
+        NotificationEditor systemDateEditor = new NotificationEditor(systemStartDate, endDate);
+        NotificationEditor userDateEditor = new NotificationEditor(userStartDate, endDate);
+
+        List<String> bomComputedFilter = Arrays.asList(NotificationType.VERSION_BOM_CODE_LOCATION_BOM_COMPUTED.name());
+        NotificationEditor systemDateFilteredEditor = new NotificationEditor(systemStartDate, endDate, bomComputedFilter);
+        NotificationEditor userDateFilteredEditor = new NotificationEditor(userStartDate, endDate, bomComputedFilter);
+
+        List<NotificationView> allNotifications = notificationService.getAllNotifications(systemDateEditor);
+        List<NotificationUserView> allUserNotifications = notificationService.getAllUserNotifications(currentUser, userDateEditor);
+
+        List<NotificationView> filteredNotifications = notificationService.getAllNotifications(systemDateFilteredEditor);
+        List<NotificationUserView> filteredUserNotifications = notificationService.getAllUserNotifications(currentUser, userDateFilteredEditor);
 
         assertFalse(allNotifications.isEmpty());
         assertFalse(allUserNotifications.isEmpty());
+
         assertFalse(filteredNotifications.isEmpty());
         assertFalse(filteredUserNotifications.isEmpty());
 

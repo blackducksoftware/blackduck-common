@@ -10,18 +10,22 @@ package com.synopsys.integration.blackduck.http.transform;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
-import com.synopsys.integration.blackduck.http.PagedRequest;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
@@ -33,49 +37,49 @@ public class BlackDuckResponsesTransformer {
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeMatchingResponses(PagedRequest pagedRequest, Class<T> clazz, Predicate<T> predicate, int totalLimit) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, totalLimit, predicate);
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeMatchingResponses(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple, Predicate<T> predicate, int totalLimit) throws IntegrationException {
+        return getInternalMatchingResponse(requestMultiple, totalLimit, predicate);
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, Integer.MAX_VALUE, alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getAllResponses(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple) throws IntegrationException {
+        return getInternalMatchingResponse(requestMultiple, Integer.MAX_VALUE, alwaysTrue());
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeResponses(PagedRequest pagedRequest, Class<T> clazz, int totalLimit) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, totalLimit, alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getSomeResponses(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple, int totalLimit) throws IntegrationException {
+        return getInternalMatchingResponse(requestMultiple, totalLimit, alwaysTrue());
     }
 
-    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(PagedRequest pagedRequest, Class<T> clazz) throws IntegrationException {
-        return getInternalMatchingResponse(pagedRequest, clazz, pagedRequest.getLimit(), alwaysTrue());
+    public <T extends BlackDuckResponse> BlackDuckPageResponse<T> getOnePageOfResponses(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple) throws IntegrationException {
+        return getInternalMatchingResponse(requestMultiple, getLimit(requestMultiple), alwaysTrue());
     }
 
     private <T extends BlackDuckResponse> Predicate<T> alwaysTrue() {
         return (blackDuckResponse) -> true;
     }
 
-    private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(PagedRequest pagedRequest, Class<T> clazz, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
+    private <T extends BlackDuckResponse> BlackDuckPageResponse<T> getInternalMatchingResponse(BlackDuckRequest<T, UrlMultipleResponses<T>> requestMultiple, int maxToReturn, Predicate<T> predicate) throws IntegrationException {
         List<T> allResponses = new LinkedList<>();
         int totalCount = 0;
-        int currentOffset = pagedRequest.getOffset();
-        Request request = pagedRequest.createRequest();
-        try (Response initialResponse = blackDuckHttpClient.execute(request)) {
+
+        int limit = getLimit(requestMultiple);
+        int offset = getOffset(requestMultiple);
+        try (Response initialResponse = blackDuckHttpClient.execute(requestMultiple)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
             String initialJsonResponse = initialResponse.getContentString();
-            BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, clazz);
+            BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, requestMultiple.getResponseClass());
 
             allResponses.addAll(this.matchPredicate(blackDuckPageResponse, predicate));
 
             totalCount = blackDuckPageResponse.getTotalCount();
             int totalItemsToRetrieve = Math.min(totalCount, maxToReturn);
 
-            while (allResponses.size() < totalItemsToRetrieve && currentOffset < totalCount) {
-                currentOffset += pagedRequest.getLimit();
-                PagedRequest offsetPagedRequest = new PagedRequest(pagedRequest.getRequestBuilder(), currentOffset, pagedRequest.getLimit());
-                request = offsetPagedRequest.createRequest();
-                try (Response response = blackDuckHttpClient.execute(request)) {
+            while (allResponses.size() < totalItemsToRetrieve && offset < totalCount) {
+                offset = offset + limit;
+                requestMultiple = nextPage(requestMultiple, offset);
+                try (Response response = blackDuckHttpClient.execute(requestMultiple)) {
                     blackDuckHttpClient.throwExceptionForError(response);
                     String jsonResponse = response.getContentString();
-                    blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, clazz);
+                    blackDuckPageResponse = blackDuckJsonTransformer.getResponses(jsonResponse, requestMultiple.getResponseClass());
                     allResponses.addAll(this.matchPredicate(blackDuckPageResponse, predicate));
                 } catch (IOException e) {
                     throw new BlackDuckIntegrationException(e);
@@ -89,6 +93,13 @@ public class BlackDuckResponsesTransformer {
         }
     }
 
+    private <T extends BlackDuckResponse> BlackDuckRequest<T, UrlMultipleResponses<T>> nextPage(BlackDuckRequest<T, UrlMultipleResponses<T>> blackDuckRequest, int offset) {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder(blackDuckRequest);
+        blackDuckRequestBuilder.setOffset(offset);
+
+        return new BlackDuckRequest<>(blackDuckRequestBuilder, blackDuckRequest.getUrlResponse());
+    }
+
     @NotNull
     private <T extends BlackDuckResponse> List<T> onlyReturnMaxRequested(int maxToReturn, List<T> allResponses) {
         return allResponses.stream().limit(maxToReturn).collect(Collectors.toList());
@@ -100,6 +111,18 @@ public class BlackDuckResponsesTransformer {
                    .stream()
                    .filter(predicate)
                    .collect(Collectors.toList());
+    }
+
+    public int getLimit(BlackDuckRequest<?, ?> blackDuckRequest) {
+        return retrieveValue(blackDuckRequest.getRequest().getQueryParameters()::get, BlackDuckRequestBuilder.LIMIT_PARAMETER, BlackDuckRequestBuilder.DEFAULT_LIMIT);
+    }
+
+    public int getOffset(BlackDuckRequest<?, ?> blackDuckRequest) {
+        return retrieveValue(blackDuckRequest.getRequest().getQueryParameters()::get, BlackDuckRequestBuilder.OFFSET_PARAMETER, BlackDuckRequestBuilder.DEFAULT_OFFSET);
+    }
+
+    private int retrieveValue(Function<String, Set<String>> valueCollection, String key, int defaultValue) {
+        return NumberUtils.toInt(valueCollection.apply(key).stream().findFirst().orElse(Integer.toString(defaultValue)));
     }
 
 }

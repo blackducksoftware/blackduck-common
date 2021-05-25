@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.comprehensive;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
@@ -12,6 +13,7 @@ import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectBomService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
+import com.synopsys.integration.blackduck.service.dataservice.UserService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -20,6 +22,7 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 public class BlackDuckServices {
     public IntLogger logger;
     public BlackDuckServicesFactory blackDuckServicesFactory;
+    public ApiDiscovery apiDiscovery;
     public BlackDuckServerConfig blackDuckServerConfig;
     public ProjectService projectService;
     public ProjectUsersService projectUsersService;
@@ -30,10 +33,12 @@ public class BlackDuckServices {
     public PolicyRuleService policyRuleService;
     public CodeLocationCreationService codeLocationCreationService;
     public NotificationService notificationService;
+    public UserService userService;
 
     public BlackDuckServices(IntHttpClientTestHelper intHttpClientTestHelper) throws IntegrationException {
         logger = new PrintStreamIntLogger(System.out, LogLevel.OFF);
         blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
+        apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
         blackDuckServerConfig = intHttpClientTestHelper.getBlackDuckServerConfig();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
@@ -44,6 +49,7 @@ public class BlackDuckServices {
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
         notificationService = blackDuckServicesFactory.createNotificationService();
+        userService = blackDuckServicesFactory.createUserService();
     }
 
 }

@@ -15,7 +15,6 @@ public class UploadBatch {
     private final List<UploadTarget> uploadTargets = new ArrayList<>();
 
     public UploadBatch() {
-
     }
 
     public UploadBatch(UploadTarget... uploadTargets) {

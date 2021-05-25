@@ -13,9 +13,11 @@ import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponent
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.exception.IntegrationTimeoutException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.WaitJobConfig;
 
 public class RapidScanWaiter {
     private IntLogger logger;
@@ -27,24 +29,17 @@ public class RapidScanWaiter {
     }
 
     public List<DeveloperScanComponentResultView> checkScanResult(HttpUrl url, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        RapidScanWaitJobTask waitTask = new RapidScanWaitJobTask(blackDuckApiClient, url);
-        // if a timeout of 0 is provided and the timeout check is done too quickly, w/o a do/while, no check will be performed
-        // regardless of the timeout provided, we always want to check at least once
-        boolean allCompleted = waitTask.isComplete();
+        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "rapid scan", timeoutInSeconds, System.currentTimeMillis(), waitIntervalInSeconds);
+        RapidScanWaitJobCondition waitJobCondition = new RapidScanWaitJobCondition(blackDuckApiClient, url);
+        RapidScanWaitJobCompleter waitJobCompleter = new RapidScanWaitJobCompleter(blackDuckApiClient, url);
 
-        // waitInterval needs to be less than the timeout
-        if (waitIntervalInSeconds > timeoutInSeconds) {
-            waitIntervalInSeconds = (int) timeoutInSeconds;
-        }
+        WaitJob<List<DeveloperScanComponentResultView>> waitJob = new WaitJob<>(waitJobConfig, waitJobCondition, waitJobCompleter);
 
-        if (!allCompleted) {
-            WaitJob waitJob = WaitJob.create(logger, timeoutInSeconds, System.currentTimeMillis(), waitIntervalInSeconds, waitTask);
-            allCompleted = waitJob.waitFor();
+        try {
+            return waitJob.waitFor();
+        } catch (IntegrationTimeoutException e) {
+            throw new BlackDuckIntegrationException(e.getMessage());
         }
-
-        if (!allCompleted) {
-            throw new BlackDuckIntegrationException("Error getting developer scan result. Timeout may have occurred.");
-        }
-        return blackDuckApiClient.getAllResponses(url, DeveloperScanComponentResultView.class);
     }
+
 }

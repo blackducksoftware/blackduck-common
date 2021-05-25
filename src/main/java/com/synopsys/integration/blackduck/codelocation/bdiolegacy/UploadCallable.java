@@ -12,26 +12,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.entity.ContentType;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
 public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final ApiDiscovery apiDiscovery;
     private final UploadTarget uploadTarget;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public UploadCallable(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, UploadTarget uploadTarget) {
+    public UploadCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, UploadTarget uploadTarget) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.apiDiscovery = apiDiscovery;
         this.uploadTarget = uploadTarget;
         this.projectAndVersion = uploadTarget.getProjectAndVersion();
         this.codeLocationName = uploadTarget.getCodeLocationName();
@@ -48,11 +51,11 @@ public class UploadCallable implements Callable<UploadOutput> {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
             }
 
-            HttpUrl url = blackDuckApiClient.getUrl(BlackDuckApiClient.BOMIMPORT_PATH);
-            Request request = blackDuckRequestFactory
-                                  .createCommonPostRequestBuilder(url, jsonPayload)
-                                  .acceptMimeType(uploadTarget.getMediaType())
-                                  .build();
+            UrlSingleResponse<BlackDuckStringResponse> stringResponse = new UrlSingleResponse<>(apiDiscovery.metaBomImportLink().getUrl(), BlackDuckStringResponse.class);
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postString(jsonPayload, ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
+                                                   .buildBlackDuckResponseRequest(stringResponse.getUrl());
+
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);

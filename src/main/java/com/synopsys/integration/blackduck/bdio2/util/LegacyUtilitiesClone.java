@@ -17,7 +17,7 @@ import com.blackducksoftware.common.base.ExtraUUIDs;
 /**
  * This functionality was copied from LegacyUtilities in the blackducksoftware/bdio repo. As of 3.0.0-beta.47 the class is package private.
  * A PR with a fix has been created: https://github.com/blackducksoftware/bdio/pull/14
- * // TODO: Remove this class once LegacyUtilities is made public.
+ * // TODO jm - remove this class once LegacyUtilities is made public in bdio project
  */
 public class LegacyUtilitiesClone {
     /**

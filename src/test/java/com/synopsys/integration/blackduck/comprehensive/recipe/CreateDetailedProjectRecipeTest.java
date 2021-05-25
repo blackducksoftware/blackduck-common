@@ -46,7 +46,7 @@ public class CreateDetailedProjectRecipeTest extends BasicRecipe {
          */
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
-        ProjectVersionView projectVersionView = blackDuckApiClient.getResponse(projectView, ProjectView.CANONICALVERSION_LINK_RESPONSE).get();
+        ProjectVersionView projectVersionView = blackDuckApiClient.getResponse(projectView.metaCanonicalVersionLink());
 
         Assertions.assertEquals(uniqueProjectName, projectView.getName());
         Assertions.assertEquals("A sample testing project to demonstrate blackduck-common capabilities.", projectView.getDescription());

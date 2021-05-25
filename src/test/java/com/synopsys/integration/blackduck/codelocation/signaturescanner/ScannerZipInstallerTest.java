@@ -51,8 +51,6 @@ public class ScannerZipInstallerTest {
         assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
         assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
 
-        File downloadTarget = new File(signatureScannerDownloadPath);
-
         IntLogger logger = new BufferedIntLogger();
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
@@ -69,11 +67,13 @@ public class ScannerZipInstallerTest {
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType);
+        File downloadTarget = new File(signatureScannerDownloadPath);
 
-        scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl(blackDuckUrl), operatingSystemType,
+            downloadTarget);
+        scannerZipInstaller.installOrUpdateScanner();
 
-        ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+        ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToJavaExecutable()));
         assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));
@@ -92,8 +92,8 @@ public class ScannerZipInstallerTest {
         Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
 
-        BlackDuckHttpClient mockBlackDuckHttpClient = Mockito.mock(BlackDuckHttpClient.class);
-        Mockito.when(mockBlackDuckHttpClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+        SignatureScannerClient mockScannerClient = Mockito.mock(SignatureScannerClient.class);
+        Mockito.when(mockScannerClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
 
         IntLogger logger = new BufferedIntLogger();
         Path tempDirectory = Files.createTempDirectory(null);
@@ -106,17 +106,17 @@ public class ScannerZipInstallerTest {
             KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
             ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, new HttpUrl("http://www.synopsys.com"),
-                OperatingSystemType.MAC);
+                OperatingSystemType.MAC, downloadTarget);
 
             try {
-                ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+                ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
                 fail("Should have thrown");
             } catch (BlackDuckIntegrationException e) {
             }
 
-            scannerZipInstaller.installOrUpdateScanner(downloadTarget);
+            scannerZipInstaller.installOrUpdateScanner();
 
-            ScanPaths scanPaths = scanPathsUtility.determineSignatureScannerPaths(downloadTarget);
+            ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
             assertTrue(scanPaths.isManagedByLibrary());
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToScanExecutable()));
             assertTrue(StringUtils.isNotBlank(scanPaths.getPathToOneJar()));

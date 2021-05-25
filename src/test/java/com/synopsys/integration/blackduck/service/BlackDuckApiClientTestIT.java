@@ -13,11 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
@@ -25,6 +26,10 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransforme
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
+import com.synopsys.integration.blackduck.service.request.AcceptHeaderEditor;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
+import com.synopsys.integration.blackduck.service.request.PagingDefaultsEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
@@ -46,29 +51,35 @@ public class BlackDuckApiClientTestIT {
         blackDuckServerConfigBuilder.setUsername(testHelper.getProperty(TestingPropertyKey.TEST_USERNAME));
         blackDuckServerConfigBuilder.setPassword(testHelper.getProperty(TestingPropertyKey.TEST_PASSWORD));
         blackDuckServerConfigBuilder.setTrustCert(Boolean.parseBoolean(testHelper.getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
-        blackDuckServerConfigBuilder.setBlackDuckMediaTypeDiscovery(blackDuckMediaTypeDiscoveryVerifier);
 
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfigBuilder.build().createBlackDuckHttpClient(logger);
-        Gson gson = new Gson();
-        ObjectMapper objectMapper = new ObjectMapper();
+        Gson gson = BlackDuckServicesFactory.createDefaultGson();
+        ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
         BlackDuckResponseResolver blackDuckResponseResolver = new BlackDuckResponseResolver(gson);
         BlackDuckJsonTransformer blackDuckJsonTransformer = new BlackDuckJsonTransformer(gson, objectMapper, blackDuckResponseResolver, logger);
         BlackDuckResponseTransformer blackDuckResponseTransformer = new BlackDuckResponseTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
         BlackDuckResponsesTransformer blackDuckResponsesTransformer = new BlackDuckResponsesTransformer(blackDuckHttpClient, blackDuckJsonTransformer);
-        BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
 
-        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, gson, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer, blackDuckRequestFactory);
+        BlackDuckApiClient blackDuckApiClient = new BlackDuckApiClient(blackDuckHttpClient, blackDuckJsonTransformer, blackDuckResponseTransformer, blackDuckResponsesTransformer);
+        ApiDiscovery apiDiscovery = new ApiDiscovery(blackDuckServerConfigBuilder.build().getBlackDuckUrl());
+
         assertNull(blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertNull(blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
-        List<ProjectView> projects = blackDuckApiClient.getSomeResponses(ApiDiscovery.PROJECTS_LINK_RESPONSE, 5);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
+        BlackDuckMultipleRequest<ProjectView> requestMultiple = new BlackDuckMultipleRequest<>(blackDuckRequestBuilder, apiDiscovery.metaProjectsLink(), new PagingDefaultsEditor(),
+            new AcceptHeaderEditor(blackDuckMediaTypeDiscoveryVerifier));
+        List<ProjectView> projects = blackDuckApiClient.getSomeResponses(requestMultiple, 5);
         assertTrue(projects.size() > 0);
-        assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
+        assertEquals(null, blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
+        blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
         ProjectView firstProject = projects.get(0);
-        ProjectView retrievedById = blackDuckApiClient.getResponse(firstProject.getHref(), ProjectView.class);
-        assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
+        UrlSingleResponse<ProjectView> projectViewUrlSingleResponse = new UrlSingleResponse<>(firstProject.getHref(), ProjectView.class);
+        BlackDuckSingleRequest<ProjectView> requestSingle = new BlackDuckSingleRequest<>(blackDuckRequestBuilder, projectViewUrlSingleResponse, new PagingDefaultsEditor(), new AcceptHeaderEditor(blackDuckMediaTypeDiscoveryVerifier));
+        ProjectView retrievedById = blackDuckApiClient.getResponse(requestSingle);
+        assertEquals(null, blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/vnd.blackducksoftware.project-detail-4+json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
     }
 

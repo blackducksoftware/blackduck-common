@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
@@ -23,7 +24,6 @@ import com.synopsys.integration.blackduck.api.manual.temporary.component.Assigne
 import com.synopsys.integration.blackduck.api.manual.temporary.response.AssignedUserGroupView;
 import com.synopsys.integration.blackduck.api.manual.temporary.view.AssignedUserView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
@@ -33,13 +33,13 @@ import com.synopsys.integration.rest.HttpUrl;
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;
 
-    public ProjectUsersService(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, IntLogger logger, UserGroupService userGroupService) {
-        super(blackDuckApiClient, blackDuckRequestFactory, logger);
+    public ProjectUsersService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, UserGroupService userGroupService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
         this.userGroupService = userGroupService;
     }
 
     public List<AssignedUserView> getAssignedUsersToProject(ProjectView project) throws IntegrationException {
-        List<AssignedUserView> assignedUsers = blackDuckApiClient.getAllResponses(project, ProjectView.USERS_LINK_RESPONSE);
+        List<AssignedUserView> assignedUsers = blackDuckApiClient.getAllResponses(project.metaUsersLink());
         return assignedUsers;
     }
 
@@ -59,7 +59,7 @@ public class ProjectUsersService extends DataService {
     }
 
     public List<AssignedUserGroupView> getAssignedGroupsToProject(ProjectView project) throws IntegrationException {
-        List<AssignedUserGroupView> assignedGroups = blackDuckApiClient.getAllResponses(project, ProjectView.USERGROUPS_LINK_RESPONSE);
+        List<AssignedUserGroupView> assignedGroups = blackDuckApiClient.getAllResponses(project.metaUsergroupsLink());
         return assignedGroups;
     }
 
@@ -90,7 +90,7 @@ public class ProjectUsersService extends DataService {
                 HttpUrl groupUrl = new HttpUrl(assignedUserGroupView.getGroup());
                 UserGroupView userGroupView = blackDuckApiClient.getResponse(groupUrl, UserGroupView.class);
                 if (userGroupView.getActive()) {
-                    List<UserView> groupUsers = blackDuckApiClient.getAllResponses(userGroupView, UserGroupView.USERS_LINK_RESPONSE);
+                    List<UserView> groupUsers = blackDuckApiClient.getAllResponses(userGroupView.metaUsersLink());
                     users.addAll(groupUsers);
                 }
             }
@@ -122,7 +122,8 @@ public class ProjectUsersService extends DataService {
     }
 
     public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
-        List<UserView> allUsers = blackDuckApiClient.getAllResponses(ApiDiscovery.USERS_LINK_RESPONSE);
+        UrlMultipleResponses<UserView> userResponses = apiDiscovery.metaUsersLink();
+        List<UserView> allUsers = blackDuckApiClient.getAllResponses(userResponses);
         UserView userView = null;
         for (UserView user : allUsers) {
             if (user.getUserName().equalsIgnoreCase(username)) {

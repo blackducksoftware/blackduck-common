@@ -14,28 +14,28 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.core.response.BlackDuckPathMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.blackduck.service.request.BlackDuckApiRequestSingleSpec2;
+import com.synopsys.integration.blackduck.service.dataservice.UserService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 
 import okhttp3.mockwebserver.MockWebServer;
@@ -46,14 +46,15 @@ public class BlackDuckHttpClientTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
     private static final String API_TOKEN_NAME = "blackDuckHttpClientTest";
-    private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens");
-    private static final BlackDuckPathMultipleResponses<ApiTokenView> API_TOKEN_LINK_RESPONSE = new BlackDuckPathMultipleResponses<>(BlackDuckHttpClientTestIT.API_TOKEN_LINK, ApiTokenView.class);
+    private static final BlackDuckPath API_TOKEN_LINK = new BlackDuckPath("/api/current-user/tokens", ApiTokenView.class, true);
 
-    private final BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(new Gson());
+    private final BlackDuckServicesFactory blackDuckServicesFactory = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
+    private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
+    private final BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
     private final HttpUrl blackDuckUrl = INT_HTTP_CLIENT_TEST_HELPER.getIntegrationBlackDuckServerUrl();
     private final String username = INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
     private final String password = INT_HTTP_CLIENT_TEST_HELPER.getTestPassword();
-    private final BlackDuckApiClient blackDuckApiClient = INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory().getBlackDuckApiClient();
+    private final UserService userService = blackDuckServicesFactory.createUserService();
 
     public BlackDuckHttpClientTestIT() throws IntegrationException {
     }
@@ -164,7 +165,7 @@ public class BlackDuckHttpClientTestIT {
         IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
         BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(logger);
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
-        UserView currentUser = blackDuckApiClient.getResponse(ApiDiscovery.CURRENT_USER_LINK_RESPONSE);
+        UserView currentUser = userService.findCurrentUser();
         assertNotNull(currentUser);
         assertEquals(username, currentUser.getUserName());
     }
@@ -187,22 +188,22 @@ public class BlackDuckHttpClientTestIT {
     // ******************************
     // WARNING!!!!
     private ApiTokenView getApiToken(String tokenName) throws IntegrationException, IOException {
-        HttpUrl blackDuckServerUrl = blackDuckUrl;
-        HttpUrl createApiTokenUrl = blackDuckServerUrl.appendRelativeUrl(BlackDuckHttpClientTestIT.API_TOKEN_LINK.getPath());
+        UrlSingleResponse<ApiTokenView> tokenResponse = apiDiscovery.metaSingleResponse(BlackDuckHttpClientTestIT.API_TOKEN_LINK);
 
         ApiTokenRequest apiTokenRequest = new ApiTokenRequest();
         apiTokenRequest.name = tokenName;
         apiTokenRequest.scopes.add("read");
         apiTokenRequest.scopes.add("write");
 
-        Request request = blackDuckRequestFactory.createCommonPostRequestBuilder(createApiTokenUrl, apiTokenRequest).build();
-        BlackDuckApiRequestSingleSpec2<ApiTokenView> apiTokenViewSpec = new BlackDuckApiRequestSingleSpec2<>(request, ApiTokenView.class);
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .postObject(apiTokenRequest, BodyContentConverter.DEFAULT);
+        BlackDuckSingleRequest<ApiTokenView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(tokenResponse);
 
-        return blackDuckApiClient.getResponse(apiTokenViewSpec);
+        return blackDuckApiClient.getResponse(requestSingle);
     }
 
     private void deleteByName(String name) throws IntegrationException {
-        List<ApiTokenView> apiTokens = blackDuckApiClient.getAllResponses(BlackDuckHttpClientTestIT.API_TOKEN_LINK_RESPONSE);
+        List<ApiTokenView> apiTokens = blackDuckApiClient.getAllResponses(apiDiscovery.metaMultipleResponses(API_TOKEN_LINK));
         for (ApiTokenView apiTokenView : apiTokens) {
             if (apiTokenView.name.equals(name)) {
                 blackDuckApiClient.delete(apiTokenView);

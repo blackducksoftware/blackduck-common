@@ -19,7 +19,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -30,7 +30,7 @@ import com.synopsys.integration.rest.response.Response;
 
 public class SignatureScannerClientProxyTest {
     private static final BufferedIntLogger LOGGER = new BufferedIntLogger();
-    private static final BlackDuckRequestFactory BLACK_DUCK_REQUEST_FACTORY = new BlackDuckRequestFactory(new Gson());
+    private static final Gson gson = new Gson();
 
     private static final int MOCK_SERVER_STATUS_CODE = 500;
     private static final String MOCK_SERVER_HEADER_KEY = "MockServerKey";
@@ -67,9 +67,9 @@ public class SignatureScannerClientProxyTest {
 
     @Test
     public void noProxyTest() throws IntegrationException {
-        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, ProxyInfo.NO_PROXY_INFO);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, gson, 10, false, ProxyInfo.NO_PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
-        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
+        Request request = new BlackDuckRequestBuilder().commonGet().url(httpsServer).build();
         Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 
@@ -82,9 +82,9 @@ public class SignatureScannerClientProxyTest {
 
     @Test
     public void withProxyTest() throws IntegrationException {
-        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, 10, false, PROXY_INFO);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(LOGGER, gson, 10, false, PROXY_INFO);
         HttpUrl httpsServer = new HttpUrl("http://127.0.0.1:" + MOCK_SERVER.getPort());
-        Request request = BLACK_DUCK_REQUEST_FACTORY.createCommonGetRequest(httpsServer);
+        Request request = new BlackDuckRequestBuilder().commonGet().url(httpsServer).build();
         Response response = signatureScannerClient.execute(request);
         Map<String, String> headers = response.getHeaders();
 
@@ -110,4 +110,5 @@ public class SignatureScannerClientProxyTest {
                     .withDelay(TimeUnit.SECONDS, 1)
             );
     }
+
 }

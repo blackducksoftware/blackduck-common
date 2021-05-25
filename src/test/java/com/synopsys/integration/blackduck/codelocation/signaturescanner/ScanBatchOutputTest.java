@@ -75,11 +75,9 @@ public class ScanBatchOutputTest {
         final String targetPath2 = "/Users/ekerwin/Documents/source/integration/libraries/blackduck-common-api";
         final String targetPath3 = "/Users/ekerwin/Documents/source/integration/libraries/integration-common";
 
-        final String installPath = "/Users/ekerwin/working/scan_install";
         final String outputPath = "/Users/ekerwin/working/scan_output";
 
         ScanBatchBuilder scanBatchBuilder = new ScanBatchBuilder();
-        scanBatchBuilder.installDirectory(new File(installPath));
         scanBatchBuilder.outputDirectory(new File(outputPath));
         scanBatchBuilder.projectAndVersionNames(projectName, versionName);
 

@@ -18,8 +18,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.CookieHeaderParser;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.builder.BuilderProperties;
@@ -64,10 +62,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private Gson gson = BlackDuckServicesFactory.createDefaultGson();
     private ObjectMapper objectMapper = BlackDuckServicesFactory.createDefaultObjectMapper();
     private AuthenticationSupport authenticationSupport = new AuthenticationSupport();
-    private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery = new BlackDuckMediaTypeDiscovery();
     private CookieHeaderParser cookieHeaderParser = new CookieHeaderParser();
     private ExecutorService executorService = new NoThreadExecutorService();
-    private BlackDuckRequestFactory blackDuckRequestFactory = new BlackDuckRequestFactory(gson);
 
     public BlackDuckServerConfigBuilder() {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
@@ -101,9 +97,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery,
-                executorService,
-                blackDuckRequestFactory);
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -111,9 +105,8 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, blackDuckMediaTypeDiscovery,
-                cookieHeaderParser, executorService,
-                blackDuckRequestFactory);
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser,
+                executorService);
         }
     }
 
@@ -270,17 +263,6 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfigBuilder setAuthenticationSupport(AuthenticationSupport authenticationSupport) {
         if (null != authenticationSupport) {
             this.authenticationSupport = authenticationSupport;
-        }
-        return this;
-    }
-
-    public BlackDuckMediaTypeDiscovery getBlackDuckMediaTypeDiscovery() {
-        return blackDuckMediaTypeDiscovery;
-    }
-
-    public BlackDuckServerConfigBuilder setBlackDuckMediaTypeDiscovery(BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery) {
-        if (null != blackDuckMediaTypeDiscovery) {
-            this.blackDuckMediaTypeDiscovery = blackDuckMediaTypeDiscovery;
         }
         return this;
     }
@@ -477,14 +459,6 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public BlackDuckServerConfigBuilder setTrustCert(boolean trustCert) {
         setTrustCert(String.valueOf(trustCert));
         return this;
-    }
-
-    public BlackDuckRequestFactory getRequestFactory() {
-        return blackDuckRequestFactory;
-    }
-
-    public void setRequestFactory(BlackDuckRequestFactory blackDuckRequestFactory) {
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
     }
 
 }

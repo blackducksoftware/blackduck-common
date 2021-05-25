@@ -15,9 +15,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Some requests to Black Duck can be filtered. There can be one more more filter keys each with one or more values.
+ * Some requests to Black Duck can be filtered. There can be one more more
+ * filter keys each with one or more values.
  *
- * If multiple filters values are combined for the same filter key, these values will be OR'ed together. If multiple filter values are combined for different filter keys, these values will be AND'ed together.
+ * If multiple filters values are combined for the same filter key, these
+ * values will be OR'ed together. If multiple filter values are combined for
+ * different filter keys, these values will be AND'ed together.
  */
 public class BlackDuckRequestFilter {
     private final Map<String, Set<String>> filterKeysToValues = new HashMap<>();

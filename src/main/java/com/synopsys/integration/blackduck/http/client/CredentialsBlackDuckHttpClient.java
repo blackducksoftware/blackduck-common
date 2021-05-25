@@ -7,18 +7,18 @@
  */
 package com.synopsys.integration.blackduck.http.client;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
+import com.google.gson.Gson;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -33,9 +33,9 @@ public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final CookieHeaderParser cookieHeaderParser;
 
     public CredentialsBlackDuckHttpClient(
-        IntLogger logger, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl baseUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
-        BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery, CookieHeaderParser cookieHeaderParser) {
-        super(logger, timeout, alwaysTrustServerCertificate, proxyInfo, baseUrl, solutionDetails, authenticationSupport, blackDuckMediaTypeDiscovery);
+        IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo, HttpUrl blackDuckUrl, NameVersion solutionDetails, AuthenticationSupport authenticationSupport, Credentials credentials,
+        CookieHeaderParser cookieHeaderParser) {
+        super(logger, gson, timeout, alwaysTrustServerCertificate, proxyInfo, blackDuckUrl, solutionDetails, authenticationSupport);
         this.credentials = credentials;
         this.cookieHeaderParser = cookieHeaderParser;
 
@@ -49,9 +49,9 @@ public class CredentialsBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         List<NameValuePair> bodyValues = new ArrayList<>();
         bodyValues.add(new BasicNameValuePair("j_username", credentials.getUsername().orElse(null)));
         bodyValues.add(new BasicNameValuePair("j_password", credentials.getPassword().orElse(null)));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, Charsets.UTF_8);
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(bodyValues, StandardCharsets.UTF_8);
 
-        return authenticationSupport.attemptAuthentication(this, getBaseUrl(), "j_spring_security_check", entity);
+        return authenticationSupport.attemptAuthentication(this, getBlackDuckUrl(), "j_spring_security_check", entity);
     }
 
     @Override

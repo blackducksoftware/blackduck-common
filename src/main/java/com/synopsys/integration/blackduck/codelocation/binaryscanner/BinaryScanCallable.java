@@ -13,9 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
@@ -23,14 +26,14 @@ import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScanCallable implements Callable<BinaryScanOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
-    private final BlackDuckRequestFactory blackDuckRequestFactory;
+    private final ApiDiscovery apiDiscovery;
     private final BinaryScan binaryScan;
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
-    public BinaryScanCallable(BlackDuckApiClient blackDuckApiClient, BlackDuckRequestFactory blackDuckRequestFactory, BinaryScan binaryScan) {
+    public BinaryScanCallable(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, BinaryScan binaryScan) {
         this.blackDuckApiClient = blackDuckApiClient;
-        this.blackDuckRequestFactory = blackDuckRequestFactory;
+        this.apiDiscovery = apiDiscovery;
         this.binaryScan = binaryScan;
         this.projectAndVersion = new NameVersion(binaryScan.getProjectName(), binaryScan.getProjectVersion());
         this.codeLocationName = binaryScan.getCodeLocationName();
@@ -47,8 +50,11 @@ public class BinaryScanCallable implements Callable<BinaryScanOutput> {
             Map<String, File> binaryParts = new HashMap<>();
             binaryParts.put("fileupload", binaryScan.getBinaryFile());
 
-            BlackDuckRequestBuilder requestBuilder = blackDuckRequestFactory.createCommonPostRequestBuilder(binaryParts, textParts);
-            try (Response response = blackDuckApiClient.execute(BlackDuckApiClient.UPLOADS_PATH, requestBuilder)) {
+            UrlSingleResponse<BlackDuckStringResponse> stringResponse = apiDiscovery.metaUploadsLink();
+            BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
+                                                   .postMultipart(binaryParts, textParts)
+                                                   .buildBlackDuckResponseRequest(stringResponse.getUrl());
+            try (Response response = blackDuckApiClient.execute(request)) {
                 return BinaryScanOutput.FROM_RESPONSE(projectAndVersion, codeLocationName, response);
             }
         } catch (IntegrationRestException e) {

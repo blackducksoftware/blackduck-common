@@ -7,34 +7,85 @@
  */
 package com.synopsys.integration.blackduck.http;
 
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.FILTER_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.LIMIT_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.OFFSET_PARAMETER;
-import static com.synopsys.integration.blackduck.http.BlackDuckRequestFactory.Q_PARAMETER;
-
+import java.io.File;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+
+import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckResponseResponse;
+import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckSingleRequest;
+import com.synopsys.integration.blackduck.service.request.BlackDuckStringRequest;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContent;
+import com.synopsys.integration.rest.body.FileBodyContent;
+import com.synopsys.integration.rest.body.MapBodyContent;
+import com.synopsys.integration.rest.body.MultipartBodyContent;
+import com.synopsys.integration.rest.body.ObjectBodyContent;
+import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckRequestBuilder {
+    public static final String LIMIT_PARAMETER = "limit";
+    public static final String OFFSET_PARAMETER = "offset";
+    public static final String Q_PARAMETER = "q";
+    public static final String FILTER_PARAMETER = "filter";
+
+    public static final int DEFAULT_LIMIT = 100;
+    public static final int DEFAULT_OFFSET = 0;
+
     private final Request.Builder requestBuilder;
 
+    public BlackDuckRequestBuilder() {
+        this.requestBuilder = new Request.Builder();
+    }
+
     public BlackDuckRequestBuilder(Request.Builder requestBuilder) {
-        this.requestBuilder = requestBuilder;
+        this.requestBuilder = new Request.Builder(requestBuilder);
+    }
+
+    public BlackDuckRequestBuilder(Request request) {
+        this(new Request.Builder(request));
+    }
+
+    public BlackDuckRequestBuilder(BlackDuckRequest<?, ?> blackDuckRequest) {
+        this.requestBuilder = new Request.Builder(blackDuckRequest.getRequest());
+    }
+
+    public BlackDuckRequestBuilder(BlackDuckRequestBuilder blackDuckRequestBuilder) {
+        this(blackDuckRequestBuilder.requestBuilder);
     }
 
     public Request build() {
         return requestBuilder.build();
     }
 
-    public Request.Builder getRequestBuilder() {
-        return requestBuilder;
+    public <T extends BlackDuckResponse> BlackDuckMultipleRequest<T> buildBlackDuckRequest(UrlMultipleResponses<T> urlMultipleResponses) {
+        return new BlackDuckMultipleRequest<>(this, urlMultipleResponses);
+    }
+
+    public <T extends BlackDuckResponse> BlackDuckSingleRequest<T> buildBlackDuckRequest(UrlSingleResponse<T> urlSingleResponse) {
+        return new BlackDuckSingleRequest<>(this, urlSingleResponse);
+    }
+
+    public BlackDuckStringRequest buildBlackDuckStringRequest(HttpUrl url) {
+        return new BlackDuckStringRequest(this, new UrlSingleResponse<>(url, BlackDuckStringResponse.class));
+    }
+
+    public BlackDuckResponseRequest buildBlackDuckResponseRequest(HttpUrl url) {
+        return new BlackDuckResponseRequest(this, new UrlSingleResponse<>(url, BlackDuckResponseResponse.class));
     }
 
     public BlackDuckRequestBuilder url(HttpUrl url) {
@@ -42,16 +93,27 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder setLimitAndOffset(int limit, int offset) {
+        return setBlackDuckPageDefinition(new BlackDuckPageDefinition(limit, offset));
+    }
+
     public BlackDuckRequestBuilder setBlackDuckPageDefinition(BlackDuckPageDefinition blackDuckPageDefinition) {
-        requestBuilder.setQueryParameter(LIMIT_PARAMETER, String.valueOf(blackDuckPageDefinition.getLimit()));
-        requestBuilder.setQueryParameter(OFFSET_PARAMETER, String.valueOf(blackDuckPageDefinition.getOffset()));
+        setLimit(blackDuckPageDefinition.getLimit());
+        return setOffset(blackDuckPageDefinition.getOffset());
+    }
+
+    public BlackDuckRequestBuilder setLimit(int limit) {
+        requestBuilder.setQueryParameter(LIMIT_PARAMETER, String.valueOf(limit));
         return this;
     }
 
-    public BlackDuckRequestBuilder addBlackDuckQuery(Optional<BlackDuckQuery> blackDuckQuery) {
-        if (blackDuckQuery.isPresent()) {
-            requestBuilder.addQueryParameter(Q_PARAMETER, blackDuckQuery.get().getParameter());
-        }
+    public BlackDuckRequestBuilder setOffset(int offset) {
+        requestBuilder.setQueryParameter(OFFSET_PARAMETER, String.valueOf(offset));
+        return this;
+    }
+
+    public BlackDuckRequestBuilder addBlackDuckQuery(BlackDuckQuery blackDuckQuery) {
+        requestBuilder.addQueryParameter(Q_PARAMETER, blackDuckQuery.getParameter());
         return this;
     }
 
@@ -70,7 +132,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public BlackDuckRequestBuilder acceptMimeType(String acceptHeader) {
-        requestBuilder.acceptMimeType(acceptHeader);
+        addHeader(HttpHeaders.ACCEPT, acceptHeader);
         return this;
     }
 
@@ -104,6 +166,73 @@ public class BlackDuckRequestBuilder {
         return this;
     }
 
+    public BlackDuckRequestBuilder apply(BlackDuckRequestBuilderEditor editor) {
+        editor.edit(this);
+        return this;
+    }
+
+    public BlackDuckRequestBuilder apply(List<BlackDuckRequestBuilderEditor> editors) {
+        for (BlackDuckRequestBuilderEditor editor : editors) {
+            editor.edit(this);
+        }
+        return this;
+    }
+
+    public BlackDuckRequestBuilder commonGet() {
+        setLimitAndOffset(DEFAULT_LIMIT, DEFAULT_OFFSET);
+        return get();
+    }
+
+    public BlackDuckRequestBuilder get() {
+        return method(HttpMethod.GET);
+    }
+
+    public BlackDuckRequestBuilder postFile(File bodyContentFile, ContentType contentType) {
+        return postBodyContent(new FileBodyContent(bodyContentFile, contentType));
+    }
+
+    public BlackDuckRequestBuilder postMap(Map<String, String> bodyContentMap, Charset encoding) {
+        return postBodyContent(new MapBodyContent(bodyContentMap, encoding));
+    }
+
+    public BlackDuckRequestBuilder postMultipart(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
+        return postBodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
+    }
+
+    public BlackDuckRequestBuilder postString(String bodyContent, ContentType contentType) {
+        return postBodyContent(new StringBodyContent(bodyContent, contentType));
+    }
+
+    public BlackDuckRequestBuilder postObject(Object bodyContent, ContentType contentType) {
+        return postBodyContent(new ObjectBodyContent(bodyContent, contentType));
+    }
+
+    public BlackDuckRequestBuilder postBodyContent(BodyContent bodyContent) {
+        post();
+        return bodyContent(bodyContent);
+    }
+
+    public BlackDuckRequestBuilder post() {
+        return method(HttpMethod.POST);
+    }
+
+    public BlackDuckRequestBuilder putString(String bodyContent, ContentType contentType) {
+        return putBodyContent(new StringBodyContent(bodyContent, contentType));
+    }
+
+    public BlackDuckRequestBuilder putObject(Object bodyContent, ContentType contentType) {
+        return putBodyContent(new ObjectBodyContent(bodyContent, contentType));
+    }
+
+    public BlackDuckRequestBuilder putBodyContent(BodyContent bodyContent) {
+        put();
+        return bodyContent(bodyContent);
+    }
+
+    public BlackDuckRequestBuilder put() {
+        return method(HttpMethod.PUT);
+    }
+
     public HttpUrl getUrl() {
         return requestBuilder.getUrl();
     }
@@ -113,7 +242,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public String getAcceptMimeType() {
-        return requestBuilder.getAcceptMimeType();
+        return requestBuilder.getHeaders().get(HttpHeaders.ACCEPT);
     }
 
     public Charset getBodyEncoding() {

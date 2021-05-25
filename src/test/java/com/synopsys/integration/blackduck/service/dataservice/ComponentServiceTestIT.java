@@ -49,21 +49,6 @@ public class ComponentServiceTestIT {
     }
 
     @Test
-    //TODO delete in 51.0.0 of blackduck-common
-    public void testGettingComponentVersionWithRemediation() throws IntegrationException {
-        ComponentVersionView commonsFileupload = retrieveCommonsFileupload(componentService);
-
-        boolean hasRemediationInformation = componentService.canRetrieveRemediationInformation(commonsFileupload);
-        if (hasRemediationInformation) {
-            System.out.println("you have remediation info - you must be an old Black Duck");
-            assertTrue(componentService.getRemediationInformation(commonsFileupload).isPresent());
-        } else {
-            System.out.println("you don't have remediation info - you must be a new Black Duck");
-            assertFalse(componentService.getRemediationInformation(commonsFileupload).isPresent());
-        }
-    }
-
-    @Test
     public void testOriginIdMismatch() throws Exception {
         ExternalId cyclerExternalId = externalIdFactory.createNameVersionExternalId(Forge.PYPI, "cycler", "0.10.0");
         List<ComponentsView> searchResults = componentService.getAllSearchResults(cyclerExternalId);

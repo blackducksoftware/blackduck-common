@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.junit.jupiter.api.BeforeEach;
 
+import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -13,7 +14,6 @@ import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationServi
 import com.synopsys.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
 import com.synopsys.integration.blackduck.codelocation.bdiolegacy.UploadBatchRunner;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.blackduck.http.BlackDuckRequestFactory;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -39,6 +39,7 @@ public class BasicRecipe {
     protected IntLogger logger;
     protected BlackDuckServicesFactory blackDuckServicesFactory;
     protected BlackDuckApiClient blackDuckApiClient;
+    protected ApiDiscovery apiDiscovery;
     protected ProjectService projectService;
     protected ProjectUsersService projectUsersService;
     protected ProjectBomService projectBomService;
@@ -48,10 +49,9 @@ public class BasicRecipe {
     protected PolicyRuleService policyRuleService;
     protected Bdio2UploadService bdio2UploadService;
     protected UploadBatchRunner uploadRunner;
-    protected BlackDuckRequestFactory blackDuckRequestFactory;
 
     @BeforeEach
-    public void startRecipe() {
+    public void startRecipe() throws IntegrationException {
         /*
          * the integration logger used to display log messages from our code
          * within a 3rd party integration environment
@@ -82,6 +82,7 @@ public class BasicRecipe {
 
         blackDuckServicesFactory = new BlackDuckServicesFactory(intEnvironmentVariables, executorService, logger, blackDuckHttpClient);
         blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
+        apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
         projectService = blackDuckServicesFactory.createProjectService();
         projectUsersService = blackDuckServicesFactory.createProjectUsersService();
         projectBomService = blackDuckServicesFactory.createProjectBomService();
@@ -91,7 +92,7 @@ public class BasicRecipe {
         policyRuleService = blackDuckServicesFactory.createPolicyRuleService();
         bdio2UploadService = blackDuckServicesFactory.createBdio2UploadService();
 
-        uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, blackDuckRequestFactory, executorService);
+        uploadRunner = new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, executorService);
     }
 
     public ProjectSyncModel createProjectSyncModel(String projectName, String projectVersionName) {

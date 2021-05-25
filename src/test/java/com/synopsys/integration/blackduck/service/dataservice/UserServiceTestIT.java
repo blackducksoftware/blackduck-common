@@ -36,6 +36,7 @@ public class UserServiceTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
     private final BlackDuckServicesFactory blackDuckServicesFactory = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
+    private final ApiDiscovery apiDiscovery = blackDuckServicesFactory.getApiDiscovery();
     private final BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
     private final ProjectService projectService = blackDuckServicesFactory.createProjectService();
     private final UserService userService = blackDuckServicesFactory.createUserService();
@@ -187,7 +188,7 @@ public class UserServiceTestIT {
         UserView userView = userService.findUserByUsername(userName).orElse(null);
         if (userView == null) {
             System.out.println("Creating user " + userName);
-            HttpUrl userUrl = blackDuckApiClient.post(ApiDiscovery.USERS_LINK, userRequest);
+            HttpUrl userUrl = blackDuckApiClient.post(apiDiscovery.metaUsersLink().getUrl(), userRequest);
             userView = blackDuckApiClient.getResponse(userUrl, UserView.class);
         } else {
             System.out.println(String.format("User %s already existed", userName));
