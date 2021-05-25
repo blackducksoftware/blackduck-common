@@ -17,6 +17,7 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.body.StringBodyContent;
 import com.synopsys.integration.rest.client.IntHttpClient;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
@@ -51,7 +52,7 @@ public class BlackDuckRedirectStrategyTest {
 
         Request requestToRedirectingServer = new Request.Builder(new HttpUrl(redirectingServerUrl))
                                                  .method(HttpMethod.POST)
-                                                 .bodyContent(new StringBodyContent("the initial request payload"))
+                                                 .bodyContent(new StringBodyContent("the initial request payload", BodyContentConverter.DEFAULT))
                                                  .build();
         Response response = redirectingClient.execute(requestToRedirectingServer);
 

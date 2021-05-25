@@ -45,9 +45,10 @@ public class BlackDuckRequest<T extends BlackDuckResponse, U extends UrlResponse
         this.blackDuckRequestBuilder = blackDuckRequestBuilder.url(urlResponse.getUrl());
         this.urlResponse = urlResponse;
 
+        blackDuckRequestBuilder.apply(acceptHeaderEditor);
+
         if (HttpMethod.GET == blackDuckRequestBuilder.getMethod()) {
             blackDuckRequestBuilder.apply(pagingDefaultsEditor);
-            blackDuckRequestBuilder.apply(acceptHeaderEditor);
         }
     }
 

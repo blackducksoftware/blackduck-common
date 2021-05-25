@@ -7,7 +7,10 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
@@ -43,7 +46,7 @@ public class Bdio2StreamUploader {
     public HttpUrl start(BdioFileContent header) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .postString(header.getContent())
+                                               .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
                                                .buildBlackDuckResponseRequest(url);
         HttpUrl responseUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(request);
@@ -54,7 +57,7 @@ public class Bdio2StreamUploader {
     public void append(HttpUrl url, int count, BdioFileContent bdioFileContent) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .putString(bdioFileContent.getContent())
+                                               .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
                                                .addHeader(HEADER_X_BD_MODE, "append")
                                                .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
@@ -65,7 +68,7 @@ public class Bdio2StreamUploader {
     public void finish(HttpUrl url, int count) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .putString(StringUtils.EMPTY)
+                                               .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
                                                .addHeader(HEADER_X_BD_MODE, "finish")
                                                .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))

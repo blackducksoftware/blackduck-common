@@ -71,7 +71,7 @@ public class BlackDuckApiClientTestIT {
             new AcceptHeaderEditor(blackDuckMediaTypeDiscoveryVerifier));
         List<ProjectView> projects = blackDuckApiClient.getSomeResponses(requestMultiple, 5);
         assertTrue(projects.size() > 0);
-        assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
+        assertEquals(null, blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
 
         blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
@@ -79,7 +79,7 @@ public class BlackDuckApiClientTestIT {
         UrlSingleResponse<ProjectView> projectViewUrlSingleResponse = new UrlSingleResponse<>(firstProject.getHref(), ProjectView.class);
         BlackDuckSingleRequest<ProjectView> requestSingle = new BlackDuckSingleRequest<>(blackDuckRequestBuilder, projectViewUrlSingleResponse, new PagingDefaultsEditor(), new AcceptHeaderEditor(blackDuckMediaTypeDiscoveryVerifier));
         ProjectView retrievedById = blackDuckApiClient.getResponse(requestSingle);
-        assertEquals("application/json", blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
+        assertEquals(null, blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
         assertEquals("application/vnd.blackducksoftware.project-detail-4+json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
     }
 

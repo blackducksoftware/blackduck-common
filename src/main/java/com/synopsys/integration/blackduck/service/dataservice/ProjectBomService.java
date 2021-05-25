@@ -32,6 +32,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckResponseReque
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.response.Response;
 
 public class ProjectBomService extends DataService {
@@ -123,7 +124,7 @@ public class ProjectBomService extends DataService {
 
     public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}")
+                                               .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}", BodyContentConverter.DEFAULT)
                                                .buildBlackDuckResponseRequest(projectVersionComponentsUrl);
         try (Response response = blackDuckApiClient.execute(request)) {
         } catch (IOException e) {

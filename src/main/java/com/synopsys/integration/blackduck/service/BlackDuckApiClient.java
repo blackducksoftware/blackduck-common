@@ -28,6 +28,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckResponseReque
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckApiClient {
@@ -97,7 +98,7 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     public HttpUrl post(HttpUrl url, BlackDuckComponent blackDuckComponent) throws IntegrationException {
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .postObject(blackDuckComponent)
+                                               .postObject(blackDuckComponent, BodyContentConverter.DEFAULT)
                                                .buildBlackDuckResponseRequest(url);
         return executePostRequestAndRetrieveURL(request);
     }
@@ -128,7 +129,7 @@ public class BlackDuckApiClient {
         // add the 'missing' pieces back from view that could have been lost
         String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .putString(json)
+                                               .putString(json, BodyContentConverter.DEFAULT)
                                                .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
         } catch (IOException e) {

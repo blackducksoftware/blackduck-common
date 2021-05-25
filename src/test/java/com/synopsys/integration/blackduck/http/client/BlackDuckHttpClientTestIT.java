@@ -34,6 +34,7 @@ import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.log.SilentIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.proxy.ProxyInfo;
 import com.synopsys.integration.rest.response.Response;
 
@@ -195,7 +196,7 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("write");
 
         BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
-                                                              .postObject(apiTokenRequest);
+                                                              .postObject(apiTokenRequest, BodyContentConverter.DEFAULT);
         BlackDuckSingleRequest<ApiTokenView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(tokenResponse);
 
         return blackDuckApiClient.getResponse(requestSingle);

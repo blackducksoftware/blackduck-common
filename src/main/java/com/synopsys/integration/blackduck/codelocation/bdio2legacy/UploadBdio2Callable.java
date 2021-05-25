@@ -7,7 +7,10 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
+
+import org.apache.http.entity.ContentType;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
@@ -40,8 +43,7 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
         try {
             HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
             BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                                   .postFile(uploadTarget.getUploadFile())
-                                                   .acceptMimeType(uploadTarget.getMediaType())
+                                                   .postFile(uploadTarget.getUploadFile(), ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
                                                    .buildBlackDuckResponseRequest(url);
 
             try (Response response = blackDuckApiClient.execute(request)) {

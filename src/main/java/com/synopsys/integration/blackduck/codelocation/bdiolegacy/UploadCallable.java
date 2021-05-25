@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.entity.ContentType;
 
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -52,8 +53,7 @@ public class UploadCallable implements Callable<UploadOutput> {
 
             UrlSingleResponse<BlackDuckStringResponse> stringResponse = new UrlSingleResponse<>(apiDiscovery.metaBomImportLink().getUrl(), BlackDuckStringResponse.class);
             BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                                   .postString(jsonPayload)
-                                                   .acceptMimeType(uploadTarget.getMediaType())
+                                                   .postString(jsonPayload, ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
                                                    .buildBlackDuckResponseRequest(stringResponse.getUrl());
 
             try (Response response = blackDuckApiClient.execute(request)) {

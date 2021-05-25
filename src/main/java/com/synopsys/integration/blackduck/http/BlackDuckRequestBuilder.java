@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
@@ -129,7 +132,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public BlackDuckRequestBuilder acceptMimeType(String acceptHeader) {
-        requestBuilder.acceptMimeType(acceptHeader);
+        addHeader(HttpHeaders.ACCEPT, acceptHeader);
         return this;
     }
 
@@ -184,24 +187,24 @@ public class BlackDuckRequestBuilder {
         return method(HttpMethod.GET);
     }
 
-    public BlackDuckRequestBuilder postFile(File bodyContentFile) {
-        return postBodyContent(new FileBodyContent(bodyContentFile));
+    public BlackDuckRequestBuilder postFile(File bodyContentFile, ContentType contentType) {
+        return postBodyContent(new FileBodyContent(bodyContentFile, contentType));
     }
 
-    public BlackDuckRequestBuilder postMap(Map<String, String> bodyContentMap) {
-        return postBodyContent(new MapBodyContent(bodyContentMap));
+    public BlackDuckRequestBuilder postMap(Map<String, String> bodyContentMap, Charset encoding) {
+        return postBodyContent(new MapBodyContent(bodyContentMap, encoding));
     }
 
     public BlackDuckRequestBuilder postMultipart(Map<String, File> bodyContentFileMap, Map<String, String> bodyContentStringMap) {
         return postBodyContent(new MultipartBodyContent(bodyContentFileMap, bodyContentStringMap));
     }
 
-    public BlackDuckRequestBuilder postString(String bodyContent) {
-        return postBodyContent(new StringBodyContent(bodyContent));
+    public BlackDuckRequestBuilder postString(String bodyContent, ContentType contentType) {
+        return postBodyContent(new StringBodyContent(bodyContent, contentType));
     }
 
-    public BlackDuckRequestBuilder postObject(Object bodyContent) {
-        return postBodyContent(new ObjectBodyContent(bodyContent));
+    public BlackDuckRequestBuilder postObject(Object bodyContent, ContentType contentType) {
+        return postBodyContent(new ObjectBodyContent(bodyContent, contentType));
     }
 
     public BlackDuckRequestBuilder postBodyContent(BodyContent bodyContent) {
@@ -213,12 +216,12 @@ public class BlackDuckRequestBuilder {
         return method(HttpMethod.POST);
     }
 
-    public BlackDuckRequestBuilder putString(String bodyContent) {
-        return putBodyContent(new StringBodyContent(bodyContent));
+    public BlackDuckRequestBuilder putString(String bodyContent, ContentType contentType) {
+        return putBodyContent(new StringBodyContent(bodyContent, contentType));
     }
 
-    public BlackDuckRequestBuilder putObject(Object bodyContent) {
-        return putBodyContent(new ObjectBodyContent(bodyContent));
+    public BlackDuckRequestBuilder putObject(Object bodyContent, ContentType contentType) {
+        return putBodyContent(new ObjectBodyContent(bodyContent, contentType));
     }
 
     public BlackDuckRequestBuilder putBodyContent(BodyContent bodyContent) {
@@ -239,7 +242,7 @@ public class BlackDuckRequestBuilder {
     }
 
     public String getAcceptMimeType() {
-        return requestBuilder.getAcceptMimeType();
+        return requestBuilder.getHeaders().get(HttpHeaders.ACCEPT);
     }
 
     public Charset getBodyEncoding() {
