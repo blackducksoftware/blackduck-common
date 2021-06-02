@@ -90,6 +90,7 @@ public class BlackDuckServicesFactory {
 
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
+                   .setLenient()
                    .setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
