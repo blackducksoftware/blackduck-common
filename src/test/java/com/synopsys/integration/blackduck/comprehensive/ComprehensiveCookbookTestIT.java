@@ -185,7 +185,7 @@ public class ComprehensiveCookbookTestIT {
             assertEquals(Result.SUCCESS, uploadOutput.getResult());
         }
 
-        VerifyNotifications.verify(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
+        VerifyNotifications.verify(currentUser, blackDuckServices.blackDuckRegistrationService, blackDuckServices.notificationService, userStartDate, systemStartDate);
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
     }
@@ -238,7 +238,7 @@ public class ComprehensiveCookbookTestIT {
             assertNotNull(scanCommandOutput.getDryRunFile());
         }
 
-        VerifyNotifications.verify(currentUser, blackDuckServices.notificationService, userStartDate, systemStartDate);
+        VerifyNotifications.verify(currentUser, blackDuckServices.blackDuckRegistrationService, blackDuckServices.notificationService, userStartDate, systemStartDate);
 
         completePolicyCheck(blackDuckServices, checkPolicyData);
     }

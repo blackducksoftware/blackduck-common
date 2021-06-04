@@ -88,7 +88,7 @@ public class BinaryScanUploadServiceTestIT {
             assertEquals(Result.SUCCESS, uploadOutput.getResult());
         }
 
-        VerifyNotifications.verify(binaryScanData.userView, blackDuckServices.notificationService, binaryScanData.userStartDate, binaryScanData.systemStartDate);
+        VerifyNotifications.verify(binaryScanData.userView, blackDuckServices.blackDuckRegistrationService, blackDuckServices.notificationService, binaryScanData.userStartDate, binaryScanData.systemStartDate);
     }
 
     private BinaryScan createTestBinaryScan() {

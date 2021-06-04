@@ -6,6 +6,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
@@ -34,6 +35,7 @@ public class BlackDuckServices {
     public CodeLocationCreationService codeLocationCreationService;
     public NotificationService notificationService;
     public UserService userService;
+    public BlackDuckRegistrationService blackDuckRegistrationService;
 
     public BlackDuckServices(IntHttpClientTestHelper intHttpClientTestHelper) throws IntegrationException {
         logger = new PrintStreamIntLogger(System.out, LogLevel.OFF);
@@ -50,6 +52,7 @@ public class BlackDuckServices {
         codeLocationCreationService = blackDuckServicesFactory.createCodeLocationCreationService();
         notificationService = blackDuckServicesFactory.createNotificationService();
         userService = blackDuckServicesFactory.createUserService();
+        blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
     }
 
 }
