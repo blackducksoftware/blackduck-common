@@ -29,7 +29,6 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleReque
 import com.synopsys.integration.blackduck.service.request.NotificationEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
 
 public class NotificationService extends DataService {
     // ejk - to get all notifications:
@@ -45,13 +44,15 @@ public class NotificationService extends DataService {
     public List<NotificationView> getAllNotifications(NotificationEditor notificationEditor) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
         BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
-        return blackDuckApiClient.getAllResponses(requestMultiple);
+        List<NotificationView> possiblyPoorlyFilteredNotifications = blackDuckApiClient.getAllResponses(requestMultiple);
+        return reallyFilterNotifications(possiblyPoorlyFilteredNotifications, notificationEditor.getNotificationTypesToInclude());
     }
 
     public List<NotificationUserView> getAllUserNotifications(UserView userView, NotificationEditor notificationEditor) throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
         BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
-        return blackDuckApiClient.getAllResponses(requestMultiple);
+        List<NotificationUserView> possiblyPoorlyFilteredNotifications = blackDuckApiClient.getAllResponses(requestMultiple);
+        return reallyFilterNotifications(possiblyPoorlyFilteredNotifications, notificationEditor.getNotificationTypesToInclude());
     }
 
     public BlackDuckPageResponse<NotificationView> getPageOfNotifications(NotificationEditor notificationEditor, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
@@ -98,12 +99,6 @@ public class NotificationService extends DataService {
         }
     }
 
-    private BlackDuckRequestBuilder prepareUserNotificationsRequest(UserView user, Date startDate, Date endDate, List<String> notificationTypesToInclude) {
-        HttpUrl url = user.getFirstLink(UserView.NOTIFICATIONS_LINK);
-        return createNotificationRequestBuilder(startDate, endDate, notificationTypesToInclude)
-                   .url(url);
-    }
-
     private BlackDuckRequestBuilder createLatestDateRequestBuilder() {
         return new BlackDuckRequestBuilder()
                    .commonGet()
@@ -121,11 +116,6 @@ public class NotificationService extends DataService {
 
     private BlackDuckRequestFilter createFilterForSpecificTypes(List<String> notificationTypesToInclude) {
         return BlackDuckRequestFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
-    }
-
-    private BlackDuckRequestBuilder createNotificationRequestBuilder(Date startDate, Date endDate, List<String> notificationTypesToInclude) {
-        NotificationEditor notificationEditor = new NotificationEditor(startDate, endDate, notificationTypesToInclude);
-        return createNotificationRequestBuilder(notificationEditor);
     }
 
     private BlackDuckRequestBuilder createNotificationRequestBuilder(NotificationEditor notificationEditor) {

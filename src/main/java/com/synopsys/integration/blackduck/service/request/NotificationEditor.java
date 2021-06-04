@@ -60,6 +60,10 @@ public class NotificationEditor extends Stringable implements BlackDuckRequestBu
             .addBlackDuckFilter(notificationTypeFilter);
     }
 
+    public List<String> getNotificationTypesToInclude() {
+        return notificationTypesToInclude;
+    }
+
     private BlackDuckRequestFilter createFilterForNotificationsTypes(List<String> notificationTypesToInclude) {
         return BlackDuckRequestFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
     }

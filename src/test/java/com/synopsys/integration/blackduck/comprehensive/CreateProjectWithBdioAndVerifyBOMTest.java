@@ -195,7 +195,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
             System.out.println("found code location urls:");
             foundCodeLocationUrls.forEach(System.out::println);
 
-            return expectedCodeLocationUrls.equals(foundCodeLocationUrls);
+            return foundCodeLocationUrls.containsAll(expectedCodeLocationUrls);
         };
         return WaitJob.createSimpleWait(waitForNotifications, findNotificationsForAllCodeLocationUrls).waitFor();
     }
