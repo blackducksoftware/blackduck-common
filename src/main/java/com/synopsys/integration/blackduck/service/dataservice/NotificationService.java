@@ -119,9 +119,9 @@ public class NotificationService extends DataService {
     }
 
     private BlackDuckRequestBuilder createNotificationRequestBuilder(NotificationEditor notificationEditor) {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder().commonGet();
-        notificationEditor.edit(blackDuckRequestBuilder);
-        return blackDuckRequestBuilder;
+        return new BlackDuckRequestBuilder()
+                   .commonGet()
+                   .apply(notificationEditor);
     }
 
     /*
