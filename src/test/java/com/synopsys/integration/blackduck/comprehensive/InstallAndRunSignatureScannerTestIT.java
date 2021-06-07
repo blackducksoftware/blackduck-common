@@ -38,6 +38,7 @@ import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.BufferedIntLogger;
@@ -103,7 +104,8 @@ public class InstallAndRunSignatureScannerTestIT {
         ScanBatchRunner scanBatchRunnerWithout = ScanBatchRunner.createComplete(environmentVariables, scanPathsUtility, scanCommandRunner, installerWithoutKeyStoreManagement);
         SignatureScannerService signatureScannerServiceWithout = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWithout);
 
-        assertScanFailure(logger, signatureScannerServiceWithout, scanBatch);
+        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
+        assertScanFailure(logger, blackDuckRegistrationService, signatureScannerServiceWithout, scanBatch);
 
         // now, delete the failed installation
         FileUtils.deleteDirectory(installDirectory);
@@ -141,14 +143,20 @@ public class InstallAndRunSignatureScannerTestIT {
         return scanBatch;
     }
 
-    private void assertScanFailure(BufferedIntLogger logger, SignatureScannerService signatureScannerService, ScanBatch scanBatch) throws InterruptedException, IntegrationException {
+    private void assertScanFailure(BufferedIntLogger logger, BlackDuckRegistrationService blackDuckRegistrationService, SignatureScannerService signatureScannerService, ScanBatch scanBatch)
+        throws InterruptedException, IntegrationException {
         assertEquals(0, logger.getOutputList(LogLevel.ERROR).size());
         ScanBatchOutput scanBatchOutput = signatureScannerService.performSignatureScanAndWait(scanBatch, 15 * 60);
         assertEquals(1, scanBatchOutput.getOutputs().size());
         ScanCommandOutput scanCommandOutput = scanBatchOutput.getOutputs().get(0);
         assertEquals(Result.FAILURE, scanCommandOutput.getResult());
-        assertEquals(1, logger.getOutputList(LogLevel.ERROR).size());
-        assertTrue(logger.getOutputList(LogLevel.ERROR).get(0).contains("use --insecure"));
+        assertEquals(1, scanCommandOutput.getScanExitCode().get());
+
+        String version = blackDuckRegistrationService.getBlackDuckServerData().getVersion();
+        if ("2020.2.0".equals(version) || "2020.2.1".equals(version)) {
+            assertEquals(1, logger.getOutputList(LogLevel.ERROR).size());
+            assertTrue(logger.getOutputList(LogLevel.ERROR).get(0).contains("use --insecure"));
+        }
     }
 
     private void assertScanSuccess(BufferedIntLogger logger, SignatureScannerService signatureScannerService, ScanBatch scanBatch) throws InterruptedException, IntegrationException {
