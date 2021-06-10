@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
@@ -153,7 +155,8 @@ public class InstallAndRunSignatureScannerTestIT {
         assertEquals(1, scanCommandOutput.getScanExitCode().get());
 
         String version = blackDuckRegistrationService.getBlackDuckServerData().getVersion();
-        if ("2020.2.0".equals(version) || "2020.2.1".equals(version)) {
+        List<String> versionsThatDoNotLogCorrectly = Arrays.asList("2020.2.0", "2020.2.1");
+        if (!versionsThatDoNotLogCorrectly.contains(version)) {
             assertEquals(1, logger.getOutputList(LogLevel.ERROR).size());
             assertTrue(logger.getOutputList(LogLevel.ERROR).get(0).contains("use --insecure"));
         }
