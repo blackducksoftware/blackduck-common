@@ -20,10 +20,10 @@ import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobConfig;
 
 public class RapidScanWaiter {
-    private IntLogger logger;
-    private BlackDuckApiClient blackDuckApiClient;
+    private final IntLogger logger;
+    private final BlackDuckApiClient blackDuckApiClient;
 
-    public RapidScanWaiter(final IntLogger logger, final BlackDuckApiClient blackDuckApiClient) {
+    public RapidScanWaiter(IntLogger logger, BlackDuckApiClient blackDuckApiClient) {
         this.logger = logger;
         this.blackDuckApiClient = blackDuckApiClient;
     }
