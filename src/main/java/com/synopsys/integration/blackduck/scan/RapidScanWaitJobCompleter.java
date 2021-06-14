@@ -9,9 +9,9 @@ package com.synopsys.integration.blackduck.scan;
 
 import java.util.List;
 
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.exception.IntegrationTimeoutException;
 import com.synopsys.integration.rest.HttpUrl;
@@ -28,8 +28,10 @@ public class RapidScanWaitJobCompleter implements WaitJobCompleter<List<Develope
 
     @Override
     public List<DeveloperScanComponentResultView> complete() throws IntegrationException {
-        UrlMultipleResponses<DeveloperScanComponentResultView> resultResponses = new UrlMultipleResponses<>(resultUrl, DeveloperScanComponentResultView.class);
-        return blackDuckApiClient.getAllResponses(resultResponses);
+        BlackDuckMultipleRequest<DeveloperScanComponentResultView> request =
+            new RapidScanRequestBuilder()
+                .createRequest(resultUrl);
+        return blackDuckApiClient.getAllResponses(request);
     }
 
     @Override

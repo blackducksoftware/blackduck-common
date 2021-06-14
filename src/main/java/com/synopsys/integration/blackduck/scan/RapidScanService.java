@@ -20,10 +20,11 @@ import com.synopsys.integration.rest.HttpUrl;
 public class RapidScanService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
     public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.developer-scan-1-ld-2+json";
-    private Bdio2FileUploadService bdio2FileUploadService;
-    private RapidScanWaiter rapidScanWaiter;
 
-    public RapidScanService(final Bdio2FileUploadService bdio2FileUploadService, final RapidScanWaiter rapidScanWaiter) {
+    private final Bdio2FileUploadService bdio2FileUploadService;
+    private final RapidScanWaiter rapidScanWaiter;
+
+    public RapidScanService(Bdio2FileUploadService bdio2FileUploadService, RapidScanWaiter rapidScanWaiter) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.rapidScanWaiter = rapidScanWaiter;
     }
@@ -49,4 +50,5 @@ public class RapidScanService {
         HttpUrl url = bdio2FileUploadService.uploadFile(bdio2File);
         return rapidScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
     }
+
 }
