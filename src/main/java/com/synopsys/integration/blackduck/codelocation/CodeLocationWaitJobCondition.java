@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
@@ -35,7 +34,6 @@ import com.synopsys.integration.wait.WaitJobCondition;
 
 public class CodeLocationWaitJobCondition implements WaitJobCondition {
     private final IntLogger logger;
-    private final BlackDuckApiClient blackDuckApiClient;
     private final ProjectService projectService;
     private final NotificationService notificationService;
 
@@ -44,13 +42,13 @@ public class CodeLocationWaitJobCondition implements WaitJobCondition {
     private final NameVersion projectAndVersion;
     private final Set<String> codeLocationNames;
     private final int expectedNotificationCount;
+    private final CodeLocationsRetriever codeLocationsRetriever;
 
     private final Set<String> foundCodeLocationNames = new HashSet<>();
 
     public CodeLocationWaitJobCondition(IntLogger logger, BlackDuckApiClient blackDuckApiClient, ProjectService projectService, NotificationService notificationService, UserView userView, NotificationTaskRange notificationTaskRange,
         NameVersion projectAndVersion, Set<String> codeLocationNames, int expectedNotificationCount) {
         this.logger = logger;
-        this.blackDuckApiClient = blackDuckApiClient;
         this.projectService = projectService;
         this.notificationService = notificationService;
         this.userView = userView;
@@ -58,6 +56,7 @@ public class CodeLocationWaitJobCondition implements WaitJobCondition {
         this.projectAndVersion = projectAndVersion;
         this.codeLocationNames = codeLocationNames;
         this.expectedNotificationCount = expectedNotificationCount;
+        codeLocationsRetriever = new CodeLocationsRetriever(blackDuckApiClient);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CodeLocationWaitJobCondition implements WaitJobCondition {
         }
         ProjectVersionView projectVersionView = projectVersionWrapper.get().getProjectVersionView();
 
-        Map<String, String> foundCodeLocations = retrieveCodeLocations(projectVersionView);
+        Map<String, String> foundCodeLocations = codeLocationsRetriever.retrieveCodeLocations(projectVersionView, codeLocationNames);
 
         int actualNotificationCount = 0;
         if (foundCodeLocations.size() > 0) {
@@ -103,14 +102,6 @@ public class CodeLocationWaitJobCondition implements WaitJobCondition {
         }
 
         return actualNotificationCount;
-    }
-
-    private Map<String, String> retrieveCodeLocations(ProjectVersionView projectVersionView) throws IntegrationException {
-        List<CodeLocationView> codeLocationViews = blackDuckApiClient.getAllResponses(projectVersionView.metaCodelocationsLink());
-        return codeLocationViews
-                   .stream()
-                   .filter(codeLocationView -> codeLocationNames.contains(codeLocationView.getName()))
-                   .collect(Collectors.toMap(codeLocationView -> codeLocationView.getHref().string(), CodeLocationView::getName));
     }
 
     private List<VersionBomCodeLocationBomComputedNotificationUserView> getFilteredNotificationUserViews(UserView userView, NotificationTaskRange notificationTaskRange) throws IntegrationException {
