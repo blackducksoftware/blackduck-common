@@ -93,7 +93,6 @@ public class Bdio2Factory {
 
         for (final Dependency dependency : dependencies) {
             if (dependency instanceof ProjectDependency) {
-                System.out.printf("***** FOUND SUBPROJECT: %s\n", dependency.getName());
                 final Project subproject = projectFromDependency(dependency);
                 dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(subproject));
 
