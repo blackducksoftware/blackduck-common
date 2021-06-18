@@ -72,7 +72,8 @@ public class Bdio2Factory {
         return new Project(projectExternalId.createBdioId().toString())
                    .identifier(projectExternalId.createExternalId())
                    .name(projectName)
-                   .version(projectVersionName);
+                   .version(projectVersionName)
+                   .namespace("root");
     }
 
     public Pair<List<Project>, List<Component>> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
