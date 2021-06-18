@@ -68,12 +68,15 @@ public class Bdio2Factory {
         return createBdioMetadata(codeLocationName, creationDateTime, productListBuilder.build());
     }
 
-    public Project createProject(final ExternalId projectExternalId, final String projectName, final String projectVersionName) {
-        return new Project(projectExternalId.createBdioId().toString())
+    public Project createProject(final ExternalId projectExternalId, final String projectName, final String projectVersionName, boolean isRootProject) {
+        Project project = new Project(projectExternalId.createBdioId().toString())
                    .identifier(projectExternalId.createExternalId())
                    .name(projectName)
-                   .version(projectVersionName)
-                   .namespace("root");
+                   .version(projectVersionName);
+        if (isRootProject) {
+            project.namespace("root");
+        }
+        return project;
     }
 
     public Pair<List<Project>, List<Component>> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
