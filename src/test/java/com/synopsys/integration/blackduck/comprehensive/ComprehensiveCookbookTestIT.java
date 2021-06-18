@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -251,6 +253,20 @@ public class ComprehensiveCookbookTestIT {
     @Test
     public void testGettingAllCodeLocations() throws IntegrationException {
         assertGettingAll(apiDiscovery.metaCodelocationsLink(), "code location");
+    }
+
+    @Test
+    public void testGettingPagesOfCodeLocations() throws IntegrationException {
+        BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
+        List<CodeLocationView> all = blackDuckServices.codeLocationService.getAllCodeLocations();
+        Set<String> names = new HashSet<>();
+        for (CodeLocationView one : all) {
+            if (names.contains(one.getName())) {
+                System.out.println("duplicate found:" + one.getName());
+            } else {
+                names.add(one.getName());
+            }
+        }
     }
 
     @Test
