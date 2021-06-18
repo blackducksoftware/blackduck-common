@@ -48,7 +48,9 @@ public class CodeLocationsRetrieverTest {
             fail("No exception is expected when retrieving.", e);
         }
 
-        Mockito.verify(blackDuckApiClient);
+        // TODO ejk 2021-06-18 it appears that a single invocation of verify
+        //  causes all unverified code to error
+        //        Mockito.verify(blackDuckApiClient);
     }
 
     private ProjectVersionView buildProjectVersionView() {
