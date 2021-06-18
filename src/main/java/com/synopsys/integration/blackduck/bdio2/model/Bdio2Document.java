@@ -12,16 +12,17 @@ import java.util.List;
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class Bdio2Document {
     private final BdioMetadata bdioMetadata;
     private final Project project;
-    private final List<Component> components;
+    private final Pair<List<Project>, List<Component>> subprojectsAndComponents;
 
-    public Bdio2Document(final BdioMetadata bdioMetadata, final Project project, final List<Component> components) {
+    public Bdio2Document(final BdioMetadata bdioMetadata, final Project project, final Pair<List<Project>, List<Component>> subprojectsAndComponents) {
         this.bdioMetadata = bdioMetadata;
         this.project = project;
-        this.components = components;
+        this.subprojectsAndComponents = subprojectsAndComponents;
     }
 
     public BdioMetadata getBdioMetadata() {
@@ -32,7 +33,7 @@ public class Bdio2Document {
         return project;
     }
 
-    public List<Component> getComponents() {
-        return components;
+    public Pair<List<Project>, List<Component>> getSubprojectsAndComponents() {
+        return subprojectsAndComponents;
     }
 }
