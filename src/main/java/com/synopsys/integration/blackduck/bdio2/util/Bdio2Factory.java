@@ -80,7 +80,7 @@ public class Bdio2Factory {
     }
 
     public Pair<List<Project>, List<Component>> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
-        return createAndLinkComponentsFromGraph(dependencyGraph, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), new HashMap<>());
+        return createAndLinkComponentsFromGraph(dependencyGraph, project::subproject, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), new HashMap<>());
     }
 
     private BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, ProductList productList) {
@@ -91,31 +91,31 @@ public class Bdio2Factory {
                    .publisher(productList);
     }
 
-    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final DependencyFunction dependencyFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
+    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
         final List<Project> addedSubprojects = new ArrayList<>();
         final List<Component> addedComponents = new ArrayList<>();
 
         for (final Dependency dependency : dependencies) {
             if (dependency instanceof ProjectDependency) {
                 final Project subproject = projectFromDependency(dependency);
-                dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(subproject));
+                subProjectFunction.subProject(new com.blackducksoftware.bdio2.model.Project(subproject.id()).subproject(subproject));
 
                 if (!existingSubprojects.containsKey(dependency.getExternalId())) {
                     addedSubprojects.add(subproject);
                     existingSubprojects.put(dependency.getExternalId(), subproject);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subproject::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
+                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subProjectFunction, dependentComponentFunction, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
                     addedSubprojects.addAll(children.getLeft());
                     addedComponents.addAll(children.getRight());
                 }
             } else {
                 final Component component = componentFromDependency(dependency);
-                dependencyFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
+                dependentComponentFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
 
                 if (!existingComponents.containsKey(dependency.getExternalId())) {
                     addedComponents.add(component);
 
                     existingComponents.put(dependency.getExternalId(), component);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
+                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subProjectFunction, dependentComponentFunction, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
                     addedSubprojects.addAll(children.getLeft());
                     addedComponents.addAll(children.getRight());
                 }
@@ -150,6 +150,11 @@ public class Bdio2Factory {
     @FunctionalInterface
     private interface DependencyFunction {
         BdioObject dependency(@Nullable com.blackducksoftware.bdio2.model.Dependency dependency);
+    }
+
+    @FunctionalInterface
+    private interface SubProjectFunction {
+        BdioObject subProject(@Nullable com.blackducksoftware.bdio2.model.Project subProject);
     }
 
 }
