@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioObject;
@@ -91,19 +91,25 @@ public class Bdio2Factory {
                    .publisher(productList);
     }
 
-    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
+    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, @Nullable final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
         final List<Project> addedSubprojects = new ArrayList<>();
         final List<Component> addedComponents = new ArrayList<>();
 
         for (final Dependency dependency : dependencies) {
             if (dependency instanceof ProjectDependency) {
+                if (subProjectFunction == null) {
+                    // Subprojects cannot be dependencies of components
+                    // TODO is there a better way to handle this?
+                    // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
+                    continue;
+                }
                 final Project subproject = projectFromDependency(dependency);
                 subProjectFunction.subProject(new com.blackducksoftware.bdio2.model.Project(subproject.id()).subproject(subproject));
 
                 if (!existingSubprojects.containsKey(dependency.getExternalId())) {
                     addedSubprojects.add(subproject);
                     existingSubprojects.put(dependency.getExternalId(), subproject);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subProjectFunction, dependentComponentFunction, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
+                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subproject::subproject, subproject::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
                     addedSubprojects.addAll(children.getLeft());
                     addedComponents.addAll(children.getRight());
                 }
@@ -115,7 +121,7 @@ public class Bdio2Factory {
                     addedComponents.add(component);
 
                     existingComponents.put(dependency.getExternalId(), component);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subProjectFunction, dependentComponentFunction, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
+                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, null, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
                     addedSubprojects.addAll(children.getLeft());
                     addedComponents.addAll(children.getRight());
                 }
