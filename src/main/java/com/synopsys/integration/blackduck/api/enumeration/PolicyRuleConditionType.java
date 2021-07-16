@@ -8,33 +8,27 @@
 package com.synopsys.integration.blackduck.api.enumeration;
 
 public enum PolicyRuleConditionType {
-    PROJECT_NAME(PolicyRuleCategoryType.PROJECT, "Project Name"),
-    PROJECT_TAGS(PolicyRuleCategoryType.PROJECT, "Project Tags"),
-    PROJECT_TIER(PolicyRuleCategoryType.PROJECT, "Project Tier"),
-    VERSION_PHASE(PolicyRuleCategoryType.PROJECT, "Project Phase"),
-    VERSION_DISTRIBUTION(PolicyRuleCategoryType.PROJECT, "Project Distribution Type"),
-    SINGLE_VERSION(PolicyRuleCategoryType.COMPONENT, "Component"),
-    COMPONENT_USAGE(PolicyRuleCategoryType.COMPONENT, "Component Usage"),
-    REVIEW_STATUS(PolicyRuleCategoryType.COMPONENT, "Review Status"),
-    LICENSE_FAMILY(PolicyRuleCategoryType.COMPONENT, "License Family"),
-    SINGLE_LICENSE(PolicyRuleCategoryType.COMPONENT, "License"),
-    RELEASE_DATE(PolicyRuleCategoryType.COMPONENT, "Component Release Date"),
-    NEWER_VERSIONS_COUNT(PolicyRuleCategoryType.COMPONENT, "Newer Versions Count"),
-    HIGH_SEVERITY_VULN_COUNT(PolicyRuleCategoryType.COMPONENT, "High Severity Vulnerability Count"),
-    MEDIUM_SEVERITY_VULN_COUNT(PolicyRuleCategoryType.COMPONENT, "Medium Severity Vulnerability Count"),
-    LOW_SEVERITY_VULN_COUNT(PolicyRuleCategoryType.COMPONENT, "Low Severity Vulnerability Count"),
-    UNKNOWN_RULE_CONDTION(null, "Unknown Rule Condition");
+    PROJECT_NAME("Project Name"),
+    PROJECT_TAGS("Project Tags"),
+    PROJECT_TIER("Project Tier"),
+    VERSION_PHASE("Project Phase"),
+    VERSION_DISTRIBUTION("Project Distribution Type"),
+    SINGLE_VERSION("Component"),
+    COMPONENT_USAGE("Component Usage"),
+    REVIEW_STATUS("Review Status"),
+    LICENSE_FAMILY("License Family"),
+    SINGLE_LICENSE("License"),
+    RELEASE_DATE("Component Release Date"),
+    NEWER_VERSIONS_COUNT("Newer Versions Count"),
+    HIGH_SEVERITY_VULN_COUNT("High Severity Vulnerability Count"),
+    MEDIUM_SEVERITY_VULN_COUNT("Medium Severity Vulnerability Count"),
+    LOW_SEVERITY_VULN_COUNT("Low Severity Vulnerability Count"),
+    VULN_LEVEL_OVERALL_SCORE("Overall Score");
 
-    private final PolicyRuleCategoryType policyRuleCategory;
     private final String displayValue;
 
-    PolicyRuleConditionType(final PolicyRuleCategoryType policyRuleCategory, final String displayValue) {
-        this.policyRuleCategory = policyRuleCategory;
+    PolicyRuleConditionType(String displayValue) {
         this.displayValue = displayValue;
-    }
-
-    public PolicyRuleCategoryType getPolicyRuleCategory() {
-        return policyRuleCategory;
     }
 
     public String getDisplayValue() {

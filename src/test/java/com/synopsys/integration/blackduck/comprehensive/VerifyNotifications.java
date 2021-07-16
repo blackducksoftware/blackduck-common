@@ -59,6 +59,10 @@ public class VerifyNotifications {
 
         // ejk - BD has a known bug in 2020.10.0 where version bom computed is
         // NOT included when asking for all
+        /*
+         * ejk 2021-07-16
+         * TODO should this be in VersionSupport?
+         */
         String version = blackDuckRegistrationService.getBlackDuckServerData().getVersion();
         if (!"2020.10.0".equals(version)) {
             assertTrue(allNotifications.containsAll(bomComputedNotifications));

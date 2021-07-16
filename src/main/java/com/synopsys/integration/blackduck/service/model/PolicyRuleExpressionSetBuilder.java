@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,10 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 
+/**
+ * The intention here is to provide a reasonable api on top of policy rule
+ * expressions available in Black Duck.
+ */
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
 
@@ -87,6 +92,10 @@ public class PolicyRuleExpressionSetBuilder {
 
     public void addComponentUsageCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, List<PolicyRuleComponentUsageValueSetType> componentUsageTypes) throws BlackDuckIntegrationException {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.COMPONENT_USAGE, componentUsageTypes);
+    }
+
+    public void addVulnerabilityOverallScoreCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, BigDecimal overallScore) throws BlackDuckIntegrationException {
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.VULN_LEVEL_OVERALL_SCORE, overallScore.toString());
     }
 
     public void addSingleObjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, Object object) throws BlackDuckIntegrationException {

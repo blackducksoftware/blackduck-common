@@ -154,6 +154,10 @@ public class InstallAndRunSignatureScannerTestIT {
         assertEquals(Result.FAILURE, scanCommandOutput.getResult());
         assertEquals(1, scanCommandOutput.getScanExitCode().get());
 
+        /*
+         * ejk 2021-07-16
+         * TODO should this be in VersionSupport?
+         */
         String version = blackDuckRegistrationService.getBlackDuckServerData().getVersion();
         List<String> versionsThatDoNotLogCorrectly = Arrays.asList("2020.2.0", "2020.2.1");
         if (!versionsThatDoNotLogCorrectly.contains(version)) {

@@ -46,7 +46,8 @@ public class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         policyRuleView = constructTestPolicy(blackDuckServicesFactory.createComponentService());
 
         /*
-         * To create a Policy Rule we can construct a PolicyRuleView and create it to Black Duck.
+         * To create a Policy Rule we can construct a PolicyRuleView and create
+         * it in Black Duck.
          */
         HttpUrl policyRuleUrl = policyRuleService.createPolicyRule(policyRuleView);
         policyRuleView = blackDuckApiClient.getResponse(policyRuleUrl, PolicyRuleView.class);
@@ -63,7 +64,8 @@ public class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         ExternalId externalId = constructExternalId();
 
         /*
-         * We add a new component to the Version that will violate our 'Test Rule'
+         * We add a new component to the Version that will violate our 'Test
+         * Rule'
          */
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
@@ -76,8 +78,10 @@ public class CheckPolicyForProjectVersionRecipeTest extends BasicRecipe {
         Optional<ComponentsView> searchResult = componentService.getSingleOrEmptyResult(externalId);
         ComponentVersionView componentVersionView = componentService.getComponentVersionView(searchResult.get()).get();
 
-        /**
-         * using the PolicyRuleExpressionSetBuilder we can build the expression set for a PolicyRuleView*/
+        /*
+         * using the PolicyRuleExpressionSetBuilder we can build the expression
+         * set for a PolicyRuleView
+         */
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersionView);
         PolicyRuleExpressionView expressionSet = builder.createPolicyRuleExpressionView();
