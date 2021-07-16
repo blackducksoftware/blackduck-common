@@ -7,8 +7,10 @@
  */
 package com.synopsys.integration.blackduck.scan;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
@@ -33,13 +35,16 @@ public class RapidScanService {
         return performScan(uploadBatch, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
+    // TODO ejk 2021-07-15 consider using DataOrException to abandon flow control with Exceptions but allow for streaming
     public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        List<DeveloperScanComponentResultView> scanResults = new LinkedList<>();
-        List<UploadTarget> uploadTargets = uploadBatch.getUploadTargets();
-        for (UploadTarget uploadTarget : uploadTargets) {
-            scanResults.addAll(performScan(uploadTarget, timeoutInSeconds, waitIntervalInSeconds));
+        List<DeveloperScanComponentResultView> allScanResults = new LinkedList<>();
+
+        for (UploadTarget uploadTarget : uploadBatch.getUploadTargets()) {
+            List<DeveloperScanComponentResultView> scanResults = performScan(uploadTarget, timeoutInSeconds, waitIntervalInSeconds);
+            allScanResults.addAll(scanResults);
         }
-        return scanResults;
+
+        return allScanResults;
     }
 
     public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
@@ -48,7 +53,7 @@ public class RapidScanService {
 
     public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         HttpUrl url = bdio2FileUploadService.uploadFile(bdio2File);
-        return rapidScanWaiter.checkScanResult(url, timeoutInSeconds, waitIntervalInSeconds);
+        return rapidScanWaiter.checkScanResult(url, bdio2File.getCodeLocationName(), timeoutInSeconds, waitIntervalInSeconds);
     }
 
 }

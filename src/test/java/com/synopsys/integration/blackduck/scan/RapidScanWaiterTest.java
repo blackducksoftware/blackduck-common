@@ -37,7 +37,7 @@ public class RapidScanWaiterTest {
 
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
-        List<DeveloperScanComponentResultView> results = waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
+        List<DeveloperScanComponentResultView> results = waiter.checkScanResult(url, "", timeoutInSeconds, waitInSeconds);
 
         assertEquals(expectedResults, results);
     }
@@ -57,7 +57,7 @@ public class RapidScanWaiterTest {
         long timeoutInSeconds = 1;
         int waitInSeconds = 2;
         try {
-            waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
+            waiter.checkScanResult(url, "", timeoutInSeconds, waitInSeconds);
             fail();
         } catch (IntegrationException | InterruptedException ex) {
             // pass
@@ -79,7 +79,7 @@ public class RapidScanWaiterTest {
         long timeoutInSeconds = 2;
         int waitInSeconds = 1;
         try {
-            waiter.checkScanResult(url, timeoutInSeconds, waitInSeconds);
+            waiter.checkScanResult(url, "", timeoutInSeconds, waitInSeconds);
             fail();
         } catch (IntegrationException | InterruptedException ex) {
             // pass

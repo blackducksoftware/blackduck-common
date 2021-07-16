@@ -22,8 +22,6 @@ import com.synopsys.integration.util.NameVersion;
 @Tag("integration")
 public class RapidScanServiceTestIT {
     @Test
-    @Disabled
-    //TODO ejk - enable when this works, at least against 2021.2.0, /api/developer-scans returns a 404
     public void testScan() throws Exception {
         IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
@@ -40,8 +38,6 @@ public class RapidScanServiceTestIT {
     }
 
     @Test
-    @Disabled
-    //TODO ejk - enable when this works, at least against 2021.2.0, /api/developer-scans returns a 404
     public void testScanBatch() throws Exception {
         IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();

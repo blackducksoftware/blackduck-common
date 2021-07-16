@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionIssuesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -50,7 +51,7 @@ public class IssueService extends DataService {
         return blackDuckApiClient.getResponse(issueUrl, IssueView.class);
     }
 
-    public void createIssueForComponent(ProjectVersionComponentView projectVersionComponentView, IssueRequest issueRequest) throws IntegrationException {
+    public void createIssueForComponent(ProjectVersionComponentVersionView projectVersionComponentView, IssueRequest issueRequest) throws IntegrationException {
         HttpUrl createIssueUrl = projectVersionComponentView.getFirstLink(ProjectVersionComponentView.COMPONENT_ISSUES_LINK);
         blackDuckApiClient.post(createIssueUrl, issueRequest);
     }

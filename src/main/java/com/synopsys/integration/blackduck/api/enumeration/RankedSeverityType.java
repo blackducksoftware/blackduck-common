@@ -16,6 +16,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSe
 public enum RankedSeverityType {
     UNSPECIFIED(PolicyRuleSeverityType.UNSPECIFIED),
     TRIVIAL(PolicyRuleSeverityType.TRIVIAL),
+    OK(PolicyRuleSeverityType.OK),
     MINOR(PolicyRuleSeverityType.MINOR),
     MAJOR(PolicyRuleSeverityType.MAJOR),
     CRITICAL(PolicyRuleSeverityType.CRITICAL),
@@ -23,7 +24,7 @@ public enum RankedSeverityType {
 
     private final PolicyRuleSeverityType policyRuleSeverityType;
 
-    private RankedSeverityType(PolicyRuleSeverityType unrankedSeverityType) {
+    RankedSeverityType(PolicyRuleSeverityType unrankedSeverityType) {
         this.policyRuleSeverityType = unrankedSeverityType;
     }
 
@@ -33,4 +34,5 @@ public enum RankedSeverityType {
                    .map(t -> t.policyRuleSeverityType)
                    .collect(Collectors.toList());
     }
+
 }
