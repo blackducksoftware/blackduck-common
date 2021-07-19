@@ -26,17 +26,17 @@ public class Bdio2Writer {
 
     public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) throws IOException {
         final BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
-        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getSubprojectsAndComponents());
+        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getSubprojects(), bdio2Document.getComponents());
     }
 
-    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final Pair<List<Project>, List<Component>> subprojectsAndComponents) throws IOException {
+    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, List<Project> projects, List<Component> components) throws IOException {
         bdioWriter.start();
 
-        for (Project subProject : subprojectsAndComponents.getLeft()) {
+        for (Project subProject : projects) {
             bdioWriter.next(subProject);
         }
 
-        for (Component component : subprojectsAndComponents.getRight()) {
+        for (Component component : components) {
             bdioWriter.next(component);
         }
 

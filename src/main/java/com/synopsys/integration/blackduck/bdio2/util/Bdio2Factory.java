@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +37,9 @@ public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(final BdioMetadata bdioMetadata, final Project project, final DependencyGraph dependencyGraph) {
-        final Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
-        return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents);
+        final Bdio2DocumentBuilder documentBuilder = new Bdio2DocumentBuilder();
+        createAndLinkComponentsFromGraph(dependencyGraph, project::subproject, project::dependency, dependencyGraph.getRootDependencies(), documentBuilder);
+        return new Bdio2Document(bdioMetadata, project, documentBuilder.getEncounteredProjects(), documentBuilder.getEncounteredComponents());
     }
 
     public BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime) {
@@ -79,10 +81,6 @@ public class Bdio2Factory {
         return project;
     }
 
-    public Pair<List<Project>, List<Component>> createAndLinkComponents(final DependencyGraph dependencyGraph, final Project project) {
-        return createAndLinkComponentsFromGraph(dependencyGraph, project::subproject, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), new HashMap<>());
-    }
-
     private BdioMetadata createBdioMetadata(final String codeLocationName, final ZonedDateTime creationDateTime, ProductList productList) {
         return new BdioMetadata()
                    .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
@@ -91,10 +89,7 @@ public class Bdio2Factory {
                    .publisher(productList);
     }
 
-    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, @Nullable final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
-        final List<Project> addedSubprojects = new ArrayList<>();
-        final List<Component> addedComponents = new ArrayList<>();
-
+    private void createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, @Nullable final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, Bdio2DocumentBuilder documentBuilder) {
         for (final Dependency dependency : dependencies) {
             if (dependency instanceof ProjectDependency) {
                 if (subProjectFunction == null) {
@@ -103,49 +98,18 @@ public class Bdio2Factory {
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
                     continue;
                 }
-                final Project subproject = projectFromDependency(dependency);
-                subProjectFunction.subProject(new com.blackducksoftware.bdio2.model.Project(subproject.id()).subproject(subproject));
+                final Project subproject = documentBuilder.getOrComputeProjectIfAbsent(dependency,
+                    (newsubproject) -> createAndLinkComponentsFromGraph(dependencyGraph, newsubproject::subproject, newsubproject::dependency, dependencyGraph.getChildrenForParent(dependency), documentBuilder));
 
-                if (!existingSubprojects.containsKey(dependency.getExternalId())) {
-                    addedSubprojects.add(subproject);
-                    existingSubprojects.put(dependency.getExternalId(), subproject);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, subproject::subproject, subproject::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
-                    addedSubprojects.addAll(children.getLeft());
-                    addedComponents.addAll(children.getRight());
-                }
+                subProjectFunction.subProject(new Project(subproject.id()).subproject(subproject));
             } else {
-                final Component component = componentFromDependency(dependency);
+                final Component component = documentBuilder.getOrComputeComponentIfAbsent(dependency,
+                    (newcomponent) -> createAndLinkComponentsFromGraph(dependencyGraph, null, newcomponent::dependency, dependencyGraph.getChildrenForParent(dependency), documentBuilder));
+
                 dependentComponentFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
-
-                if (!existingComponents.containsKey(dependency.getExternalId())) {
-                    addedComponents.add(component);
-
-                    existingComponents.put(dependency.getExternalId(), component);
-                    final Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(dependencyGraph, null, component::dependency, dependencyGraph.getChildrenForParent(dependency), existingSubprojects, existingComponents);
-                    addedSubprojects.addAll(children.getLeft());
-                    addedComponents.addAll(children.getRight());
-                }
             }
         }
-        return Pair.of(addedSubprojects, addedComponents);
     }
-
-    private Project projectFromDependency(final Dependency dependency) {
-        return new Project(dependency.getExternalId().createBdioId().toString())
-                .name(dependency.getName())
-                .version(dependency.getVersion())
-                .identifier(dependency.getExternalId().createExternalId())
-                .namespace(dependency.getExternalId().getForge().getName());
-    }
-
-    private Component componentFromDependency(final Dependency dependency) {
-        return new Component(dependency.getExternalId().createBdioId().toString())
-                   .name(dependency.getName())
-                   .version(dependency.getVersion())
-                   .identifier(dependency.getExternalId().createExternalId())
-                   .namespace(dependency.getExternalId().getForge().getName());
-    }
-
     private List<Product> addLists(List<Product> list1, List<Product> list2) {
         return Stream
                    .concat(list1.stream(), list2.stream())
