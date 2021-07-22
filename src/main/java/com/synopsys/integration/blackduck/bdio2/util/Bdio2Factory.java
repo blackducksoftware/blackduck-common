@@ -91,20 +91,20 @@ public class Bdio2Factory {
                    .publisher(productList);
     }
 
-    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, @Nullable final SubProjectFunction subProjectFunction, final DependencyFunction dependentComponentFunction, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
+    private Pair<List<Project>, List<Component>> createAndLinkComponentsFromGraph(final DependencyGraph dependencyGraph, @Nullable final SubProjectFunction linkProjectDependency, final DependencyFunction linkComponentDependency, final Set<Dependency> dependencies, final Map<ExternalId, Project> existingSubprojects, final Map<ExternalId, Component> existingComponents) {
         final List<Project> addedSubprojects = new ArrayList<>();
         final List<Component> addedComponents = new ArrayList<>();
 
         for (final Dependency dependency : dependencies) {
             if (dependency instanceof ProjectDependency) {
-                if (subProjectFunction == null) {
+                if (linkProjectDependency == null) {
                     // Subprojects cannot be dependencies of components
                     // TODO is there a better way to handle this?
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
                     continue;
                 }
                 final Project subproject = projectFromDependency(dependency);
-                subProjectFunction.subProject(new com.blackducksoftware.bdio2.model.Project(subproject.id()).subproject(subproject));
+                linkProjectDependency.subProject(new com.blackducksoftware.bdio2.model.Project(subproject.id()).subproject(subproject));
 
                 if (!existingSubprojects.containsKey(dependency.getExternalId())) {
                     addedSubprojects.add(subproject);
@@ -115,7 +115,7 @@ public class Bdio2Factory {
                 }
             } else {
                 final Component component = componentFromDependency(dependency);
-                dependentComponentFunction.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
+                linkComponentDependency.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
 
                 if (!existingComponents.containsKey(dependency.getExternalId())) {
                     addedComponents.add(component);
