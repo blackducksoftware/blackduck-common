@@ -7,12 +7,14 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.apache.http.entity.ContentType;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.bdio2.Bdio2Headers;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
@@ -44,8 +46,9 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
             HttpUrl url = apiDiscovery.metaSingleResponse(BlackDuckApiClient.SCAN_DATA_PATH).getUrl();
             BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                    .postFile(uploadTarget.getUploadFile(), ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
+                                                   .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectAndVersion.getName())
+                                                   .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectAndVersion.getVersion())
                                                    .buildBlackDuckResponseRequest(url);
-
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
                 return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
@@ -55,6 +58,15 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
         } catch (Exception e) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
+        }
+    }
+
+    private UploadOutput executeRequest(BlackDuckResponseRequest request) throws IOException {
+        try (Response response = blackDuckApiClient.execute(request)) {
+            String responseString = response.getContentString();
+            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
+        } catch (IntegrationException e) {
+            return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
         }
     }
 

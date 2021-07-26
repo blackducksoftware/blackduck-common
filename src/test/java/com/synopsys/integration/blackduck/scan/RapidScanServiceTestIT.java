@@ -1,6 +1,5 @@
 package com.synopsys.integration.blackduck.scan;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -11,11 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +71,7 @@ public class RapidScanServiceTestIT {
         String codeLocationName = String.format("__CodeLocation_%s_%s", projectNameVersion.getName(), projectNameVersion.getVersion());
         UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, codeLocationName, bdioFile);
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(uploadTarget, timeout, 5);
+        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(uploadTarget, projectNameVersion, timeout, 5);
         assertNotNull(results);
         assertTrue(results.size() > 0);
         assertNotNull(results.get(0).getViolatingPolicyNames());
@@ -88,7 +84,7 @@ public class RapidScanServiceTestIT {
         String codeLocationName = String.format("__CodeLocation_%s_%s", projectNameVersion.getName(), projectNameVersion.getVersion());
         UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, codeLocationName, bdioFile);
         int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(new UploadBatch(uploadTarget), timeout, 5);
+        List<DeveloperScanComponentResultView> results = rapidScanService.performScan(new UploadBatch(uploadTarget), projectNameVersion, timeout, 5);
         assertNotNull(results);
         assertTrue(results.size() > 0);
         assertNotNull(results.get(0).getViolatingPolicyNames());
@@ -102,7 +98,7 @@ public class RapidScanServiceTestIT {
             String codeLocationName = String.format("__CodeLocation_%s_%s", projectNameVersion.getName(), projectNameVersion.getVersion());
             UploadTarget uploadTarget = UploadTarget.createDefault(projectNameVersion, codeLocationName, bdioFile);
             int timeout = intHttpClientTestHelper.getBlackDuckServerConfig().getTimeout();
-            rapidScanService.performScan(uploadTarget, timeout);
+            rapidScanService.performScan(uploadTarget, projectNameVersion, timeout);
             fail();
         } catch (BlackDuckIntegrationException ex) {
             // pass
