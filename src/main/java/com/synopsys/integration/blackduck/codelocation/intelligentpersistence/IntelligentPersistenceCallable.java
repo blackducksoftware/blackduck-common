@@ -28,7 +28,7 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
         NameVersion projectAndVersion = uploadTarget.getProjectAndVersion();
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
-            bdio2FileUploadService.uploadFile(uploadTarget);
+            bdio2FileUploadService.uploadFile(uploadTarget, projectAndVersion);
             return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, null);
         } catch (Exception ex) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), ex.getMessage());

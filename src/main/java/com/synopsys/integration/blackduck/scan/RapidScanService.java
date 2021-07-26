@@ -7,10 +7,8 @@
  */
 package com.synopsys.integration.blackduck.scan;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.manual.view.DeveloperScanComponentResultView;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
@@ -18,6 +16,7 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.util.NameVersion;
 
 public class RapidScanService {
     public static final int DEFAULT_WAIT_INTERVAL_IN_SECONDS = 30;
@@ -31,28 +30,28 @@ public class RapidScanService {
         this.rapidScanWaiter = rapidScanWaiter;
     }
 
-    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return performScan(uploadBatch, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, NameVersion projectNameVersion, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performScan(uploadBatch, projectNameVersion, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
     // TODO ejk 2021-07-15 consider using DataOrException to abandon flow control with Exceptions but allow for streaming
-    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public List<DeveloperScanComponentResultView> performScan(UploadBatch uploadBatch, NameVersion projectNameVersion, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         List<DeveloperScanComponentResultView> allScanResults = new LinkedList<>();
 
         for (UploadTarget uploadTarget : uploadBatch.getUploadTargets()) {
-            List<DeveloperScanComponentResultView> scanResults = performScan(uploadTarget, timeoutInSeconds, waitIntervalInSeconds);
+            List<DeveloperScanComponentResultView> scanResults = performScan(uploadTarget, projectNameVersion, timeoutInSeconds, waitIntervalInSeconds);
             allScanResults.addAll(scanResults);
         }
 
         return allScanResults;
     }
 
-    public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        return performScan(bdio2File, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
+    public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, NameVersion projectNameVersion, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+        return performScan(bdio2File, projectNameVersion, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        HttpUrl url = bdio2FileUploadService.uploadFile(bdio2File);
+    public List<DeveloperScanComponentResultView> performScan(UploadTarget bdio2File, NameVersion projectNameVersion, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        HttpUrl url = bdio2FileUploadService.uploadFile(bdio2File, projectNameVersion);
         return rapidScanWaiter.checkScanResult(url, bdio2File.getCodeLocationName(), timeoutInSeconds, waitIntervalInSeconds);
     }
 

@@ -20,6 +20,7 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
@@ -27,20 +28,19 @@ public class Bdio2FileUploadService extends DataService {
     private final Bdio2ContentExtractor bdio2Extractor;
     private final Bdio2StreamUploader bdio2Uploader;
 
-    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery,
-        IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
+    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
         super(blackDuckApiClient, apiDiscovery, logger);
         this.bdio2Extractor = bdio2Extractor;
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
+    public HttpUrl uploadFile(UploadTarget uploadTarget, NameVersion projectNameVersion) throws IntegrationException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList);
+        return uploadFiles(bdioFileContentList, projectNameVersion);
     }
 
-    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles) throws IntegrationException {
+    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, NameVersion projectNameVersion) throws IntegrationException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -54,11 +54,11 @@ public class Bdio2FileUploadService extends DataService {
                                                    .collect(Collectors.toList());
         int count = remainingFiles.size();
         logger.debug("BDIO upload file count = " + count);
-        HttpUrl url = bdio2Uploader.start(header);
+        HttpUrl url = bdio2Uploader.start(header, projectNameVersion);
         for (BdioFileContent content : remainingFiles) {
-            bdio2Uploader.append(url, count, content);
+            bdio2Uploader.append(url, count, content, projectNameVersion);
         }
-        bdio2Uploader.finish(url, count);
+        bdio2Uploader.finish(url, count, projectNameVersion);
 
         return url;
     }
