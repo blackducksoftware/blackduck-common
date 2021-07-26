@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckResponseReque
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2StreamUploader {
@@ -32,11 +34,10 @@ public class Bdio2StreamUploader {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
     private final IntLogger logger;
-    private final BlackDuckPath scanPath;
+    private final BlackDuckPath<BlackDuckResponse> scanPath;
     private final String contentType;
 
-    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath,
-        String contentType) {
+    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath, String contentType) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
         this.logger = logger;
@@ -57,7 +58,7 @@ public class Bdio2StreamUploader {
         return responseUrl;
     }
 
-    public void append(HttpUrl url, int count, BdioFileContent bdioFileContent, NameVersion projectNameVersion) throws IntegrationException {
+    public Response append(HttpUrl url, int count, BdioFileContent bdioFileContent, NameVersion projectNameVersion) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
@@ -67,10 +68,15 @@ public class Bdio2StreamUploader {
                                                .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectNameVersion.getName())
                                                .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectNameVersion.getVersion())
                                                .buildBlackDuckResponseRequest(url);
-        blackDuckApiClient.execute(request);  // 202 accepted
+        try (Response response = blackDuckApiClient.execute(request)) {
+            // 202 accepted
+            return response;
+        } catch (IOException e) {
+            throw new IntegrationException("Failed to finish BDIO 2 upload.", e);
+        }
     }
 
-    public void finish(HttpUrl url, int count, NameVersion projectNameVersion) throws IntegrationException {
+    public Response finish(HttpUrl url, int count, NameVersion projectNameVersion) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
@@ -80,7 +86,11 @@ public class Bdio2StreamUploader {
                                                .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectNameVersion.getName())
                                                .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectNameVersion.getVersion())
                                                .buildBlackDuckResponseRequest(url);
-        blackDuckApiClient.execute(request);
+        try (Response response = blackDuckApiClient.execute(request)) {
+            return response;
+        } catch (IOException e) {
+            throw new IntegrationException("Failed to finish BDIO 2 upload.", e);
+        }
     }
 
 }
