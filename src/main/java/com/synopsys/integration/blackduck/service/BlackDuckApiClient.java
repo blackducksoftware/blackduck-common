@@ -33,7 +33,7 @@ import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckApiClient {
     //TODO ejk - create tests to exercise this endpoint - find out what version the slash is not required in
-    public static final BlackDuckPath SCAN_DATA_PATH = new BlackDuckPath("/api/scan/data/", BlackDuckResponse.class, false);
+    public static final BlackDuckPath<BlackDuckResponse> SCAN_DATA_PATH = new BlackDuckPath<>("/api/scan/data/", BlackDuckResponse.class, false);
 
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
@@ -132,6 +132,7 @@ public class BlackDuckApiClient {
                                                .putString(json, BodyContentConverter.DEFAULT)
                                                .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
+            // TODO: Why do we not return the response here? JM - 07/2021
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }

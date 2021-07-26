@@ -10,10 +10,10 @@ package com.synopsys.integration.blackduck.bdio2.model;
 import com.synopsys.integration.util.Stringable;
 
 public class BdioFileContent extends Stringable {
-    private String fileName;
-    private String content;
+    private final String fileName;
+    private final String content;
 
-    public BdioFileContent(final String fileName, final String content) {
+    public BdioFileContent(String fileName, String content) {
         this.fileName = fileName;
         this.content = content;
     }

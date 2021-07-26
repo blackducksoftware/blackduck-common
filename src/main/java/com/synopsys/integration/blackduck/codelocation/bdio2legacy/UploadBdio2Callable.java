@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
@@ -46,15 +47,19 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
                                                    .postFile(uploadTarget.getUploadFile(), ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
                                                    .buildBlackDuckResponseRequest(url);
 
-            try (Response response = blackDuckApiClient.execute(request)) {
-                String responseString = response.getContentString();
-                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
-            } catch (IntegrationException e) {
-                return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
-            }
+            return executeRequest(request);
         } catch (Exception e) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);
+        }
+    }
+
+    private UploadOutput executeRequest(BlackDuckResponseRequest request) throws IOException {
+        try (Response response = blackDuckApiClient.execute(request)) {
+            String responseString = response.getContentString();
+            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
+        } catch (IntegrationException e) {
+            return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
         }
     }
 
