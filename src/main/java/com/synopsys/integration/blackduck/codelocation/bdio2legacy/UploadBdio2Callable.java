@@ -49,12 +49,8 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
                                                    .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectAndVersion.getName())
                                                    .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectAndVersion.getVersion())
                                                    .buildBlackDuckResponseRequest(url);
-            try (Response response = blackDuckApiClient.execute(request)) {
-                String responseString = response.getContentString();
-                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
-            } catch (IntegrationException e) {
-                return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
-            }
+
+            return executeRequest(request);
         } catch (Exception e) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, e);

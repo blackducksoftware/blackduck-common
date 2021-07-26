@@ -15,10 +15,10 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.util.NameVersion;
 
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
-    private Bdio2FileUploadService bdio2FileUploadService;
-    private UploadTarget uploadTarget;
+    private final Bdio2FileUploadService bdio2FileUploadService;
+    private final UploadTarget uploadTarget;
 
-    public IntelligentPersistenceCallable(final Bdio2FileUploadService bdio2FileUploadService, final UploadTarget uploadTarget) {
+    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.uploadTarget = uploadTarget;
     }
