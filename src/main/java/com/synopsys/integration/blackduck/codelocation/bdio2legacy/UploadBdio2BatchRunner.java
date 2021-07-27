@@ -14,11 +14,13 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.bdio2.Bdio2Headers;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.log.IntLogger;
 
 public class UploadBdio2BatchRunner {
@@ -65,7 +67,16 @@ public class UploadBdio2BatchRunner {
     private List<UploadBdio2Callable> createCallables(UploadBatch uploadBatch) {
         return uploadBatch.getUploadTargets()
                    .stream()
-                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, uploadTarget))
+                   .map(uploadTarget -> {
+                       BlackDuckRequestBuilderEditor editor = uploadTarget.getProjectAndVersion()
+                                                                  .map(projectVersion -> (BlackDuckRequestBuilderEditor) builder -> {
+                                                                      builder
+                                                                          .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectVersion.getName())
+                                                                          .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectVersion.getVersion());
+                                                                  })
+                                                                  .orElse(noOp -> {});
+                       return new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, uploadTarget, editor);
+                   })
                    .collect(Collectors.toList());
     }
 

@@ -25,18 +25,13 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class Bdio2StreamUploader {
-    private static final String HEADER_CONTENT_TYPE = "Content-type";
-    private static final String HEADER_X_BD_MODE = "X-BD-MODE";
-    private static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
-
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
     private final IntLogger logger;
     private final BlackDuckPath<BlackDuckResponse> scanPath;
     private final String contentType;
 
-    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath,
-        String contentType) {
+    public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath, String contentType) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
         this.logger = logger;
@@ -48,7 +43,7 @@ public class Bdio2StreamUploader {
         HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(HEADER_CONTENT_TYPE, contentType)
+                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
                                                .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         HttpUrl responseUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(request);
@@ -60,9 +55,9 @@ public class Bdio2StreamUploader {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(HEADER_CONTENT_TYPE, contentType)
-                                               .addHeader(HEADER_X_BD_MODE, "append")
-                                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
+                                               .addHeader(Bdio2Headers.HEADER_X_BD_MODE, "append")
+                                               .addHeader(Bdio2Headers.HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
                                                .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);  // 202 accepted
@@ -72,9 +67,9 @@ public class Bdio2StreamUploader {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(HEADER_CONTENT_TYPE, contentType)
-                                               .addHeader(HEADER_X_BD_MODE, "finish")
-                                               .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
+                                               .addHeader(Bdio2Headers.HEADER_X_BD_MODE, "finish")
+                                               .addHeader(Bdio2Headers.HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
                                                .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);

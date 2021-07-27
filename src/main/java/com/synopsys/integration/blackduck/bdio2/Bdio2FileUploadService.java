@@ -10,6 +10,8 @@ package com.synopsys.integration.blackduck.bdio2;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
@@ -17,9 +19,11 @@ import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
@@ -37,10 +41,10 @@ public class Bdio2FileUploadService extends DataService {
     public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList);
+        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null));
     }
 
-    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles) throws IntegrationException {
+    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -54,11 +58,21 @@ public class Bdio2FileUploadService extends DataService {
                                                    .collect(Collectors.toList());
         int count = remainingFiles.size();
         logger.debug("BDIO upload file count = " + count);
-        HttpUrl url = bdio2Uploader.start(header);
-        for (BdioFileContent content : remainingFiles) {
-            bdio2Uploader.append(url, count, content);
+
+        BlackDuckRequestBuilderEditor editor = noOp -> {};
+        if (nameVersion != null) {
+            editor = builder -> {
+                builder
+                    .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, nameVersion.getName())
+                    .addHeader(Bdio2Headers.VERSION_NAME_HEADER, nameVersion.getVersion());
+            };
         }
-        bdio2Uploader.finish(url, count);
+
+        HttpUrl url = bdio2Uploader.start(header, editor);
+        for (BdioFileContent content : remainingFiles) {
+            bdio2Uploader.append(url, count, content, editor);
+        }
+        bdio2Uploader.finish(url, count, editor);
 
         return url;
     }
