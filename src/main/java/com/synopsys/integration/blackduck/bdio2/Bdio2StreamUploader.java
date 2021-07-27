@@ -18,6 +18,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -31,7 +32,7 @@ public class Bdio2StreamUploader {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
     private final IntLogger logger;
-    private final BlackDuckPath scanPath;
+    private final BlackDuckPath<BlackDuckResponse> scanPath;
     private final String contentType;
 
     public Bdio2StreamUploader(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, BlackDuckPath<BlackDuckResponse> scanPath,
@@ -43,37 +44,39 @@ public class Bdio2StreamUploader {
         this.contentType = contentType;
     }
 
-    public HttpUrl start(BdioFileContent header) throws IntegrationException {
+    public HttpUrl start(BdioFileContent header, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
+                                               .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         HttpUrl responseUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(request);
         logger.debug(String.format("Starting upload to %s", responseUrl.toString()));
         return responseUrl;
     }
 
-    public void append(HttpUrl url, int count, BdioFileContent bdioFileContent) throws IntegrationException {
+    public void append(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
                                                .addHeader(HEADER_X_BD_MODE, "append")
                                                .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                                               .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);  // 202 accepted
     }
 
-    public void finish(HttpUrl url, int count) throws IntegrationException {
+    public void finish(HttpUrl url, int count, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
                                                .addHeader(HEADER_CONTENT_TYPE, contentType)
                                                .addHeader(HEADER_X_BD_MODE, "finish")
                                                .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+                                               .apply(editor)
                                                .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);
     }
-
 }
