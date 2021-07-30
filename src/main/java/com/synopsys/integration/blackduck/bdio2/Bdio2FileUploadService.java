@@ -49,13 +49,13 @@ public class Bdio2FileUploadService extends DataService {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
         BdioFileContent header = bdioFiles.stream()
-                                     .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
-                                     .findFirst()
-                                     .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
+            .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+            .findFirst()
+            .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
 
         List<BdioFileContent> remainingFiles = bdioFiles.stream()
-                                                   .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
-                                                   .collect(Collectors.toList());
+            .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+            .collect(Collectors.toList());
         int count = remainingFiles.size();
         logger.debug("BDIO upload file count = " + count);
 
@@ -63,8 +63,8 @@ public class Bdio2FileUploadService extends DataService {
         if (nameVersion != null) {
             editor = builder -> {
                 builder
-                    .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, nameVersion.getName())
-                    .addHeader(Bdio2Headers.VERSION_NAME_HEADER, nameVersion.getVersion());
+                    .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
+                    .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
             };
         }
 

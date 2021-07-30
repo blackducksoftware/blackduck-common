@@ -25,6 +25,14 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
 public class Bdio2StreamUploader {
+    // IDETECT-2756
+    public static final String PROJECT_NAME_HEADER = "X-BD-PROJECT-NAME";
+    public static final String VERSION_NAME_HEADER = "X-BD-VERSION-NAME";
+
+    public static final String HEADER_CONTENT_TYPE = "Content-type";
+    public static final String HEADER_X_BD_MODE = "X-BD-MODE";
+    public static final String HEADER_X_BD_DOCUMENT_COUNT = "X-BD-DOCUMENT-COUNT";
+
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
     private final IntLogger logger;
@@ -42,10 +50,10 @@ public class Bdio2StreamUploader {
     public HttpUrl start(BdioFileContent header, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
-                                               .apply(editor)
-                                               .buildBlackDuckResponseRequest(url);
+            .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
+            .addHeader(HEADER_CONTENT_TYPE, contentType)
+            .apply(editor)
+            .buildBlackDuckResponseRequest(url);
         HttpUrl responseUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(request);
         logger.debug(String.format("Starting upload to %s", responseUrl.toString()));
         return responseUrl;
@@ -54,24 +62,24 @@ public class Bdio2StreamUploader {
     public void append(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
-                                               .addHeader(Bdio2Headers.HEADER_X_BD_MODE, "append")
-                                               .addHeader(Bdio2Headers.HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
-                                               .apply(editor)
-                                               .buildBlackDuckResponseRequest(url);
+            .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
+            .addHeader(HEADER_CONTENT_TYPE, contentType)
+            .addHeader(HEADER_X_BD_MODE, "append")
+            .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+            .apply(editor)
+            .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);  // 202 accepted
     }
 
     public void finish(HttpUrl url, int count, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
-                                               .addHeader(Bdio2Headers.HEADER_CONTENT_TYPE, contentType)
-                                               .addHeader(Bdio2Headers.HEADER_X_BD_MODE, "finish")
-                                               .addHeader(Bdio2Headers.HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
-                                               .apply(editor)
-                                               .buildBlackDuckResponseRequest(url);
+            .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
+            .addHeader(HEADER_CONTENT_TYPE, contentType)
+            .addHeader(HEADER_X_BD_MODE, "finish")
+            .addHeader(HEADER_X_BD_DOCUMENT_COUNT, String.valueOf(count))
+            .apply(editor)
+            .buildBlackDuckResponseRequest(url);
         blackDuckApiClient.execute(request);
     }
 }

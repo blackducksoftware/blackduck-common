@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.bdio2.Bdio2Headers;
+import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatch;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
@@ -67,18 +67,18 @@ public class UploadBdio2BatchRunner {
 
     private List<UploadBdio2Callable> createCallables(UploadBatch uploadBatch) {
         return uploadBatch.getUploadTargets()
-                   .stream()
-                   .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, uploadTarget, createEditor(uploadTarget)))
-                   .collect(Collectors.toList());
+            .stream()
+            .map(uploadTarget -> new UploadBdio2Callable(blackDuckApiClient, apiDiscovery, uploadTarget, createEditor(uploadTarget)))
+            .collect(Collectors.toList());
     }
 
     private BlackDuckRequestBuilderEditor createEditor(UploadTarget uploadTarget) {
         return uploadTarget.getProjectAndVersion()
-                   .map(projectVersion -> (BlackDuckRequestBuilderEditor) builder -> {
-                       builder
-                           .addHeader(Bdio2Headers.PROJECT_NAME_HEADER, projectVersion.getName())
-                           .addHeader(Bdio2Headers.VERSION_NAME_HEADER, projectVersion.getVersion());
-                   })
-                   .orElse(noOp -> {});
+            .map(projectVersion -> (BlackDuckRequestBuilderEditor) builder -> {
+                builder
+                    .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, projectVersion.getName())
+                    .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, projectVersion.getVersion());
+            })
+            .orElse(noOp -> {});
     }
 }
