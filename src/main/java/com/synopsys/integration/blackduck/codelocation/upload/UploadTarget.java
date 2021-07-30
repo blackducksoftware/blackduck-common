@@ -33,8 +33,16 @@ public class UploadTarget {
         this.mediaType = mediaType;
     }
 
+    public static UploadTarget createDefault(String codeLocationName, File uploadFile) {
+        return createDefault(null, codeLocationName, uploadFile);
+    }
+
     public static UploadTarget createDefault(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile) {
         return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, "application/ld+json");
+    }
+
+    public static UploadTarget createWithMediaType(String codeLocationName, File uploadFile, String mediaType) {
+        return createWithMediaType(null, codeLocationName, uploadFile, mediaType);
     }
 
     public static UploadTarget createWithMediaType(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) {
