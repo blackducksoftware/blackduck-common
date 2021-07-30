@@ -30,7 +30,7 @@ public class CodeLocationsRetriever {
     their old positions. By the time the second GET happens, a codelocation that
     was in page 1 when the first GET happened could have been bumped to page 2,
     providing a duplicate across the two GETs. It would be very rare, possibly
-    explaining why this is the first time we’ve seen this."
+    explaining why this is the first time we've seen this."
      */
     private static final BinaryOperator<String> COLLAPSE_DUPLICATES = (s1, s2) -> s1;
 
