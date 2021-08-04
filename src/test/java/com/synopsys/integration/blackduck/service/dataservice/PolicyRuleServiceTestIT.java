@@ -32,7 +32,7 @@ public class PolicyRuleServiceTestIT {
         List<HttpUrl> testPolicies = new LinkedList<>();
         int i = 0;
         while (i < 10) {
-            // Create policies in extra policies
+            // Create extra policies
             PolicyRuleView extraPolicyRuleView = createTestPolicy("Test Rule " + UUID.randomUUID());
             HttpUrl extraPolicyRuleURL = policyRuleService.createPolicyRule(extraPolicyRuleView);
             testPolicies.add(extraPolicyRuleURL);
@@ -46,7 +46,7 @@ public class PolicyRuleServiceTestIT {
         testPolicies.add(policyRuleToLookForURL);
 
         try {
-            // look for the policy by name and make sure the one found is correct
+            // Look for the policy by name and make sure the one found is correct
             Optional<PolicyRuleView> policyRuleViewByName = policyRuleService.getPolicyRuleViewByName(nameToLookFor);
             assertTrue(policyRuleViewByName.isPresent());
             PolicyRuleView foundPolicyRuleView = policyRuleViewByName.get();
@@ -54,7 +54,7 @@ public class PolicyRuleServiceTestIT {
             assertEquals(PolicyRuleCategoryType.SECURITY, foundPolicyRuleView.getCategory());
             assertEquals(false, foundPolicyRuleView.getEnabled());
         } finally {
-            // cleanup the test policies
+            // Cleanup the test policies
             BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
             for (HttpUrl policyRuleURL : testPolicies) {
                 blackDuckApiClient.delete(policyRuleURL);
