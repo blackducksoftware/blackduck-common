@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
@@ -38,7 +39,8 @@ public class PolicyRuleService extends DataService {
     }
 
     public Optional<PolicyRuleView> getPolicyRuleViewByName(String policyRuleName) throws IntegrationException {
-        List<PolicyRuleView> allPolicyRules = blackDuckApiClient.getAllResponses(policyRulesResponses);
+        Predicate<PolicyRuleView> predicate = policyRuleView -> policyRuleName.equals(policyRuleView.getName());
+        List<PolicyRuleView> allPolicyRules = blackDuckApiClient.getSomeMatchingResponses(policyRulesResponses, predicate, 1);
         for (PolicyRuleView policyRule : allPolicyRules) {
             if (policyRuleName.equals(policyRule.getName())) {
                 return Optional.of(policyRule);
