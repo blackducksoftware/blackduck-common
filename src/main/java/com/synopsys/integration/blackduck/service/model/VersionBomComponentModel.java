@@ -14,25 +14,29 @@ import java.util.List;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentActivityDataView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentLicensesView;
 import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentReviewedDetailsView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionActivityDataView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionLicensesView;
+import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionReviewedDetailsView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.UsageType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.MatchType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomOriginView;
 
 public class VersionBomComponentModel {
-    private final ProjectVersionComponentView component;
+    private final ProjectVersionComponentVersionView component;
     private final List<MatchedFilesModel> matchedFiles;
 
-    public VersionBomComponentModel(ProjectVersionComponentView component, List<ComponentMatchedFilesView> matchedFiles) {
+    public VersionBomComponentModel(ProjectVersionComponentVersionView component, List<ComponentMatchedFilesView> matchedFiles) {
         this.component = component;
         this.matchedFiles = getMatchedFilesModel(matchedFiles);
     }
 
-    public ProjectVersionComponentActivityDataView getActivityData() {
+    public ProjectVersionComponentVersionActivityDataView getActivityData() {
         return component.getActivityData();
     }
 
@@ -68,7 +72,7 @@ public class VersionBomComponentModel {
         return hasRisk(getLicenseRiskProfile());
     }
 
-    public List<ProjectVersionComponentLicensesView> getLicenses() {
+    public List<ProjectVersionComponentVersionLicensesView> getLicenses() {
         return component.getLicenses();
     }
 
@@ -116,7 +120,7 @@ public class VersionBomComponentModel {
         return component.getReviewStatus();
     }
 
-    public ProjectVersionComponentReviewedDetailsView getReviewedDetails() {
+    public ProjectVersionComponentVersionReviewedDetailsView getReviewedDetails() {
         return component.getReviewedDetails();
     }
 

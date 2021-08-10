@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
@@ -39,24 +40,29 @@ public class CodeLocationCreationService extends DataService {
         this.userService = userService;
     }
 
-    public <T extends CodeLocationBatchOutput> CodeLocationCreationData<T> createCodeLocations(CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
+    public <T extends CodeLocationBatchOutput<?>> CodeLocationCreationData<T> createCodeLocations(CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
         NotificationTaskRange notificationTaskRange = calculateCodeLocationRange();
         T output = codeLocationCreationRequest.executeRequest();
 
         return new CodeLocationCreationData<>(notificationTaskRange, output);
     }
 
-    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
+    public <T extends CodeLocationBatchOutput<?>> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return createCodeLocationsAndWait(codeLocationCreationRequest, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }
 
-    public <T extends CodeLocationBatchOutput> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+    public <T extends CodeLocationBatchOutput<?>> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
         CodeLocationCreationData<T> codeLocationCreationData = createCodeLocations(codeLocationCreationRequest);
 
         NotificationTaskRange notificationTaskRange = codeLocationCreationData.getNotificationTaskRange();
         T output = codeLocationCreationData.getOutput();
 
-        waitForCodeLocations(notificationTaskRange, output.getProjectAndVersion(), output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds, waitIntervalInSeconds);
+        Optional<NameVersion> projectAndVersion = output.getProjectAndVersion();
+        if (projectAndVersion.isPresent()) {
+            waitForCodeLocations(notificationTaskRange, projectAndVersion.get(), output.getSuccessfulCodeLocationNames(), output.getExpectedNotificationCount(), timeoutInSeconds, waitIntervalInSeconds);
+        } else {
+            logger.info("Cannot wait for a code location that is not mapped to a project version. Skipping.");
+        }
 
         return output;
     }

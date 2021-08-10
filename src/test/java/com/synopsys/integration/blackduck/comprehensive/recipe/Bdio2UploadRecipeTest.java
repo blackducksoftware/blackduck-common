@@ -28,6 +28,7 @@ import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Factory;
@@ -92,7 +93,7 @@ public class Bdio2UploadRecipeTest extends BasicRecipe {
         // verify that we now have a bom with 1 component
         projectVersionWrapper = projectService.getProjectVersion(PROJECT);
         assertTrue(projectVersionWrapper.isPresent());
-        List<ProjectVersionComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.get().getProjectVersionView());
+        List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.get().getProjectVersionView());
         assertEquals(1, bomComponents.size());
     }
 

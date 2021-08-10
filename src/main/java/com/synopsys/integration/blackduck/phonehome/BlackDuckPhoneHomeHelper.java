@@ -23,6 +23,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
+import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.util.IntEnvironmentVariables;
@@ -39,6 +40,10 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
+        return createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, executorService, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID);
+    }
+
+    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService, String trackingId) {
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
@@ -46,7 +51,7 @@ public class BlackDuckPhoneHomeHelper {
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
         HttpClientBuilder httpClientBuilder = blackDuckHttpClient.getHttpClientBuilder();
         Gson gson = blackDuckServicesFactory.getGson();
-        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, httpClientBuilder, gson);
+        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, httpClientBuilder, gson, trackingId);
 
         PhoneHomeService phoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, phoneHomeClient, executorService);
 
@@ -54,7 +59,11 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson) {
-        return new PhoneHomeClient(intLogger, httpClientBuilder, gson);
+        return createPhoneHomeClient(intLogger, httpClientBuilder, gson, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID);
+    }
+
+    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson, String trackingId) {
+        return new PhoneHomeClient(intLogger, httpClientBuilder, gson, trackingId);
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,

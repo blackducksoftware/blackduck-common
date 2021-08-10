@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -45,7 +46,7 @@ public class ProjectBomServiceTestIT {
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
 
         // verify the bom
-        List<ProjectVersionComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
+        List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(0, bomComponents.size());
 
         ExternalId externalId = new ExternalIdFactory().createMavenExternalId("com.blackducksoftware.integration", "blackduck-common", "43.0.0");
@@ -93,7 +94,7 @@ public class ProjectBomServiceTestIT {
         ProjectVersionWrapper projectVersionWrapperToAdd = projectService.syncProjectAndVersion(projectSyncModelToAdd);
 
         // verify the boms
-        List<ProjectVersionComponentView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
+        List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(0, bomComponents.size());
 
         projectBomService.addProjectVersionToProjectVersion(projectVersionWrapperToAdd.getProjectVersionView(), projectVersionWrapper.getProjectVersionView());

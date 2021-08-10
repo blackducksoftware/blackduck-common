@@ -9,17 +9,20 @@ package com.synopsys.integration.blackduck.codelocation;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.synopsys.integration.util.NameVersion;
 
 public abstract class CodeLocationOutput {
     private final Result result;
+    @Nullable
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
     private final int expectedNotificationCount;
     private final String errorMessage;
     private final Exception exception;
 
-    public CodeLocationOutput(Result result, NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, String errorMessage, Exception exception) {
+    public CodeLocationOutput(Result result, @Nullable NameVersion projectAndVersion, String codeLocationName, int expectedNotificationCount, String errorMessage, Exception exception) {
         this.result = result;
         this.projectAndVersion = projectAndVersion;
         this.codeLocationName = codeLocationName;
@@ -32,8 +35,8 @@ public abstract class CodeLocationOutput {
         return result;
     }
 
-    public NameVersion getProjectAndVersion() {
-        return projectAndVersion;
+    public Optional<NameVersion> getProjectAndVersion() {
+        return Optional.ofNullable(projectAndVersion);
     }
 
     public String getCodeLocationName() {

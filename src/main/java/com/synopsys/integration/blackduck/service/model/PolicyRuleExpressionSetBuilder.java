@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.service.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,8 +19,8 @@ import com.synopsys.integration.blackduck.api.enumeration.ReviewStatusType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
+import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
@@ -29,6 +30,10 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 
+/**
+ * The intention here is to provide a reasonable api on top of policy rule
+ * expressions available in Black Duck.
+ */
 public class PolicyRuleExpressionSetBuilder {
     private final List<PolicyRuleExpressionExpressionsView> expressions = new ArrayList<>();
 
@@ -89,10 +94,14 @@ public class PolicyRuleExpressionSetBuilder {
         addMultiObjectCondition(policyRuleConditionOperator, PolicyRuleConditionType.COMPONENT_USAGE, componentUsageTypes);
     }
 
+    public void addVulnerabilityOverallScoreCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, BigDecimal overallScore) throws BlackDuckIntegrationException {
+        addSingleCondition(policyRuleConditionOperator, PolicyRuleConditionType.VULN_LEVEL_OVERALL_SCORE, overallScore.toString());
+    }
+
     public void addSingleObjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, Object object) throws BlackDuckIntegrationException {
         List<String> values = new ArrayList<>(1);
         values.add(object.toString());
-        addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
+        addMultiCondition(policyRuleConditionOperator, policyRuleConditionType, values);
     }
 
     public void addMultiObjectCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, List<?> objectValues) throws BlackDuckIntegrationException {
@@ -100,7 +109,7 @@ public class PolicyRuleExpressionSetBuilder {
         for (Object object : objectValues) {
             values.add(object.toString());
         }
-        addMultiCondition(policyRuleConditionOperator, PolicyRuleConditionType.PROJECT_NAME, values);
+        addMultiCondition(policyRuleConditionOperator, policyRuleConditionType, values);
     }
 
     public void addSingleCondition(PolicyRuleConditionOperatorType policyRuleConditionOperator, PolicyRuleConditionType policyRuleConditionType, HttpUrl httpUrl) throws BlackDuckIntegrationException {

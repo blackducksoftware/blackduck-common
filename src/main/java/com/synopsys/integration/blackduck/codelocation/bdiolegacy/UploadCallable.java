@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
@@ -29,6 +30,7 @@ public class UploadCallable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
     private final UploadTarget uploadTarget;
+    @Nullable
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
 
@@ -36,7 +38,7 @@ public class UploadCallable implements Callable<UploadOutput> {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
         this.uploadTarget = uploadTarget;
-        this.projectAndVersion = uploadTarget.getProjectAndVersion();
+        this.projectAndVersion = uploadTarget.getProjectAndVersion().orElse(null);
         this.codeLocationName = uploadTarget.getCodeLocationName();
     }
 

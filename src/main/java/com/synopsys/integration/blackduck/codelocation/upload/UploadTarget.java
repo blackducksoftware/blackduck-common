@@ -8,21 +8,21 @@
 package com.synopsys.integration.blackduck.codelocation.upload;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.util.NameVersion;
 
 public class UploadTarget {
+    @Nullable
     private final NameVersion projectAndVersion;
     private final String codeLocationName;
     private final File uploadFile;
     private final String mediaType;
 
-    private UploadTarget(NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) throws IllegalArgumentException {
-        if (StringUtils.isAnyBlank(projectAndVersion.getName(), projectAndVersion.getVersion())) {
-            throw new IllegalArgumentException("An UploadTarget must have a non-blank project and version.");
-        }
+    private UploadTarget(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) throws IllegalArgumentException {
         if (StringUtils.isBlank(codeLocationName)) {
             throw new IllegalArgumentException("An UploadTarget must have a non-blank codeLocationName.");
         }
@@ -33,16 +33,24 @@ public class UploadTarget {
         this.mediaType = mediaType;
     }
 
-    public static UploadTarget createDefault(NameVersion projectAndVersion, String codeLocationName, File uploadFile) {
+    public static UploadTarget createDefault(String codeLocationName, File uploadFile) {
+        return createDefault(null, codeLocationName, uploadFile);
+    }
+
+    public static UploadTarget createDefault(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile) {
         return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, "application/ld+json");
     }
 
-    public static UploadTarget createWithMediaType(NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) {
+    public static UploadTarget createWithMediaType(String codeLocationName, File uploadFile, String mediaType) {
+        return createWithMediaType(null, codeLocationName, uploadFile, mediaType);
+    }
+
+    public static UploadTarget createWithMediaType(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) {
         return new UploadTarget(projectAndVersion, codeLocationName, uploadFile, mediaType);
     }
 
-    public NameVersion getProjectAndVersion() {
-        return projectAndVersion;
+    public Optional<NameVersion> getProjectAndVersion() {
+        return Optional.ofNullable(projectAndVersion);
     }
 
     public String getCodeLocationName() {

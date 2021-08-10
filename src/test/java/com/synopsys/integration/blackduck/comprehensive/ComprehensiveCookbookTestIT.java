@@ -24,6 +24,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
@@ -310,12 +311,12 @@ public class ComprehensiveCookbookTestIT {
         assertNotNull(projectVersion);
 
         // check that we have components in the BOM
-        List<ProjectVersionComponentView> bomComponents = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersion.metaComponentsLink());
+        List<ProjectVersionComponentVersionView> bomComponents = blackDuckServices.blackDuckApiClient.getAllResponses(projectVersion.metaComponentsLink());
         assertTrue(bomComponents.size() > 0);
 
         // Look for testComponent in BOM
-        ProjectVersionComponentView foundComp = null;
-        for (ProjectVersionComponentView comp : bomComponents) {
+        ProjectVersionComponentVersionView foundComp = null;
+        for (ProjectVersionComponentVersionView comp : bomComponents) {
             if (checkPolicyData.componentName.equals(comp.getComponentName()) && (checkPolicyData.componentVersion.equals(comp.getComponentVersionName()))) {
                 foundComp = comp;
             }

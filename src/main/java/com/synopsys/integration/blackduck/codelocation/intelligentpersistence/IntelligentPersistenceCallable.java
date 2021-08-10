@@ -9,23 +9,26 @@ package com.synopsys.integration.blackduck.codelocation.intelligentpersistence;
 
 import java.util.concurrent.Callable;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.util.NameVersion;
 
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
-    private Bdio2FileUploadService bdio2FileUploadService;
-    private UploadTarget uploadTarget;
+    private final Bdio2FileUploadService bdio2FileUploadService;
+    private final UploadTarget uploadTarget;
 
-    public IntelligentPersistenceCallable(final Bdio2FileUploadService bdio2FileUploadService, final UploadTarget uploadTarget) {
+    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.uploadTarget = uploadTarget;
     }
 
     @Override
     public UploadOutput call() {
-        NameVersion projectAndVersion = uploadTarget.getProjectAndVersion();
+        @Nullable
+        NameVersion projectAndVersion = uploadTarget.getProjectAndVersion().orElse(null);
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
             bdio2FileUploadService.uploadFile(uploadTarget);

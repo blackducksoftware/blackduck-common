@@ -28,8 +28,9 @@ public class RapidScanWaiter {
         this.blackDuckApiClient = blackDuckApiClient;
     }
 
-    public List<DeveloperScanComponentResultView> checkScanResult(HttpUrl url, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
-        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "rapid scan", timeoutInSeconds, System.currentTimeMillis(), waitIntervalInSeconds);
+    public List<DeveloperScanComponentResultView> checkScanResult(HttpUrl url, String codeLocationName, long timeoutInSeconds, int waitIntervalInSeconds) throws IntegrationException, InterruptedException {
+        String taskName = "rapid scan for " + codeLocationName;
+        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, taskName, timeoutInSeconds, System.currentTimeMillis(), waitIntervalInSeconds);
         RapidScanWaitJobCondition waitJobCondition = new RapidScanWaitJobCondition(blackDuckApiClient, url);
         RapidScanWaitJobCompleter waitJobCompleter = new RapidScanWaitJobCompleter(blackDuckApiClient, url);
 

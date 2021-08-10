@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,13 @@ public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> impl
         return outputs;
     }
 
-    public NameVersion getProjectAndVersion() {
+    public Optional<NameVersion> getProjectAndVersion() {
         return outputs
                    .stream()
                    .map(CodeLocationOutput::getProjectAndVersion)
-                   .findFirst()
-                   .get();
+                   .filter(Optional::isPresent)
+                   .map(Optional::get)
+                   .findFirst();
     }
 
     public Set<String> getSuccessfulCodeLocationNames() {

@@ -21,6 +21,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.IssueView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionIssuesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -79,21 +80,21 @@ public class IssueServiceTestIT {
         projectBomService.addComponentToProjectVersion(blackDuckCommon, projectVersionWrapper.getProjectVersionView());
         projectBomService.addComponentToProjectVersion(apacheFileUpload, projectVersionWrapper.getProjectVersionView());
 
-        List<ProjectVersionComponentView> componentsForProjectVersion = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
+        List<ProjectVersionComponentVersionView> componentsForProjectVersion = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(2, componentsForProjectVersion.size());
 
         // check existing issues
         List<ProjectVersionIssuesView> issuesForProjectVersion = issueService.getIssuesForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(0, issuesForProjectVersion.size());
 
-        ProjectVersionComponentView blackduckCommonComponent =
+        ProjectVersionComponentVersionView blackduckCommonComponent =
             componentsForProjectVersion
                 .stream()
                 .filter(component -> component.getComponentName().equalsIgnoreCase("blackduck-common"))
                 .findAny()
                 .get();
 
-        ProjectVersionComponentView fileUploadComponent =
+        ProjectVersionComponentVersionView fileUploadComponent =
             componentsForProjectVersion
                 .stream()
                 .filter(component -> !component.getComponentName().equalsIgnoreCase("blackduck-common"))
