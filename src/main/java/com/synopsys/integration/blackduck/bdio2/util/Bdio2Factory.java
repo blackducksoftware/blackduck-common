@@ -27,7 +27,7 @@ import com.blackducksoftware.common.value.Product;
 import com.blackducksoftware.common.value.ProductList;
 import com.synopsys.integration.bdio.graph.DependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
+import com.synopsys.integration.blackduck.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import org.apache.commons.lang3.tuple.Pair;

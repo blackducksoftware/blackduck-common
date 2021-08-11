@@ -1,16 +1,13 @@
 package com.synopsys.integration.blackduck.bdio2.util;
 
-import com.blackducksoftware.bdio2.Bdio;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.synopsys.integration.bdio.graph.DependencyGraph;
-import com.synopsys.integration.bdio.model.Forge;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
+import com.synopsys.integration.blackduck.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
