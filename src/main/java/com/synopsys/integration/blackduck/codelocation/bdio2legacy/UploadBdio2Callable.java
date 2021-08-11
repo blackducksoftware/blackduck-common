@@ -52,7 +52,6 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
                                                    .postFile(uploadTarget.getUploadFile(), ContentType.create(uploadTarget.getMediaType(), StandardCharsets.UTF_8))
                                                    .apply(editor)
                                                    .buildBlackDuckResponseRequest(url);
-
             return executeRequest(request);
         } catch (Exception e) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), e.getMessage());
