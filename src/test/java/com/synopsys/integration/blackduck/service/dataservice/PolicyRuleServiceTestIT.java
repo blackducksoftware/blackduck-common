@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
@@ -22,6 +23,7 @@ import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetB
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 
+@Tag("integration")
 public class PolicyRuleServiceTestIT {
     private static final IntHttpClientTestHelper INT_HTTP_CLIENT_TEST_HELPER = new IntHttpClientTestHelper();
 
@@ -51,8 +53,12 @@ public class PolicyRuleServiceTestIT {
             assertTrue(policyRuleViewByName.isPresent());
             PolicyRuleView foundPolicyRuleView = policyRuleViewByName.get();
             assertEquals(nameToLookFor, foundPolicyRuleView.getName());
-            assertEquals(PolicyRuleCategoryType.SECURITY, foundPolicyRuleView.getCategory());
             assertEquals(false, foundPolicyRuleView.getEnabled());
+
+            String version = blackDuckServicesFactory.createBlackDuckRegistrationService().getBlackDuckServerData().getVersion();
+            if (!version.startsWith("2020.2")) {
+                assertEquals(PolicyRuleCategoryType.SECURITY, foundPolicyRuleView.getCategory());
+            }
         } finally {
             // Cleanup the test policies
             BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
