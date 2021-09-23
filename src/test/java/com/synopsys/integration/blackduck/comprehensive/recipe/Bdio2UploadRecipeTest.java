@@ -65,7 +65,7 @@ public class Bdio2UploadRecipeTest extends BasicRecipe {
         // create the bdio2 project
         ExternalIdFactory externalIdFactory = new ExternalIdFactory();
         ExternalId externalId = externalIdFactory.createMavenExternalId("com.synopsys.integration", PROJECT.getName(), PROJECT.getVersion());
-        Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion());
+        Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion(), true);
 
         // create a graph of one dependency
         Dependency dependency = createDependency(externalIdFactory, "org.apache.commons", "commons-lang3", "3.11");

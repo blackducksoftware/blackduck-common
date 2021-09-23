@@ -16,6 +16,7 @@ import com.blackducksoftware.bdio2.BdioWriter;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class Bdio2Writer {
     public BdioWriter createBdioWriter(final OutputStream outputStream, final BdioMetadata bdioMetadata) {
@@ -25,13 +26,17 @@ public class Bdio2Writer {
 
     public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) throws IOException {
         final BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
-        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getComponents());
+        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getSubprojectsAndComponents());
     }
 
-    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final List<Component> components) throws IOException {
+    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final Pair<List<Project>, List<Component>> subprojectsAndComponents) throws IOException {
         bdioWriter.start();
 
-        for (Component component : components) {
+        for (Project subProject : subprojectsAndComponents.getLeft()) {
+            bdioWriter.next(subProject);
+        }
+
+        for (Component component : subprojectsAndComponents.getRight()) {
             bdioWriter.next(component);
         }
 

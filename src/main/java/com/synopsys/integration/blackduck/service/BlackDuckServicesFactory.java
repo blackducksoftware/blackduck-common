@@ -37,8 +37,6 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransforme
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
-import com.synopsys.integration.blackduck.scan.RapidScanService;
-import com.synopsys.integration.blackduck.scan.RapidScanWaiter;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
@@ -213,13 +211,6 @@ public class BlackDuckServicesFactory {
 
     public TagService createTagService() {
         return new TagService(blackDuckApiClient, apiDiscovery, logger);
-    }
-
-    public RapidScanService createRapidScanService() {
-        RapidScanWaiter rapidScanWaiter = new RapidScanWaiter(logger, blackDuckApiClient);
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.DEVELOPER_SCANS_PATH, RapidScanService.CONTENT_TYPE);
-        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
-        return new RapidScanService(bdio2FileUploadService, rapidScanWaiter);
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
