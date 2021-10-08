@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.net.URL;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +54,7 @@ public class BlackDuckServerConfigBuilderTestIT {
     }
 
     @Test
+    @Disabled
     public void testValidConfigWithProxies() throws Exception {
         BlackDuckServerConfigBuilder builder = createBuilder();
         setBuilderProxyDefaults(builder);
@@ -142,6 +144,7 @@ public class BlackDuckServerConfigBuilderTestIT {
     }
 
     @Test
+    @Disabled
     public void testValidBuildWithProxy() throws Exception {
         BlackDuckServerConfigBuilder builder = createValid();
         builder.setProxyHost(BlackDuckServerConfigBuilderTestIT.PROXY_PASSTHROUGH_HOST);
