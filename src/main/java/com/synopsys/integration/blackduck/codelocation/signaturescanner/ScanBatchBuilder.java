@@ -94,10 +94,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
         if (StringUtils.isNotBlank(blackDuckApiToken)) {
             return;
-        }
-
-        if (StringUtils.isAnyBlank(blackDuckUsername, blackDuckPassword)) {
-            builderStatus.addErrorMessage("Either an api token or a username and password is required.");
+        } else {
+            builderStatus.addErrorMessage("An api token is required.");
         }
     }
 
