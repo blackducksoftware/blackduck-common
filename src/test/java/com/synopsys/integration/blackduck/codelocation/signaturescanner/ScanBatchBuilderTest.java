@@ -63,6 +63,12 @@ public class ScanBatchBuilderTest {
         builder.blackDuckApiToken("apitoken");
         assertTrue(builder.isValid());
         builder.blackDuckApiToken(null);
+
+        builder.blackDuckUsername("username");
+        assertFalse(builder.isValid());
+
+        builder.blackDuckPassword("password");
+        assertTrue(builder.isValid());
     }
 
     @Test
