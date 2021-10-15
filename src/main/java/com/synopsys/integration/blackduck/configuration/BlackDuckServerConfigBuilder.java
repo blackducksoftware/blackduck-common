@@ -158,7 +158,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         } else {
             Credentials credentials = credentialsBuilder.build();
             if (credentials.isBlank()) {
-                builderStatus.addErrorMessage("Either an API token or a username/password must be specified.");
+                builderStatus.addErrorMessage("An API token must be specified.");
             }
         }
     }
