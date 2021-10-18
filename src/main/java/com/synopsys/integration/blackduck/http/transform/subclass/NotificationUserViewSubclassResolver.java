@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.manual.view.BomEditNotificationUserView;
+import com.synopsys.integration.blackduck.api.manual.view.ComponentUnknownVersionView;
 import com.synopsys.integration.blackduck.api.manual.view.LicenseLimitNotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
 import com.synopsys.integration.blackduck.api.manual.view.PolicyOverrideNotificationUserView;
@@ -29,10 +30,13 @@ public class NotificationUserViewSubclassResolver extends BlackDuckResponseSubcl
 
     @Override
     public Class<? extends BlackDuckResponse> resolveSubclass(JsonElement jsonElement) {
+        // Note: If you are supporting new notification types then this class and NotificationViewSubclassResolver may need to be changed.
         SimpleNotificationView simpleNotificationView = gson.fromJson(jsonElement, SimpleNotificationView.class);
         switch (simpleNotificationView.type) {
             case BOM_EDIT:
                 return BomEditNotificationUserView.class;
+            case COMPONENT_UNKNOWN_VERSION:
+                return ComponentUnknownVersionView.class;
             case LICENSE_LIMIT:
                 return LicenseLimitNotificationUserView.class;
             case POLICY_OVERRIDE:

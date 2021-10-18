@@ -30,6 +30,7 @@ public class NotificationViewSubclassResolver extends BlackDuckResponseSubclassR
 
     @Override
     public Class<? extends BlackDuckResponse> resolveSubclass(JsonElement jsonElement) {
+        // Note: If you are supporting new notification types then this class and NotificationUserViewSubclassResolver may need to be changed.
         SimpleNotificationView simpleNotificationView = gson.fromJson(jsonElement, SimpleNotificationView.class);
         switch (simpleNotificationView.type) {
             case BOM_EDIT:
