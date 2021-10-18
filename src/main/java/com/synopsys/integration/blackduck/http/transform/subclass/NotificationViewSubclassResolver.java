@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.manual.view.BomEditNotificationView;
-import com.synopsys.integration.blackduck.api.manual.view.ComponentUnknownVersionView;
+import com.synopsys.integration.blackduck.api.manual.view.ComponentUnknownVersionNotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.LicenseLimitNotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
 import com.synopsys.integration.blackduck.api.manual.view.PolicyOverrideNotificationView;
@@ -36,7 +36,7 @@ public class NotificationViewSubclassResolver extends BlackDuckResponseSubclassR
             case BOM_EDIT:
                 return BomEditNotificationView.class;
             case COMPONENT_UNKNOWN_VERSION:
-                return ComponentUnknownVersionView.class;
+                return ComponentUnknownVersionNotificationView.class;
             case LICENSE_LIMIT:
                 return LicenseLimitNotificationView.class;
             case POLICY_OVERRIDE:
