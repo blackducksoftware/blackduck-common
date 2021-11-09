@@ -7,11 +7,15 @@
  */
 package com.synopsys.integration.blackduck.codelocation.bdio2legacy;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
+import java.net.URLEncoder;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
@@ -23,6 +27,7 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.util.NameVersion;
 
 public class UploadBdio2BatchRunner {
     private final IntLogger logger;
@@ -73,12 +78,34 @@ public class UploadBdio2BatchRunner {
     }
 
     private BlackDuckRequestBuilderEditor createEditor(UploadTarget uploadTarget) {
+        NameVersion encodedProjectVersion = urlEncode(uploadTarget.getProjectAndVersion().get());
         return uploadTarget.getProjectAndVersion()
+            //    .map(this::urlEncode)
             .map(projectVersion -> (BlackDuckRequestBuilderEditor) builder -> {
                 builder
-                    .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, projectVersion.getName())
-                    .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, projectVersion.getVersion());
+                    //.addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, projectVersion.getName())
+                    //.addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, projectVersion.getVersion());
+                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, encodedProjectVersion.getName())
+                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, encodedProjectVersion.getVersion());
             })
             .orElse(noOp -> {});
+    }
+
+    private NameVersion urlEncode(NameVersion nameVersion) {
+        String encodedName;
+        String encodedVersion;
+        try {
+            encodedName = URLEncoder.encode(nameVersion.getName(), "UTF-8");
+            System.out.printf("*** mapped %s to %s\n", nameVersion.getName(), encodedName);
+        } catch (UnsupportedEncodingException e) {
+            encodedName = nameVersion.getName();
+        }
+        try {
+            encodedVersion = URLEncoder.encode(nameVersion.getVersion(), "UTF-8");
+            System.out.printf("*** mapped %s to %s\n", nameVersion.getVersion(), encodedVersion);
+        } catch (UnsupportedEncodingException e) {
+            encodedVersion = nameVersion.getVersion();
+        }
+        return new NameVersion(encodedName, encodedVersion);
     }
 }
