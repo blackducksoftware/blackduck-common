@@ -115,6 +115,7 @@ public class ProjectSyncModel {
         projectRequest.setProjectLevelAdjustments(projectLevelAdjustments);
         projectRequest.setProjectOwner(projectOwner);
         projectRequest.setProjectTier(projectTier);
+        projectRequest.setProjectGroup(projectGroup);
         projectRequest.setCloneCategories(cloneCategories);
         projectRequest.setCustomSignatureEnabled(customSignatureEnabled);
 
