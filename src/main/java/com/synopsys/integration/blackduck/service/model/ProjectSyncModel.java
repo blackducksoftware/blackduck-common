@@ -42,6 +42,7 @@ public class ProjectSyncModel {
     public static final Field PROJECT_LEVEL_ADJUSTMENTS_FIELD = ProjectSyncModel.getFieldSafely("projectLevelAdjustments");
     public static final Field PROJECT_OWNER_FIELD = ProjectSyncModel.getFieldSafely("projectOwner");
     public static final Field PROJECT_TIER_FIELD = ProjectSyncModel.getFieldSafely("projectTier");
+    public static final Field PROJECT_GROUP_FIELD = ProjectSyncModel.getFieldSafely("projectGroup");
 
     // version fields
     public static final Field CLONE_FROM_RELEASE_URL_FIELD = ProjectSyncModel.getFieldSafely("cloneFromReleaseUrl");
@@ -60,6 +61,7 @@ public class ProjectSyncModel {
     private Boolean projectLevelAdjustments;
     private String projectOwner;
     private Integer projectTier;
+    private String projectGroup;
 
     // version fields
     private String cloneFromReleaseUrl;
@@ -162,6 +164,10 @@ public class ProjectSyncModel {
         if (fieldSet(ProjectSyncModel.PROJECT_TIER_FIELD)) {
             projectView.setProjectTier(projectTier);
         }
+
+        if (fieldSet(ProjectSyncModel.PROJECT_GROUP_FIELD)) {
+            projectView.setProjectGroup(projectGroup);
+        }
     }
 
     public void populateProjectVersionView(ProjectVersionView projectVersionView) {
@@ -255,6 +261,15 @@ public class ProjectSyncModel {
     public void setProjectTier(Integer projectTier) {
         this.projectTier = projectTier;
         fieldsWithSetValues.add(ProjectSyncModel.PROJECT_TIER_FIELD);
+    }
+
+    public String getProjectGroup() {
+        return projectGroup;
+    }
+
+    public void setProjectGroup(String projectGroup) {
+        this.projectGroup = projectGroup;
+        fieldsWithSetValues.add(ProjectSyncModel.PROJECT_GROUP_FIELD);
     }
 
     public String getCloneFromReleaseUrl() {

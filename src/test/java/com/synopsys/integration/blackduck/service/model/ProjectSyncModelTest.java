@@ -95,6 +95,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setProjectLevelAdjustments(false);
         projectSyncModel.setProjectOwner("owner");
         projectSyncModel.setProjectTier(2);
+        projectSyncModel.setProjectGroup("projectGroup");
         projectSyncModel.setReleaseComments("release comments");
         projectSyncModel.setReleasedOn(new Date());
 
