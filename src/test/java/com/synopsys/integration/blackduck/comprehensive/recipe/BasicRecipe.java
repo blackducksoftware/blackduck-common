@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.comprehensive.recipe;
 
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
@@ -9,6 +10,7 @@ import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.synopsys.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
@@ -49,6 +51,8 @@ public class BasicRecipe {
     protected PolicyRuleService policyRuleService;
     protected Bdio2UploadService bdio2UploadService;
     protected UploadBatchRunner uploadRunner;
+
+    private final LinkedHashSet<String> projectsToDelete = new LinkedHashSet<>();
 
     @BeforeEach
     public void startRecipe() throws IntegrationException {
@@ -106,8 +110,18 @@ public class BasicRecipe {
         projectSyncModel.setDescription("A sample testing project to demonstrate blackduck-common capabilities.");
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectSyncModel.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
+        projectsToDelete.add(projectName);
 
         return projectSyncModel;
+    }
+
+    public void createThrowAwayProjects(int numberOfProjectsToCreate) throws IntegrationException {
+        for (int i = 1; i <= numberOfProjectsToCreate; i++) {
+            String uniqueProjectName = PROJECT_NAME + System.currentTimeMillis();
+            ProjectSyncModel projectSyncModel = createProjectSyncModel(uniqueProjectName, PROJECT_VERSION_NAME);
+            ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
+            projectService.createProject(projectRequest);
+        }
     }
 
     public void deleteProject(String projectName) throws IntegrationException {
@@ -122,6 +136,12 @@ public class BasicRecipe {
     public void deleteProject(ProjectView projectView) throws IntegrationException {
         if (null != projectView) {
             blackDuckApiClient.delete(projectView);
+        }
+    }
+
+    public void deleteCreatedProjects() throws IntegrationException {
+        for (String projectName : projectsToDelete) {
+            deleteProject(projectName);
         }
     }
 
