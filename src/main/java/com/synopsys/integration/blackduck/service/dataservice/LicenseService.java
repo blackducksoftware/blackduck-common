@@ -72,4 +72,21 @@ public class LicenseService extends DataService {
         }
     }
 
+    public HttpUrl getLicenseUrlByLicenseName(String licenseName) throws IntegrationException {
+        Optional<LicenseView> license = blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
+            .filter(licenseView -> licenseView.getName().equals(licenseName))
+            .findFirst();
+
+        String href = null;
+        try {
+            if (license.isPresent()) {
+                href = ""; //TODO - license.getHref();
+            }
+            return new HttpUrl(href);
+        } catch (IntegrationException e) {
+            throw new IntegrationException("Inivalid url: " + href);
+        }
+    }
+
+
 }

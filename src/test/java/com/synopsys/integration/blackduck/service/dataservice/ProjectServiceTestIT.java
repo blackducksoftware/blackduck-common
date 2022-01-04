@@ -12,16 +12,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
@@ -46,6 +49,7 @@ public class ProjectServiceTestIT {
     private static BlackDuckServicesFactory blackDuckServicesFactory;
     private static BlackDuckApiClient blackDuckApiClient;
     private static ProjectService projectService;
+    private static LicenseService licenseService;
     private static ProjectView project = null;
 
     @BeforeAll
@@ -53,6 +57,7 @@ public class ProjectServiceTestIT {
         ProjectServiceTestIT.blackDuckServicesFactory = ProjectServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
         ProjectServiceTestIT.blackDuckApiClient = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectServiceTestIT.projectService = ProjectServiceTestIT.blackDuckServicesFactory.createProjectService();
+        ProjectServiceTestIT.licenseService = ProjectServiceTestIT.blackDuckServicesFactory.createLicenseService();
     }
 
     @AfterEach
@@ -61,6 +66,36 @@ public class ProjectServiceTestIT {
             ProjectServiceTestIT.blackDuckApiClient.delete(ProjectServiceTestIT.project);
             ProjectServiceTestIT.project = null;
         }
+    }
+
+    //testing
+    @Test
+    public void testSetLicenseForProjectVersion() throws IntegrationException {
+        String projectName = "InitialName";
+        deleteProjectIfExists(projectName);
+        ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.setName(projectName);
+        projectRequest.setProjectTier(2);
+        projectRequest.setDescription("Initial Description");
+
+        ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.setVersionName("InitialVersion");
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
+
+        ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
+        String licenseName = ".NETZ GPL 2.0 With Exception License";
+        String url = "https://us1a-int-relcandi.nprd.sig.synopsys.com/api/licenses/8b4e4d5b-ba13-4b13-9e92-fda0305a324e";
+        complexLicenseRequest.setLicense(licenseService.getLicenseUrlByLicenseName(licenseName).string());
+        complexLicenseRequest.setType(LicenseType.DISJUNCTIVE);
+        projectVersionRequest.setLicense(complexLicenseRequest);
+
+        projectRequest.setVersionRequest(projectVersionRequest);
+
+        ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
+        ProjectVersionView projectVersion = projectVersionWrapper.getProjectVersionView();
+
+        Assertions.assertEquals(licenseName, projectVersion.getLicense().getLicenseDisplay());
     }
 
     @Test
