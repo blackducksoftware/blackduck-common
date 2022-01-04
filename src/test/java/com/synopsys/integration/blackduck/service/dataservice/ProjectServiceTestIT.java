@@ -85,7 +85,6 @@ public class ProjectServiceTestIT {
 
         ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
         String licenseName = ".NETZ GPL 2.0 With Exception License";
-        String url = "https://us1a-int-relcandi.nprd.sig.synopsys.com/api/licenses/8b4e4d5b-ba13-4b13-9e92-fda0305a324e";
         complexLicenseRequest.setLicense(licenseService.getLicenseUrlByLicenseName(licenseName).string());
         complexLicenseRequest.setType(LicenseType.DISJUNCTIVE);
         projectVersionRequest.setLicense(complexLicenseRequest);

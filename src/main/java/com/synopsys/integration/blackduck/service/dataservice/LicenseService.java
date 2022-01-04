@@ -77,15 +77,10 @@ public class LicenseService extends DataService {
             .filter(licenseView -> licenseView.getName().equals(licenseName))
             .findFirst();
 
-        String href = null;
-        try {
-            if (license.isPresent()) {
-                href = ""; //TODO - license.getHref();
-            }
-            return new HttpUrl(href);
-        } catch (IntegrationException e) {
-            throw new IntegrationException("Inivalid url: " + href);
+        if (license.isPresent()) {
+            return license.get().getHref();
         }
+        throw new IntegrationException("Could not find url for license with name " + licenseName);
     }
 
 
