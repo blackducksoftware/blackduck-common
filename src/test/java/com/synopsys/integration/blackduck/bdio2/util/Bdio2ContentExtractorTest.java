@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
@@ -49,6 +50,7 @@ public class Bdio2ContentExtractorTest {
         }
     }
 
+    @Disabled
     @Test
     public void testReadValidFile() throws Exception {
         File bdioFile = new File(getClass().getResource("/bdio/scans/developerScanTest.bdio").getFile());

@@ -1,7 +1,7 @@
 /*
  * blackduck-common
  *
- * Copyright (c) 2021 Synopsys, Inc.
+ * Copyright (c) 2022 Synopsys, Inc.
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
@@ -17,15 +17,19 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.synopsys.integration.blackduck.api.generated.enumeration.LicenseType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.util.NameVersion;
 
+//TODO- make sure versionLicense is validated in all the right ways
 public class ProjectSyncModel {
     // these fields are currently not supported - if you need to create a
     // project/version with these fields, or update these fields, please use
@@ -53,6 +57,9 @@ public class ProjectSyncModel {
     public static final Field RELEASED_ON_FIELD = ProjectSyncModel.getFieldSafely("releasedOn");
     public static final Field VERSION_NAME_FIELD = ProjectSyncModel.getFieldSafely("versionName");
 
+    // version license fields
+    public static final Field VERSION_LICENSE_FIELD = ProjectSyncModel.getFieldSafely("versionLicense");
+
     // project fields
     private List<ProjectCloneCategoriesType> cloneCategories;
     private Boolean customSignatureEnabled;
@@ -71,6 +78,9 @@ public class ProjectSyncModel {
     private String releaseComments;
     private Date releasedOn;
     private String versionName;
+
+    // version license fields
+    private String versionLicense;
 
     private final Set<Field> fieldsWithSetValues = new HashSet<>();
 
@@ -133,8 +143,16 @@ public class ProjectSyncModel {
         projectVersionRequest.setCloneFromReleaseUrl(cloneFromReleaseUrl);
         projectVersionRequest.setReleasedOn(releasedOn);
         projectVersionRequest.setNickname(nickname);
+        projectVersionRequest.setLicense(createComplexLicenseRequest());
 
         return projectVersionRequest;
+    }
+
+    public ComplexLicenseRequest createComplexLicenseRequest() {
+        ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
+        complexLicenseRequest.setLicense(versionLicense);
+
+        return complexLicenseRequest;
     }
 
     public void populateProjectView(ProjectView projectView) {
@@ -195,6 +213,18 @@ public class ProjectSyncModel {
         if (fieldSet(ProjectSyncModel.VERSION_NAME_FIELD)) {
             projectVersionView.setVersionName(versionName);
         }
+
+        //TODO- do we need to populate the version license?
+//        if (fieldSet(ProjectSyncModel.VERSION_LICENSE_FIELD)) {
+//            ProjectVersionLicenseView projectVersionLicenseView;
+//            if (projectVersionView.getLicense() != null) {
+//                projectVersionLicenseView = projectVersionView.getLicense();
+//            } else {
+//                projectVersionLicenseView = new ProjectVersionLicenseView();
+//            }
+//            projectVersionLicenseView.setLicenseDisplay(versionLicense);
+//            projectVersionView.setLicense(projectVersionLicenseView);
+//        }
     }
 
     public boolean shouldHandleProjectVersion() {
@@ -340,4 +370,12 @@ public class ProjectSyncModel {
         return fieldsWithSetValues.contains(field);
     }
 
+    public String getVersionLicense() {
+        return versionLicense;
+    }
+
+    public void setVersionLicense(String versionLicense) {
+        this.versionLicense = versionLicense;
+        fieldsWithSetValues.add(ProjectSyncModel.VERSION_LICENSE_FIELD);
+    }
 }
