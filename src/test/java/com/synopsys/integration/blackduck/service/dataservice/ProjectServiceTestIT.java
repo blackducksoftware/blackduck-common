@@ -68,7 +68,6 @@ public class ProjectServiceTestIT {
         }
     }
 
-    //testing
     @Test
     public void testSetLicenseForProjectVersion() throws IntegrationException {
         String projectName = "InitialName";

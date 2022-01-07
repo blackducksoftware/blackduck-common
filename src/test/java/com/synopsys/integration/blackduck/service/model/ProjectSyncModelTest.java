@@ -98,7 +98,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setProjectGroup("projectGroup");
         projectSyncModel.setReleaseComments("release comments");
         projectSyncModel.setReleasedOn(new Date());
-        projectSyncModel.setVersionLicense("versionLicense");
+        projectSyncModel.setVersionLicenseUrl("versionLicenseUrl");
 
         assertFalse(((Set) setFields.get(projectSyncModel)).isEmpty());
         assertEquals(allFields, setFields.get(projectSyncModel));
