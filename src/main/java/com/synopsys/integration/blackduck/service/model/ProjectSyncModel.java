@@ -30,7 +30,6 @@ import com.synopsys.integration.blackduck.api.manual.temporary.component.Project
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
 import com.synopsys.integration.util.NameVersion;
 
-//TODO- make sure versionLicense is validated in all the right ways
 public class ProjectSyncModel {
     // these fields are currently not supported - if you need to create a
     // project/version with these fields, or update these fields, please use
