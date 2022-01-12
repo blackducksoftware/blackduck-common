@@ -73,10 +73,10 @@ public class LicenseService extends DataService {
     }
 
     public HttpUrl getLicenseUrlByLicenseName(String licenseName) throws IntegrationException {
-        Optional<LicenseView> license = blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
+        return blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
             .filter(licenseView -> licenseView.getName().equals(licenseName))
-            .findFirst();
-        return license.orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName)).getHref();
+            .findFirst()
+            .orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName)).getHref();
     }
 
 
