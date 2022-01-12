@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +99,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setProjectGroup("projectGroup");
         projectSyncModel.setReleaseComments("release comments");
         projectSyncModel.setReleasedOn(new Date());
+        projectSyncModel.setVersionLicenseUrls(Collections.singletonList("versionLicenseUrls"));
 
         assertFalse(((Set) setFields.get(projectSyncModel)).isEmpty());
         assertEquals(allFields, setFields.get(projectSyncModel));

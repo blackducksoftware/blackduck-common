@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
@@ -53,6 +57,9 @@ public class ProjectSyncModel {
     public static final Field RELEASED_ON_FIELD = ProjectSyncModel.getFieldSafely("releasedOn");
     public static final Field VERSION_NAME_FIELD = ProjectSyncModel.getFieldSafely("versionName");
 
+    // version license fields
+    public static final Field VERSION_LICENSE_URLS_FIELD = ProjectSyncModel.getFieldSafely("versionLicenseUrls");
+
     // project fields
     private List<ProjectCloneCategoriesType> cloneCategories;
     private Boolean customSignatureEnabled;
@@ -71,6 +78,9 @@ public class ProjectSyncModel {
     private String releaseComments;
     private Date releasedOn;
     private String versionName;
+
+    // version license fields
+    private List<String> versionLicenseUrls;
 
     private final Set<Field> fieldsWithSetValues = new HashSet<>();
 
@@ -133,8 +143,25 @@ public class ProjectSyncModel {
         projectVersionRequest.setCloneFromReleaseUrl(cloneFromReleaseUrl);
         projectVersionRequest.setReleasedOn(releasedOn);
         projectVersionRequest.setNickname(nickname);
+        if (fieldSet(ProjectSyncModel.VERSION_LICENSE_URLS_FIELD)) {
+            // A ProjectVersionRequest with a ComplexLicenseRequest that has a null license url triggers a failure
+            projectVersionRequest.setLicense(createComplexLicenseRequest());
+        }
 
         return projectVersionRequest;
+    }
+
+    public ComplexLicenseRequest createComplexLicenseRequest() {
+        ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
+        List<ComplexLicenseRequest> licenses = new LinkedList<>();
+        for (String licenseUrl : versionLicenseUrls) {
+                ComplexLicenseRequest c = new ComplexLicenseRequest();
+                c.setLicense(licenseUrl);
+                licenses.add(c);
+        }
+        complexLicenseRequest.setLicenses(licenses);
+
+        return complexLicenseRequest;
     }
 
     public void populateProjectView(ProjectView projectView) {
@@ -195,6 +222,29 @@ public class ProjectSyncModel {
         if (fieldSet(ProjectSyncModel.VERSION_NAME_FIELD)) {
             projectVersionView.setVersionName(versionName);
         }
+
+        if (fieldSet(ProjectSyncModel.VERSION_LICENSE_URLS_FIELD)) {
+            projectVersionView.setLicense(createProjectVersionLicense(projectVersionView.getLicense(), versionLicenseUrls));
+        }
+    }
+
+    private ProjectVersionLicenseView createProjectVersionLicense(ProjectVersionLicenseView currentLicense, List<String> licenseUrls) {
+        ProjectVersionLicenseView projectVersionLicenseView;
+        if (currentLicense != null) {
+            projectVersionLicenseView = currentLicense;
+        } else {
+            projectVersionLicenseView = new ProjectVersionLicenseView();
+        }
+
+        List<ProjectVersionLicenseLicensesView> licenses = new LinkedList<>();
+        for (String licenseUrl : licenseUrls) {
+            ProjectVersionLicenseLicensesView projectVersionLicenseLicensesView = new ProjectVersionLicenseLicensesView();
+            projectVersionLicenseLicensesView.setLicense(licenseUrl);
+            licenses.add(projectVersionLicenseLicensesView);
+        }
+        projectVersionLicenseView.setLicenses(licenses);
+
+        return projectVersionLicenseView;
     }
 
     public boolean shouldHandleProjectVersion() {
@@ -340,4 +390,12 @@ public class ProjectSyncModel {
         return fieldsWithSetValues.contains(field);
     }
 
+    public List<String> getVersionLicenseUrls() {
+        return versionLicenseUrls;
+    }
+
+    public void setVersionLicenseUrls(List<String> versionLicenseUrls) {
+        this.versionLicenseUrls = versionLicenseUrls;
+        fieldsWithSetValues.add(ProjectSyncModel.VERSION_LICENSE_URLS_FIELD);
+    }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectClone
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
@@ -46,6 +48,7 @@ public class ProjectServiceTestIT {
     private static BlackDuckServicesFactory blackDuckServicesFactory;
     private static BlackDuckApiClient blackDuckApiClient;
     private static ProjectService projectService;
+    private static LicenseService licenseService;
     private static ProjectView project = null;
 
     @BeforeAll
@@ -53,6 +56,7 @@ public class ProjectServiceTestIT {
         ProjectServiceTestIT.blackDuckServicesFactory = ProjectServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.createBlackDuckServicesFactory();
         ProjectServiceTestIT.blackDuckApiClient = ProjectServiceTestIT.blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectServiceTestIT.projectService = ProjectServiceTestIT.blackDuckServicesFactory.createProjectService();
+        ProjectServiceTestIT.licenseService = ProjectServiceTestIT.blackDuckServicesFactory.createLicenseService();
     }
 
     @AfterEach
@@ -61,6 +65,33 @@ public class ProjectServiceTestIT {
             ProjectServiceTestIT.blackDuckApiClient.delete(ProjectServiceTestIT.project);
             ProjectServiceTestIT.project = null;
         }
+    }
+
+    @Test
+    public void testSetLicenseForProjectVersion() throws IntegrationException {
+        String projectName = "InitialName";
+        deleteProjectIfExists(projectName);
+        ProjectRequest projectRequest = new ProjectRequest();
+        projectRequest.setName(projectName);
+        projectRequest.setProjectTier(2);
+        projectRequest.setDescription("Initial Description");
+
+        ProjectVersionRequest projectVersionRequest = new ProjectVersionRequest();
+        projectVersionRequest.setVersionName("InitialVersion");
+        projectVersionRequest.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectVersionRequest.setDistribution(ProjectVersionDistributionType.OPENSOURCE);
+
+        ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
+        String licenseName = ".NETZ GPL 2.0 With Exception License";
+        complexLicenseRequest.setLicense(licenseService.getLicenseUrlByLicenseName(licenseName).string());
+        projectVersionRequest.setLicense(complexLicenseRequest);
+
+        projectRequest.setVersionRequest(projectVersionRequest);
+
+        ProjectVersionWrapper projectVersionWrapper = ProjectServiceTestIT.projectService.createProject(projectRequest);
+        ProjectVersionView projectVersion = projectVersionWrapper.getProjectVersionView();
+
+        Assertions.assertEquals(licenseName, projectVersion.getLicense().getLicenseDisplay());
     }
 
     @Test
