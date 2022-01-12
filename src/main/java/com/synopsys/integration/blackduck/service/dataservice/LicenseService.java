@@ -76,11 +76,7 @@ public class LicenseService extends DataService {
         Optional<LicenseView> license = blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
             .filter(licenseView -> licenseView.getName().equals(licenseName))
             .findFirst();
-
-        if (license.isPresent()) {
-            return license.get().getHref();
-        }
-        throw new IntegrationException("Could not find url for license with name " + licenseName);
+        return license.orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName)).getHref();
     }
 
 

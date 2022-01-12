@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLic
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
+import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -50,6 +52,22 @@ public class LicenseDataServiceTestIT {
         assertEquals(0, embeddedLicense.getLicenses().size());
 
         System.out.println(complexLicense);
+    }
+
+    @Test
+    public void testGetLicenseUrlByName() throws IntegrationException {
+        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+        LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
+        String licenseName = ".NETZ GPL 2.0 With Exception License";
+        licenseService.getLicenseUrlByLicenseName(licenseName).string();
+    }
+
+    @Test
+    public void testGetLicenseUrlByNameThrowsExceptionOnBadLicenseName() throws IntegrationException {
+        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+        LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
+        String licenseName = "fakeLicenseName";
+        Assertions.assertThrows(IntegrationException.class, () -> licenseService.getLicenseUrlByLicenseName(licenseName).string());
     }
 
 }
