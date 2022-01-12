@@ -154,13 +154,11 @@ public class ProjectSyncModel {
     public ComplexLicenseRequest createComplexLicenseRequest() {
         ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
         List<ComplexLicenseRequest> licenses = new LinkedList<>();
-        versionLicenseUrls.forEach(
-            url -> {
+        for (String licenseUrl : versionLicenseUrls) {
                 ComplexLicenseRequest c = new ComplexLicenseRequest();
-                c.setLicense(url);
+                c.setLicense(licenseUrl);
                 licenses.add(c);
-            }
-        );
+        }
         complexLicenseRequest.setLicenses(licenses);
 
         return complexLicenseRequest;
