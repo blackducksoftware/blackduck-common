@@ -10,6 +10,8 @@ package com.synopsys.integration.blackduck.service.dataservice;
 import java.io.IOException;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
@@ -72,11 +74,13 @@ public class LicenseService extends DataService {
         }
     }
 
+    @NotNull
     public HttpUrl getLicenseUrlByLicenseName(String licenseName) throws IntegrationException {
         return blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
             .filter(licenseView -> licenseView.getName().equals(licenseName))
             .findFirst()
-            .orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName)).getHref();
+            .orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName))
+            .getHref();
     }
 
 
