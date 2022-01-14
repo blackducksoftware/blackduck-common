@@ -59,7 +59,7 @@ public class LicenseDataServiceTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
         String licenseName = ".NETZ GPL 2.0 With Exception License";
-        licenseService.getLicenseUrlByLicenseName(licenseName).string();
+        licenseService.getLicenseUrlByLicenseName(licenseName).get().string();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class LicenseDataServiceTestIT {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
         String licenseName = "fakeLicenseName";
-        Assertions.assertThrows(IntegrationException.class, () -> licenseService.getLicenseUrlByLicenseName(licenseName).string());
+        Assertions.assertThrows(IntegrationException.class, () -> licenseService.getLicenseUrlByLicenseName(licenseName).get().string());
     }
 
 }

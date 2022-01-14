@@ -83,7 +83,7 @@ public class ProjectServiceTestIT {
 
         ComplexLicenseRequest complexLicenseRequest = new ComplexLicenseRequest();
         String licenseName = ".NETZ GPL 2.0 With Exception License";
-        complexLicenseRequest.setLicense(licenseService.getLicenseUrlByLicenseName(licenseName).string());
+        complexLicenseRequest.setLicense(licenseService.getLicenseUrlByLicenseName(licenseName).get().string());
         projectVersionRequest.setLicense(complexLicenseRequest);
 
         projectRequest.setVersionRequest(projectVersionRequest);
