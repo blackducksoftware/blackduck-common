@@ -79,8 +79,8 @@ public class LicenseService extends DataService {
 
     public List<LicenseView> searchLicensesByName(String licenseName) throws IntegrationException {
         BlackDuckQuery nameQuery = new BlackDuckQuery("name:" + licenseName);
-            BlackDuckRequest<LicenseView, UrlMultipleResponses<LicenseView>> requestMultiple = new BlackDuckRequest<>(new BlackDuckRequestBuilder().commonGet().addBlackDuckQuery(nameQuery), apiDiscovery.metaLicensesLink());
-            return blackDuckApiClient.getAllResponses(requestMultiple);
+        BlackDuckRequest<LicenseView, UrlMultipleResponses<LicenseView>> requestMultiple = new BlackDuckRequest<>(new BlackDuckRequestBuilder().commonGet().addBlackDuckQuery(nameQuery), apiDiscovery.metaLicensesLink());
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     public Optional<HttpUrl> getLicenseUrlByLicenseName(String licenseName) {
