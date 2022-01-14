@@ -8,11 +8,11 @@
 package com.synopsys.integration.blackduck.service.dataservice;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
@@ -20,8 +20,11 @@ import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLic
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
+import com.synopsys.integration.blackduck.http.BlackDuckQuery;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -74,13 +77,21 @@ public class LicenseService extends DataService {
         }
     }
 
-    @NotNull
-    public HttpUrl getLicenseUrlByLicenseName(String licenseName) throws IntegrationException {
-        return blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
-            .filter(licenseView -> licenseView.getName().equals(licenseName))
-            .findFirst()
-            .orElseThrow(() -> new IntegrationException("Could not find url for license with name " + licenseName))
-            .getHref();
+    public List<LicenseView> searchLicensesByName(String licenseName) throws IntegrationException {
+        BlackDuckQuery nameQuery = new BlackDuckQuery("name:" + licenseName);
+            BlackDuckRequest<LicenseView, UrlMultipleResponses<LicenseView>> requestMultiple = new BlackDuckRequest<>(new BlackDuckRequestBuilder().commonGet().addBlackDuckQuery(nameQuery), apiDiscovery.metaLicensesLink());
+            return blackDuckApiClient.getAllResponses(requestMultiple);
+    }
+
+    public Optional<HttpUrl> getLicenseUrlByLicenseName(String licenseName) {
+        try {
+            return blackDuckApiClient.getAllResponses(apiDiscovery.metaLicensesLink()).stream()
+                .filter(license -> license.getName().equals(licenseName))
+                .findFirst()
+                .map(LicenseView::getHref);
+        } catch (IntegrationException e) {
+            return Optional.empty();
+        }
     }
 
 
