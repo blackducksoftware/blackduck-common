@@ -63,11 +63,11 @@ public class LicenseDataServiceTestIT {
     }
 
     @Test
-    public void testGetLicenseUrlByNameThrowsExceptionOnBadLicenseName() throws IntegrationException {
+    public void testGetLicenseUrlByNameReturnsEmptyOptionalOnBadLicenseName() throws IntegrationException {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
         LicenseService licenseService = blackDuckServicesFactory.createLicenseService();
         String licenseName = "fakeLicenseName";
-        Assertions.assertThrows(IntegrationException.class, () -> licenseService.getLicenseUrlByLicenseName(licenseName).get().string());
+        Assertions.assertFalse(licenseService.getLicenseUrlByLicenseName(licenseName).isPresent());
     }
 
 }
