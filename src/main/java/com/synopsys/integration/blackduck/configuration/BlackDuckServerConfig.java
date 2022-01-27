@@ -34,6 +34,10 @@ import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.util.Stringable;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
+    @Deprecated
+    /**
+     * deprecated Please use one of the other static methods for your situation: newApiBuilder(), newUserPassBuilder()
+     */
     public static BlackDuckServerConfigBuilder newBuilder() {
         return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.API_TOKEN_KEY, BlackDuckServerConfigBuilder.USERNAME_KEY, BlackDuckServerConfigBuilder.PASSWORD_KEY);
     }
