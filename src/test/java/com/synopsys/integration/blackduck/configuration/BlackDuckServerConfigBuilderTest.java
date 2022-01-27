@@ -144,8 +144,32 @@ public class BlackDuckServerConfigBuilderTest {
             blackDuckServerConfig = blackDuckServerConfigBuilder.build();
             assertNotNull(executorServiceField.get(blackDuckServerConfig));
         } finally {
+            assert executorService != null;
             executorService.shutdownNow();
         }
     }
 
+    @Test
+    public void testNewBuilder() {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newBuilder();
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.USERNAME_KEY));
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.PASSWORD_KEY));
+    }
+
+    @Test
+    public void testNewApiBuilder() {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
+        assertFalse(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.USERNAME_KEY));
+        assertFalse(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.PASSWORD_KEY));
+    }
+
+    @Test
+    public void testNewUserPassBuilder() {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+        assertFalse(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.USERNAME_KEY));
+        assertTrue(blackDuckServerConfigBuilder.getKeys().contains(BlackDuckServerConfigBuilder.PASSWORD_KEY));
+    }
 }

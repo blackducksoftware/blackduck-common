@@ -35,7 +35,15 @@ import com.synopsys.integration.util.Stringable;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
     public static BlackDuckServerConfigBuilder newBuilder() {
-        return new BlackDuckServerConfigBuilder();
+        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.API_TOKEN_KEY, BlackDuckServerConfigBuilder.USERNAME_KEY, BlackDuckServerConfigBuilder.PASSWORD_KEY);
+    }
+
+    public static BlackDuckServerConfigBuilder newApiBuilder() {
+        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
+    }
+
+    public static BlackDuckServerConfigBuilder newUserPassBuilder() {
+        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.USERNAME_KEY, BlackDuckServerConfigBuilder.PASSWORD_KEY);
     }
 
     private final HttpUrl blackDuckUrl;

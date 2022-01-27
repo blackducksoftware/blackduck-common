@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -65,14 +66,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private CookieHeaderParser cookieHeaderParser = new CookieHeaderParser();
     private ExecutorService executorService = new NoThreadExecutorService();
 
-    public BlackDuckServerConfigBuilder() {
+    public BlackDuckServerConfigBuilder(BuilderPropertyKey... additionalProperties) {
         Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
         propertyKeys.add(URL_KEY);
         propertyKeys.add(SOLUTION_NAME_KEY);
         propertyKeys.add(SOLUTION_VERSION_KEY);
-        propertyKeys.add(USERNAME_KEY);
-        propertyKeys.add(PASSWORD_KEY);
-        propertyKeys.add(API_TOKEN_KEY);
         propertyKeys.add(TIMEOUT_KEY);
         propertyKeys.add(PROXY_HOST_KEY);
         propertyKeys.add(PROXY_PORT_KEY);
@@ -81,6 +79,9 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         propertyKeys.add(PROXY_NTLM_DOMAIN_KEY);
         propertyKeys.add(PROXY_NTLM_WORKSTATION_KEY);
         propertyKeys.add(TRUST_CERT_KEY);
+
+        propertyKeys.addAll(Arrays.asList(additionalProperties));
+
         builderProperties = new BuilderProperties(propertyKeys);
 
         builderProperties.set(TIMEOUT_KEY, Integer.toString(BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS));
@@ -91,7 +92,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         HttpUrl blackDuckUrl = null;
         try {
             blackDuckUrl = new HttpUrl(getUrl());
-        } catch (IntegrationException e) {
+        } catch (IntegrationException ignored) {
         }
 
         NameVersion solutionDetails = getSolutionDetails();
