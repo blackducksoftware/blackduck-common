@@ -7,6 +7,8 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
+import static com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
+
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
@@ -39,15 +41,15 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
      * deprecated Please use one of the other static methods for your situation: newApiBuilder(), newUserPassBuilder()
      */
     public static BlackDuckServerConfigBuilder newBuilder() {
-        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.API_TOKEN_KEY, BlackDuckServerConfigBuilder.USERNAME_KEY, BlackDuckServerConfigBuilder.PASSWORD_KEY);
+        return new BlackDuckServerConfigBuilder(KEYS.all);
     }
 
-    public static BlackDuckServerConfigBuilder newApiBuilder() {
-        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
+    public static BlackDuckServerConfigBuilder newApiTokenBuilder() {
+        return new BlackDuckServerConfigBuilder(KEYS.apiToken);
     }
 
-    public static BlackDuckServerConfigBuilder newUserPassBuilder() {
-        return new BlackDuckServerConfigBuilder(BlackDuckServerConfigBuilder.USERNAME_KEY, BlackDuckServerConfigBuilder.PASSWORD_KEY);
+    public static BlackDuckServerConfigBuilder newCredentialsBuilder() {
+        return new BlackDuckServerConfigBuilder(KEYS.credentials);
     }
 
     private final HttpUrl blackDuckUrl;

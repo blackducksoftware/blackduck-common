@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.configuration;
 
+import static com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -45,21 +45,21 @@ import com.synopsys.integration.util.NoThreadExecutorService;
 @ExtendWith(TimingExtension.class)
 public class BlackDuckServerConfigBuilderTest {
     private static final String GOOD_URL = "https://blackduck-common.com";
-    private static final String NAME_VERSION_NAME = "name";
-    private static final String NAME_VERSION_VERSION = "version";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-    private static final String KEY = "property-key";
-    private static final String VALUE = "property-value";
+    private static final String NAME_VERSION_NAME = "a valid, non-blank NameVersion name";
+    private static final String NAME_VERSION_VERSION = "a valid, non-blank NameVersion version";
+    private static final String USERNAME = "a valid, non-blank username";
+    private static final String PASSWORD = "a valid, non-blank password";
+    private static final String KEY = "a valid, non-blank property key";
+    private static final String VALUE = "a valid, non-blank property value";
+    public static final String API_TOKEN = "a valid, non-empty api token";
     public static final int TIMEOUT = 60;
-    public static final String API_TOKEN = "my_api_token";
 
     @Test
     void testSettingFromPropertiesMapWithMixed() {
         Map<String, String> properties = new HashMap<>();
         properties.put("BLACKDUCK_URL", "test url");
-        properties.put("blackduck.username", "user");
-        properties.put("BLACKDUCK_PASSWORD", "password");
+        properties.put("blackduck.username", USERNAME);
+        properties.put("BLACKDUCK_PASSWORD", PASSWORD);
 
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         assertNull(blackDuckServerConfigBuilder.getUrl());
@@ -69,8 +69,8 @@ public class BlackDuckServerConfigBuilderTest {
         blackDuckServerConfigBuilder.setProperties(properties.entrySet());
 
         assertEquals("test url", blackDuckServerConfigBuilder.getUrl());
-        assertEquals("user", blackDuckServerConfigBuilder.getUsername());
-        assertEquals("password", blackDuckServerConfigBuilder.getPassword());
+        assertEquals(USERNAME, blackDuckServerConfigBuilder.getUsername());
+        assertEquals(PASSWORD, blackDuckServerConfigBuilder.getPassword());
     }
 
     @Test
@@ -83,8 +83,8 @@ public class BlackDuckServerConfigBuilderTest {
     public void testNullUrlInvalid() {
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl((String) null);
-        blackDuckServerConfigBuilder.setUsername("fakeUser");
-        blackDuckServerConfigBuilder.setPassword("fakePassword");
+        blackDuckServerConfigBuilder.setUsername(USERNAME);
+        blackDuckServerConfigBuilder.setPassword(PASSWORD);
         assertFalse(blackDuckServerConfigBuilder.isValid());
         try {
             blackDuckServerConfigBuilder.build();
@@ -114,42 +114,36 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testValidConfig() {
-        String blackDuckUrl = "http://this.might.exist/somewhere";
-
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
-        blackDuckServerConfigBuilder.setApiToken("a valid, non-empty api token");
+        blackDuckServerConfigBuilder.setUrl(GOOD_URL);
+        blackDuckServerConfigBuilder.setApiToken(API_TOKEN);
         assertTrue(blackDuckServerConfigBuilder.isValid());
     }
 
     @Test
     public void testValidConfigHttpUrl() throws IntegrationException {
-        HttpUrl blackDuckUrl = new HttpUrl("http://this.might.exist/somewhere");
+        HttpUrl blackDuckUrl = new HttpUrl(GOOD_URL);
 
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
-        blackDuckServerConfigBuilder.setApiToken("a valid, non-empty api token");
+        blackDuckServerConfigBuilder.setApiToken(API_TOKEN);
         assertTrue(blackDuckServerConfigBuilder.isValid());
     }
 
     @Test
     public void testValidConfigWithUsernameAndPassword() {
-        String blackDuckUrl = "http://this.might.exist/somewhere";
-
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
+        blackDuckServerConfigBuilder.setUrl(GOOD_URL);
         CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
-        credentialsBuilder.setUsernameAndPassword("a valid, non-blank username", "a valid, non-blank password");
+        credentialsBuilder.setUsernameAndPassword(USERNAME, PASSWORD);
         blackDuckServerConfigBuilder.setCredentials(credentialsBuilder.build());
         assertTrue(blackDuckServerConfigBuilder.isValid());
     }
 
     @Test
     public void testInvalidConfigWithBlankUsernameAndPassword() {
-        String blackDuckUrl = "http://this.might.exist/somewhere";
-
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
+        blackDuckServerConfigBuilder.setUrl(GOOD_URL);
         CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
         credentialsBuilder.setUsernameAndPassword("", null);
         blackDuckServerConfigBuilder.setCredentials(credentialsBuilder.build());
@@ -158,10 +152,8 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testTimeout() {
-        String blackDuckUrl = "http://this.might.exist/somewhere";
-
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-        blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
+        blackDuckServerConfigBuilder.setUrl(GOOD_URL);
         blackDuckServerConfigBuilder.setTimeoutInSeconds(0);
         assertFalse(blackDuckServerConfigBuilder.isValid());
     }
@@ -173,8 +165,8 @@ public class BlackDuckServerConfigBuilderTest {
             executorService = Executors.newSingleThreadExecutor();
 
             BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
-            blackDuckServerConfigBuilder.setUrl("http://this.might.exist/somewhere");
-            blackDuckServerConfigBuilder.setApiToken("a valid, non-empty api token");
+            blackDuckServerConfigBuilder.setUrl(GOOD_URL);
+            blackDuckServerConfigBuilder.setApiToken(API_TOKEN);
             BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
 
             Field executorServiceField = BlackDuckServerConfig.class.getDeclaredField("executorService");
@@ -193,7 +185,7 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
-    public void testNewBuilder() {
+    public void testNewBuilderIncludesAllKeys() {
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newBuilder();
         Set<BuilderPropertyKey> configBuilderKeys = blackDuckServerConfigBuilder.getKeys();
         assertTrue(configBuilderKeys.contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
@@ -202,8 +194,8 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
-    public void testNewApiBuilder() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+    public void testNewBuilderIncludesApiTokenKey() {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         Set<BuilderPropertyKey> configBuilderKeys = blackDuckServerConfigBuilder.getKeys();
         assertTrue(configBuilderKeys.contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
         assertFalse(configBuilderKeys.contains(BlackDuckServerConfigBuilder.USERNAME_KEY));
@@ -215,8 +207,8 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
-    public void testNewUserPassBuilder() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+    public void testNewBuilderIncludesCredentialsKeys() {
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
         Set<BuilderPropertyKey> configBuilderKeys = blackDuckServerConfigBuilder.getKeys();
         assertFalse(configBuilderKeys.contains(BlackDuckServerConfigBuilder.API_TOKEN_KEY));
         assertTrue(configBuilderKeys.contains(BlackDuckServerConfigBuilder.USERNAME_KEY));
@@ -232,12 +224,10 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testGetPropertyKeys() {
-        Set<BuilderPropertyKey> builderPropertyKeys = new HashSet<>();
-        builderPropertyKeys.add(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
-        BuilderProperties apiTokenBuilderProperties = new BuilderProperties(builderPropertyKeys);
+        BuilderProperties apiTokenBuilderProperties = new BuilderProperties(KEYS.apiToken);
         String apiTokenPropertyKey = apiTokenBuilderProperties.getPropertyKeys().iterator().next();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         Set<String> configBuilderPropertyKeys = blackDuckServerConfigBuilder.getPropertyKeys();
 
         assertTrue(configBuilderPropertyKeys.contains(apiTokenPropertyKey));
@@ -245,12 +235,10 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testGetEnvironmentVariableKeys() {
-        Set<BuilderPropertyKey> builderPropertyKeys = new HashSet<>();
-        builderPropertyKeys.add(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
-        BuilderProperties apiTokenBuilderProperties = new BuilderProperties(builderPropertyKeys);
+        BuilderProperties apiTokenBuilderProperties = new BuilderProperties(KEYS.apiToken);
         String apiTokenEnvVarKey = apiTokenBuilderProperties.getEnvironmentVariableKeys().iterator().next();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         Set<String> configBuilderPropertyKeys = blackDuckServerConfigBuilder.getEnvironmentVariableKeys();
 
         assertTrue(configBuilderPropertyKeys.contains(apiTokenEnvVarKey));
@@ -258,12 +246,9 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testGetProperties() {
-        Set<BuilderPropertyKey> builderPropertyKeys = new HashSet<>();
-        builderPropertyKeys.add(BlackDuckServerConfigBuilder.USERNAME_KEY);
-        builderPropertyKeys.add(BlackDuckServerConfigBuilder.PASSWORD_KEY);
-        BuilderProperties userBuilderProperties = new BuilderProperties(builderPropertyKeys);
+        BuilderProperties userBuilderProperties = new BuilderProperties(KEYS.credentials);
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
         Map<BuilderPropertyKey, String> configBuilderPropertyKeys = blackDuckServerConfigBuilder.getProperties();
 
         for (Map.Entry<BuilderPropertyKey, String> entry : userBuilderProperties.getProperties().entrySet()) {
@@ -277,7 +262,7 @@ public class BlackDuckServerConfigBuilderTest {
         Map<String, String> properties = new HashMap<>();
         properties.put(KEY, VALUE);
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
 
         blackDuckServerConfigBuilder.setProperties(properties.entrySet());
         assertTrue(blackDuckServerConfigBuilder.getProperties().containsKey(builderPropertyKey));
@@ -286,7 +271,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testSetProperty() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
 
         BuilderPropertyKey builderPropertyKey = new BuilderPropertyKey(KEY);
         blackDuckServerConfigBuilder.setProperty(builderPropertyKey.getKey(), VALUE);
@@ -296,7 +281,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testBuildWithoutValidationNoValues() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setUrl("");
 
         assertTrue(StringUtils.isBlank(blackDuckServerConfigBuilder.getUrl()));
@@ -326,7 +311,7 @@ public class BlackDuckServerConfigBuilderTest {
     public void testBuildWithoutValidationApiToken() {
         ProxyInfo proxyInfo = getProxyInfo();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
 
         blackDuckServerConfigBuilder.setApiToken(API_TOKEN)
             .setUrl(GOOD_URL)
@@ -359,7 +344,7 @@ public class BlackDuckServerConfigBuilderTest {
     }
 
     @Test
-    public void testBuildWithoutValidationUserPass() throws IntegrationException {
+    public void testBuildWithoutValidationCredentials() throws IntegrationException {
         CredentialsBuilder credentialsBuilder = Credentials.newBuilder();
         credentialsBuilder.setUsernameAndPassword(USERNAME, PASSWORD);
         Credentials credentials = credentialsBuilder.build();
@@ -367,7 +352,7 @@ public class BlackDuckServerConfigBuilderTest {
         HttpUrl httpUrl = new HttpUrl(GOOD_URL);
         ProxyInfo proxyInfo = getProxyInfo();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newUserPassBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
 
         blackDuckServerConfigBuilder.setCredentials(credentials)
             .setSolutionDetails(nameVersion)
@@ -402,7 +387,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testNullCheckSetters() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
 
         assertNotNull(blackDuckServerConfigBuilder.getLogger());
         assertNotNull(blackDuckServerConfigBuilder.getAuthenticationSupport());
@@ -451,7 +436,7 @@ public class BlackDuckServerConfigBuilderTest {
     public void testProxyInfoMethods() {
         ProxyInfo proxyInfo = getProxyInfo();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setProxyInfo(proxyInfo);
 
         assertEquals(proxyInfo, blackDuckServerConfigBuilder.getProxyInfo());
@@ -461,12 +446,11 @@ public class BlackDuckServerConfigBuilderTest {
         assertEquals(proxyInfo.getPassword().orElse(null), blackDuckServerConfigBuilder.getProxyPassword());
         assertEquals(proxyInfo.getNtlmDomain().orElse(null), blackDuckServerConfigBuilder.getProxyNtlmDomain());
         assertEquals(proxyInfo.getNtlmWorkstation().orElse(null), blackDuckServerConfigBuilder.getProxyNtlmWorkstation());
-
     }
 
     @Test
     public void testValidateBlankBDUrl() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setApiToken(API_TOKEN);
 
         BuilderStatus builderStatus = new BuilderStatus();
@@ -478,7 +462,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testValidateBadBDCredentials() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setUsername(USERNAME)
             .setUrl(GOOD_URL);
 
@@ -491,7 +475,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testValidateBlankApiToken() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setUrl(GOOD_URL);
 
         BuilderStatus builderStatus = new BuilderStatus();
@@ -503,7 +487,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testValidateBadProxyCredentials() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setProxyUsername(USERNAME)
             .setApiToken(API_TOKEN)
             .setUrl(GOOD_URL);
@@ -517,7 +501,7 @@ public class BlackDuckServerConfigBuilderTest {
 
     @Test
     public void testValidateBlankProxyHost() {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
         blackDuckServerConfigBuilder.setProxyUsername(USERNAME)
             .setProxyPassword(PASSWORD)
             .setApiToken(API_TOKEN)
