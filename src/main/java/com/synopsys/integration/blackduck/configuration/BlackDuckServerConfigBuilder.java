@@ -89,7 +89,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -97,7 +97,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser,
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser,
                 executorService);
         }
     }
@@ -106,13 +106,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     protected void validate(BuilderStatus builderStatus) {
         validateBlackDuckUrl(builderStatus);
 
-        if (StringUtils.isBlank(getApiToken())) {
-            validateBlackDuckCredentials(builderStatus);
-        }
+        validateConnectionDetails(builderStatus);
 
         validateProxyDetails(builderStatus);
 
-        if (getTimemoutInSeconds() <= 0) {
+        if (getTimeoutInSeconds() <= 0) {
             builderStatus.addErrorMessage("The timeout must be greater than zero.");
         }
     }
@@ -140,6 +138,18 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
+    private void validateConnectionDetails(BuilderStatus builderStatus) {
+        if (builderProperties.getKeys().contains(API_TOKEN_KEY)) {
+            if (StringUtils.isBlank(getApiToken())) {
+                builderStatus.addErrorMessage("Configured to use API Token but token was not set.");
+            }
+        } else if (builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY)) {
+            validateBlackDuckCredentials(builderStatus);
+        } else {
+            builderStatus.addErrorMessage("Must be configured to use an API Token or username/password.");
+        }
+    }
+
     private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
         CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
         credentialsBuilder.setUsername(getUsername());
@@ -150,7 +160,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         } else {
             Credentials credentials = credentialsBuilder.build();
             if (credentials.isBlank()) {
-                builderStatus.addErrorMessage("An API token must be specified.");
+                builderStatus.addErrorMessage("Configured to use username/password but both are not valid.");
             }
         }
     }
@@ -366,7 +376,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    public int getTimemoutInSeconds() {
+    public int getTimeoutInSeconds() {
         return NumberUtils.toInt(builderProperties.get(TIMEOUT_KEY), BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS);
     }
 
