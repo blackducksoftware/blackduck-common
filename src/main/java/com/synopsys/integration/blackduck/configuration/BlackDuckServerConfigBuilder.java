@@ -7,7 +7,8 @@
  */
 package com.synopsys.integration.blackduck.configuration;
 
-import java.util.HashSet;
+import static com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -42,9 +43,6 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public static final BuilderPropertyKey URL_KEY = new BuilderPropertyKey("BLACKDUCK_URL");
     public static final BuilderPropertyKey SOLUTION_NAME_KEY = new BuilderPropertyKey("SOLUTION_NAME_KEY");
     public static final BuilderPropertyKey SOLUTION_VERSION_KEY = new BuilderPropertyKey("SOLUTION_VERSION_KEY");
-    public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_USERNAME");
-    public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PASSWORD");
-    public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_API_TOKEN");
     public static final BuilderPropertyKey TIMEOUT_KEY = new BuilderPropertyKey("BLACKDUCK_TIMEOUT");
     public static final BuilderPropertyKey PROXY_HOST_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_HOST");
     public static final BuilderPropertyKey PROXY_PORT_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_PORT");
@@ -53,6 +51,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public static final BuilderPropertyKey PROXY_NTLM_DOMAIN_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_NTLM_DOMAIN");
     public static final BuilderPropertyKey PROXY_NTLM_WORKSTATION_KEY = new BuilderPropertyKey("BLACKDUCK_PROXY_NTLM_WORKSTATION");
     public static final BuilderPropertyKey TRUST_CERT_KEY = new BuilderPropertyKey("BLACKDUCK_TRUST_CERT");
+
+    public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_API_TOKEN");
+
+    public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_USERNAME");
+    public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PASSWORD");
 
     public static int DEFAULT_TIMEOUT_SECONDS = 120;
 
@@ -66,22 +69,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     private ExecutorService executorService = new NoThreadExecutorService();
 
     public BlackDuckServerConfigBuilder() {
-        Set<BuilderPropertyKey> propertyKeys = new HashSet<>();
-        propertyKeys.add(URL_KEY);
-        propertyKeys.add(SOLUTION_NAME_KEY);
-        propertyKeys.add(SOLUTION_VERSION_KEY);
-        propertyKeys.add(USERNAME_KEY);
-        propertyKeys.add(PASSWORD_KEY);
-        propertyKeys.add(API_TOKEN_KEY);
-        propertyKeys.add(TIMEOUT_KEY);
-        propertyKeys.add(PROXY_HOST_KEY);
-        propertyKeys.add(PROXY_PORT_KEY);
-        propertyKeys.add(PROXY_USERNAME_KEY);
-        propertyKeys.add(PROXY_PASSWORD_KEY);
-        propertyKeys.add(PROXY_NTLM_DOMAIN_KEY);
-        propertyKeys.add(PROXY_NTLM_WORKSTATION_KEY);
-        propertyKeys.add(TRUST_CERT_KEY);
-        builderProperties = new BuilderProperties(propertyKeys);
+        this(KEYS.common);
+    }
+
+    public BlackDuckServerConfigBuilder(Set<BuilderPropertyKey> properties) {
+        builderProperties = new BuilderProperties(properties);
 
         builderProperties.set(TIMEOUT_KEY, Integer.toString(BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS));
     }
@@ -91,13 +83,13 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         HttpUrl blackDuckUrl = null;
         try {
             blackDuckUrl = new HttpUrl(getUrl());
-        } catch (IntegrationException e) {
+        } catch (IntegrationException ignored) {
         }
 
         NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
         if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -105,7 +97,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
             credentialsBuilder.setUsernameAndPassword(username, password);
             Credentials credentials = credentialsBuilder.build();
 
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimemoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser,
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), credentials, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser,
                 executorService);
         }
     }
@@ -114,13 +106,11 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     protected void validate(BuilderStatus builderStatus) {
         validateBlackDuckUrl(builderStatus);
 
-        if (StringUtils.isBlank(getApiToken())) {
-            validateBlackDuckCredentials(builderStatus);
-        }
+        validateConnectionDetails(builderStatus);
 
         validateProxyDetails(builderStatus);
 
-        if (getTimemoutInSeconds() <= 0) {
+        if (getTimeoutInSeconds() <= 0) {
             builderStatus.addErrorMessage("The timeout must be greater than zero.");
         }
     }
@@ -148,6 +138,18 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         }
     }
 
+    private void validateConnectionDetails(BuilderStatus builderStatus) {
+        if (builderProperties.getKeys().contains(API_TOKEN_KEY)) {
+            if (StringUtils.isBlank(getApiToken())) {
+                builderStatus.addErrorMessage("Configured to use API Token but token was not set.");
+            }
+        } else if (builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY)) {
+            validateBlackDuckCredentials(builderStatus);
+        } else {
+            builderStatus.addErrorMessage("Must be configured to use an API Token or username/password.");
+        }
+    }
+
     private void validateBlackDuckCredentials(BuilderStatus builderStatus) {
         CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
         credentialsBuilder.setUsername(getUsername());
@@ -158,7 +160,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         } else {
             Credentials credentials = credentialsBuilder.build();
             if (credentials.isBlank()) {
-                builderStatus.addErrorMessage("An API token must be specified.");
+                builderStatus.addErrorMessage("Configured to use username/password but both are not valid.");
             }
         }
     }
@@ -374,7 +376,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
         return this;
     }
 
-    public int getTimemoutInSeconds() {
+    public int getTimeoutInSeconds() {
         return NumberUtils.toInt(builderProperties.get(TIMEOUT_KEY), BlackDuckServerConfigBuilder.DEFAULT_TIMEOUT_SECONDS);
     }
 
