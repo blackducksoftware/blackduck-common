@@ -17,7 +17,6 @@ import org.apache.http.client.HttpClient;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKeys;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
@@ -82,7 +81,7 @@ public class IntHttpClientTestHelper {
     }
 
     public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder(BlackDuckServerConfigKeys.KEYS.all);
+        BlackDuckServerConfigBuilder builder = BlackDuckServerConfig.newApiTokenBuilder();
         builder.setUrl(blackDuckServerUrl);
         String apiToken = getProperty(TestingPropertyKey.TEST_API_TOKEN);
         if (StringUtils.isNotBlank(apiToken)) {
