@@ -81,18 +81,21 @@ public class IntHttpClientTestHelper {
     }
 
     public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
-        BlackDuckServerConfigBuilder builder = BlackDuckServerConfig.newApiTokenBuilder();
-        builder.setUrl(blackDuckServerUrl);
+        BlackDuckServerConfigBuilder builder;
+
         String apiToken = getProperty(TestingPropertyKey.TEST_API_TOKEN);
         if (StringUtils.isNotBlank(apiToken)) {
+            builder = BlackDuckServerConfig.newApiTokenBuilder();
             builder.setApiToken(apiToken);
         } else {
+            builder = BlackDuckServerConfig.newCredentialsBuilder();
             builder.setUsername(getProperty(TestingPropertyKey.TEST_USERNAME));
             builder.setPassword(getProperty(TestingPropertyKey.TEST_PASSWORD));
         }
 
-        builder.setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT));
-        builder.setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
+        builder.setUrl(blackDuckServerUrl)
+            .setTimeoutInSeconds(getProperty(TestingPropertyKey.TEST_BLACK_DUCK_TIMEOUT))
+            .setTrustCert(Boolean.parseBoolean(getProperty(TestingPropertyKey.TEST_TRUST_HTTPS_CERT)));
 
         return builder;
     }
