@@ -23,6 +23,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKeys;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
@@ -52,7 +53,7 @@ public class ScannerZipInstallerTest {
         assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
 
         IntLogger logger = new BufferedIntLogger();
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
         blackDuckServerConfigBuilder.setUrl(blackDuckUrl);
         blackDuckServerConfigBuilder.setUsername(blackDuckUsername);
         blackDuckServerConfigBuilder.setPassword(blackDuckPassword);
@@ -100,7 +101,7 @@ public class ScannerZipInstallerTest {
         File downloadTarget = tempDirectory.toFile();
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder(BlackDuckServerConfigKeys.KEYS.all);
             BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
             BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
             KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);

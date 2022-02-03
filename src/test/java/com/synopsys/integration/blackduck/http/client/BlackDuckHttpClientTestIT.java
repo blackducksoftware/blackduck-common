@@ -61,7 +61,7 @@ public class BlackDuckHttpClientTestIT {
 
     @Test
     public void testCredentials() throws IntegrationException, IOException {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder builder = BlackDuckServerConfig.newCredentialsBuilder();
         builder.setTrustCert(true);
         builder.setUrl(blackDuckUrl);
         builder.setUsername(username);
@@ -104,7 +104,7 @@ public class BlackDuckHttpClientTestIT {
         deleteByName(BlackDuckHttpClientTestIT.API_TOKEN_NAME);
         ApiTokenView apiTokenView = getApiToken(BlackDuckHttpClientTestIT.API_TOKEN_NAME);
 
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder builder = BlackDuckServerConfig.newApiTokenBuilder();
         builder.setTrustCert(true);
         builder.setUrl(blackDuckUrl);
         builder.setApiToken(apiTokenView.token);
@@ -126,7 +126,7 @@ public class BlackDuckHttpClientTestIT {
 
     @Test
     public void testBlackDuckRedirectWithCredentials() throws IntegrationException, IOException {
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
         blackDuckServerConfigBuilder.setUsername(username);
         blackDuckServerConfigBuilder.setPassword(password);
 
@@ -138,7 +138,7 @@ public class BlackDuckHttpClientTestIT {
         String tokenName = "redirect-test";
         ApiTokenView apiTokenView = getApiToken(tokenName);
         try {
-            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newApiTokenBuilder();
             blackDuckServerConfigBuilder.setApiToken(apiTokenView.token);
 
             testRedirect(blackDuckServerConfigBuilder);
@@ -173,7 +173,7 @@ public class BlackDuckHttpClientTestIT {
     @Test
     @Disabled
     public void testProvidedApiToken() {
-        BlackDuckServerConfigBuilder builder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder builder = BlackDuckServerConfig.newApiTokenBuilder();
         builder.setUrl("https://int-hub02.dc1.lan");
         builder.setApiToken("MTYzZjkxMjAtMDBmMi00NTk4LWJmNjEtZmYzYWIyMmEwNWE2OjJkYjQwZDJiLTAzYWQtNGZiOC05ZTJjLTY3MWQyZTcwNWIzOQ==");
         builder.setTrustCert(true);
@@ -196,7 +196,7 @@ public class BlackDuckHttpClientTestIT {
         apiTokenRequest.scopes.add("write");
 
         BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
-                                                              .postObject(apiTokenRequest, BodyContentConverter.DEFAULT);
+            .postObject(apiTokenRequest, BodyContentConverter.DEFAULT);
         BlackDuckSingleRequest<ApiTokenView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(tokenResponse);
 
         return blackDuckApiClient.getResponse(requestSingle);

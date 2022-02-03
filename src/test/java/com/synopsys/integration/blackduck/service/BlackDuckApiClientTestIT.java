@@ -17,6 +17,7 @@ import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -46,7 +47,7 @@ public class BlackDuckApiClientTestIT {
         IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
         BlackDuckMediaTypeDiscoveryVerifier blackDuckMediaTypeDiscoveryVerifier = new BlackDuckMediaTypeDiscoveryVerifier();
 
-        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder();
+        BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
         blackDuckServerConfigBuilder.setUrl(testHelper.getProperty(TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL));
         blackDuckServerConfigBuilder.setUsername(testHelper.getProperty(TestingPropertyKey.TEST_USERNAME));
         blackDuckServerConfigBuilder.setPassword(testHelper.getProperty(TestingPropertyKey.TEST_PASSWORD));
