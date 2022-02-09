@@ -15,15 +15,17 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.core.response.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionVulnerableBomComponentsView;
+import com.synopsys.integration.blackduck.api.manual.temporary.response.PolicySummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -85,6 +87,16 @@ public class ProjectBomService extends DataService {
     public Optional<ProjectVersionPolicyStatusView> getPolicyStatusForVersion(ProjectVersionView version) throws IntegrationException {
         if (version.metaPolicyStatusLinkSafely().isPresent()) {
             return Optional.ofNullable(blackDuckApiClient.getResponse(version.metaPolicyStatusLink()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<List<PolicySummaryView>> getActivePoliciesForVersion(ProjectVersionView version) throws IntegrationException {
+        LinkMultipleResponses<PolicySummaryView> rulesLink = new LinkMultipleResponses<>(BlackDuckMediaTypeDiscovery.API_PROJECTS_VERSIONS_COMPONENTS_POLICY_RULES, PolicySummaryView.class);
+        Optional<UrlMultipleResponses<PolicySummaryView>> rulesUrl = version.metaMultipleResponsesSafely(rulesLink);
+        if (rulesUrl.isPresent()) {
+            return Optional.ofNullable(blackDuckApiClient.getAllResponses(rulesUrl.get()));
         } else {
             return Optional.empty();
         }
