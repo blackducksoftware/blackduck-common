@@ -15,9 +15,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.LinkMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
@@ -37,6 +35,7 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.response.Response;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;
@@ -92,12 +91,11 @@ public class ProjectBomService extends DataService {
         }
     }
 
-    public Optional<List<PolicySummaryView>> getActivePoliciesForVersion(ProjectVersionView version) throws IntegrationException {
-        LinkMultipleResponses<PolicySummaryView> rulesLink = new LinkMultipleResponses<>(BlackDuckMediaTypeDiscovery.API_PROJECTS_VERSIONS_COMPONENTS_POLICY_RULES, PolicySummaryView.class);
-        Optional<UrlMultipleResponses<PolicySummaryView>> rulesUrl = version.metaMultipleResponsesSafely(rulesLink);
-        if (rulesUrl.isPresent()) {
-            return Optional.ofNullable(blackDuckApiClient.getAllResponses(rulesUrl.get()));
-        } else {
+    public Optional<List<PolicySummaryView>> getActivePoliciesForVersion(ProjectVersionView version) {
+        UrlMultipleResponses<PolicySummaryView> url = version.metaActivePolicyRulesLink();
+        try {
+            return Optional.ofNullable(blackDuckApiClient.getAllResponses(url));
+        } catch (IntegrationException e) {
             return Optional.empty();
         }
     }
