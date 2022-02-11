@@ -2,13 +2,11 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,9 +25,11 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigKey
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
+import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
+import com.synopsys.integration.blackduck.service.model.BlackDuckServerData;
 import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -40,19 +40,17 @@ import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
 @ExtendWith(TimingExtension.class)
-public class ScannerZipInstallerTest {
+class ScannerZipInstallerTest {
     @Test
-    public void testActualDownload() throws Exception {
-        IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
-
-        String signatureScannerDownloadPath = intEnvironmentVariables.getValue("BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH");
-        String blackDuckUrl = intEnvironmentVariables.getValue("BLACKDUCK_URL");
-        String blackDuckUsername = intEnvironmentVariables.getValue("BLACKDUCK_USERNAME");
-        String blackDuckPassword = intEnvironmentVariables.getValue("BLACKDUCK_PASSWORD");
-        assumeTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
-        assumeTrue(null != blackDuckUrl);
-        assumeTrue(StringUtils.isNotBlank(blackDuckUsername));
-        assumeTrue(StringUtils.isNotBlank(blackDuckPassword));
+    void testActualDownload() throws Exception {
+        String signatureScannerDownloadPath = TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH.fromEnvironment();
+        String blackDuckUrl = TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL.fromEnvironment();
+        String blackDuckUsername = TestingPropertyKey.TEST_USERNAME.fromEnvironment();
+        String blackDuckPassword = TestingPropertyKey.TEST_PASSWORD.fromEnvironment();
+        assertTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));
+        assertTrue(StringUtils.isNotBlank(blackDuckUrl));
+        assertTrue(StringUtils.isNotBlank(blackDuckUsername));
+        assertTrue(StringUtils.isNotBlank(blackDuckPassword));
 
         IntLogger logger = new BufferedIntLogger();
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = BlackDuckServerConfig.newCredentialsBuilder();
@@ -69,7 +67,7 @@ public class ScannerZipInstallerTest {
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
-        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
+        ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, IntEnvironmentVariables.includeSystemEnv(), operatingSystemType);
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
@@ -92,31 +90,48 @@ public class ScannerZipInstallerTest {
 
     @Disabled
     @Test
-    public void testInitialDownload() throws Exception {
+    void testInitialDownload() throws Exception {
+        // This test was already disabled, so I tried to fix it and failed.
+        // ERROR: No Archiver found for the stream signature.
+        // The ArchiveStreamFactory::detect method cannot determine that the stream is a Zip.
+        // We could change CommonZipExpander::expandUnknownFile to allow the Archive type to be supplied (bypassing detection)
+        // Using different resources does not help. It might have something to do with mockito. JM-02/2022
+
         IntEnvironmentVariables intEnvironmentVariables = IntEnvironmentVariables.includeSystemEnv();
 
-        InputStream zipFileStream = getClass().getResourceAsStream("/blackduck_cli_mac.zip");
+        InputStream zipFileStream = getClass().getResourceAsStream("/testArchive.zip");
         Response mockResponse = Mockito.mock(Response.class);
         Mockito.when(mockResponse.getContent()).thenReturn(zipFileStream);
 
         SignatureScannerClient mockScannerClient = Mockito.mock(SignatureScannerClient.class);
-        Mockito.when(mockScannerClient.executeGetRequestIfModifiedSince(Mockito.any(Request.class), Mockito.anyLong())).thenReturn(Optional.of(mockResponse));
+        Mockito.when(mockScannerClient.executeGetRequest(Mockito.any(Request.class))).thenReturn(mockResponse);
 
         IntLogger logger = new BufferedIntLogger();
         Path tempDirectory = Files.createTempDirectory(null);
         File downloadTarget = tempDirectory.toFile();
         try {
             CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder(BlackDuckServerConfigKeys.KEYS.all);
+            BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = new BlackDuckServerConfigBuilder(BlackDuckServerConfigKeys.KEYS.apiToken);
+            HttpUrl mockUrl = new HttpUrl("https://synopsys.com");
+            blackDuckServerConfigBuilder.setUrl(mockUrl);
+            blackDuckServerConfigBuilder.setApiToken("mock-token");
             BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
             BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
-            BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(blackDuckHttpClient, logger);
-            BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
+            BlackDuckRegistrationService blackDuckRegistrationService = Mockito.mock(BlackDuckRegistrationService.class);
+            Mockito.when(blackDuckRegistrationService.getBlackDuckServerData()).thenReturn(new BlackDuckServerData(mockUrl, "version", "registration-key"));
             KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
             ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, OperatingSystemType.MAC);
-            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
-                new HttpUrl("http://www.synopsys.com"),
-                OperatingSystemType.MAC, downloadTarget);
+            ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(
+                logger,
+                new SignatureScannerClient(blackDuckHttpClient),
+                blackDuckRegistrationService,
+                cleanupZipExpander,
+                scanPathsUtility,
+                keyStoreHelper,
+                mockUrl,
+                OperatingSystemType.MAC,
+                downloadTarget
+            );
 
             assertThrows(BlackDuckIntegrationException.class, () -> scanPathsUtility.searchForScanPaths(downloadTarget));
 
