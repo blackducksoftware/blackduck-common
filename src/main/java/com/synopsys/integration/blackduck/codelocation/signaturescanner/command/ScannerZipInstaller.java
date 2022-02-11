@@ -96,34 +96,38 @@ public class ScannerZipInstaller implements ScannerInstaller {
         File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = null;
-        try {
-            versionFile = retrieveOrCreateVersionFile(scannerExpansionDirectory);
-        } catch (IOException e) {
-            throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage(), e);
-        } catch (IntegrationException e) {
-            throw new BlackDuckIntegrationException("Failed to determine current Black Duck version: " + e.getMessage(), e);
-        }
-
+        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
+
         try {
-            downloadIfNeeded(scannerExpansionDirectory, versionFile, downloadUrl);
+            String connectedBlackDuckVersion = StringUtils.trim(blackDuckRegistrationService.getBlackDuckServerData().getVersion());
+
+            if (!versionFile.exists()) {
+                logger.info("No version file exists, assuming this is new installation and the signature scanner should be downloaded.");
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl);
+                // Version file creation should happen after successful download
+                logger.debug("The version file has not been created yet so creating it now.");
+                FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
+                return installDirectory;
+            }
+
+            // A version file exists, so we have to compare to determine if a download should occur.
+            String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+            logger.debug(String.format("Last version downloaded: %s", localScannerVersion));
+
+            if (!localScannerVersion.equals(connectedBlackDuckVersion)) {
+                logger.info(String.format("The signature scanner should be downloaded. Current version: %s Black Duck version: %s", localScannerVersion, connectedBlackDuckVersion));
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl);
+                FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
+            } else {
+                logger.debug("The Black Duck Signature Scanner version matches the connected Black Duck version - skipping download.");
+            }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
         }
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
         return installDirectory;
-    }
-
-    private File retrieveOrCreateVersionFile(File scannerExpansionDirectory) throws IOException, IntegrationException {
-        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
-        if (!versionFile.exists()) {
-            logger.info("The version file has not been created yet so creating it now.");
-            String connectedBlackDuckVersion = blackDuckRegistrationService.getBlackDuckServerData().getVersion();
-            FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
-        }
-        return versionFile;
     }
 
     private HttpUrl getDownloadUrl() throws BlackDuckIntegrationException {
@@ -147,15 +151,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
         }
     }
 
-    private void downloadIfNeeded(File scannerExpansionDirectory, File versionFile, HttpUrl downloadUrl) throws IOException, IntegrationException, ArchiveException {
-        String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
-        logger.debug(String.format("Last version downloaded: %s", localScannerVersion));
-        String connectedBlackDuckVersion = StringUtils.trim(blackDuckRegistrationService.getBlackDuckServerData().getVersion());
-        if (localScannerVersion.equals(connectedBlackDuckVersion)) {
-            logger.debug("The Black Duck Signature Scanner version matches the connected Black Duck version - skipping download.");
-            return;
-        }
-
+    private void downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl) throws IOException, IntegrationException, ArchiveException {
         Request downloadRequest = new Request.Builder(downloadUrl).build();
         try (Response response = signatureScannerClient.executeGetRequest(downloadRequest)) {
             logger.info("Downloading the Black Duck Signature Scanner.");
@@ -165,8 +161,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
                     scannerExpansionDirectory.getAbsolutePath()));
                 cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
             }
-
-            FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
 
             ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
             File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
@@ -180,7 +174,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
 
             keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), serverCertificate, scanPaths.getPathToCacerts());
 
-            logger.info(String.format("Black Duck Signature Scanner (version %s) downloaded successfully.", connectedBlackDuckVersion));
+            logger.info("Black Duck Signature Scanner downloaded successfully.");
         }
     }
 
