@@ -113,10 +113,10 @@ public class ScannerZipInstaller implements ScannerInstaller {
 
             // A version file exists, so we have to compare to determine if a download should occur.
             String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
-            logger.debug(String.format("Last version downloaded: %s", localScannerVersion));
+            logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
 
-            if (!localScannerVersion.equals(connectedBlackDuckVersion)) {
-                logger.info(String.format("The signature scanner should be downloaded. Current version: %s Black Duck version: %s", localScannerVersion, connectedBlackDuckVersion));
+            if (!connectedBlackDuckVersion.equals(localScannerVersion)) {
+                logger.info(String.format("The signature scanner should be downloaded. Locally installed signature scanner is %s, but the connected Black Duck version is %s", localScannerVersion, connectedBlackDuckVersion));
                 downloadSignatureScanner(scannerExpansionDirectory, downloadUrl);
                 FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
             } else {
