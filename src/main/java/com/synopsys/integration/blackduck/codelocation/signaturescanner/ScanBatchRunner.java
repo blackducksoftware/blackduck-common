@@ -15,7 +15,6 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerInstaller;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
@@ -23,6 +22,7 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.IntEnvironmentVariables;
@@ -34,31 +34,54 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final ScannerInstaller scannerInstaller;
 
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, File signatureScannerInstallDirectory) {
+    public static ScanBatchRunner createDefault(
+        IntLogger logger,
+        BlackDuckHttpClient blackDuckHttpClient,
+        BlackDuckRegistrationService blackDuckRegistrationService,
+        IntEnvironmentVariables intEnvironmentVariables,
+        ExecutorService executorService,
+        File signatureScannerInstallDirectory
+    ) {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, intEnvironmentVariables, operatingSystemType);
         ScanCommandRunner scanCommandRunner = new ScanCommandRunner(logger, intEnvironmentVariables, scanPathsUtility, executorService);
 
-        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner, signatureScannerInstallDirectory);
+        return ScanBatchRunner.createDefault(logger, blackDuckHttpClient, blackDuckRegistrationService, intEnvironmentVariables, scanPathsUtility, operatingSystemType, scanCommandRunner, signatureScannerInstallDirectory);
     }
 
-    public static ScanBatchRunner createDefault(IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
-        OperatingSystemType operatingSystemType, ScanCommandRunner scanCommandRunner, File signatureScannerInstallDirectory) {
+    public static ScanBatchRunner createDefault(
+        IntLogger logger,
+        BlackDuckHttpClient blackDuckHttpClient,
+        BlackDuckRegistrationService blackDuckRegistrationService,
+        IntEnvironmentVariables intEnvironmentVariables,
+        ScanPathsUtility scanPathsUtility,
+        OperatingSystemType operatingSystemType,
+        ScanCommandRunner scanCommandRunner,
+        File signatureScannerInstallDirectory
+    ) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(logger, signatureScannerClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckHttpClient.getBlackDuckUrl(), operatingSystemType, signatureScannerInstallDirectory);
+        ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(
+            logger,
+            signatureScannerClient,
+            blackDuckRegistrationService,
+            cleanupZipExpander,
+            scanPathsUtility,
+            keyStoreHelper,
+            blackDuckHttpClient.getBlackDuckUrl(),
+            operatingSystemType,
+            signatureScannerInstallDirectory
+        );
 
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerZipInstaller);
     }
 
-    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
-        ScanCommandRunner scanCommandRunner, File existingInstallDirectory) {
+    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, new ExistingScannerInstaller(existingInstallDirectory));
     }
 
-    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility,
-        ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {
+    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerInstaller);
     }
 

@@ -88,8 +88,8 @@ public class BlackDuckServicesFactory {
 
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
-                   .setLenient()
-                   .setDateFormat(RestConstants.JSON_DATE_FORMAT);
+            .setLenient()
+            .setDateFormat(RestConstants.JSON_DATE_FORMAT);
     }
 
     public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient) {
@@ -125,7 +125,7 @@ public class BlackDuckServicesFactory {
     }
 
     public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {
-        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, intEnvironmentVariables, executorService, signatureScannerInstallDirectory);
+        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, createBlackDuckRegistrationService(), intEnvironmentVariables, executorService, signatureScannerInstallDirectory);
         return createSignatureScannerService(scanBatchRunner);
     }
 
