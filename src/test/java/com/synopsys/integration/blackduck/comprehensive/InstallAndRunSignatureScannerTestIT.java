@@ -55,7 +55,7 @@ import com.synopsys.integration.wait.WaitJobConfig;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class InstallAndRunSignatureScannerTestIT {
+class InstallAndRunSignatureScannerTestIT {
     public static final String PROJECT_NAME = "Scanner Installer Test";
     public static final String PROJECT_VERSION_NAME = "1.0";
     public static final String CODE_LOCATION_NAME = "verify-scan-installer";
@@ -75,7 +75,7 @@ public class InstallAndRunSignatureScannerTestIT {
     }
 
     @Test
-    public void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
+    void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
         // here, we do not want to automatically trust the server's certificate
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = intHttpClientTestHelper.getBlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setTrustCert(false);
@@ -93,6 +93,7 @@ public class InstallAndRunSignatureScannerTestIT {
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ExecutorService executorService = BlackDuckServicesFactory.NO_THREAD_EXECUTOR_SERVICE;
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
+        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         HttpUrl blackDuckServerUrl = blackDuckHttpClient.getBlackDuckUrl();
 
@@ -101,12 +102,20 @@ public class InstallAndRunSignatureScannerTestIT {
 
         // first, run a scan with an install that will NOT update the embedded keystore, which should fail
         KeyStoreHelper noOpKeyStoreHelper = new NoOpKeyStoreHelper();
-        ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, noOpKeyStoreHelper, blackDuckServerUrl,
-            operatingSystemType, installDirectory);
+        ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(
+            logger,
+            new SignatureScannerClient(blackDuckHttpClient),
+            blackDuckRegistrationService,
+            cleanupZipExpander,
+            scanPathsUtility,
+            noOpKeyStoreHelper,
+            blackDuckServerUrl,
+            operatingSystemType,
+            installDirectory
+        );
         ScanBatchRunner scanBatchRunnerWithout = ScanBatchRunner.createComplete(environmentVariables, scanPathsUtility, scanCommandRunner, installerWithoutKeyStoreManagement);
         SignatureScannerService signatureScannerServiceWithout = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWithout);
 
-        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
         assertScanFailure(logger, blackDuckRegistrationService, signatureScannerServiceWithout, scanBatch);
 
         // now, delete the failed installation
@@ -115,7 +124,9 @@ public class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), cleanupZipExpander, scanPathsUtility, keyStoreHelper, blackDuckServerUrl, operatingSystemType,
+        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+            blackDuckServerUrl,
+            operatingSystemType,
             installDirectory);
         ScanBatchRunner scanBatchRunnerWith = ScanBatchRunner.createComplete(environmentVariables, scanPathsUtility, scanCommandRunner, installerWithKeyStoreManagement);
         SignatureScannerService signatureScannerServiceWith = blackDuckServicesFactory.createSignatureScannerService(scanBatchRunnerWith);
@@ -141,8 +152,7 @@ public class InstallAndRunSignatureScannerTestIT {
         scanBatchBuilder.outputDirectory(outputDirectory);
         scanBatchBuilder.projectAndVersionNames(PROJECT_NAME, PROJECT_VERSION_NAME);
         scanBatchBuilder.addTarget(ScanTarget.createBasicTarget(scanFile.getAbsolutePath(), CODE_LOCATION_NAME));
-        ScanBatch scanBatch = scanBatchBuilder.build();
-        return scanBatch;
+        return scanBatchBuilder.build();
     }
 
     private void assertScanFailure(BufferedIntLogger logger, BlackDuckRegistrationService blackDuckRegistrationService, SignatureScannerService signatureScannerService, ScanBatch scanBatch)
@@ -152,6 +162,7 @@ public class InstallAndRunSignatureScannerTestIT {
         assertEquals(1, scanBatchOutput.getOutputs().size());
         ScanCommandOutput scanCommandOutput = scanBatchOutput.getOutputs().get(0);
         assertEquals(Result.FAILURE, scanCommandOutput.getResult());
+        assertTrue(scanCommandOutput.getScanExitCode().isPresent());
         assertEquals(1, scanCommandOutput.getScanExitCode().get());
 
         /*

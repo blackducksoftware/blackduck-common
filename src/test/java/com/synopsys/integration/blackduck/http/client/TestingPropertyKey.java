@@ -1,6 +1,7 @@
 package com.synopsys.integration.blackduck.http.client;
 
 public enum TestingPropertyKey {
+    TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH,
     TEST_BLACK_DUCK_SERVER_URL,
     TEST_USERNAME,
     TEST_PASSWORD,
@@ -50,6 +51,9 @@ public enum TestingPropertyKey {
     TEST_VULNERABLE_COMPONENT_NAME,
     TEST_VULNERABLE_COMPONENT_MIN_VULNERABILITIES,
     TEST_VULNERABLE_COMPONENT_VULNERABILITY_NAME,
-    LOG_DETAILS_TO_CONSOLE
+    LOG_DETAILS_TO_CONSOLE;
 
+    public String fromEnvironment() {
+        return System.getenv(name());
+    }
 }

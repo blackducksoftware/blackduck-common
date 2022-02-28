@@ -32,8 +32,8 @@ public class BlackDuckRegistrationService extends DataService {
 
     public String getRegistrationId() throws IntegrationException {
         BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
-                                                              .commonGet()
-                                                              .acceptMimeType("application/vnd.blackducksoftware.status-4+json");
+            .commonGet()
+            .acceptMimeType("application/vnd.blackducksoftware.status-4+json");
 
         BlackDuckSingleRequest<RegistrationView> requestSingle = blackDuckRequestBuilder.buildBlackDuckRequest(registrationResponse);
         RegistrationView registrationView = blackDuckApiClient.getResponse(requestSingle);
@@ -42,7 +42,7 @@ public class BlackDuckRegistrationService extends DataService {
     }
 
     public BlackDuckServerData getBlackDuckServerData() throws IntegrationException {
-        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(apiDiscovery.metaCurrentVersionLink());
+        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
         String registrationId = null;
         try {
             // We need to wrap this because this will most likely fail unless they are running as an admin

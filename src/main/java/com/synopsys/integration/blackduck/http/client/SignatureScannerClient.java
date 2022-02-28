@@ -50,17 +50,32 @@ public class SignatureScannerClient extends IntHttpClient {
         httpClientBuilder.setConnectionReuseStrategy((httpResponse, httpContext) -> true);
     }
 
+    /*
+    Deprecated in favor of SignatureScannerClient::executeGetRequest.
+    Black Duck does not handle HEAD requests properly, resulting in too much data for firewalls to allow in a HEAD request.
+    The new mechanism uses a saved Black Duck version for comparison rather than modified file timestamps.
+     */
+    @Deprecated
     @Override
     public Optional<Response> executeGetRequestIfModifiedSince(Request getRequest, long timeToCheck) throws IntegrationException, IOException {
         HttpContext httpContext = new BasicHttpContext();
         Optional<Response> response = super.executeGetRequestIfModifiedSince(getRequest, timeToCheck, httpContext);
+        saveCertificates(httpContext);
+        return response;
+    }
 
+    public Response executeGetRequest(Request getRequest) throws IntegrationException {
+        HttpContext httpContext = new BasicHttpContext();
+        Response response = super.execute(getRequest, httpContext);
+        saveCertificates(httpContext);
+        return response;
+    }
+
+    private void saveCertificates(HttpContext httpContext) {
         Certificate[] peerCertificates = (Certificate[]) httpContext.getAttribute(PEER_CERTIFICATES);
         if (null != peerCertificates) {
             serverCertificate = peerCertificates[0];
         }
-
-        return response;
     }
 
     public Certificate getServerCertificate() {

@@ -10,14 +10,17 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.cert.Certificate;
-import java.util.Optional;
 
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -36,6 +39,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
 
     private final IntLogger logger;
     private final SignatureScannerClient signatureScannerClient;
+    private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
     private final KeyStoreHelper keyStoreHelper;
@@ -43,14 +47,24 @@ public class ScannerZipInstaller implements ScannerInstaller {
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
 
-    public ScannerZipInstaller(IntLogger logger, SignatureScannerClient signatureScannerClient, CleanupZipExpander cleanupZipExpander, ScanPathsUtility scanPathsUtility, KeyStoreHelper keyStoreHelper, HttpUrl blackDuckServerUrl,
-        OperatingSystemType operatingSystemType, File installDirectory) {
+    public ScannerZipInstaller(
+        IntLogger logger,
+        SignatureScannerClient signatureScannerClient,
+        BlackDuckRegistrationService blackDuckRegistrationService,
+        CleanupZipExpander cleanupZipExpander,
+        ScanPathsUtility scanPathsUtility,
+        KeyStoreHelper keyStoreHelper,
+        HttpUrl blackDuckServerUrl,
+        OperatingSystemType operatingSystemType,
+        File installDirectory
+    ) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
         }
 
         this.logger = logger;
         this.signatureScannerClient = signatureScannerClient;
+        this.blackDuckRegistrationService = blackDuckRegistrationService;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
         this.keyStoreHelper = keyStoreHelper;
@@ -82,33 +96,38 @@ public class ScannerZipInstaller implements ScannerInstaller {
         File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = null;
-        try {
-            versionFile = retrieveVersionFile(scannerExpansionDirectory);
-        } catch (IOException e) {
-            throw new BlackDuckIntegrationException("Trying to install the scanner but could not create the version file: " + e.getMessage(), e);
-        }
-
+        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
+
         try {
-            downloadIfModified(scannerExpansionDirectory, versionFile, downloadUrl);
+            String connectedBlackDuckVersion = StringUtils.trim(blackDuckRegistrationService.getBlackDuckServerData().getVersion());
+
+            if (!versionFile.exists()) {
+                logger.info("No version file exists, assuming this is new installation and the signature scanner should be downloaded.");
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl);
+                // Version file creation should happen after successful download
+                logger.debug("The version file has not been created yet so creating it now.");
+                FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
+                return installDirectory;
+            }
+
+            // A version file exists, so we have to compare to determine if a download should occur.
+            String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+            logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
+
+            if (!connectedBlackDuckVersion.equals(localScannerVersion)) {
+                logger.info(String.format("The signature scanner should be downloaded. Locally installed signature scanner is %s, but the connected Black Duck version is %s", localScannerVersion, connectedBlackDuckVersion));
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl);
+                FileUtils.writeStringToFile(versionFile, connectedBlackDuckVersion, Charset.defaultCharset());
+            } else {
+                logger.debug("The Black Duck Signature Scanner version matches the connected Black Duck version - skipping download.");
+            }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
         }
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
         return installDirectory;
-    }
-
-    private File retrieveVersionFile(File scannerExpansionDirectory) throws IOException {
-        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
-        if (!versionFile.exists()) {
-            logger.info("The version file has not been created yet so creating it now.");
-            versionFile.createNewFile();
-            versionFile.setLastModified(0L);
-        }
-
-        return versionFile;
     }
 
     private HttpUrl getDownloadUrl() throws BlackDuckIntegrationException {
@@ -132,19 +151,9 @@ public class ScannerZipInstaller implements ScannerInstaller {
         }
     }
 
-    private void downloadIfModified(File scannerExpansionDirectory, File versionFile, HttpUrl downloadUrl) throws IOException, IntegrationException, ArchiveException {
-        long lastTimeDownloaded = versionFile.lastModified();
-        logger.debug(String.format("last time downloaded: %d", lastTimeDownloaded));
-
+    private void downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl) throws IOException, IntegrationException, ArchiveException {
         Request downloadRequest = new Request.Builder(downloadUrl).build();
-
-        Optional<Response> optionalResponse = signatureScannerClient.executeGetRequestIfModifiedSince(downloadRequest, lastTimeDownloaded);
-        if (!optionalResponse.isPresent()) {
-            logger.debug("The Black Duck Signature Scanner has not been modified since it was last downloaded - skipping download.");
-            return;
-        }
-
-        try (Response response = optionalResponse.get()) {
+        try (Response response = signatureScannerClient.executeGetRequest(downloadRequest)) {
             logger.info("Downloading the Black Duck Signature Scanner.");
             try (InputStream responseStream = response.getContent()) {
                 logger.info(String.format(
@@ -152,8 +161,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
                     scannerExpansionDirectory.getAbsolutePath()));
                 cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
             }
-            long lastModifiedOnServer = response.getLastModified();
-            versionFile.setLastModified(lastModifiedOnServer);
 
             ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
             File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
