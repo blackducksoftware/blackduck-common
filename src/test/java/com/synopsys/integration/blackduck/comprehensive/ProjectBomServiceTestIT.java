@@ -167,8 +167,7 @@ public class ProjectBomServiceTestIT {
         }
 
         // query projectBomService to see if projctversion has violated rule
-        ProjectVersionView projectVersionViewWithRuleApplied = projectService.getProjectVersion(projectName, projectVersionName).orElse(null).getProjectVersionView();
-        projectBomService.getActivePoliciesForVersion(projectVersionViewWithRuleApplied).ifPresent(policies -> {
+        projectBomService.getActivePoliciesForVersion(projectVersionView).ifPresent(policies -> {
             Assertions.assertTrue(policies.stream()
                 .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
                 .map(PolicySummaryView::getName)
