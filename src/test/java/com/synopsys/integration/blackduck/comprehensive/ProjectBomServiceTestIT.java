@@ -163,16 +163,16 @@ public class ProjectBomServiceTestIT {
             .findFirst();
         if (existingDuplicateRule.isPresent()) {
             blackDuckApiClient.delete(existingDuplicateRule.get());
-            policyRuleService.createPolicyRule(policyRule);
         }
+        policyRuleService.createPolicyRule(policyRule);
 
         // query projectBomService to see if projctversion has violated rule
-        projectBomService.getActivePoliciesForVersion(projectVersionView).ifPresent(policies -> {
-            Assertions.assertTrue(policies.stream()
+        Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
+        Assertions.assertTrue(activePolicies.isPresent());
+            Assertions.assertTrue(activePolicies.get().stream()
                 .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
                 .map(PolicySummaryView::getName)
                 .anyMatch(name -> name.equals(testPolicyName)));
-        });
     }
 
     private PolicyRuleView createTestPolicyRuleForProjectWithComponentVersion(ProjectView projectView, ComponentVersionView componentVersion, String policyRuleName) throws BlackDuckIntegrationException {
