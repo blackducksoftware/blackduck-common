@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
 import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleCategoryType;
@@ -33,6 +34,7 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.synopsys.integration.blackduck.service.model.ProjectSyncModel;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 
@@ -166,13 +168,21 @@ public class ProjectBomServiceTestIT {
         }
         policyRuleService.createPolicyRule(policyRule);
 
-        // query projectBomService to see if projctversion has violated rule
-        Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
+        // query projectBomService to see if projectversion has violated rule
+        //TODO- replace w ProjectBomService method
+        Optional<List<PolicySummaryView>> activePolicies;
+        UrlMultipleResponses<PolicySummaryView> url = projectVersionView.metaActivePolicyRulesLink();
+        try {
+            activePolicies = Optional.ofNullable(blackDuckApiClient.getAllResponses(url));
+        } catch (IntegrationException e) {
+            activePolicies = Optional.empty();
+        }
+
         Assertions.assertTrue(activePolicies.isPresent());
-            Assertions.assertTrue(activePolicies.get().stream()
-                .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
-                .map(PolicySummaryView::getName)
-                .anyMatch(name -> name.equals(testPolicyName)));
+        Assertions.assertTrue(activePolicies.get().stream()
+            .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
+            .map(PolicySummaryView::getName)
+            .anyMatch(name -> name.equals(testPolicyName)));
     }
 
     private PolicyRuleView createTestPolicyRuleForProjectWithComponentVersion(ProjectView projectView, ComponentVersionView componentVersion, String policyRuleName) throws BlackDuckIntegrationException {
