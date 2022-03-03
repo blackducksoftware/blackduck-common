@@ -119,7 +119,6 @@ public class ProjectBomServiceTestIT {
         assertEquals(1, bomComponents.size());
     }
 
-    @Disabled
     @Test
     public void testGetActivePoliciesForVersion() throws Exception {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
