@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
@@ -29,6 +31,8 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
+    Logger logger = LoggerFactory.getLogger(this.getClass()); //TODO- delete
+
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
 
@@ -66,6 +70,9 @@ public class BlackDuckResponsesTransformer {
         try (Response initialResponse = blackDuckHttpClient.execute(requestMultiple)) {
             blackDuckHttpClient.throwExceptionForError(initialResponse);
             String initialJsonResponse = initialResponse.getContentString();
+
+            logger.info(String.format("Initial response: %s", initialJsonResponse)); //TODO- delete
+
             BlackDuckPageResponse<T> blackDuckPageResponse = blackDuckJsonTransformer.getResponses(initialJsonResponse, requestMultiple.getResponseClass());
 
             allResponses.addAll(this.matchPredicate(blackDuckPageResponse, predicate));
@@ -87,6 +94,9 @@ public class BlackDuckResponsesTransformer {
             }
 
             allResponses = onlyReturnMaxRequested(maxToReturn, allResponses);
+
+            logger.info(String.format("Final responses: %s", allResponses)); //TODO- delete
+
             return new BlackDuckPageResponse<>(totalCount, allResponses);
         } catch (IOException e) {
             throw new BlackDuckIntegrationException(e.getMessage(), e);

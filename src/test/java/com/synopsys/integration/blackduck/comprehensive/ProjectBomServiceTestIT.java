@@ -153,7 +153,7 @@ public class ProjectBomServiceTestIT {
         ProjectVersionView projectVersionView = projectVersionWrapper.getProjectVersionView();
         ProjectVersionComponentVersionView projectVersionComponentVersionView = blackDuckApiClient.getAllResponses(projectVersionView.metaComponentsLink()).stream().filter(component -> component.getComponentName().equals(componentName)).findFirst().orElse(null);
 
-        //find correspondng ComponentVersionView
+        //find corresponding ComponentVersionView
         HttpUrl projectVersionComponentUrl = new HttpUrl(projectVersionComponentVersionView.getComponentVersion());
         ComponentVersionView componentVersionView = blackDuckApiClient.getResponse(projectVersionComponentUrl, ComponentVersionView.class);
 
