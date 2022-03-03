@@ -171,10 +171,11 @@ public class ProjectBomServiceTestIT {
         // query projectBomService to see if projctversion has violated rule
         Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
-            Assertions.assertTrue(activePolicies.get().stream()
-                .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
-                .map(PolicySummaryView::getName)
-                .anyMatch(name -> name.equals(testPolicyName)));
+        Assertions.assertFalse(activePolicies.get().isEmpty());
+        Assertions.assertTrue(activePolicies.get().stream()
+            .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
+            .map(PolicySummaryView::getName)
+            .anyMatch(name -> name.equals(testPolicyName)));
     }
 
     private PolicyRuleView createTestPolicyRuleForProjectWithComponentVersion(ProjectView projectView, ComponentVersionView componentVersion, String policyRuleName) throws BlackDuckIntegrationException {
