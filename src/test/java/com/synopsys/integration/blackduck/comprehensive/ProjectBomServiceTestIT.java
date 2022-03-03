@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,6 +119,7 @@ public class ProjectBomServiceTestIT {
         assertEquals(1, bomComponents.size());
     }
 
+    @Disabled
     @Test
     public void testGetActivePoliciesForVersion() throws Exception {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
