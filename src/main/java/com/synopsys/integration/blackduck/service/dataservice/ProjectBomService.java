@@ -95,7 +95,9 @@ public class ProjectBomService extends DataService {
         UrlMultipleResponses<PolicySummaryView> url = version.metaActivePolicyRulesLink();
         try {
             logger.info(String.format("*** Active Policies Url: %s", url.getUrl().string())); //TODO-delete
-            return Optional.ofNullable(blackDuckApiClient.getAllResponses(url));
+            Optional<List<PolicySummaryView>> policies = Optional.ofNullable(blackDuckApiClient.getAllResponses(url));
+            logger.info(String.format("*** Policies: %s", policies.get()));
+            return policies;
         } catch (IntegrationException e) {
             return Optional.empty();
         }

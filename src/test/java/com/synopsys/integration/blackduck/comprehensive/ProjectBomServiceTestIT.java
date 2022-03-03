@@ -167,7 +167,7 @@ public class ProjectBomServiceTestIT {
         }
         policyRuleService.createPolicyRule(policyRule);
 
-        // query projectBomService to see if projctversion has violated rule
+        // query projectBomService to see if project version has violated rule
         Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
         Assertions.assertFalse(activePolicies.get().isEmpty());
