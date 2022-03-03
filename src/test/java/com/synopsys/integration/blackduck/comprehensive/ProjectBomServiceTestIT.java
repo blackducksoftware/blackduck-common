@@ -167,10 +167,13 @@ public class ProjectBomServiceTestIT {
         }
         policyRuleService.createPolicyRule(policyRule);
 
+        Thread.sleep(10000);
+
         // query projectBomService to see if project version has violated rule
         Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
         Assertions.assertFalse(activePolicies.get().isEmpty());
+
         Assertions.assertTrue(activePolicies.get().stream()
             .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
             .map(PolicySummaryView::getName)
