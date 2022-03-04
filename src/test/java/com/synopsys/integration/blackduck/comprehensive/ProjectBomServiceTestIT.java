@@ -3,10 +3,11 @@ package com.synopsys.integration.blackduck.comprehensive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.junit.Assume;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,6 +143,13 @@ public class ProjectBomServiceTestIT {
         // create the project
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
+
+        // check for presence of active-policy-rules link for project version (if not present then this is an older/incompatible BlackDuck, test should abort)
+        try {
+            projectVersionWrapper.getProjectVersionView().metaActivePolicyRulesLink();
+        } catch (NoSuchElementException e) {
+            Assume.assumeNoException(e); // skip test if exception is thrown
+        }
 
         // verify the bom
         List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
