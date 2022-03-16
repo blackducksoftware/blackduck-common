@@ -38,6 +38,7 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransf
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
+import com.synopsys.integration.blackduck.service.dataservice.BlackDuckScanReadinessService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
 import com.synopsys.integration.blackduck.service.dataservice.IssueService;
@@ -187,6 +188,10 @@ public class BlackDuckServicesFactory {
     public ProjectUsersService createProjectUsersService() {
         UserGroupService userGroupService = createUserGroupService();
         return new ProjectUsersService(blackDuckApiClient, apiDiscovery, logger, userGroupService);
+    }
+
+    public BlackDuckScanReadinessService createScanReadinessService() {
+        return new BlackDuckScanReadinessService(blackDuckApiClient, apiDiscovery, logger);
     }
 
     public UserService createUserService() {
