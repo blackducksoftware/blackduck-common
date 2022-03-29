@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.util.NameVersion;
 
-// project name, project version name, project group, correlation id, and git info.
+// Additional fields for the bdio-header.jsonld file
 public class ProjectInfo {
     private final NameVersion nameVersion;
     @Nullable
