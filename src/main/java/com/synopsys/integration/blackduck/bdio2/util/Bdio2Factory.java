@@ -86,11 +86,12 @@ public class Bdio2Factory {
 
         projectInfo.getProjectGroup().ifPresent(metadata::projectGroup);
         projectInfo.getCorrelationId().ifPresent(metadata::correlationId);
-        projectInfo.getSourceRepository()
+
+        projectInfo.getGitInfo().getSourceRevision().ifPresent(metadata::sourceRevision);
+        projectInfo.getGitInfo().getSourceBranch().ifPresent(metadata::sourceBranch);
+        projectInfo.getGitInfo().getSourceRepository()
             .map(URL::toString)
             .ifPresent(metadata::sourceRepository);
-        projectInfo.getSourceRevision().ifPresent(metadata::sourceRevision);
-        projectInfo.getSourceBranch().ifPresent(metadata::sourceBranch);
 
         return metadata;
     }

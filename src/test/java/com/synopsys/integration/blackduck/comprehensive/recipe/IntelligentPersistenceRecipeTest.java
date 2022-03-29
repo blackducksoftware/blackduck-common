@@ -60,7 +60,7 @@ class IntelligentPersistenceRecipeTest extends BasicRecipe {
 
         // create the bdio2 metadata
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("EST5EDT"));
-        ProjectInfo projectInfo = ProjectInfo.simple(PROJECT);
+        ProjectInfo projectInfo = ProjectInfo.nameVersion(PROJECT);
         BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, projectInfo, now);
 
         // create the bdio2 project

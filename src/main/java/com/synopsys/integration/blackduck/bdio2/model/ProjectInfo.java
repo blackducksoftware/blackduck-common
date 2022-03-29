@@ -1,6 +1,5 @@
 package com.synopsys.integration.blackduck.bdio2.model;
 
-import java.net.URL;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -14,31 +13,34 @@ public class ProjectInfo {
     private final String projectGroup;
     @Nullable
     private final String correlationId;
-    @Nullable
-    private final URL sourceRepository;
-    @Nullable
-    private final String sourceRevision;
-    @Nullable
-    private final String sourceBranch;
+    private final GitInfo gitInfo;
 
-    public static ProjectInfo simple(NameVersion nameVersion) {
-        return new ProjectInfo(nameVersion, null, null, null, null, null);
+    public static ProjectInfo nameVersion(NameVersion nameVersion) {
+        return ProjectInfo.nameVersionGit(nameVersion, GitInfo.none());
+    }
+
+    public static ProjectInfo nameVersionGroup(NameVersion nameVersion, String group) {
+        return ProjectInfo.nameVersionGroupGit(nameVersion, group, GitInfo.none());
+    }
+
+    public static ProjectInfo nameVersionGit(NameVersion nameVersion, GitInfo gitInfo) {
+        return ProjectInfo.nameVersionGroupGit(nameVersion, null, gitInfo);
+    }
+
+    public static ProjectInfo nameVersionGroupGit(NameVersion nameVersion, String group, GitInfo gitInfo) {
+        return new ProjectInfo(nameVersion, group, null, gitInfo);
     }
 
     public ProjectInfo(
         NameVersion nameVersion,
         @Nullable String projectGroup,
         @Nullable String correlationId,
-        @Nullable URL sourceRepository,
-        @Nullable String sourceRevision,
-        @Nullable String sourceBranch
+        GitInfo gitInfo
     ) {
         this.nameVersion = nameVersion;
         this.projectGroup = projectGroup;
         this.correlationId = correlationId;
-        this.sourceRepository = sourceRepository;
-        this.sourceRevision = sourceRevision;
-        this.sourceBranch = sourceBranch;
+        this.gitInfo = gitInfo;
     }
 
     public NameVersion getNameVersion() {
@@ -53,15 +55,7 @@ public class ProjectInfo {
         return Optional.ofNullable(correlationId);
     }
 
-    public Optional<URL> getSourceRepository() {
-        return Optional.ofNullable(sourceRepository);
-    }
-
-    public Optional<String> getSourceRevision() {
-        return Optional.ofNullable(sourceRevision);
-    }
-
-    public Optional<String> getSourceBranch() {
-        return Optional.ofNullable(sourceBranch);
+    public GitInfo getGitInfo() {
+        return gitInfo;
     }
 }

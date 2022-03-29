@@ -29,6 +29,7 @@ import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
+import com.synopsys.integration.blackduck.bdio2.model.GitInfo;
 import com.synopsys.integration.blackduck.bdio2.model.ProjectInfo;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Factory;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2Writer;
@@ -62,9 +63,11 @@ class Bdio2UploadRecipeTest extends BasicRecipe {
             PROJECT,
             GROUP_NAME,
             null, // TODO: What is this supposed to look like? Only used for chunking?
-            new URL("https://github.com/blackducksoftware/blackduck-common"),
-            "4a1f431d7aa4ac15f755edd5de004f07d36ae89a",
-            "master"
+            new GitInfo(
+                new URL("https://github.com/blackducksoftware/blackduck-common"),
+                "4a1f431d7aa4ac15f755edd5de004f07d36ae89a",
+                "master"
+            )
         );
         BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, projectInfo, now);
 
