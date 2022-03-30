@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -40,7 +41,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.util.NameVersion;
 
-//@Tag("integration")
+@Tag("integration")
 @ExtendWith(TimingExtension.class)
 class Bdio2UploadRecipeTest extends BasicRecipe {
     public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
