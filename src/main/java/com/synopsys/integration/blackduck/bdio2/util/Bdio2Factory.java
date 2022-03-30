@@ -80,7 +80,7 @@ public class Bdio2Factory {
             .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
             .name(codeLocationName)
             .project(projectInfo.getNameVersion().getName())
-            .project(projectInfo.getNameVersion().getVersion())
+            .projectVersion(projectInfo.getNameVersion().getVersion())
             .creationDateTime(creationDateTime)
             .publisher(productList);
 

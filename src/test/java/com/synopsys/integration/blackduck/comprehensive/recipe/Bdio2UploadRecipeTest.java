@@ -16,10 +16,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import com.blackducksoftware.bdio2.Bdio;
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.model.Project;
 import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
@@ -40,7 +40,7 @@ import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.util.NameVersion;
 
-@Tag("integration")
+//@Tag("integration")
 @ExtendWith(TimingExtension.class)
 class Bdio2UploadRecipeTest extends BasicRecipe {
     public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
@@ -98,9 +98,18 @@ class Bdio2UploadRecipeTest extends BasicRecipe {
         UploadBatchOutput uploadBatchOutput = bdio2UploadService.uploadBdioAndWait(uploadBatch, 120);
         assertFalse(uploadBatchOutput.hasAnyFailures());
 
-        // verify that we now have a bom with 1 component
         Optional<ProjectVersionWrapper> projectVersionWrapper = projectService.getProjectVersion(PROJECT);
         assertTrue(projectVersionWrapper.isPresent());
+
+        // Verify project headers are being set correctly
+        String projectName = projectVersionWrapper.get().getProjectView().getName();
+        String projectVersionName = projectVersionWrapper.get().getProjectVersionView().getVersionName();
+        assertEquals(PROJECT, new NameVersion(projectName, projectVersionName));
+        assertEquals(PROJECT.getName(), bdio2Document.getBdioMetadata().get(Bdio.DataProperty.project.toString()));
+        assertEquals(PROJECT.getVersion(), bdio2Document.getBdioMetadata().get(Bdio.DataProperty.projectVersion.toString()));
+        assertEquals(GROUP_NAME, bdio2Document.getBdioMetadata().get(Bdio.DataProperty.projectGroup.toString()));
+
+        // verify that we now have a bom with 1 component
         List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.get().getProjectVersionView());
         assertEquals(1, bomComponents.size());
     }
