@@ -49,7 +49,7 @@ import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class CodeLocationServiceTestIT {
+class CodeLocationServiceTestIT {
     private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTest";
     private static final String CODE_LOCATION_NAME = BASE_ELEMENT_NAME + "__CodeLocation";
     private static final String PROJECT_NAME = BASE_ELEMENT_NAME + "__ProjectName";
@@ -65,8 +65,8 @@ public class CodeLocationServiceTestIT {
 
     @Test
     @Disabled
-    //ejk 2020-09-17 disabling this until I can figure out a better way to create the required elements for the test to pass
-    public void testMappingWithProjectCodeCreator() throws IntegrationException, InterruptedException {
+        //ejk 2020-09-17 disabling this until I can figure out a better way to create the required elements for the test to pass
+    void testMappingWithProjectCodeCreator() throws IntegrationException, InterruptedException {
         /*
         This test requires a project/version: code_location_mapping_test_donotdelete/code_location_mapping_test_donotdelete
         Also, it requires a user, project_code_scanner, with the Project Code Scanner role on the above project.
@@ -100,24 +100,29 @@ public class CodeLocationServiceTestIT {
         projectCodeScannerBuilder.setPassword("super_secure_password");
         projectCodeScannerBuilder.setTrustCert(true);
         BlackDuckServicesFactory specialFactory = projectCodeScannerBuilder.build().createBlackDuckServicesFactory(logger);
-        ProjectVersionWrapper projectVersionWrapper = specialFactory.createProjectService()
-            .getProjectVersion(new NameVersion("code_location_mapping_test_donotdelete", "code_location_mapping_test_donotdelete")).get();
+        Optional<ProjectVersionWrapper> projectVersionWrapper = specialFactory.createProjectService().getProjectVersion(
+            new NameVersion(
+                "code_location_mapping_test_donotdelete",
+                "code_location_mapping_test_donotdelete"
+            ));
+        assertTrue(projectVersionWrapper.isPresent());
         CodeLocationService specialCodeLocationService = specialFactory.createCodeLocationService();
-        specialCodeLocationService.mapCodeLocation(codeLocationUrl, projectVersionWrapper.getProjectVersionView());
+        specialCodeLocationService.mapCodeLocation(codeLocationUrl, projectVersionWrapper.get().getProjectVersionView());
 
         codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-        assertEquals(projectVersionWrapper.getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
+        assertTrue(codeLocationView.isPresent());
+        assertEquals(projectVersionWrapper.get().getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
 
         blackDuckServices.blackDuckApiClient.delete(codeLocationView.get());
     }
 
     @Test
-    public void testSingleCodeLocationByName() throws IntegrationException, IOException {
+    void testSingleCodeLocationByName() throws IntegrationException, IOException {
         uploadAndVerifyCodeLocation(1, 1);
     }
 
     @Test
-    public void testPagingCodeLocationByName() throws IntegrationException, IOException {
+    void testPagingCodeLocationByName() throws IntegrationException, IOException {
         uploadAndVerifyCodeLocation(10, 10);
     }
 
