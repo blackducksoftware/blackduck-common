@@ -22,11 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.blackducksoftware.bdio2.Bdio;
 import com.blackducksoftware.bdio2.BdioMetadata;
-import com.blackducksoftware.bdio2.model.Project;
-import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
-import com.synopsys.integration.bdio.graph.MutableMapDependencyGraph;
+import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
@@ -63,7 +60,7 @@ class Bdio2UploadRecipeTest extends BasicRecipe {
         ProjectInfo projectInfo = new ProjectInfo(
             PROJECT,
             GROUP_NAME,
-            null, // TODO: What is this supposed to look like? Only used for chunking?
+            null, // TODO: What is this supposed to look like? Only used for chunking? JM-04/2022
             new GitInfo(
                 new URL("https://github.com/blackducksoftware/blackduck-common"),
                 "4a1f431d7aa4ac15f755edd5de004f07d36ae89a",
@@ -72,17 +69,14 @@ class Bdio2UploadRecipeTest extends BasicRecipe {
         );
         BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, projectInfo, now);
 
-        // create the bdio2 project
-        ExternalId externalId = ExternalId.FACTORY.createMavenExternalId(GROUP_NAME, PROJECT.getName(), PROJECT.getVersion());
-        Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion(), true);
-
         // create a graph of one dependency
+        Dependency projectDependency = Dependency.FACTORY.createMavenDependency(GROUP_NAME, PROJECT.getName(), PROJECT.getVersion());
         Dependency dependency = Dependency.FACTORY.createMavenDependency("org.apache.commons", "commons-lang3", "3.11");
-        MutableDependencyGraph dependencyGraph = new MutableMapDependencyGraph();
+        ProjectDependencyGraph dependencyGraph = new ProjectDependencyGraph(projectDependency);
         dependencyGraph.addChildToRoot(dependency);
 
         // now, with metadata, a project, and a graph, we can create a bdio2 document and write out the file
-        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project, dependencyGraph);
+        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, dependencyGraph);
 
         File bdio2File = File.createTempFile("test_bdio2", ".bdio");
         bdio2File.createNewFile();

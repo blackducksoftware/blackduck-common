@@ -18,8 +18,7 @@ import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 
-public class Bdio2FactoryTest {
-
+class Bdio2FactoryTest {
     @Test
     void testCreateAndLinkComponents() {
         ExternalIdFactory externalIdFactory = new ExternalIdFactory();
@@ -40,7 +39,7 @@ public class Bdio2FactoryTest {
         ExternalId componentExternalId = externalIdFactory.createMavenExternalId(compGroup, compName, compVersion);
 
         Bdio2Factory bdio2Factory = new Bdio2Factory();
-        Project rootProject = bdio2Factory.createProject(rootProjectExternalId, rootProjectName, rootProjectVersion, true);
+        Project rootProject = bdio2Factory.createProject(rootProjectExternalId, true);
 
         DependencyGraph dependencyGraph = Mockito.mock(DependencyGraph.class);
         Set<Dependency> dependencies = new HashSet<>();

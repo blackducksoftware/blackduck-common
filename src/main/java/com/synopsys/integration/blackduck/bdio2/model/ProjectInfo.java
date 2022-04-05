@@ -9,8 +9,10 @@ package com.synopsys.integration.blackduck.bdio2.model;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.util.NameVersion;
 
 // Additional fields for the bdio-header.jsonld file
@@ -21,6 +23,14 @@ public class ProjectInfo {
     @Nullable
     private final String correlationId;
     private final GitInfo gitInfo;
+
+    public static ProjectInfo fromProjectDependency(ProjectDependency projectDependency) {
+        String projectName = projectDependency.getExternalId().getName();
+        String projectVersion = projectDependency.getExternalId().getVersion();
+        String projectGroup = StringUtils.trimToNull(projectDependency.getExternalId().getGroup());
+        // Today there is no GitInfo or CorrelationId, but perhaps those will be attached to the ProjectDependency class in the future. JM-04/2022
+        return ProjectInfo.nameVersionGroup(new NameVersion(projectName, projectVersion), projectGroup);
+    }
 
     public static ProjectInfo nameVersion(NameVersion nameVersion) {
         return ProjectInfo.nameVersionGit(nameVersion, GitInfo.none());

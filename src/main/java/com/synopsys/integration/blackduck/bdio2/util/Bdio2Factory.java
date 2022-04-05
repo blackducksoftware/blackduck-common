@@ -24,11 +24,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioObject;
+import com.blackducksoftware.bdio2.LegacyUtilities;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.blackducksoftware.common.value.Product;
 import com.blackducksoftware.common.value.ProductList;
 import com.synopsys.integration.bdio.graph.DependencyGraph;
+import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
 import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
@@ -38,9 +40,10 @@ import com.synopsys.integration.blackduck.bdio2.model.ProjectInfo;
 public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
-    public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, Project project, DependencyGraph dependencyGraph) {
+    public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
+        Project project = createProject(dependencyGraph.getRootDependency().getExternalId(), true);
         Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
-        return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents);
+        return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
 
     public BdioMetadata createBdioMetadata(String codeLocationName, ProjectInfo projectInfo, ZonedDateTime creationDateTime) {
@@ -60,24 +63,24 @@ public class Bdio2Factory {
         return createBdioMetadata(codeLocationName, projectInfo, creationDateTime, productList);
     }
 
-    public Project createProject(ExternalId projectExternalId, String projectName, String projectVersionName, boolean isRootProject) {
+    protected Project createProject(ExternalId projectExternalId, boolean isRootProject) {
         Project project = new Project(projectExternalId.createBdioId().toString())
             .identifier(projectExternalId.createExternalId())
-            .name(projectName)
-            .version(projectVersionName);
+            .name(projectExternalId.getName())
+            .version(projectExternalId.getVersion());
         if (isRootProject) {
             project.namespace("root");
         }
         return project;
     }
 
-    public Pair<List<Project>, List<Component>> createAndLinkComponents(DependencyGraph dependencyGraph, Project project) {
+    protected Pair<List<Project>, List<Component>> createAndLinkComponents(DependencyGraph dependencyGraph, Project project) {
         return createAndLinkComponentsFromGraph(dependencyGraph, project::subproject, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), new HashMap<>());
     }
 
     private BdioMetadata createBdioMetadata(String codeLocationName, ProjectInfo projectInfo, ZonedDateTime creationDateTime, ProductList productList) {
         BdioMetadata metadata = new BdioMetadata()
-            .id(LegacyUtilitiesClone.toNameUri(codeLocationName))
+            .id(LegacyUtilities.toNameUri(codeLocationName))
             .name(codeLocationName)
             .project(projectInfo.getNameVersion().getName())
             .projectVersion(projectInfo.getNameVersion().getVersion())
@@ -138,7 +141,6 @@ public class Bdio2Factory {
 
                 if (!existingComponents.containsKey(dependency.getExternalId())) {
                     addedComponents.add(component);
-
                     existingComponents.put(dependency.getExternalId(), component);
                     Pair<List<Project>, List<Component>> children = createAndLinkComponentsFromGraph(
                         dependencyGraph,
