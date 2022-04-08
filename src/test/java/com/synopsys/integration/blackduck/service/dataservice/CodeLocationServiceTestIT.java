@@ -188,7 +188,7 @@ class CodeLocationServiceTestIT {
             Dependency bdioTestDependency = Dependency.FACTORY.createMavenDependency(GROUP, COMPONENT_NAME, VERSION);
             dependencyGraph.addChildrenToRoot(bdioTestDependency);
 
-            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, dependencyGraph);
+            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createPopulatedBdioDocument(codeLocationName, dependencyGraph);
             simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
 
             uploadBatch.addUploadTarget(UploadTarget.createDefault(new NameVersion(PROJECT_NAME, VERSION), codeLocationName, bdioFile));
