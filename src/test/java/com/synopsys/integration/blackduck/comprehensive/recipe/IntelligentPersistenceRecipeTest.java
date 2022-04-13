@@ -65,7 +65,7 @@ class IntelligentPersistenceRecipeTest extends BasicRecipe {
         // create a graph of one dependency
         Dependency dependency = Dependency.FACTORY.createMavenDependency("org.apache.commons", "commons-lang3", "3.11");
         ProjectDependencyGraph dependencyGraph = new ProjectDependencyGraph(projectDependency);
-        dependencyGraph.addChildToRoot(dependency);
+        dependencyGraph.addDirectDependency(dependency);
 
         // now, with metadata, a project, and a graph, we can create a bdio2 document and write out the file
         Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, dependencyGraph);

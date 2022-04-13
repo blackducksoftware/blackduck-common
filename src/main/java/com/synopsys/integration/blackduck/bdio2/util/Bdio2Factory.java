@@ -41,7 +41,7 @@ public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
-        Project project = createProject(dependencyGraph.getRootDependency().getExternalId(), true);
+        Project project = createProject(dependencyGraph.getProjectDependency().getExternalId(), true);
         Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
         return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
@@ -75,7 +75,14 @@ public class Bdio2Factory {
     }
 
     protected Pair<List<Project>, List<Component>> createAndLinkComponents(DependencyGraph dependencyGraph, Project project) {
-        return createAndLinkComponentsFromGraph(dependencyGraph, project::subproject, project::dependency, dependencyGraph.getRootDependencies(), new HashMap<>(), new HashMap<>());
+        return createAndLinkComponentsFromGraph(
+            dependencyGraph,
+            project::subproject,
+            project::dependency,
+            dependencyGraph.getDirectDependencies(),
+            new HashMap<>(),
+            new HashMap<>()
+        );
     }
 
     private BdioMetadata createBdioMetadata(String codeLocationName, ProjectInfo projectInfo, ZonedDateTime creationDateTime, ProductList productList) {
@@ -116,7 +123,9 @@ public class Bdio2Factory {
                     // Subprojects cannot be dependencies of components
                     // TODO is there a better way to handle this?
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
-                    continue;
+
+                    // Jake's maybe better way for now?
+                    throw new UnsupportedOperationException("Subprojects cannot be dependencies of components. The graph was incorrectly built.");
                 }
                 Project subproject = projectFromDependency(dependency);
                 linkProjectDependency.subProject(new Project(subproject.id()).subproject(subproject));

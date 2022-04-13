@@ -47,7 +47,7 @@ class Bdio2FactoryTest {
         Dependency componentDependency = new Dependency(componentExternalId);
         dependencies.add(subProjectDependency);
         dependencies.add(componentDependency);
-        Mockito.when(dependencyGraph.getRootDependencies()).thenReturn(dependencies);
+        Mockito.when(dependencyGraph.getDirectDependencies()).thenReturn(dependencies);
 
         Pair<List<Project>, List<Component>> results = bdio2Factory.createAndLinkComponents(dependencyGraph, rootProject);
 
