@@ -16,30 +16,26 @@ import com.blackducksoftware.bdio2.BdioWriter;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class Bdio2Writer {
-    public BdioWriter createBdioWriter(final OutputStream outputStream, final BdioMetadata bdioMetadata) {
-        final BdioWriter.StreamSupplier streamSupplier = new BdioWriter.BdioFile(outputStream);
+    public BdioWriter createBdioWriter(OutputStream outputStream, BdioMetadata bdioMetadata) {
+        BdioWriter.StreamSupplier streamSupplier = new BdioWriter.BdioFile(outputStream);
         return new BdioWriter(bdioMetadata, streamSupplier);
     }
 
-    public void writeBdioDocument(final OutputStream outputStream, final Bdio2Document bdio2Document) throws IOException {
-        final BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
-        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getSubprojectsAndComponents());
+    public void writeBdioDocument(OutputStream outputStream, Bdio2Document bdio2Document) throws IOException {
+        BdioWriter bdioWriter = createBdioWriter(outputStream, bdio2Document.getBdioMetadata());
+        writeBdioDocument(bdioWriter, bdio2Document.getProject(), bdio2Document.getSubProjects(), bdio2Document.getComponents());
     }
 
-    public void writeBdioDocument(final BdioWriter bdioWriter, final Project project, final Pair<List<Project>, List<Component>> subprojectsAndComponents) throws IOException {
+    public void writeBdioDocument(BdioWriter bdioWriter, Project project, List<Project> subProjects, List<Component> components) throws IOException {
         bdioWriter.start();
-
-        for (Project subProject : subprojectsAndComponents.getLeft()) {
+        for (Project subProject : subProjects) {
             bdioWriter.next(subProject);
         }
-
-        for (Component component : subprojectsAndComponents.getRight()) {
+        for (Component component : components) {
             bdioWriter.next(component);
         }
-
         // We put the project node at the end of the document to be more inline with the way Black Duck produces BDIO 2.
         bdioWriter.next(project);
 

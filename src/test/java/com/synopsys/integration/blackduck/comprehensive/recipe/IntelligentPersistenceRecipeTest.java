@@ -20,12 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
-import com.blackducksoftware.bdio2.model.Project;
-import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
-import com.synopsys.integration.bdio.graph.MutableMapDependencyGraph;
+import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
@@ -64,17 +60,15 @@ class IntelligentPersistenceRecipeTest extends BasicRecipe {
         BdioMetadata bdio2Metadata = bdio2Factory.createBdioMetadata(CODE_LOCATION_NAME, projectInfo, now);
 
         // create the bdio2 project
-        ExternalIdFactory externalIdFactory = new ExternalIdFactory();
-        ExternalId externalId = externalIdFactory.createMavenExternalId("com.synopsys.integration", PROJECT.getName(), PROJECT.getVersion());
-        Project bdio2Project = bdio2Factory.createProject(externalId, PROJECT.getName(), PROJECT.getVersion(), true);
+        Dependency projectDependency = Dependency.FACTORY.createMavenDependency("com.synopsys.integration", PROJECT.getName(), PROJECT.getVersion());
 
         // create a graph of one dependency
         Dependency dependency = Dependency.FACTORY.createMavenDependency("org.apache.commons", "commons-lang3", "3.11");
-        MutableDependencyGraph dependencyGraph = new MutableMapDependencyGraph();
-        dependencyGraph.addChildToRoot(dependency);
+        ProjectDependencyGraph dependencyGraph = new ProjectDependencyGraph(projectDependency);
+        dependencyGraph.addDirectDependency(dependency);
 
         // now, with metadata, a project, and a graph, we can create a bdio2 document and write out the file
-        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, bdio2Project, dependencyGraph);
+        Bdio2Document bdio2Document = bdio2Factory.createBdio2Document(bdio2Metadata, dependencyGraph);
 
         File bdio2File = File.createTempFile("test_bdio2", ".bdio");
         bdio2File.createNewFile();
