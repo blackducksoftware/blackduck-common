@@ -1,3 +1,10 @@
+/*
+ * blackduck-common
+ *
+ * Copyright (c) 2022 Synopsys, Inc.
+ *
+ * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ */
 package com.synopsys.integration.blackduck.bdio2;
 
 import java.util.Arrays;
@@ -17,6 +24,7 @@ import com.synopsys.integration.wait.WaitJobCondition;
 public class Bdio2UploadWaitJobCondition implements WaitJobCondition {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private static final List<Integer> SUCCESSFUL_REQUEST_STATUS_CODES = Arrays.asList(200, 201, 202, 203, 204);
     private static final List<Integer> BD_SANCTIONED_FAILURE_EXIT_CODES = Arrays.asList(401, 402, 403, 404, 500);
 
     private Bdio2StreamUploader bdio2Uploader;
@@ -61,7 +69,7 @@ public class Bdio2UploadWaitJobCondition implements WaitJobCondition {
 
     // Return true if we get a 200, otherwise return false unless we get a sanctioned failure code
     private boolean responseSuccessful(Response response) throws IntegrationException {
-        if (response.getStatusCode() == 200) {
+        if (SUCCESSFUL_REQUEST_STATUS_CODES.contains(response.getStatusCode())) {
             return true;
         } else {
             if (BD_SANCTIONED_FAILURE_EXIT_CODES.contains(response.getStatusCode())) {
