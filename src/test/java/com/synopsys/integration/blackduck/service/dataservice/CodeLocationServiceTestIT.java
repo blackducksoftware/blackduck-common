@@ -19,11 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.bdio.SimpleBdioFactory;
-import com.synopsys.integration.bdio.graph.MutableDependencyGraph;
+import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
 import com.synopsys.integration.bdio.model.SimpleBdioDocument;
 import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.dependency.DependencyFactory;
-import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
@@ -51,7 +49,7 @@ import com.synopsys.integration.util.NameVersion;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class CodeLocationServiceTestIT {
+class CodeLocationServiceTestIT {
     private static final String BASE_ELEMENT_NAME = "CodeLocationServiceTest";
     private static final String CODE_LOCATION_NAME = BASE_ELEMENT_NAME + "__CodeLocation";
     private static final String PROJECT_NAME = BASE_ELEMENT_NAME + "__ProjectName";
@@ -62,16 +60,13 @@ public class CodeLocationServiceTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final SimpleBdioFactory simpleBdioFactory = new SimpleBdioFactory();
-    private final ExternalIdFactory externalIdFactory = simpleBdioFactory.getExternalIdFactory();
-    private final DependencyFactory dependencyFactory = simpleBdioFactory.getDependencyFactory();
-    private final MutableDependencyGraph mutableDependencyGraph = simpleBdioFactory.createMutableDependencyGraph();
 
     public CodeLocationServiceTestIT() throws IntegrationException {}
 
     @Test
     @Disabled
-    //ejk 2020-09-17 disabling this until I can figure out a better way to create the required elements for the test to pass
-    public void testMappingWithProjectCodeCreator() throws IntegrationException, InterruptedException {
+        //ejk 2020-09-17 disabling this until I can figure out a better way to create the required elements for the test to pass
+    void testMappingWithProjectCodeCreator() throws IntegrationException, InterruptedException {
         /*
         This test requires a project/version: code_location_mapping_test_donotdelete/code_location_mapping_test_donotdelete
         Also, it requires a user, project_code_scanner, with the Project Code Scanner role on the above project.
@@ -105,23 +100,29 @@ public class CodeLocationServiceTestIT {
         projectCodeScannerBuilder.setPassword("super_secure_password");
         projectCodeScannerBuilder.setTrustCert(true);
         BlackDuckServicesFactory specialFactory = projectCodeScannerBuilder.build().createBlackDuckServicesFactory(logger);
-        ProjectVersionWrapper projectVersionWrapper = specialFactory.createProjectService().getProjectVersion(new NameVersion("code_location_mapping_test_donotdelete", "code_location_mapping_test_donotdelete")).get();
+        Optional<ProjectVersionWrapper> projectVersionWrapper = specialFactory.createProjectService().getProjectVersion(
+            new NameVersion(
+                "code_location_mapping_test_donotdelete",
+                "code_location_mapping_test_donotdelete"
+            ));
+        assertTrue(projectVersionWrapper.isPresent());
         CodeLocationService specialCodeLocationService = specialFactory.createCodeLocationService();
-        specialCodeLocationService.mapCodeLocation(codeLocationUrl, projectVersionWrapper.getProjectVersionView());
+        specialCodeLocationService.mapCodeLocation(codeLocationUrl, projectVersionWrapper.get().getProjectVersionView());
 
         codeLocationView = blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationName);
-        assertEquals(projectVersionWrapper.getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
+        assertTrue(codeLocationView.isPresent());
+        assertEquals(projectVersionWrapper.get().getProjectVersionView().getHref().string(), codeLocationView.get().getMappedProjectVersion());
 
         blackDuckServices.blackDuckApiClient.delete(codeLocationView.get());
     }
 
     @Test
-    public void testSingleCodeLocationByName() throws IntegrationException, IOException {
+    void testSingleCodeLocationByName() throws IntegrationException, IOException {
         uploadAndVerifyCodeLocation(1, 1);
     }
 
     @Test
-    public void testPagingCodeLocationByName() throws IntegrationException, IOException {
+    void testPagingCodeLocationByName() throws IntegrationException, IOException {
         uploadAndVerifyCodeLocation(10, 10);
     }
 
@@ -134,7 +135,11 @@ public class CodeLocationServiceTestIT {
         deleteProjectByName(blackDuckServices);
 
         // Verify code location does not exist
-        assertEquals(Optional.empty(), blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate), String.format("Code location %s should not exist", codeLocationToValidate));
+        assertEquals(
+            Optional.empty(),
+            blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate),
+            String.format("Code location %s should not exist", codeLocationToValidate)
+        );
 
         try {
             createAndUploadSimpleBdioObject(codeLocationNames);
@@ -142,8 +147,8 @@ public class CodeLocationServiceTestIT {
             // Verify code location now exists using getSomeMatchingResponses()
             Predicate<CodeLocationView> nameMatcherPredicate = codeLocationView -> CodeLocationService.NAME_MATCHER.test(codeLocationToValidate, codeLocationView);
             BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
-                                                                  .commonGet()
-                                                                  .setLimit(2);
+                .commonGet()
+                .setLimit(2);
             BlackDuckMultipleRequest<CodeLocationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(blackDuckServices.apiDiscovery.metaCodelocationsLink());
             List<CodeLocationView> foundCodeLocation = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(requestMultiple, nameMatcherPredicate, 1);
 
@@ -152,7 +157,11 @@ public class CodeLocationServiceTestIT {
 
             // Verify code location now exists using getCodeLocationByName()
             assertTrue(blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).isPresent(), "Code location is empty after uploading.");
-            assertEquals(codeLocationToValidate, blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).get().getName(), "Found code location does not equal expected");
+            assertEquals(
+                codeLocationToValidate,
+                blackDuckServices.codeLocationService.getCodeLocationByName(codeLocationToValidate).get().getName(),
+                "Found code location does not equal expected"
+            );
         } finally {
             // Post-clean test data
             deleteCodeLocationByName(blackDuckServices, codeLocationNames);
@@ -162,10 +171,10 @@ public class CodeLocationServiceTestIT {
 
     private List<String> populateCodeLocationNames(int numberOfCodeLocations) {
         return IntStream
-                   .range(0, numberOfCodeLocations)
-                   .boxed()
-                   .map(i -> CODE_LOCATION_NAME + i)
-                   .collect(Collectors.toList());
+            .range(0, numberOfCodeLocations)
+            .boxed()
+            .map(i -> CODE_LOCATION_NAME + i)
+            .collect(Collectors.toList());
     }
 
     private void createAndUploadSimpleBdioObject(List<String> codeLocationNames) throws IOException, IntegrationException {
@@ -175,10 +184,11 @@ public class CodeLocationServiceTestIT {
             File bdioFile = File.createTempFile("bdio", "jsonld");
             bdioFile.deleteOnExit();
 
-            Dependency bdioTestDependency = dependencyFactory.createMavenDependency(GROUP, COMPONENT_NAME, VERSION);
-            mutableDependencyGraph.addChildrenToRoot(bdioTestDependency);
+            ProjectDependencyGraph dependencyGraph = new ProjectDependencyGraph(Dependency.FACTORY.createMavenDependency(GROUP, PROJECT_NAME, VERSION));
+            Dependency bdioTestDependency = Dependency.FACTORY.createMavenDependency(GROUP, COMPONENT_NAME, VERSION);
+            dependencyGraph.addChildrenToRoot(bdioTestDependency);
 
-            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createSimpleBdioDocument(codeLocationName, PROJECT_NAME, VERSION, externalIdFactory.createMavenExternalId(GROUP, PROJECT_NAME, VERSION), mutableDependencyGraph);
+            SimpleBdioDocument simpleBdioDocument = simpleBdioFactory.createPopulatedBdioDocument(codeLocationName, dependencyGraph);
             simpleBdioFactory.writeSimpleBdioDocumentToFile(bdioFile, simpleBdioDocument);
 
             uploadBatch.addUploadTarget(UploadTarget.createDefault(new NameVersion(PROJECT_NAME, VERSION), codeLocationName, bdioFile));
@@ -202,7 +212,11 @@ public class CodeLocationServiceTestIT {
 
     private void deleteCodeLocationByName(BlackDuckServices blackDuckServices, List<String> codeLocationNames) throws IntegrationException {
         Predicate<CodeLocationView> toDelete = (codeLocationView -> codeLocationNames.contains(codeLocationView.getName()));
-        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(blackDuckServices.apiDiscovery.metaCodelocationsLink(), toDelete, codeLocationNames.size());
+        List<CodeLocationView> codeLocationsToDelete = blackDuckServices.blackDuckApiClient.getSomeMatchingResponses(
+            blackDuckServices.apiDiscovery.metaCodelocationsLink(),
+            toDelete,
+            codeLocationNames.size()
+        );
 
         for (CodeLocationView codeLocationToDelete : codeLocationsToDelete) {
             blackDuckServices.blackDuckApiClient.delete(codeLocationToDelete);

@@ -37,8 +37,13 @@ public class Bdio2FileUploadService extends DataService {
     private final Bdio2ContentExtractor bdio2Extractor;
     private final Bdio2StreamUploader bdio2Uploader;
 
-    public Bdio2FileUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery,
-        IntLogger logger, Bdio2ContentExtractor bdio2Extractor, Bdio2StreamUploader bdio2Uploader) {
+    public Bdio2FileUploadService(
+        BlackDuckApiClient blackDuckApiClient,
+        ApiDiscovery apiDiscovery,
+        IntLogger logger,
+        Bdio2ContentExtractor bdio2Extractor,
+        Bdio2StreamUploader bdio2Uploader
+    ) {
         super(blackDuckApiClient, apiDiscovery, logger);
         this.bdio2Extractor = bdio2Extractor;
         this.bdio2Uploader = bdio2Uploader;
@@ -67,11 +72,9 @@ public class Bdio2FileUploadService extends DataService {
 
         BlackDuckRequestBuilderEditor editor = noOp -> {};
         if (nameVersion != null) {
-            editor = builder -> {
-                builder
-                    .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
-                    .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
-            };
+            editor = builder -> builder
+                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
+                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
         WaitJobConfig waitJobConfig = new WaitJobConfig(logger, UPLOAD_WAIT_JOB_TASK_NAME, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
