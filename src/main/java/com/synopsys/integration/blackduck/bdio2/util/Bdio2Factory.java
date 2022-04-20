@@ -38,6 +38,7 @@ import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.model.ProjectInfo;
+import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2Factory {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -45,19 +46,17 @@ public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
-        return createBdio2Document(bdioMetadata, dependencyGraph, dependencyGraph.getProjectDependency().getExternalId());
+        Project project = createProject(dependencyGraph.getProjectDependency().getExternalId(), true);
+        Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
+        return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
 
     /**
      * @deprecated (Use createBdio2Document instead when the ProjectDependencyGraph has an accurate ProjectDependency)
      */
     @Deprecated
-    public Bdio2Document createLegacyBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ExternalId projectExternalId) {
-        return createBdio2Document(bdioMetadata, dependencyGraph, projectExternalId);
-    }
-
-    private Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ExternalId projectExternalId) {
-        Project project = createProject(projectExternalId, true);
+    public Bdio2Document createLegacyBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ProjectInfo projectInfo, ExternalId projectExternalId) {
+        Project project = createProject(projectInfo.getNameVersion(), projectExternalId, true);
         Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
         return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
@@ -77,6 +76,21 @@ public class Bdio2Factory {
                 .collect(ProductList.toProductList());
 
         return createBdioMetadata(codeLocationName, projectInfo, creationDateTime, productList);
+    }
+
+    /**
+     * @deprecated (ideally the root projects ExternalId could be used for both the identifier and the project name and version)
+     */
+    @Deprecated
+    protected Project createProject(NameVersion projectNameVersion, ExternalId identifier, boolean isRootProject) {
+        Project project = new Project(identifier.createBdioId().toString())
+            .identifier(identifier.createExternalId())
+            .name(projectNameVersion.getName())
+            .version(projectNameVersion.getVersion());
+        if (isRootProject) {
+            project.namespace("root");
+        }
+        return project;
     }
 
     protected Project createProject(ExternalId projectExternalId, boolean isRootProject) {
