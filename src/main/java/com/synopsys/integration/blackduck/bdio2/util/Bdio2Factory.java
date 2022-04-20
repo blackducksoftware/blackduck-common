@@ -45,7 +45,19 @@ public class Bdio2Factory {
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
-        Project project = createProject(dependencyGraph.getProjectDependency().getExternalId(), true);
+        return createBdio2Document(bdioMetadata, dependencyGraph, dependencyGraph.getProjectDependency().getExternalId());
+    }
+
+    /**
+     * @deprecated (Use createBdio2Document instead when the ProjectDependencyGraph has an accurate ProjectDependency)
+     */
+    @Deprecated
+    public Bdio2Document createLegacyBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ExternalId projectExternalId) {
+        return createBdio2Document(bdioMetadata, dependencyGraph, projectExternalId);
+    }
+
+    private Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ExternalId projectExternalId) {
+        Project project = createProject(projectExternalId, true);
         Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
         return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
