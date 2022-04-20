@@ -21,6 +21,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioObject;
@@ -38,6 +40,8 @@ import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.model.ProjectInfo;
 
 public class Bdio2Factory {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
@@ -123,9 +127,15 @@ public class Bdio2Factory {
                     // Subprojects cannot be dependencies of components
                     // TODO is there a better way to handle this?
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
+                    String subprojectExternalId = dependency.getExternalId().toString();
+                    logger.warn(
+                        "Sipping subproject {}. Failed to add the subproject to the graph because subprojects cannot be dependencies of components. Please contact Synopsys support.",
+                        subprojectExternalId
+                    );
+                    continue;
 
-                    // Jake's maybe better way for now?
-                    throw new UnsupportedOperationException("Subprojects cannot be dependencies of components. The graph was incorrectly built.");
+                    // Jake's maybe better way for now? Exposed a few issues with graph building. See IDETECT-3243
+                    // throw new UnsupportedOperationException("Subprojects cannot be dependencies of components. The graph was incorrectly built.");
                 }
                 Project subproject = projectFromDependency(dependency);
                 linkProjectDependency.subProject(new Project(subproject.id()).subproject(subproject));
