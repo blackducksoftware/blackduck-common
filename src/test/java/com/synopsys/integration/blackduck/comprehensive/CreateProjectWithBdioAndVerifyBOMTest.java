@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -43,9 +42,9 @@ import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
+import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobCondition;
-import com.synopsys.integration.wait.WaitJobConfig;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -73,10 +72,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final UserView currentUser = blackDuckServices.userService.findCurrentUser();
     private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
-    private final Function<String, WaitJobConfig> createConfig = (taskName) -> new WaitJobConfig(waitLogger, taskName, TEN_MINUTES, WaitJobConfig.CURRENT_TIME_SUPPLIER, THIRTY_SECONDS);
-    private final WaitJobConfig waitForProject = createConfig.apply("wait for project");
-    private final WaitJobConfig waitForCodeLocations = createConfig.apply("wait for code locations");
-    private final WaitJobConfig waitForNotifications = createConfig.apply("wait for notifications");
+    private final ResilientJobConfig jobbyConfig = new ResilientJobConfig(waitLogger, TEN_MINUTES, ResilientJobConfig.CURRENT_TIME_SUPPLIER, THIRTY_SECONDS);
     private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
 
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {
@@ -153,7 +149,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
     private boolean waitForProject() throws InterruptedException, IntegrationException {
         WaitJobCondition findProjectTask = () -> blackDuckServices.projectService.getProjectVersion(PROJECT_NAME, PROJECT_VERSION_NAME).isPresent();
-        return WaitJob.createSimpleWait(waitForProject, findProjectTask).waitFor();
+        return WaitJob.waitFor(jobbyConfig, findProjectTask, "wait for project");
     }
 
     private boolean waitForCodeLocations(Set<String> expectedCodeLocationNames, ProjectVersionView projectVersionView) throws InterruptedException, IntegrationException {
@@ -169,7 +165,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
             return expectedCodeLocationNames.equals(foundCodeLocationNames);
         };
-        return WaitJob.createSimpleWait(waitForCodeLocations, findAllCodeLocationNames).waitFor();
+        return WaitJob.waitFor(jobbyConfig, findAllCodeLocationNames, "wait for code locations");
     }
 
     private void printOutCodeLocations(List<CodeLocationView> codeLocationViews) {
@@ -197,7 +193,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
 
             return foundCodeLocationUrls.containsAll(expectedCodeLocationUrls);
         };
-        return WaitJob.createSimpleWait(waitForNotifications, findNotificationsForAllCodeLocationUrls).waitFor();
+        return WaitJob.waitFor(jobbyConfig, findNotificationsForAllCodeLocationUrls, "wait for notifications");
     }
 
     private UploadTarget createUploadTarget(String codeLocationName, String bdioFilename) {

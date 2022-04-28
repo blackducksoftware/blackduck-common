@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,15 +23,13 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilde
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.wait.WaitJob;
-import com.synopsys.integration.wait.WaitJobConfig;
+import com.synopsys.integration.wait.ResilientJobConfig;
+import com.synopsys.integration.wait.ResilientJobExecutor;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
     private static final int BD_WAIT_AND_RETRY_INTERVAL = 30000;
-    private static final String UPLOAD_WAIT_JOB_TASK_NAME = "bdio upload";
 
     private final Bdio2ContentExtractor bdio2Extractor;
     private final Bdio2StreamUploader bdio2Uploader;
@@ -77,12 +74,12 @@ public class Bdio2FileUploadService extends DataService {
                 .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
-        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, UPLOAD_WAIT_JOB_TASK_NAME, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
-        Bdio2UploadWaitJobCondition bdio2UploadWaitJobCondition = new Bdio2UploadWaitJobCondition(bdio2Uploader, header, remainingFiles, editor, count);
-        Bdio2UploadWaitJobCompleter bdio2UploadWaitJobCompleter = new Bdio2UploadWaitJobCompleter(bdio2UploadWaitJobCondition);
-        WaitJob<Bdio2UploadResult> uploadWaitJob = new WaitJob<>(waitJobConfig, bdio2UploadWaitJobCondition, bdio2UploadWaitJobCompleter);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2Uploader, header, remainingFiles, editor, count);
+        ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
-        return uploadWaitJob.waitFor().getUploadUrl();
+        return jobExecutor.executeJob(bdio2UploadJob)
+            .getUploadUrl();
     }
 
 }
