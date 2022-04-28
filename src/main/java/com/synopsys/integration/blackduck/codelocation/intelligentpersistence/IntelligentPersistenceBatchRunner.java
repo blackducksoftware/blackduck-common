@@ -31,7 +31,7 @@ public class IntelligentPersistenceBatchRunner {
         this.bdio2FileUploadService = bdio2FileUploadService;
     }
 
-    public UploadBatchOutput executeUploads(UploadBatch uploadBatch, int timeout) throws BlackDuckIntegrationException {
+    public UploadBatchOutput executeUploads(UploadBatch uploadBatch, long timeout) throws BlackDuckIntegrationException {
         logger.info("Starting the codelocation file uploads.");
         UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch, timeout);
         logger.info("Completed the codelocation file uploads.");
@@ -39,7 +39,7 @@ public class IntelligentPersistenceBatchRunner {
         return uploadBatchOutput;
     }
 
-    private UploadBatchOutput uploadTargets(UploadBatch uploadBatch, int timeout) throws BlackDuckIntegrationException {
+    private UploadBatchOutput uploadTargets(UploadBatch uploadBatch, long timeout) throws BlackDuckIntegrationException {
         List<UploadOutput> uploadOutputs = new ArrayList<>();
 
         try {
@@ -59,7 +59,7 @@ public class IntelligentPersistenceBatchRunner {
         return new UploadBatchOutput(uploadOutputs);
     }
 
-    private List<IntelligentPersistenceCallable> createCallables(UploadBatch uploadBatch, int timeout) {
+    private List<IntelligentPersistenceCallable> createCallables(UploadBatch uploadBatch, long timeout) {
         List<IntelligentPersistenceCallable> callables = uploadBatch.getUploadTargets()
                                                              .stream()
                                                              .map(uploadTarget -> new IntelligentPersistenceCallable(bdio2FileUploadService, uploadTarget, timeout))

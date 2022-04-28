@@ -15,9 +15,9 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 public class IntelligentPersistenceCodeLocationCreationRequest extends CodeLocationCreationRequest<UploadBatchOutput> {
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final UploadBatch uploadBatch;
-    private final int timeout;
+    private final long timeout;
 
-    public IntelligentPersistenceCodeLocationCreationRequest(final IntelligentPersistenceBatchRunner uploadBatchRunner, final UploadBatch uploadBatch, final int timeout) {
+    public IntelligentPersistenceCodeLocationCreationRequest(final IntelligentPersistenceBatchRunner uploadBatchRunner, final UploadBatch uploadBatch, final long timeout) {
         this.uploadBatchRunner = uploadBatchRunner;
         this.uploadBatch = uploadBatch;
         this.timeout = timeout;

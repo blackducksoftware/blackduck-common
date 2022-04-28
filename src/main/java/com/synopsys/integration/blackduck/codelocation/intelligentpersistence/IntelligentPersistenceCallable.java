@@ -19,9 +19,9 @@ import com.synopsys.integration.util.NameVersion;
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
     private final Bdio2FileUploadService bdio2FileUploadService;
     private final UploadTarget uploadTarget;
-    private final int timeout;
+    private final long timeout;
 
-    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget, final int timeout) {
+    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget, long timeout) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.uploadTarget = uploadTarget;
         this.timeout = timeout;

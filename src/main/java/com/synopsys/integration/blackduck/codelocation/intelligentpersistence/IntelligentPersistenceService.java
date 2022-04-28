@@ -33,16 +33,16 @@ public class IntelligentPersistenceService extends DataService {
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
-    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch, int timeout) {
-        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch, timeout);
+    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch, long timeoutInSeconds) {
+        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch, timeoutInSeconds);
     }
 
     public CodeLocationCreationData<UploadBatchOutput> uploadBdio(CodeLocationCreationRequest<UploadBatchOutput> uploadRequest) throws IntegrationException {
         return codeLocationCreationService.createCodeLocations(uploadRequest);
     }
 
-    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch, int timeout) throws IntegrationException {
-        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, timeout);
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException {
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, timeoutInSeconds);
         return uploadBdio(uploadRequest);
     }
 
