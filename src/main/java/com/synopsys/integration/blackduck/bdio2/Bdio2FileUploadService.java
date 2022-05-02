@@ -29,7 +29,7 @@ import com.synopsys.integration.wait.ResilientJobExecutor;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
-    private static final int BD_WAIT_AND_RETRY_INTERVAL = 30000;
+    private static final int BD_WAIT_AND_RETRY_INTERVAL = 30;
 
     private final Bdio2ContentExtractor bdio2Extractor;
     private final Bdio2StreamUploader bdio2Uploader;
