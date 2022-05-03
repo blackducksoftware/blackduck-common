@@ -24,9 +24,12 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.util.NameVersion;
+import com.synopsys.integration.wait.ResilientJobConfig;
+import com.synopsys.integration.wait.ResilientJobExecutor;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
+    private static final int BD_WAIT_AND_RETRY_INTERVAL = 30;
 
     private final Bdio2ContentExtractor bdio2Extractor;
     private final Bdio2StreamUploader bdio2Uploader;
@@ -43,13 +46,13 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
+    public HttpUrl uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null));
+        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout);
     }
 
-    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
+    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -71,13 +74,12 @@ public class Bdio2FileUploadService extends DataService {
                 .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
-        HttpUrl url = bdio2Uploader.start(header, editor);
-        for (BdioFileContent content : remainingFiles) {
-            bdio2Uploader.append(url, count, content, editor);
-        }
-        bdio2Uploader.finish(url, count, editor);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2Uploader, header, remainingFiles, editor, count);
+        ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
-        return url;
+        return jobExecutor.executeJob(bdio2UploadJob)
+            .getUploadUrl();
     }
 
 }

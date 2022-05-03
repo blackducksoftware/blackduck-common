@@ -19,10 +19,12 @@ import com.synopsys.integration.util.NameVersion;
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
     private final Bdio2FileUploadService bdio2FileUploadService;
     private final UploadTarget uploadTarget;
+    private final long timeout;
 
-    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget) {
+    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget, long timeout) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.uploadTarget = uploadTarget;
+        this.timeout = timeout;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
         NameVersion projectAndVersion = uploadTarget.getProjectAndVersion().orElse(null);
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
-            bdio2FileUploadService.uploadFile(uploadTarget);
+            bdio2FileUploadService.uploadFile(uploadTarget, timeout);
             return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, null);
         } catch (Exception ex) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), ex.getMessage());

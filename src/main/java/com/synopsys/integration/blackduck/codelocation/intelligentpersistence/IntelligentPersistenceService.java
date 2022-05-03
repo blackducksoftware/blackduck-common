@@ -33,16 +33,16 @@ public class IntelligentPersistenceService extends DataService {
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
-    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch) {
-        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch);
+    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch, long timeoutInSeconds) {
+        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch, timeoutInSeconds);
     }
 
     public CodeLocationCreationData<UploadBatchOutput> uploadBdio(CodeLocationCreationRequest<UploadBatchOutput> uploadRequest) throws IntegrationException {
         return codeLocationCreationService.createCodeLocations(uploadRequest);
     }
 
-    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch) throws IntegrationException {
-        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch);
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException {
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, timeoutInSeconds);
         return uploadBdio(uploadRequest);
     }
 
@@ -51,7 +51,7 @@ public class IntelligentPersistenceService extends DataService {
     }
 
     public UploadBatchOutput uploadBdioAndWait(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch);
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, (int) timeoutInSeconds);
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
 

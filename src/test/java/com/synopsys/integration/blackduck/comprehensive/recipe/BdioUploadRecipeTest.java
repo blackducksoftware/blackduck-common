@@ -30,8 +30,8 @@ import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
+import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.WaitJob;
-import com.synopsys.integration.wait.WaitJobConfig;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -134,9 +134,8 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         if (optionalCodeLocationView.isPresent()) {
             deleteCodeLocation(codeLocationName);
         }
-        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "code location not found", 30, WaitJobConfig.CURRENT_TIME_SUPPLIER, 5);
-        WaitJob<Boolean> waitJob = WaitJob.createSimpleWait(waitJobConfig, () -> !codeLocationService.getCodeLocationByName(codeLocationName).isPresent());
-        assertTrue(waitJob.waitFor());
+        ResilientJobConfig waitJobConfig = new ResilientJobConfig(logger, 30, ResilientJobConfig.CURRENT_TIME_SUPPLIER, 5);
+        WaitJob.waitFor(waitJobConfig, () -> !codeLocationService.getCodeLocationByName(codeLocationName).isPresent(), "code location not found");
     }
 
 }

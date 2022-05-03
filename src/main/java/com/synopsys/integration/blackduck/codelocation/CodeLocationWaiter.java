@@ -15,10 +15,12 @@ import com.synopsys.integration.blackduck.service.dataservice.NotificationServic
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.model.NotificationTaskRange;
 import com.synopsys.integration.exception.IntegrationException;
+import com.synopsys.integration.exception.IntegrationTimeoutException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
+import com.synopsys.integration.wait.ResilientJobConfig;
+import com.synopsys.integration.wait.ResilientJobExecutor;
 import com.synopsys.integration.wait.WaitJob;
-import com.synopsys.integration.wait.WaitJobConfig;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;
@@ -40,14 +42,13 @@ public class CodeLocationWaiter {
         codeLocationNames.forEach(codeLocation -> logger.debug(String.format("  Code Location -> %s", codeLocation)));
         logger.debug("");
 
-        WaitJobConfig waitJobConfig = new WaitJobConfig(logger, "code location", timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds);
-        CodeLocationWaitJobCondition waitJobCondition = new CodeLocationWaitJobCondition(logger, blackDuckApiClient, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
-            expectedNotificationCount);
-        CodeLocationWaitJobCompleter waitJobCompleter = new CodeLocationWaitJobCompleter(logger, waitJobCondition, waitJobConfig);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds);
 
-        WaitJob<CodeLocationWaitResult> waitJob = new WaitJob<>(waitJobConfig, waitJobCondition, waitJobCompleter);
 
-        return waitJob.waitFor();
+        CodeLocationWaitJob codeLocationWaitJob = new CodeLocationWaitJob(logger, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
+            expectedNotificationCount, blackDuckApiClient);
+        ResilientJobExecutor resilientJobExecutor = new ResilientJobExecutor(jobConfig);
+        return resilientJobExecutor.executeJob(codeLocationWaitJob);
     }
 
 }

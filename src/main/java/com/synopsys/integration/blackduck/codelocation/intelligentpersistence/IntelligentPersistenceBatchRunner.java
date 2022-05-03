@@ -31,19 +31,19 @@ public class IntelligentPersistenceBatchRunner {
         this.bdio2FileUploadService = bdio2FileUploadService;
     }
 
-    public UploadBatchOutput executeUploads(UploadBatch uploadBatch) throws BlackDuckIntegrationException {
+    public UploadBatchOutput executeUploads(UploadBatch uploadBatch, long timeout) throws BlackDuckIntegrationException {
         logger.info("Starting the codelocation file uploads.");
-        UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch);
+        UploadBatchOutput uploadBatchOutput = uploadTargets(uploadBatch, timeout);
         logger.info("Completed the codelocation file uploads.");
 
         return uploadBatchOutput;
     }
 
-    private UploadBatchOutput uploadTargets(UploadBatch uploadBatch) throws BlackDuckIntegrationException {
+    private UploadBatchOutput uploadTargets(UploadBatch uploadBatch, long timeout) throws BlackDuckIntegrationException {
         List<UploadOutput> uploadOutputs = new ArrayList<>();
 
         try {
-            List<IntelligentPersistenceCallable> callables = createCallables(uploadBatch);
+            List<IntelligentPersistenceCallable> callables = createCallables(uploadBatch, timeout);
             List<Future<UploadOutput>> submitted = new ArrayList<>();
             for (IntelligentPersistenceCallable callable : callables) {
                 submitted.add(executorService.submit(callable));
@@ -59,10 +59,10 @@ public class IntelligentPersistenceBatchRunner {
         return new UploadBatchOutput(uploadOutputs);
     }
 
-    private List<IntelligentPersistenceCallable> createCallables(UploadBatch uploadBatch) {
+    private List<IntelligentPersistenceCallable> createCallables(UploadBatch uploadBatch, long timeout) {
         List<IntelligentPersistenceCallable> callables = uploadBatch.getUploadTargets()
                                                              .stream()
-                                                             .map(uploadTarget -> new IntelligentPersistenceCallable(bdio2FileUploadService, uploadTarget))
+                                                             .map(uploadTarget -> new IntelligentPersistenceCallable(bdio2FileUploadService, uploadTarget, timeout))
                                                              .collect(Collectors.toList());
 
         return callables;
