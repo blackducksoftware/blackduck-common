@@ -46,13 +46,13 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public HttpUrl uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
+    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
         return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout);
     }
 
-    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout) throws IntegrationException, InterruptedException {
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout) throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -78,8 +78,7 @@ public class Bdio2FileUploadService extends DataService {
         Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2Uploader, header, remainingFiles, editor, count);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
-        return jobExecutor.executeJob(bdio2UploadJob)
-            .getUploadUrl();
+        return jobExecutor.executeJob(bdio2UploadJob);
     }
 
 }
