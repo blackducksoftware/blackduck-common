@@ -17,7 +17,7 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;
 
-public class Bdio2FileUploadTest {
+public class Bdio2UploadJobTest {
     private final IntLogger logger = new Slf4jIntLogger(LoggerFactory.getLogger(this.getClass()));
     private final int timeout = 10;
     private final int waitInterval = 2;
