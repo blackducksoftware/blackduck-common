@@ -85,7 +85,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 logger.info(IOUtils.toString(blackDuckCliProcess.getInputStream(), StandardCharsets.UTF_8));
 
                 logger.info("Black Duck Signature Scanner return code: " + returnCode);
-                logger.info("You can view the logs at: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
+                logger.info("Signature Scanner log output directory: '" + scanCommand.getOutputDirectory().getCanonicalPath() + "'");
 
                 if (returnCode != 0) {
                     return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, returnCode);

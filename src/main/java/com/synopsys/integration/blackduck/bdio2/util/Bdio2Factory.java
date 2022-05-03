@@ -21,6 +21,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioObject;
@@ -36,12 +38,25 @@ import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
 import com.synopsys.integration.blackduck.bdio2.model.Bdio2Document;
 import com.synopsys.integration.blackduck.bdio2.model.ProjectInfo;
+import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2Factory {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     public static final List<Product> DEFAULT_PRODUCTS = Arrays.asList(Product.java(), Product.os());
 
     public Bdio2Document createBdio2Document(BdioMetadata bdioMetadata, ProjectDependencyGraph dependencyGraph) {
         Project project = createProject(dependencyGraph.getProjectDependency().getExternalId(), true);
+        Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
+        return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
+    }
+
+    /**
+     * @deprecated (Use createBdio2Document instead when the ProjectDependencyGraph has an accurate ProjectDependency)
+     */
+    @Deprecated
+    public Bdio2Document createLegacyBdio2Document(BdioMetadata bdioMetadata, DependencyGraph dependencyGraph, ProjectInfo projectInfo, ExternalId projectExternalId) {
+        Project project = createProject(projectInfo.getNameVersion(), projectExternalId, true);
         Pair<List<Project>, List<Component>> subprojectsAndComponents = createAndLinkComponents(dependencyGraph, project);
         return new Bdio2Document(bdioMetadata, project, subprojectsAndComponents.getLeft(), subprojectsAndComponents.getRight());
     }
@@ -61,6 +76,21 @@ public class Bdio2Factory {
                 .collect(ProductList.toProductList());
 
         return createBdioMetadata(codeLocationName, projectInfo, creationDateTime, productList);
+    }
+
+    /**
+     * @deprecated (ideally the root projects ExternalId could be used for both the identifier and the project name and version)
+     */
+    @Deprecated
+    protected Project createProject(NameVersion projectNameVersion, ExternalId identifier, boolean isRootProject) {
+        Project project = new Project(identifier.createBdioId().toString())
+            .identifier(identifier.createExternalId())
+            .name(projectNameVersion.getName())
+            .version(projectNameVersion.getVersion());
+        if (isRootProject) {
+            project.namespace("root");
+        }
+        return project;
     }
 
     protected Project createProject(ExternalId projectExternalId, boolean isRootProject) {
@@ -123,9 +153,15 @@ public class Bdio2Factory {
                     // Subprojects cannot be dependencies of components
                     // TODO is there a better way to handle this?
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
+                    String subprojectExternalId = dependency.getExternalId().toString();
+                    logger.warn(
+                        "Sipping subproject {}. Failed to add the subproject to the graph because subprojects cannot be dependencies of components. Please contact Synopsys support.",
+                        subprojectExternalId
+                    );
+                    continue;
 
-                    // Jake's maybe better way for now?
-                    throw new UnsupportedOperationException("Subprojects cannot be dependencies of components. The graph was incorrectly built.");
+                    // Jake's maybe better way for now? Exposed a few issues with graph building. See IDETECT-3243
+                    // throw new UnsupportedOperationException("Subprojects cannot be dependencies of components. The graph was incorrectly built.");
                 }
                 Project subproject = projectFromDependency(dependency);
                 linkProjectDependency.subProject(new Project(subproject.id()).subproject(subproject));
