@@ -23,6 +23,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilde
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 
 public class Bdio2FileUploadService extends DataService {
@@ -43,13 +44,13 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
+    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget) throws IntegrationException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
         return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null));
     }
 
-    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -71,13 +72,20 @@ public class Bdio2FileUploadService extends DataService {
                 .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
-        HttpUrl url = bdio2Uploader.start(header, editor);
+        Response headerResponse = bdio2Uploader.start(header, editor);
+        HttpUrl url = new HttpUrl(headerResponse.getHeaderValue("location"));
+        String scanId = parseScanIdFromScanUrl(url.toString());
         for (BdioFileContent content : remainingFiles) {
             bdio2Uploader.append(url, count, content, editor);
         }
         bdio2Uploader.finish(url, count, editor);
 
-        return url;
+        return new Bdio2UploadResult(url, scanId);
+    }
+
+    private String parseScanIdFromScanUrl(String scanUrl) {
+        String[] urlPieces = scanUrl.split("/");
+        return urlPieces[urlPieces.length-1];
     }
 
 }

@@ -125,6 +125,12 @@ public class BlackDuckServicesFactory {
             createCodeLocationCreationService());
     }
 
+    public Bdio2FileUploadService createBdio2FileUploadService() {
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.INTELLIGENT_PERSISTENCE_SCANS_PATH,
+            IntelligentPersistenceService.CONTENT_TYPE);
+        return new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+    }
+
     public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {
         ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, createBlackDuckRegistrationService(), intEnvironmentVariables, executorService, signatureScannerInstallDirectory);
         return createSignatureScannerService(scanBatchRunner);
@@ -219,10 +225,7 @@ public class BlackDuckServicesFactory {
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.INTELLIGENT_PERSISTENCE_SCANS_PATH,
-            IntelligentPersistenceService.CONTENT_TYPE);
-        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
-        IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);
+        IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, createBdio2FileUploadService());
         return new IntelligentPersistenceService(blackDuckApiClient, apiDiscovery, logger, batchRunner, createCodeLocationCreationService());
     }
 
