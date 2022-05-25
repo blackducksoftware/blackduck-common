@@ -21,6 +21,7 @@ import com.synopsys.integration.rest.response.Response;
 
 public class SigmaUploadService {
     public static final String SIGMA_UPLOAD_PATH_PATTERN = "/api/internal/scans/%s/iac-issues";
+    public static final String HEADER_CONTENT_TYPE = "Content-type";
     public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.scan-6+json";
 
     private final BlackDuckApiClient blackDuckApiClient;
@@ -31,10 +32,12 @@ public class SigmaUploadService {
         this.apiDiscovery = apiDiscovery;
     }
 
+    //TODO- do we need to implement waiting?
     public Response uploadSigmaResults(String resultsFileContent, String scanId) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(getUploadEndpoint(scanId)).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
             .postString(resultsFileContent, ContentType.create(CONTENT_TYPE))
+            .addHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE)
             .buildBlackDuckResponseRequest(url);
         return blackDuckApiClient.execute(request);
 
