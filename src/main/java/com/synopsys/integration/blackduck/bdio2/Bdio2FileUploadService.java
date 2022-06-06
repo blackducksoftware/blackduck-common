@@ -44,13 +44,19 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2Uploader = bdio2Uploader;
     }
 
-    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget) throws IntegrationException {
+    public HttpUrl uploadFile(UploadTarget uploadTarget) throws IntegrationException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
         return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null));
     }
 
-    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
+    public Bdio2UploadResult uploadFileAndGetResult(UploadTarget uploadTarget) throws IntegrationException {
+        HttpUrl url = uploadFile(uploadTarget);
+        String scanId = parseScanIdFromScanUrl(url.toString());
+        return new Bdio2UploadResult(url, scanId);
+    }
+
+    private HttpUrl uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -72,20 +78,25 @@ public class Bdio2FileUploadService extends DataService {
                 .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
-        Response headerResponse = bdio2Uploader.start(header, editor);
+        Response headerResponse = bdio2Uploader.startAndGetResponse(header, editor);
         HttpUrl url = new HttpUrl(headerResponse.getHeaderValue("location"));
-        String scanId = parseScanIdFromScanUrl(url.toString());
         for (BdioFileContent content : remainingFiles) {
             bdio2Uploader.append(url, count, content, editor);
         }
         bdio2Uploader.finish(url, count, editor);
 
+        return url;
+    }
+
+    private Bdio2UploadResult uploadFilesAndGetResult(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion) throws IntegrationException {
+        HttpUrl url = uploadFiles(bdioFiles, nameVersion);
+        String scanId = parseScanIdFromScanUrl(url.toString());
         return new Bdio2UploadResult(url, scanId);
     }
 
     private String parseScanIdFromScanUrl(String scanUrl) {
         String[] urlPieces = scanUrl.split("/");
-        return urlPieces[urlPieces.length-1];
+        return urlPieces[urlPieces.length - 1];
     }
 
 }

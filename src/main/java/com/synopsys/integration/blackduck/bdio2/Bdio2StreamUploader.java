@@ -48,19 +48,26 @@ public class Bdio2StreamUploader {
         this.contentType = contentType;
     }
 
-    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+    public HttpUrl start(BdioFileContent header, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+        Response response = startAndGetResponse(header, editor);
+        return new HttpUrl(response.getHeaderValue("location"));
+    }
+
+    public Response startAndGetResponse(BdioFileContent header, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(scanPath).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
             .postString(header.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
             .addHeader(HEADER_CONTENT_TYPE, contentType)
             .apply(editor)
             .buildBlackDuckResponseRequest(url);
-        HttpUrl responseUrl = blackDuckApiClient.executePostRequestAndRetrieveURL(request);
-        logger.debug(String.format("Starting upload to %s", responseUrl.toString()));
         return blackDuckApiClient.execute(request);
     }
 
-    public Response append(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+    public void append(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+        appendAndGetResponse(url, count, bdioFileContent, editor);
+    }
+
+    public Response appendAndGetResponse(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Appending file %s, to %s with count %d", bdioFileContent.getFileName(), url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
             .putString(bdioFileContent.getContent(), ContentType.create(contentType, StandardCharsets.UTF_8))
@@ -72,7 +79,11 @@ public class Bdio2StreamUploader {
         return blackDuckApiClient.execute(request);  // 202 accepted
     }
 
-    public Response finish(HttpUrl url, int count, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+    public void finish(HttpUrl url, int count, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
+        finishAndGetResponse(url, count, editor);
+    }
+
+    public Response finishAndGetResponse(HttpUrl url, int count, BlackDuckRequestBuilderEditor editor) throws IntegrationException {
         logger.debug(String.format("Finishing upload to %s with count %d", url.toString(), count));
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
             .putString(StringUtils.EMPTY, ContentType.create(contentType, StandardCharsets.UTF_8))
