@@ -7,6 +7,8 @@
  */
 package com.synopsys.integration.blackduck.http.client.cache;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.collections4.map.LRUMap;
@@ -29,11 +31,11 @@ import com.synopsys.integration.rest.response.Response;
 
 public class CachingHttpClient implements BlackDuckHttpClient {
     private final BlackDuckHttpClient blackDuckHttpClient;
-    private final LRUMap<Request, Response> cache;
+    private final Map<Request, Response> cache;
 
     public CachingHttpClient(BlackDuckHttpClient blackDuckHttpClient) {
         this.blackDuckHttpClient = blackDuckHttpClient;
-        this.cache = new LRUMap<>(1000);
+        this.cache = Collections.synchronizedMap(new LRUMap<>(1000));
     }
 
     public void emptyCache() {
