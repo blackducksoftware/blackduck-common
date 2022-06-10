@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import org.apache.commons.collections4.map.LRUMap;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 
@@ -24,11 +23,11 @@ import com.synopsys.integration.rest.response.Response;
 public class CacheableResponse implements Response {
     private final Request request;
     private final Response response;
-    private final LRUMap<Request, Response> cache;
+    private final Map<Request, Response> cache;
 
     private String stringResponse;
 
-    public CacheableResponse(Request request, Response response, LRUMap<Request, Response> cache) {
+    public CacheableResponse(Request request, Response response, Map<Request, Response> cache) {
         this.request = request;
         this.response = response;
         this.cache = cache;
