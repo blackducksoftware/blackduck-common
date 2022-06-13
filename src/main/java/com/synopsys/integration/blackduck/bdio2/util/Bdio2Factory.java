@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.bdio2.util;
 
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,9 +128,7 @@ public class Bdio2Factory {
 
         projectInfo.getGitInfo().getSourceRevision().ifPresent(metadata::sourceRevision);
         projectInfo.getGitInfo().getSourceBranch().ifPresent(metadata::sourceBranch);
-        projectInfo.getGitInfo().getSourceRepository()
-            .map(URL::toString)
-            .ifPresent(metadata::sourceRepository);
+        projectInfo.getGitInfo().getSourceRepository().ifPresent(metadata::sourceRepository);
 
         return metadata;
     }

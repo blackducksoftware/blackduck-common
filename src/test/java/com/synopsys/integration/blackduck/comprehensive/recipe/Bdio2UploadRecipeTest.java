@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -62,7 +61,7 @@ class Bdio2UploadRecipeTest extends BasicRecipe {
             GROUP_NAME,
             null, // TODO: What is this supposed to look like? Only used for chunking? JM-04/2022
             new GitInfo(
-                new URL("https://github.com/blackducksoftware/blackduck-common"),
+                "https://github.com/blackducksoftware/blackduck-common",
                 "4a1f431d7aa4ac15f755edd5de004f07d36ae89a",
                 "master"
             )
