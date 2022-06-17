@@ -41,6 +41,7 @@ import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrat
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckScanReadinessService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
+import com.synopsys.integration.blackduck.service.dataservice.IacScanUploadService;
 import com.synopsys.integration.blackduck.service.dataservice.IssueService;
 import com.synopsys.integration.blackduck.service.dataservice.LicenseService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
@@ -51,7 +52,6 @@ import com.synopsys.integration.blackduck.service.dataservice.ProjectMappingServ
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectUsersService;
 import com.synopsys.integration.blackduck.service.dataservice.RoleService;
-import com.synopsys.integration.blackduck.service.dataservice.SigmaUploadService;
 import com.synopsys.integration.blackduck.service.dataservice.TagService;
 import com.synopsys.integration.blackduck.service.dataservice.UserGroupService;
 import com.synopsys.integration.blackduck.service.dataservice.UserRoleService;
@@ -243,8 +243,8 @@ public class BlackDuckServicesFactory {
         return new IntelligentPersistenceService(blackDuckApiClient, apiDiscovery, logger, batchRunner, createCodeLocationCreationService());
     }
 
-    public SigmaUploadService createSigmaUploadService() {
-        return new SigmaUploadService(blackDuckApiClient, apiDiscovery);
+    public IacScanUploadService createIacScanUploadService() {
+        return new IacScanUploadService(blackDuckApiClient, apiDiscovery);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {

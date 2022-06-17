@@ -19,21 +19,21 @@ import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.response.Response;
 
-public class SigmaUploadService {
-    public static final String SIGMA_UPLOAD_PATH_PATTERN = "/api/internal/scans/%s/iac-issues";
+public class IacScanUploadService {
+    public static final String IAC_SCAN_UPLOAD_PATH_PATTERN = "/api/internal/scans/%s/iac-issues";
     public static final String HEADER_CONTENT_TYPE = "Content-type";
     public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.scan-6+json";
 
     private final BlackDuckApiClient blackDuckApiClient;
     private final ApiDiscovery apiDiscovery;
 
-    public SigmaUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery) {
+    public IacScanUploadService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery) {
         this.blackDuckApiClient = blackDuckApiClient;
         this.apiDiscovery = apiDiscovery;
     }
 
     //TODO- do we need to implement waiting?
-    public Response uploadSigmaResults(String resultsFileContent, String scanId) throws IntegrationException {
+    public Response uploadIacScanResults(String resultsFileContent, String scanId) throws IntegrationException {
         HttpUrl url = apiDiscovery.metaSingleResponse(getUploadEndpoint(scanId)).getUrl();
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
             .postString(resultsFileContent, ContentType.create(CONTENT_TYPE))
@@ -44,6 +44,6 @@ public class SigmaUploadService {
     }
 
     private BlackDuckPath<BlackDuckResponse> getUploadEndpoint(String scanId) {
-        return new BlackDuckPath<>(String.format(SIGMA_UPLOAD_PATH_PATTERN, scanId), BlackDuckResponse.class, false);
+        return new BlackDuckPath<>(String.format(IAC_SCAN_UPLOAD_PATH_PATTERN, scanId), BlackDuckResponse.class, false);
     }
 }
