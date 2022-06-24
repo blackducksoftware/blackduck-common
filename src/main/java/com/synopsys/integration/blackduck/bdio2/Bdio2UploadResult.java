@@ -7,22 +7,22 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.synopsys.integration.rest.HttpUrl;
 
 public class Bdio2UploadResult {
     private final HttpUrl uploadUrl;
+    private final String scanId;
 
-    public Bdio2UploadResult(HttpUrl uploadUrl) {
+    public Bdio2UploadResult(HttpUrl uploadUrl, final String scanId) {
         this.uploadUrl = uploadUrl;
+        this.scanId = scanId;
     }
 
     public HttpUrl getUploadUrl() {
         return uploadUrl;
     }
 
-
+    public String getScanId() {
+        return scanId;
+    }
 }

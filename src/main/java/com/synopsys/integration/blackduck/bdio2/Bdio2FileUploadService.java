@@ -23,6 +23,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilde
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;

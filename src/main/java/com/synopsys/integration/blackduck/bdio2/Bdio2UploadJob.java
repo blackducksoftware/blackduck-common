@@ -34,14 +34,15 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private final int count;
 
     private HttpUrl uploadUrl;
+    private String scanId;
     private boolean complete;
 
     public Bdio2UploadJob(
-        final Bdio2StreamUploader bdio2Uploader,
-        final BdioFileContent header,
-        final List<BdioFileContent> bdioEntries,
-        final BlackDuckRequestBuilderEditor editor,
-        final int count
+        Bdio2StreamUploader bdio2Uploader,
+        BdioFileContent header,
+        List<BdioFileContent> bdioEntries,
+        BlackDuckRequestBuilderEditor editor,
+        int count
     ) {
         this.bdio2Uploader = bdio2Uploader;
         this.header = header;
@@ -57,6 +58,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         try {
             throwIfResponseUnsuccessful(headerResponse);
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
+            scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
             for (BdioFileContent content : bdioEntries) {
                 Response chunkResponse = bdio2Uploader.append(uploadUrl, count, content, editor);
@@ -78,6 +80,11 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         }
     }
 
+    private String parseScanIdFromUploadUrl(String uploadUrl) {
+        String[] pieces = uploadUrl.split("/");
+        return pieces[pieces.length - 1];
+    }
+
     @Override
     public boolean wasJobCompleted() {
         return complete;
@@ -90,7 +97,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
 
     @Override
     public Bdio2UploadResult onCompletion() {
-        return new Bdio2UploadResult(uploadUrl);
+        return new Bdio2UploadResult(uploadUrl, scanId);
     }
 
     @Override

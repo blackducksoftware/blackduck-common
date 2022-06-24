@@ -41,6 +41,7 @@ import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrat
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckScanReadinessService;
 import com.synopsys.integration.blackduck.service.dataservice.CodeLocationService;
 import com.synopsys.integration.blackduck.service.dataservice.ComponentService;
+import com.synopsys.integration.blackduck.service.dataservice.IacScanUploadService;
 import com.synopsys.integration.blackduck.service.dataservice.IssueService;
 import com.synopsys.integration.blackduck.service.dataservice.LicenseService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
@@ -97,8 +98,10 @@ public class BlackDuckServicesFactory {
         this(intEnvironmentVariables, executorService, logger, blackDuckHttpClient, createDefaultGson(), createDefaultObjectMapper());
     }
 
-    public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson,
-        ObjectMapper objectMapper) {
+    public BlackDuckServicesFactory(
+        IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient, Gson gson,
+        ObjectMapper objectMapper
+    ) {
         this.intEnvironmentVariables = intEnvironmentVariables;
         this.executorService = executorService;
         this.logger = logger;
@@ -117,16 +120,32 @@ public class BlackDuckServicesFactory {
 
     public BdioUploadService createBdioUploadService() {
         return new BdioUploadService(blackDuckApiClient, apiDiscovery, logger, new UploadBatchRunner(logger, blackDuckApiClient, apiDiscovery, executorService),
-            createCodeLocationCreationService());
+            createCodeLocationCreationService()
+        );
     }
 
     public Bdio2UploadService createBdio2UploadService() {
         return new Bdio2UploadService(blackDuckApiClient, apiDiscovery, logger, new UploadBdio2BatchRunner(logger, blackDuckApiClient, apiDiscovery, executorService),
-            createCodeLocationCreationService());
+            createCodeLocationCreationService()
+        );
+    }
+
+    public Bdio2FileUploadService createBdio2FileUploadService() {
+        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.INTELLIGENT_PERSISTENCE_SCANS_PATH,
+            IntelligentPersistenceService.CONTENT_TYPE
+        );
+        return new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
     }
 
     public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {
-        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(logger, blackDuckHttpClient, createBlackDuckRegistrationService(), intEnvironmentVariables, executorService, signatureScannerInstallDirectory);
+        ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(
+            logger,
+            blackDuckHttpClient,
+            createBlackDuckRegistrationService(),
+            intEnvironmentVariables,
+            executorService,
+            signatureScannerInstallDirectory
+        );
         return createSignatureScannerService(scanBatchRunner);
     }
 
@@ -136,7 +155,8 @@ public class BlackDuckServicesFactory {
 
     public BinaryScanUploadService createBinaryScanUploadService() {
         return new BinaryScanUploadService(blackDuckApiClient, apiDiscovery, logger, new BinaryScanBatchRunner(logger, blackDuckApiClient, apiDiscovery, executorService),
-            createCodeLocationCreationService());
+            createCodeLocationCreationService()
+        );
     }
 
     public CodeLocationCreationService createCodeLocationCreationService() {
@@ -219,11 +239,12 @@ public class BlackDuckServicesFactory {
     }
 
     public IntelligentPersistenceService createIntelligentPersistenceService() {
-        Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.INTELLIGENT_PERSISTENCE_SCANS_PATH,
-            IntelligentPersistenceService.CONTENT_TYPE);
-        Bdio2FileUploadService bdio2FileUploadService = new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
-        IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, bdio2FileUploadService);
+        IntelligentPersistenceBatchRunner batchRunner = new IntelligentPersistenceBatchRunner(logger, executorService, createBdio2FileUploadService());
         return new IntelligentPersistenceService(blackDuckApiClient, apiDiscovery, logger, batchRunner, createCodeLocationCreationService());
+    }
+
+    public IacScanUploadService createIacScanUploadService() {
+        return new IacScanUploadService(blackDuckApiClient, apiDiscovery);
     }
 
     public IntegrationEscapeUtil createIntegrationEscapeUtil() {
