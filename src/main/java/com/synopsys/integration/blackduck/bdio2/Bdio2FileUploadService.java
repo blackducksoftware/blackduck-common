@@ -7,6 +7,7 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,6 @@ import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;
@@ -48,12 +47,17 @@ public class Bdio2FileUploadService extends DataService {
     }
 
     public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
-        logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
-        List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout);
+        return uploadFile(uploadTarget, timeout, false);
     }
 
-    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout) throws IntegrationException, InterruptedException {
+    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout, boolean onlyUploadHeader) throws IntegrationException, InterruptedException {
+        logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
+        List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
+        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, onlyUploadHeader);
+    }
+
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean onlyUploadHeader)
+        throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
@@ -62,9 +66,14 @@ public class Bdio2FileUploadService extends DataService {
             .findFirst()
             .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
 
-        List<BdioFileContent> remainingFiles = bdioFiles.stream()
-            .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
-            .collect(Collectors.toList());
+        List<BdioFileContent> remainingFiles = new LinkedList<>();
+        if (onlyUploadHeader) {
+            logger.debug(String.format("Only uploading BDIO header file %s", header.getFileName()));
+        } else {
+            remainingFiles.addAll(bdioFiles.stream()
+                .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+                .collect(Collectors.toList()));
+        }
         int count = remainingFiles.size();
         logger.debug("BDIO upload file count = " + count);
 
