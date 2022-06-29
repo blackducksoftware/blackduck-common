@@ -32,6 +32,8 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private final List<BdioFileContent> bdioEntries;
     private final BlackDuckRequestBuilderEditor editor;
     private final int count;
+    private final boolean shouldUploadEntries;
+    private final boolean shouldFinishUpload;
 
     private HttpUrl uploadUrl;
     private String scanId;
@@ -42,13 +44,17 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         BdioFileContent header,
         List<BdioFileContent> bdioEntries,
         BlackDuckRequestBuilderEditor editor,
-        int count
+        int count,
+        boolean onlyUploadHeader,
+        boolean shouldFinishUpload
     ) {
         this.bdio2Uploader = bdio2Uploader;
         this.header = header;
         this.bdioEntries = bdioEntries;
         this.editor = editor;
         this.count = count;
+        this.shouldUploadEntries = onlyUploadHeader;
+        this.shouldFinishUpload = shouldFinishUpload;
     }
 
     @Override
@@ -59,12 +65,16 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
             throwIfResponseUnsuccessful(headerResponse);
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
-            logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
-            for (BdioFileContent content : bdioEntries) {
-                Response chunkResponse = bdio2Uploader.append(uploadUrl, count, content, editor);
-                throwIfResponseUnsuccessful(chunkResponse);
+            if (shouldUploadEntries) {
+                logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
+                for (BdioFileContent content : bdioEntries) {
+                    Response chunkResponse = bdio2Uploader.append(uploadUrl, count, content, editor);
+                    throwIfResponseUnsuccessful(chunkResponse);
+                }
             }
-            throwIfResponseUnsuccessful(bdio2Uploader.finish(uploadUrl, count, editor));
+            if (shouldFinishUpload) {
+                throwIfResponseUnsuccessful(bdio2Uploader.finish(uploadUrl, count, editor));
+            }
         } catch (RetriableBdioUploadException e) {
             complete = false;
         }

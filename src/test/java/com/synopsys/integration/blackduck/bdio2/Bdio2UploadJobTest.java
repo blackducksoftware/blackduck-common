@@ -38,7 +38,7 @@ public class Bdio2UploadJobTest {
     private Bdio2UploadJob getUploadJob(Bdio2StreamUploader bdio2StreamUploader) {
         BdioFileContent header = new BdioFileContent("bdio-header.jsonld", "");
         BdioFileContent entry = new BdioFileContent("bdio-entry-00.jsonld", "");
-        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), null, 2);
+        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), null, 2, true, true);
     }
 
     private Bdio2StreamUploader getUploaderThatGets429OnStart() throws IntegrationException {
