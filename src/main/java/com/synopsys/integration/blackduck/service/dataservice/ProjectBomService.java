@@ -15,15 +15,16 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.bdio.model.externalid.ExternalId;
+import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyRulesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionVulnerableBomComponentsView;
-import com.synopsys.integration.blackduck.api.manual.temporary.response.PolicySummaryView;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
@@ -35,7 +36,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.body.BodyContentConverter;
 import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 
 public class ProjectBomService extends DataService {
     private final ComponentService componentService;
@@ -91,8 +91,8 @@ public class ProjectBomService extends DataService {
         }
     }
 
-    public Optional<List<PolicySummaryView>> getActivePoliciesForVersion(ProjectVersionView version) {
-        UrlMultipleResponses<PolicySummaryView> url = version.metaActivePolicyRulesLink();
+    public Optional<List<ProjectVersionPolicyRulesView>> getActivePoliciesForVersion(ProjectVersionView version) {
+        UrlMultipleResponses<ProjectVersionPolicyRulesView> url = version.metaActivePolicyRulesLink();
         try {
             return Optional.ofNullable(blackDuckApiClient.getAllResponses(url));
         } catch (IntegrationException e) {
@@ -135,8 +135,8 @@ public class ProjectBomService extends DataService {
 
     public void addComponentToProjectVersion(HttpUrl componentVersionUrl, HttpUrl projectVersionComponentsUrl) throws IntegrationException {
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-                                               .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}", BodyContentConverter.DEFAULT)
-                                               .buildBlackDuckResponseRequest(projectVersionComponentsUrl);
+            .postString("{\"component\": \"" + componentVersionUrl.string() + "\"}", BodyContentConverter.DEFAULT)
+            .buildBlackDuckResponseRequest(projectVersionComponentsUrl);
         try (Response response = blackDuckApiClient.execute(request)) {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);

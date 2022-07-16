@@ -22,9 +22,9 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersi
 import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
+import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyRulesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.temporary.response.PolicySummaryView;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
@@ -159,7 +159,8 @@ public class ProjectBomServiceTestIT {
 
         // get added component
         ProjectVersionView projectVersionView = projectVersionWrapper.getProjectVersionView();
-        ProjectVersionComponentVersionView projectVersionComponentVersionView = blackDuckApiClient.getAllResponses(projectVersionView.metaComponentsLink()).stream().filter(component -> component.getComponentName().equals(componentName)).findFirst().orElse(null);
+        ProjectVersionComponentVersionView projectVersionComponentVersionView = blackDuckApiClient.getAllResponses(projectVersionView.metaComponentsLink()).stream()
+            .filter(component -> component.getComponentName().equals(componentName)).findFirst().orElse(null);
 
         //find corresponding ComponentVersionView
         HttpUrl projectVersionComponentUrl = new HttpUrl(projectVersionComponentVersionView.getComponentVersion());
@@ -178,17 +179,18 @@ public class ProjectBomServiceTestIT {
         Thread.sleep(10000); // need this to give Black Duck enough time to check the project version against the policy rule
 
         // query projectBomService to see if project version has violated rule
-        Optional<List<PolicySummaryView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
+        Optional<List<ProjectVersionPolicyRulesView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
         Assertions.assertFalse(activePolicies.get().isEmpty());
 
         Assertions.assertTrue(activePolicies.get().stream()
             .filter(rule -> ProjectVersionComponentPolicyStatusType.IN_VIOLATION.equals(rule.getStatus()))
-            .map(PolicySummaryView::getName)
+            .map(ProjectVersionPolicyRulesView::getName)
             .anyMatch(name -> name.equals(testPolicyName)));
     }
 
-    private PolicyRuleView createTestPolicyRuleForProjectWithComponentVersion(ProjectView projectView, ComponentVersionView componentVersion, String policyRuleName) throws BlackDuckIntegrationException {
+    private PolicyRuleView createTestPolicyRuleForProjectWithComponentVersion(ProjectView projectView, ComponentVersionView componentVersion, String policyRuleName)
+        throws BlackDuckIntegrationException {
         PolicyRuleExpressionSetBuilder builder = new PolicyRuleExpressionSetBuilder();
         builder.addProjectCondition(PolicyRuleConditionOperatorType.EQ, projectView);
         builder.addComponentVersionCondition(PolicyRuleConditionOperatorType.EQ, componentVersion);
