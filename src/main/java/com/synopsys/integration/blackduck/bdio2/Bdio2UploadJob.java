@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilde
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.exception.IntegrationTimeoutException;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.ResilientJob;
 
@@ -61,18 +59,18 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         try {
             Response headerResponse = bdio2RetryAwareStreamUploader.executeUploadStart(header, editor);
             complete = true;
-            bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(headerResponse);
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             if (shouldUploadEntries) {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
                     Response chunkResponse = bdio2RetryAwareStreamUploader.executeUploadAppend(uploadUrl, count, content, editor);
-                    bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(chunkResponse);
+                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse);
                 }
             }
             if (shouldFinishUpload) {
-                bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(bdio2RetryAwareStreamUploader.executeUploadFinish(uploadUrl, count, editor));
+                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(bdio2RetryAwareStreamUploader.executeUploadFinish(uploadUrl, count, editor));
             }
         } catch (RetriableBdioUploadException e) {
             complete = false;

@@ -63,9 +63,7 @@ public class Bdio2RetryAwareStreamUploader {
         return response;
     }
 
-
-    // If response is unsuccessful, throw a recoverable RetriableBdioUploadException unless we get a failure status code in which case we throw an unrecoverable exception
-    public void throwIfRetryableExitCode(Response response) throws IntegrationException, RetriableBdioUploadException {
+    public void onErrorThrowRetryableOrFailure(Response response) throws IntegrationException, RetriableBdioUploadException {
         if (!response.isStatusCodeSuccess()) {
             if (isRetryableExitCode(response.getStatusCode())) {
                 throw new RetriableBdioUploadException();
