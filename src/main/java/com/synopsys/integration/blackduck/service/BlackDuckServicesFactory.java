@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
+import com.synopsys.integration.blackduck.bdio2.Bdio2RetryAwareStreamUploader;
 import com.synopsys.integration.blackduck.bdio2.Bdio2StreamUploader;
 import com.synopsys.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.synopsys.integration.blackduck.codelocation.CodeLocationCreationService;
@@ -134,7 +135,8 @@ public class BlackDuckServicesFactory {
         Bdio2StreamUploader bdio2Uploader = new Bdio2StreamUploader(blackDuckApiClient, apiDiscovery, logger, ApiDiscovery.INTELLIGENT_PERSISTENCE_SCANS_PATH,
             IntelligentPersistenceService.CONTENT_TYPE
         );
-        return new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2Uploader);
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = new Bdio2RetryAwareStreamUploader(bdio2Uploader);
+        return new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2RetryAwareStreamUploader);
     }
 
     public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {

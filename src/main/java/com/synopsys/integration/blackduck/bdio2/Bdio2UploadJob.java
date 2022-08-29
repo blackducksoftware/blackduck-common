@@ -24,10 +24,9 @@ import com.synopsys.integration.wait.ResilientJob;
 
 public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final List<Integer> NON_RETRYABLE_EXIT_CODES = Arrays.asList(401, 402, 403, 404, 500);
     private static final String UPLOAD_JOB_NAME = "bdio upload";
 
-    private final Bdio2StreamUploader bdio2Uploader;
+    private final Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader;
     private final BdioFileContent header;
     private final List<BdioFileContent> bdioEntries;
     private final BlackDuckRequestBuilderEditor editor;
@@ -40,7 +39,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private boolean complete;
 
     public Bdio2UploadJob(
-        Bdio2StreamUploader bdio2Uploader,
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader,
         BdioFileContent header,
         List<BdioFileContent> bdioEntries,
         BlackDuckRequestBuilderEditor editor,
@@ -48,7 +47,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         boolean onlyUploadHeader,
         boolean shouldFinishUpload
     ) {
-        this.bdio2Uploader = bdio2Uploader;
+        this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
         this.header = header;
         this.bdioEntries = bdioEntries;
         this.editor = editor;
@@ -60,85 +59,24 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            Response headerResponse = executeUploadStart();
+            Response headerResponse = bdio2RetryAwareStreamUploader.executeUploadStart(header, editor);
             complete = true;
-            throwIfRetryableExitCode(headerResponse);
+            bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(headerResponse);
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             if (shouldUploadEntries) {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
-                    Response chunkResponse = executeUploadAppend(content);
-                    throwIfRetryableExitCode(chunkResponse);
+                    Response chunkResponse = bdio2RetryAwareStreamUploader.executeUploadAppend(uploadUrl, count, content, editor);
+                    bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(chunkResponse);
                 }
             }
             if (shouldFinishUpload) {
-                throwIfRetryableExitCode(executeUploadFinish());
+                bdio2RetryAwareStreamUploader.throwIfRetryableExitCode(bdio2RetryAwareStreamUploader.executeUploadFinish(uploadUrl, count, editor));
             }
         } catch (RetriableBdioUploadException e) {
             complete = false;
         }
-    }
-
-    //////////////////////
-    // TODO these 4 deserve their own class (or a better approach; the exceptions make it challenging)
-    private Response executeUploadStart()
-        throws RetriableBdioUploadException, IntegrationException {
-        logger.trace("Executing BDIO upload start operation");
-        try {
-            return bdio2Uploader.start(header, editor);
-        } catch (IntegrationRestException e) {
-            return translateRetryableExceptions(e);
-        }
-    }
-
-    private Response executeUploadAppend(BdioFileContent content)
-        throws RetriableBdioUploadException, IntegrationException {
-        logger.trace("Executing BDIO upload append operation");
-        Response response = null;
-        try {
-            response = bdio2Uploader.append(uploadUrl, count, content, editor);
-        } catch (IntegrationRestException e) {
-            translateRetryableExceptions(e);
-        }
-        return response;
-    }
-
-    private Response executeUploadFinish()
-        throws RetriableBdioUploadException, IntegrationException {
-        logger.trace("Executing BDIO upload finish operation");
-        Response response = null;
-        try {
-            response = bdio2Uploader.finish(uploadUrl, count, editor);
-        } catch (IntegrationRestException e) {
-            translateRetryableExceptions(e);
-        }
-        return response;
-    }
-
-    private Response translateRetryableExceptions(final IntegrationRestException e) throws RetriableBdioUploadException, IntegrationRestException {
-        if (isRetryableExitCode(e.getHttpStatusCode())) {
-            throw new RetriableBdioUploadException();
-        }
-        throw e;
-    }
-    ///////////////////
-
-    // If response is unsuccessful, throw a recoverable RetriableBdioUploadException unless we get a failure status code in which case we throw an unrecoverable exception
-    private void throwIfRetryableExitCode(Response response) throws IntegrationException, RetriableBdioUploadException {
-        if (!response.isStatusCodeSuccess()) {
-            if (isRetryableExitCode(response.getStatusCode())) {
-                throw new RetriableBdioUploadException();
-            }
-            throw new IntegrationException(String.format("Bdio upload failed with non-retryable exit code: %d", response.getStatusCode()));
-        }
-    }
-
-    private boolean isRetryableExitCode(int exitCode) {
-        if (NON_RETRYABLE_EXIT_CODES.contains(exitCode)) {
-            return false;
-        }
-        return true;
     }
 
     private String parseScanIdFromUploadUrl(String uploadUrl) {
