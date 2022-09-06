@@ -17,9 +17,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     void testStartRetriable() throws IntegrationException {
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
-
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrows512OnStart(editor, bdioFileContent);
-
         try {
             bdio2RetryAwareStreamUploader.start(bdioFileContent, editor);
             Assertions.fail("Expected RetriableBdioUploadException");
@@ -33,7 +31,6 @@ class Bdio2RetryAwareStreamUploaderTest {
         HttpUrl httpUrl = Mockito.mock(HttpUrl.class);
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
-
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrows512OnAppend(httpUrl, bdioFileContent, editor);
         try {
             bdio2RetryAwareStreamUploader.append(httpUrl, 1, bdioFileContent, editor);
@@ -48,7 +45,6 @@ class Bdio2RetryAwareStreamUploaderTest {
         HttpUrl httpUrl = Mockito.mock(HttpUrl.class);
         //BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
-
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrows512OnFinish(httpUrl, editor);
         try {
             bdio2RetryAwareStreamUploader.finish(httpUrl, 1, editor);
@@ -62,7 +58,6 @@ class Bdio2RetryAwareStreamUploaderTest {
     void testStartNonRetriable() throws IntegrationException, RetriableBdioUploadException {
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
-
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrow404OnStart(bdioFileContent, editor);
         try {
             bdio2RetryAwareStreamUploader.start(bdioFileContent, editor);
@@ -73,7 +68,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @NotNull
-    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrow404OnStart(final BdioFileContent bdioFileContent, final BlackDuckRequestBuilderEditor editor)
+    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrow404OnStart(BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor)
         throws IntegrationException {
         Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = new Bdio2RetryAwareStreamUploader(bdio2StreamUploader);
@@ -84,7 +79,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @NotNull
-    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnStart(final BlackDuckRequestBuilderEditor editor, final BdioFileContent bdioFileContent)
+    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnStart(BlackDuckRequestBuilderEditor editor, BdioFileContent bdioFileContent)
         throws IntegrationException {
         Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
         IntegrationRestException exception512 = Mockito.mock(IntegrationRestException.class);
@@ -94,7 +89,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @NotNull
-    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnAppend(final HttpUrl httpUrl, final BdioFileContent bdioFileContent, final BlackDuckRequestBuilderEditor editor)
+    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnAppend(HttpUrl httpUrl, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor)
         throws IntegrationException {
         Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
         IntegrationRestException exception512 = Mockito.mock(IntegrationRestException.class);
@@ -104,7 +99,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @NotNull
-    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnFinish(final HttpUrl httpUrl, final BlackDuckRequestBuilderEditor editor)
+    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrows512OnFinish(HttpUrl httpUrl, BlackDuckRequestBuilderEditor editor)
         throws IntegrationException {
         Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
         IntegrationRestException exception512 = Mockito.mock(IntegrationRestException.class);
