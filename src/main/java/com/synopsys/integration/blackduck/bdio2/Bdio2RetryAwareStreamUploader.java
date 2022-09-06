@@ -29,7 +29,7 @@ public class Bdio2RetryAwareStreamUploader {
         this.bdio2StreamUploader = bdio2StreamUploader;
     }
 
-    public Response executeUploadStart(BdioFileContent header, BlackDuckRequestBuilderEditor editor)
+    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor)
         throws RetriableBdioUploadException, IntegrationException {
         logger.trace("Executing BDIO upload start operation");
         try {
@@ -39,7 +39,7 @@ public class Bdio2RetryAwareStreamUploader {
         }
     }
 
-    public Response executeUploadAppend(HttpUrl uploadUrl, int count, BdioFileContent content, BlackDuckRequestBuilderEditor editor)
+    public Response append(HttpUrl uploadUrl, int count, BdioFileContent content, BlackDuckRequestBuilderEditor editor)
         throws RetriableBdioUploadException, IntegrationException {
         logger.trace("Executing BDIO upload append operation");
         Response response = null;
@@ -51,7 +51,7 @@ public class Bdio2RetryAwareStreamUploader {
         return response;
     }
 
-    public Response executeUploadFinish(HttpUrl uploadUrl, int count, BlackDuckRequestBuilderEditor editor)
+    public Response finish(HttpUrl uploadUrl, int count, BlackDuckRequestBuilderEditor editor)
         throws RetriableBdioUploadException, IntegrationException {
         logger.trace("Executing BDIO upload finish operation");
         Response response = null;

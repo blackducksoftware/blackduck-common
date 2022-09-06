@@ -57,7 +57,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            Response headerResponse = bdio2RetryAwareStreamUploader.executeUploadStart(header, editor);
+            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor);
             bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
             complete = true;
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
@@ -65,12 +65,12 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
             if (shouldUploadEntries) {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
-                    Response chunkResponse = bdio2RetryAwareStreamUploader.executeUploadAppend(uploadUrl, count, content, editor);
+                    Response chunkResponse = bdio2RetryAwareStreamUploader.append(uploadUrl, count, content, editor);
                     bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse);
                 }
             }
             if (shouldFinishUpload) {
-                Response finishResponse = bdio2RetryAwareStreamUploader.executeUploadFinish(uploadUrl, count, editor);
+                Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
                 bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
             }
         } catch (RetriableBdioUploadException e) {
