@@ -23,8 +23,8 @@ public class Bdio2UploadJobTest {
     private final int waitInterval = 2;
 
     @Test
-    public void testRetryOnFailedHeaderUpload() throws IntegrationException, InterruptedException {
-        Bdio2StreamUploader bdio2StreamUploader = getUploaderThatGets429OnStart();
+    public void testRetryOnFailedHeaderUpload() throws IntegrationException, InterruptedException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatGets429OnStart();
         Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
         ResilientJobExecutor jobExecutor = getJobExecutor();
         Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
@@ -35,14 +35,14 @@ public class Bdio2UploadJobTest {
         return new ResilientJobExecutor(jobConfig);
     }
 
-    private Bdio2UploadJob getUploadJob(Bdio2StreamUploader bdio2StreamUploader) {
+    private Bdio2UploadJob getUploadJob(Bdio2RetryAwareStreamUploader bdio2StreamUploader) {
         BdioFileContent header = new BdioFileContent("bdio-header.jsonld", "");
         BdioFileContent entry = new BdioFileContent("bdio-entry-00.jsonld", "");
         return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), null, 2, true, true);
     }
 
-    private Bdio2StreamUploader getUploaderThatGets429OnStart() throws IntegrationException {
-        Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
+    private Bdio2RetryAwareStreamUploader getUploaderThatGets429OnStart() throws IntegrationException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
         Response response = Mockito.mock(DefaultResponse.class);
         Mockito.when(response.getStatusCode()).thenReturn(429);
         Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any())).thenReturn(response);
@@ -51,15 +51,15 @@ public class Bdio2UploadJobTest {
     }
 
     @Test
-    public void testRetryOnFailedChunkUpload() throws IntegrationException, InterruptedException {
-        Bdio2StreamUploader bdio2StreamUploader = getUploaderThatGets429OnAppend();
+    public void testRetryOnFailedChunkUpload() throws IntegrationException, InterruptedException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatGets429OnAppend();
         Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
         ResilientJobExecutor jobExecutor = getJobExecutor();
         Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
     }
 
-    private Bdio2StreamUploader getUploaderThatGets429OnAppend() throws IntegrationException {
-        Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
+    private Bdio2RetryAwareStreamUploader getUploaderThatGets429OnAppend() throws IntegrationException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
 
         Response failedResponse = Mockito.mock(DefaultResponse.class);
         Mockito.when(failedResponse.getStatusCode()).thenReturn(429);
