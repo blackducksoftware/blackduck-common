@@ -7,7 +7,6 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -23,11 +22,9 @@ import com.synopsys.integration.wait.ResilientJob;
 
 public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private static final List<Integer> BD_FAILURE_EXIT_CODES = Arrays.asList(401, 402, 403, 404, 500);
     private static final String UPLOAD_JOB_NAME = "bdio upload";
 
-    private final Bdio2StreamUploader bdio2Uploader;
+    private final Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader;
     private final BdioFileContent header;
     private final List<BdioFileContent> bdioEntries;
     private final BlackDuckRequestBuilderEditor editor;
@@ -40,7 +37,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private boolean complete;
 
     public Bdio2UploadJob(
-        Bdio2StreamUploader bdio2Uploader,
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader,
         BdioFileContent header,
         List<BdioFileContent> bdioEntries,
         BlackDuckRequestBuilderEditor editor,
@@ -48,7 +45,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         boolean onlyUploadHeader,
         boolean shouldFinishUpload
     ) {
-        this.bdio2Uploader = bdio2Uploader;
+        this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
         this.header = header;
         this.bdioEntries = bdioEntries;
         this.editor = editor;
@@ -59,34 +56,25 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
 
     @Override
     public void attemptJob() throws IntegrationException {
-        Response headerResponse = bdio2Uploader.start(header, editor);
-        complete = true;
         try {
-            throwIfResponseUnsuccessful(headerResponse);
+            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor);
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
+            complete = true;
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             if (shouldUploadEntries) {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
-                    Response chunkResponse = bdio2Uploader.append(uploadUrl, count, content, editor);
-                    throwIfResponseUnsuccessful(chunkResponse);
+                    Response chunkResponse = bdio2RetryAwareStreamUploader.append(uploadUrl, count, content, editor);
+                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse);
                 }
             }
             if (shouldFinishUpload) {
-                throwIfResponseUnsuccessful(bdio2Uploader.finish(uploadUrl, count, editor));
+                Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
+                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
             }
         } catch (RetriableBdioUploadException e) {
             complete = false;
-        }
-    }
-
-    // If response is unsuccessful, throw a recoverable RetriableBdioUploadException unless we get a failure status code in which case we throw an unrecoverable exception
-    private void throwIfResponseUnsuccessful(Response response) throws IntegrationException, RetriableBdioUploadException {
-        if (!response.isStatusCodeSuccess()) {
-            if (BD_FAILURE_EXIT_CODES.contains(response.getStatusCode())) {
-                throw new IntegrationException(String.format("Bdio upload failed with exit code: %d", response.getStatusCode()));
-            }
-            throw new RetriableBdioUploadException();
         }
     }
 

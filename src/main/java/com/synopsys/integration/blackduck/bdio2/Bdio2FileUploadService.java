@@ -31,18 +31,18 @@ public class Bdio2FileUploadService extends DataService {
     private static final int BD_WAIT_AND_RETRY_INTERVAL = 30;
 
     private final Bdio2ContentExtractor bdio2Extractor;
-    private final Bdio2StreamUploader bdio2Uploader;
+    private final Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader;
 
     public Bdio2FileUploadService(
         BlackDuckApiClient blackDuckApiClient,
         ApiDiscovery apiDiscovery,
         IntLogger logger,
         Bdio2ContentExtractor bdio2Extractor,
-        Bdio2StreamUploader bdio2Uploader
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader
     ) {
         super(blackDuckApiClient, apiDiscovery, logger);
         this.bdio2Extractor = bdio2Extractor;
-        this.bdio2Uploader = bdio2Uploader;
+        this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
     }
 
     public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
@@ -81,7 +81,7 @@ public class Bdio2FileUploadService extends DataService {
         }
 
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
-        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2Uploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
         return jobExecutor.executeJob(bdio2UploadJob);
