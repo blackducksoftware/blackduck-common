@@ -72,8 +72,6 @@ public class Bdio2UploadJobTest {
         Response successResponse = Mockito.mock(Response.class);
         Mockito.when(successResponse.isStatusCodeSuccess()).thenReturn(true);
         Mockito.when(successResponse.getHeaderValue("location")).thenReturn("https://server.blackduck.com/api/endpoint/scanId");
-        //Response failureResponse = Mockito.mock(Response.class);
-        //Mockito.when(failureResponse.isStatusCodeSuccess()).thenReturn(false);
         Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any())).thenReturn(successResponse);
         Mockito.when(bdio2StreamUploader.append(Mockito.any(HttpUrl.class), Mockito.anyInt(), Mockito.any(BdioFileContent.class), Mockito.any(BlackDuckRequestBuilderEditor.class))).thenReturn(successResponse);
         Mockito.when(bdio2StreamUploader.finish(Mockito.any(), Mockito.anyInt(), Mockito.any())).thenThrow(new RetriableBdioUploadException());
