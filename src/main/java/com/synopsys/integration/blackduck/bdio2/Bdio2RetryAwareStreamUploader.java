@@ -25,7 +25,7 @@ public class Bdio2RetryAwareStreamUploader {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Bdio2StreamUploader bdio2StreamUploader;
 
-    public Bdio2RetryAwareStreamUploader(final Bdio2StreamUploader bdio2StreamUploader) {
+    public Bdio2RetryAwareStreamUploader(Bdio2StreamUploader bdio2StreamUploader) {
         this.bdio2StreamUploader = bdio2StreamUploader;
     }
 
