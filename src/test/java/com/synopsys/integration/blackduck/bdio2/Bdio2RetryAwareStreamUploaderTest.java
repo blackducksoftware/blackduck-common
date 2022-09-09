@@ -80,7 +80,6 @@ class Bdio2RetryAwareStreamUploaderTest {
         } catch (RetriableBdioUploadException e) {
             // expected
         }
-
     }
 
     @Test
