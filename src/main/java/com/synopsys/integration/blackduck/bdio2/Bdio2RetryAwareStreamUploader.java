@@ -31,7 +31,7 @@ public class Bdio2RetryAwareStreamUploader {
 
     public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor)
         throws RetriableBdioUploadException, IntegrationException {
-        logger.trace("Executing BDIO upload start operation");
+        logger.trace("Executing BDIO upload start operation; non-retryable status codes: {}", NON_RETRYABLE_EXIT_CODES);
         try {
             return bdio2StreamUploader.start(header, editor);
         } catch (IntegrationRestException e) {
@@ -66,14 +66,18 @@ public class Bdio2RetryAwareStreamUploader {
     public void onErrorThrowRetryableOrFailure(Response response) throws IntegrationException, RetriableBdioUploadException {
         if (!response.isStatusCodeSuccess()) {
             if (isRetryableExitCode(response.getStatusCode())) {
+                logger.trace("Response status code {} is retryable", response.getStatusCode());
                 throw new RetriableBdioUploadException();
             }
+            logger.trace("Response status code {} is not retryable", response.getStatusCode());
             throw new IntegrationException(String.format("Bdio upload failed with non-retryable exit code: %d", response.getStatusCode()));
         }
+        logger.trace("Response status code {} treated as success", response.getStatusCode());
     }
 
     private Response translateRetryableExceptions(final IntegrationRestException e) throws RetriableBdioUploadException, IntegrationRestException {
         if (isRetryableExitCode(e.getHttpStatusCode())) {
+            logger.trace("Response status code {} in caught exception is retryable", e.getHttpStatusCode());
             throw new RetriableBdioUploadException();
         }
         throw e;

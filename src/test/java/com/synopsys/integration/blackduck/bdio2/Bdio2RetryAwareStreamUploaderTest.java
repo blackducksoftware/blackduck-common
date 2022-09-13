@@ -10,6 +10,7 @@ import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilde
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.synopsys.integration.rest.response.Response;
 
 class Bdio2RetryAwareStreamUploaderTest {
 
@@ -67,6 +68,43 @@ class Bdio2RetryAwareStreamUploaderTest {
         }
     }
 
+    @Test
+    void testNoExceptionStatusCodeAnalysisRetryable() throws IntegrationException {
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
+        Response response400 = Mockito.mock(Response.class);
+        Mockito.when(response400.isStatusCodeSuccess()).thenReturn(false);
+        Mockito.when(response400.getStatusCode()).thenReturn(400);
+        try {
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(response400);
+            Assertions.fail("Expected RetriableBdioUploadException");
+        } catch (RetriableBdioUploadException e) {
+            // expected
+        }
+    }
+
+    @Test
+    void testNoExceptionStatusCodeAnalysisSuccess() throws IntegrationException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
+        Response response200 = Mockito.mock(Response.class);
+        Mockito.when(response200.isStatusCodeSuccess()).thenReturn(true);
+        Mockito.when(response200.getStatusCode()).thenReturn(200);
+        bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(response200);
+    }
+
+    @Test
+    void testNoExceptionStatusCodeAnalysisNonRetryable() throws IntegrationException, RetriableBdioUploadException {
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
+        Response response404 = Mockito.mock(Response.class);
+        Mockito.when(response404.isStatusCodeSuccess()).thenReturn(false);
+        Mockito.when(response404.getStatusCode()).thenReturn(404);
+        try {
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(response404);
+            Assertions.fail("Expected IntegrationException");
+        } catch (IntegrationException e) {
+            // expected
+        }
+    }
+
     @NotNull
     private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderThrow404OnStart(BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor)
         throws IntegrationException {
@@ -75,6 +113,13 @@ class Bdio2RetryAwareStreamUploaderTest {
         IntegrationRestException exception404 = Mockito.mock(IntegrationRestException.class);
         Mockito.when(bdio2StreamUploader.start(bdioFileContent, editor)).thenThrow(exception404);
         Mockito.when(exception404.getHttpStatusCode()).thenReturn(404);
+        return bdio2RetryAwareStreamUploader;
+    }
+
+    @NotNull
+    private Bdio2RetryAwareStreamUploader mockBdio2RetryAwareStreamUploaderMinimal() {
+        Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = new Bdio2RetryAwareStreamUploader(bdio2StreamUploader);
         return bdio2RetryAwareStreamUploader;
     }
 
