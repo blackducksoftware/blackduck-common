@@ -10,9 +10,6 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 public class BlackDuckOnlineProperties {
     public static final String ONLINE_CAPABILITY_NEEDED_WARNING = "No snippet functionality, license search, or uploading of source is supported when running a dry run signature scan.";
 
@@ -25,16 +22,11 @@ public class BlackDuckOnlineProperties {
     private final boolean snippetMatchingOnlyFlag;
     private final boolean fullSnippetScanFlag;
 
-    @Nullable
-    private String correlationId;
-
-    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch,
-        @Nullable String correlationId) {
+    public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch) {
         this.snippetMatchingMode = snippetMatchingMode;
         this.uploadSource = uploadSource;
         this.licenseSearch = licenseSearch;
         this.copyrightSearch = copyrightSearch;
-        this.correlationId = correlationId;
 
         snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
         snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
@@ -68,11 +60,6 @@ public class BlackDuckOnlineProperties {
 
         if (uploadSource) {
             cmd.add("--upload-source");
-        }
-
-        if (StringUtils.isNotBlank(correlationId)) {
-            cmd.add("--correlationId");
-            cmd.add(correlationId);
         }
     }
 

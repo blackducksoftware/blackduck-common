@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
@@ -54,11 +55,14 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean debug;
     private final boolean verbose;
     private final boolean isRapid;
+    @Nullable
+    private final String correlationId;
 
     public ScanBatch(File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
         String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
-        List<ScanTarget> scanTargets, boolean isRapid) {
+        List<ScanTarget> scanTargets, boolean isRapid, @Nullable String correlationId
+        ) {
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
@@ -79,6 +83,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.projectVersionName = projectVersionName;
         this.scanTargets = scanTargets;
         this.isRapid = isRapid;
+        this.correlationId = correlationId;
     }
 
     /**
@@ -119,7 +124,7 @@ public class ScanBatch extends Stringable implements Buildable {
         File commandOutputDirectory = scanTarget.determineCommandOutputDirectory(scanPathsUtility, outputDirectory);
         ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
             blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
-            individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid);
+            individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid, correlationId);
         scanCommands.add(scanCommand);
     }
 
@@ -211,4 +216,8 @@ public class ScanBatch extends Stringable implements Buildable {
         return isRapid;
     }
 
+    @Nullable
+    public String getCorrelationId() {
+        return correlationId;
+    }
 }

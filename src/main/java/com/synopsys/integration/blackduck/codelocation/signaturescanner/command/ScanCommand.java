@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -46,10 +47,13 @@ public class ScanCommand {
     private final boolean debug;
     private final boolean verbose;
     private final boolean isRapid;
+    @Nullable
+    private final String correlationId;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
-        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid) {
+        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
+        @Nullable String correlationId) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -74,6 +78,7 @@ public class ScanCommand {
         this.projectName = projectName;
         this.versionName = versionName;
         this.isRapid = isRapid;
+        this.correlationId = correlationId;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -130,6 +135,11 @@ public class ScanCommand {
 
         if (isRapid) {
             cmd.add("--no-persistence");
+        }
+
+        if (StringUtils.isNotBlank(correlationId)) {
+            cmd.add("--correlationId");
+            cmd.add(correlationId);
         }
 
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();

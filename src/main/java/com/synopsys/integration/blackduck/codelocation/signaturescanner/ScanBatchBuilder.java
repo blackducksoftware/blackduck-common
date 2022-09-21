@@ -63,10 +63,10 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch, correlationId);
+        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
         return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
-            projectName, projectVersionName, scanTargets, isRapid);
+            projectName, projectVersionName, scanTargets, isRapid, correlationId);
     }
 
     @Override
