@@ -57,6 +57,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private String projectName;
     private String projectVersionName;
 
+    private boolean isRapid;
+
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
     @Override
@@ -64,7 +66,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch, correlationId);
         return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
-            projectName, projectVersionName, scanTargets);
+            projectName, projectVersionName, scanTargets, isRapid);
     }
 
     @Override
@@ -338,6 +340,14 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     public List<ScanTarget> getScanTargets() {
         return scanTargets;
+    }
+
+    public boolean isRapid() {
+        return isRapid;
+    }
+    public ScanBatchBuilder rapid(boolean isRapid) {
+        this.isRapid = isRapid;
+        return this;
     }
 
     public ScanBatchBuilder simpleScanTargets(List<ScanTarget> scanTargets) {
