@@ -177,14 +177,14 @@ public class ScanCommandTest {
     public void testIsRapidSignatureScan() throws IntegrationException {
     	scanBatchBuilder.rapid(true);
     	List<String> commandList = createCommandList();
-    	assertEquals(true, commandList.contains("--no-persistence"));
+    	assertTrue(commandList.contains("--no-persistence"));
     }
     
     @Test
     public void testIsNotRapidSignatureScan() throws IntegrationException {
     	scanBatchBuilder.rapid(false);
     	List<String> commandList = createCommandList();
-    	assertEquals(false, commandList.contains("--no-persistence"));
+    	assertFalse(commandList.contains("--no-persistence"));
     }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
