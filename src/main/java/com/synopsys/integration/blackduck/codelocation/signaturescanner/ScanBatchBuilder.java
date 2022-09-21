@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
@@ -43,6 +44,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean licenseSearch;
     private boolean copyrightSearch;
     private IndividualFileMatching individualFileMatching;
+    @Nullable
+    private String correlationId;
 
     private HttpUrl blackDuckUrl;
     private String blackDuckUsername;
@@ -58,7 +61,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     @Override
     protected ScanBatch buildWithoutValidation() {
-        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
+        BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch, correlationId);
         return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
             projectName, projectVersionName, scanTargets);
@@ -340,6 +343,16 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public ScanBatchBuilder simpleScanTargets(List<ScanTarget> scanTargets) {
         this.scanTargets = scanTargets;
         return this;
+    }
+
+    public ScanBatchBuilder correlationId(String correlationId) {
+        this.correlationId = correlationId;
+        return this;
+    }
+
+    @Nullable
+    public String getCorrelationId() {
+        return correlationId;
     }
 
 }
