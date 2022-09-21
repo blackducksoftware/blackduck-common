@@ -45,10 +45,11 @@ public class ScanCommand {
     private final IndividualFileMatching individualFileMatching;
     private final boolean debug;
     private final boolean verbose;
+    private final boolean isRapid;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
-        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName) {
+        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -72,6 +73,7 @@ public class ScanCommand {
         this.debug = debug;
         this.projectName = projectName;
         this.versionName = versionName;
+        this.isRapid = isRapid;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -124,6 +126,10 @@ public class ScanCommand {
 
         if (null != individualFileMatching) {
             cmd.add("--individualFileMatching=" + individualFileMatching);
+        }
+
+        if (isRapid) {
+            cmd.add("--no-persistence");
         }
 
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
@@ -344,6 +350,10 @@ public class ScanCommand {
 
     public String getVersionName() {
         return versionName;
+    }
+
+    public boolean isRapid() {
+        return isRapid;
     }
 
 }

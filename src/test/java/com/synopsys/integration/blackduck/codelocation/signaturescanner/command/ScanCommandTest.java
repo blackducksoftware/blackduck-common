@@ -172,6 +172,20 @@ public class ScanCommandTest {
         List<String> commandList = createCommandList();
         assertIndividualFileMatching(commandList, IndividualFileMatching.BINARY);
     }
+    
+    @Test
+    public void testIsRapidSignatureScan() throws IntegrationException {
+    	scanBatchBuilder.rapid(true);
+    	List<String> commandList = createCommandList();
+    	assertTrue(commandList.contains("--no-persistence"));
+    }
+    
+    @Test
+    public void testIsNotRapidSignatureScan() throws IntegrationException {
+    	scanBatchBuilder.rapid(false);
+    	List<String> commandList = createCommandList();
+    	assertFalse(commandList.contains("--no-persistence"));
+    }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
