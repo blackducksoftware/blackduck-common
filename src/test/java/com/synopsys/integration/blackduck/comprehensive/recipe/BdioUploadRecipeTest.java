@@ -32,6 +32,8 @@ import com.synopsys.integration.rest.RestConstants;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
+import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -134,7 +136,8 @@ public class BdioUploadRecipeTest extends BasicRecipe {
         if (optionalCodeLocationView.isPresent()) {
             deleteCodeLocation(codeLocationName);
         }
-        ResilientJobConfig waitJobConfig = new ResilientJobConfig(logger, 30, ResilientJobConfig.CURRENT_TIME_SUPPLIER, 5);
+        WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(30, 5);
+        ResilientJobConfig waitJobConfig = new ResilientJobConfig(logger, ResilientJobConfig.CURRENT_TIME_SUPPLIER, waitIntervalTracker);
         WaitJob.waitFor(waitJobConfig, () -> !codeLocationService.getCodeLocationByName(codeLocationName).isPresent(), "code location not found");
     }
 

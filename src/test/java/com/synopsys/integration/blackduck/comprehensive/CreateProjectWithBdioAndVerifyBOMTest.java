@@ -45,6 +45,8 @@ import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.WaitJob;
 import com.synopsys.integration.wait.WaitJobCondition;
+import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
+import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -72,7 +74,8 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     private final BlackDuckServices blackDuckServices = new BlackDuckServices(intHttpClientTestHelper);
     private final UserView currentUser = blackDuckServices.userService.findCurrentUser();
     private final IntLogger waitLogger = new PrintStreamIntLogger(System.out, LogLevel.DEBUG);
-    private final ResilientJobConfig jobbyConfig = new ResilientJobConfig(waitLogger, TEN_MINUTES, ResilientJobConfig.CURRENT_TIME_SUPPLIER, THIRTY_SECONDS);
+    WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(TEN_MINUTES, THIRTY_SECONDS);
+    private final ResilientJobConfig jobbyConfig = new ResilientJobConfig(waitLogger, ResilientJobConfig.CURRENT_TIME_SUPPLIER, waitIntervalTracker);
     private final Predicate<CodeLocationView> shouldDeleteCodeLocation = (codeLocationView -> CODE_LOCATION_NAMES.contains(codeLocationView.getName()));
 
     public CreateProjectWithBdioAndVerifyBOMTest() throws IntegrationException {

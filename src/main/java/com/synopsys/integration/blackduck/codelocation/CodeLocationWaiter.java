@@ -21,6 +21,8 @@ import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;
 import com.synopsys.integration.wait.WaitJob;
+import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
+import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;
@@ -42,7 +44,8 @@ public class CodeLocationWaiter {
         codeLocationNames.forEach(codeLocation -> logger.debug(String.format("  Code Location -> %s", codeLocation)));
         logger.debug("");
 
-        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeoutInSeconds, notificationTaskRange.getTaskStartTime(), waitIntervalInSeconds);
+        WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeoutInSeconds, waitIntervalInSeconds);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, notificationTaskRange.getTaskStartTime(), waitIntervalTracker);
 
 
         CodeLocationWaitJob codeLocationWaitJob = new CodeLocationWaitJob(logger, projectService, notificationService, userView, notificationTaskRange, projectAndVersion, codeLocationNames,
