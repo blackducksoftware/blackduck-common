@@ -25,6 +25,8 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;
+import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
+import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
@@ -80,7 +82,8 @@ public class Bdio2FileUploadService extends DataService {
                 .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
         }
 
-        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeout, System.currentTimeMillis(), BD_WAIT_AND_RETRY_INTERVAL);
+        WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
         Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 

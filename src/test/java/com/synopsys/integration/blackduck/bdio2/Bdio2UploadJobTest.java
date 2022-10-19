@@ -21,6 +21,8 @@ import com.synopsys.integration.rest.response.DefaultResponse;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.wait.ResilientJobConfig;
 import com.synopsys.integration.wait.ResilientJobExecutor;
+import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
+import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 public class Bdio2UploadJobTest {
     private final IntLogger logger = new Slf4jIntLogger(LoggerFactory.getLogger(this.getClass()));
@@ -80,7 +82,8 @@ public class Bdio2UploadJobTest {
 
 
     private ResilientJobExecutor getJobExecutor() {
-        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, timeout, System.currentTimeMillis(), waitInterval);
+        WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, waitInterval);
+        ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
         return new ResilientJobExecutor(jobConfig);
     }
 
