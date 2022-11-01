@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ReducedPersistence;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
@@ -54,11 +55,12 @@ public class ScanBatch extends Stringable implements Buildable {
     private final boolean debug;
     private final boolean verbose;
     private final boolean isRapid;
+    private final ReducedPersistence reducedPersistence;
 
     public ScanBatch(File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
         String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
-        List<ScanTarget> scanTargets, boolean isRapid) {
+        List<ScanTarget> scanTargets, boolean isRapid, ReducedPersistence reducedPersistence) {
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
@@ -79,6 +81,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.projectVersionName = projectVersionName;
         this.scanTargets = scanTargets;
         this.isRapid = isRapid;
+        this.reducedPersistence = reducedPersistence;
     }
 
     /**
@@ -119,7 +122,7 @@ public class ScanBatch extends Stringable implements Buildable {
         File commandOutputDirectory = scanTarget.determineCommandOutputDirectory(scanPathsUtility, outputDirectory);
         ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
             blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
-            individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid);
+            individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid, reducedPersistence);
         scanCommands.add(scanCommand);
     }
 
@@ -209,6 +212,10 @@ public class ScanBatch extends Stringable implements Buildable {
 
     public boolean isRapid() {
         return isRapid;
+    }
+    
+    public ReducedPersistence getReducedPersistence() {
+        return reducedPersistence;
     }
 
 }
