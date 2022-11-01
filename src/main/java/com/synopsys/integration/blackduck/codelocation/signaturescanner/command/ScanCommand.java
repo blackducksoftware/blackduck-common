@@ -47,12 +47,14 @@ public class ScanCommand {
     private final boolean debug;
     private final boolean verbose;
     private final boolean isRapid;
+    private final ReducedPersistence reducedPersistence;
     @Nullable
     private final String correlationId;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
+        ReducedPersistence reducedPersistence,
         @Nullable String correlationId) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
@@ -78,6 +80,7 @@ public class ScanCommand {
         this.projectName = projectName;
         this.versionName = versionName;
         this.isRapid = isRapid;
+        this.reducedPersistence = reducedPersistence;
         this.correlationId = correlationId;
     }
 
@@ -137,6 +140,8 @@ public class ScanCommand {
             cmd.add("--no-persistence");
         }
 
+        populateReducedPersistence(cmd);
+
         if (StringUtils.isNotBlank(correlationId)) {
             cmd.add("--correlationId");
             cmd.add(correlationId);
@@ -146,6 +151,17 @@ public class ScanCommand {
         populateAdditionalScanArguments(cmd, parser);
 
         return cmd;
+    }
+
+    private void populateReducedPersistence(List<String> cmd) {
+        if (reducedPersistence != null) {
+            if (reducedPersistence.equals(ReducedPersistence.DISCARD_UNMATCHED)) {
+                cmd.add("--discard-unmatched-files");
+            }
+            if (reducedPersistence.equals(ReducedPersistence.RETAIN_UNMATCHED)) {
+                cmd.add("--retain-unmatched-files");
+            }
+        }
     }
 
     private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
@@ -364,6 +380,10 @@ public class ScanCommand {
 
     public boolean isRapid() {
         return isRapid;
+    }
+    
+    public ReducedPersistence getReducedPersistence() {
+        return reducedPersistence;
     }
 
 }

@@ -186,6 +186,20 @@ public class ScanCommandTest {
     	List<String> commandList = createCommandList();
     	assertFalse(commandList.contains("--no-persistence"));
     }
+    
+    @Test
+    public void testRetainUnmatchedFiles() throws IntegrationException {
+    	scanBatchBuilder.reducedPersistence(ReducedPersistence.RETAIN_UNMATCHED);
+    	List<String> commandList = createCommandList();
+    	assertTrue(commandList.contains("--retain-unmatched-files"));
+    }
+    
+    @Test
+    public void testDiscardUnmatchedFiles() throws IntegrationException {
+    	scanBatchBuilder.reducedPersistence(ReducedPersistence.DISCARD_UNMATCHED);
+    	List<String> commandList = createCommandList();
+    	assertTrue(commandList.contains("--discard-unmatched-files"));
+    }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
