@@ -142,16 +142,16 @@ public class ScanCommand {
         return cmd;
     }
 
-	private void populateReducedPersistence(List<String> cmd) {
-		if (reducedPersistence != null) {
-        	if (reducedPersistence.equals(ReducedPersistence.DISCARD_UNMATCHED)) {
-        		cmd.add("--discard-unmatched-files");
-        	}
-        	if (reducedPersistence.equals(ReducedPersistence.RETAIN_UNMATCHED)) {
-        		cmd.add("--retain-unmatched-files");
-        	}
+    private void populateReducedPersistence(List<String> cmd) {
+        if (reducedPersistence != null) {
+            if (reducedPersistence.equals(ReducedPersistence.DISCARD_UNMATCHED)) {
+                cmd.add("--discard-unmatched-files");
+            }
+            if (reducedPersistence.equals(ReducedPersistence.RETAIN_UNMATCHED)) {
+                cmd.add("--retain-unmatched-files");
+            }
         }
-	}
+    }
 
     private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
         List<String> arguments = parser.parse(additionalScanArguments);
