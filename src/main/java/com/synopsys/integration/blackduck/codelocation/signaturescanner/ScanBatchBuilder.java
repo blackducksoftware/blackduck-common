@@ -45,8 +45,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private boolean licenseSearch;
     private boolean copyrightSearch;
     private IndividualFileMatching individualFileMatching;
-    @Nullable
-    private String correlationId;
 
     private HttpUrl blackDuckUrl;
     private String blackDuckUsername;
@@ -60,6 +58,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     private boolean isRapid;
     private ReducedPersistence reducedPersistence;
+    @Nullable
+    private String correlationId;
 
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
@@ -357,6 +357,15 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
+    public ScanBatchBuilder reducedPersistence(ReducedPersistence reducedPersistence) {
+        this.reducedPersistence = reducedPersistence;
+        return this;
+    }
+
+    public ReducedPersistence getReducedPersistence() {
+        return reducedPersistence;
+    }
+
     public ScanBatchBuilder correlationId(String correlationId) {
         this.correlationId = correlationId;
         return this;
@@ -365,15 +374,6 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     @Nullable
     public String getCorrelationId() {
         return correlationId;
-    }
-
-    public ScanBatchBuilder reducedPersistence(ReducedPersistence reducedPersistence) {
-        this.reducedPersistence = reducedPersistence;
-        return this;
-    }
-
-    public ReducedPersistence getReducedPersistence() {
-        return reducedPersistence;
     }
 
 }
