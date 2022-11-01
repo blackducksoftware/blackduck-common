@@ -368,10 +368,10 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     }
 
     public ScanBatchBuilder reducedPersistence(ReducedPersistence reducedPersistence) {
-        this.reducedPersistence = reducedPersistence;		
-	return this;
+        this.reducedPersistence = reducedPersistence;
+        return this;
     }
-	
+
     public ReducedPersistence getReducedPersistence() {
         return reducedPersistence;
     }
