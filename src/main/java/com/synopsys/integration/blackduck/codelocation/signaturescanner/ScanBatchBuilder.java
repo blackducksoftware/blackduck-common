@@ -367,9 +367,9 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return correlationId;
     }
 
-    // TODO I believe this should return this
-    public void reducedPersistence(ReducedPersistence reducedPersistence) {
+    public ScanBatchBuilder reducedPersistence(ReducedPersistence reducedPersistence) {
         this.reducedPersistence = reducedPersistence;		
+	return this;
     }
 	
     public ReducedPersistence getReducedPersistence() {
