@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
@@ -57,6 +58,8 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
 
     private boolean isRapid;
     private ReducedPersistence reducedPersistence;
+    @Nullable
+    private String correlationId;
 
     private List<ScanTarget> scanTargets = new ArrayList<>();
 
@@ -65,7 +68,7 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
         return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
-            projectName, projectVersionName, scanTargets, isRapid, reducedPersistence);
+            projectName, projectVersionName, scanTargets, isRapid, reducedPersistence, correlationId);
     }
 
     @Override
@@ -354,12 +357,23 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
         return this;
     }
 
-	public void reducedPersistence(ReducedPersistence reducedPersistence) {
-		this.reducedPersistence = reducedPersistence;		
-	}
-	
+    public ScanBatchBuilder reducedPersistence(ReducedPersistence reducedPersistence) {
+        this.reducedPersistence = reducedPersistence;
+        return this;
+    }
+
     public ReducedPersistence getReducedPersistence() {
         return reducedPersistence;
+    }
+
+    public ScanBatchBuilder correlationId(String correlationId) {
+        this.correlationId = correlationId;
+        return this;
+    }
+
+    @Nullable
+    public String getCorrelationId() {
+        return correlationId;
     }
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
@@ -47,10 +48,14 @@ public class ScanCommand {
     private final boolean verbose;
     private final boolean isRapid;
     private final ReducedPersistence reducedPersistence;
+    @Nullable
+    private final String correlationId;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
-        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid, ReducedPersistence reducedPersistence) {
+        String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
+        ReducedPersistence reducedPersistence,
+        @Nullable String correlationId) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -76,6 +81,7 @@ public class ScanCommand {
         this.versionName = versionName;
         this.isRapid = isRapid;
         this.reducedPersistence = reducedPersistence;
+        this.correlationId = correlationId;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -135,7 +141,12 @@ public class ScanCommand {
         }
 
         populateReducedPersistence(cmd);
-        
+
+        if (StringUtils.isNotBlank(correlationId)) {
+            cmd.add("--correlationId");
+            cmd.add(correlationId);
+        }
+
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
         populateAdditionalScanArguments(cmd, parser);
 
