@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import org.jetbrains.annotations.Nullable;
 
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
+import com.synopsys.integration.blackduck.bdio2.Bdio2UploadResult;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadOutput;
 import com.synopsys.integration.blackduck.codelocation.upload.UploadTarget;
 import com.synopsys.integration.util.NameVersion;
@@ -33,8 +34,8 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
         NameVersion projectAndVersion = uploadTarget.getProjectAndVersion().orElse(null);
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
-            bdio2FileUploadService.uploadFile(uploadTarget, timeout);
-            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, null);
+            Bdio2UploadResult result = bdio2FileUploadService.uploadFile(uploadTarget, timeout);
+            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, null, result.getScanId());
         } catch (Exception ex) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), ex.getMessage());
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, errorMessage, ex);

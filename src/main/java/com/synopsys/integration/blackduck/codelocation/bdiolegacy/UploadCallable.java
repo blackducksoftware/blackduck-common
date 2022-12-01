@@ -60,7 +60,7 @@ public class UploadCallable implements Callable<UploadOutput> {
 
             try (Response response = blackDuckApiClient.execute(request)) {
                 String responseString = response.getContentString();
-                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
+                return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString, null);
             } catch (IOException e) {
                 return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
             }

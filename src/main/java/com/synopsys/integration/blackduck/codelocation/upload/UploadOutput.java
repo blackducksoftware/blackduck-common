@@ -17,26 +17,32 @@ import com.synopsys.integration.util.NameVersion;
 
 public class UploadOutput extends CodeLocationOutput {
     private final String response;
+    private final String scanId;
 
-    private UploadOutput(@Nullable NameVersion projectAndVersion, String codeLocationName, Result result, String response, String errorMessage, Exception exception) {
+    private UploadOutput(@Nullable NameVersion projectAndVersion, String codeLocationName, Result result, String response, String errorMessage, Exception exception, String scanId) {
         super(result, projectAndVersion, codeLocationName, 1, errorMessage, exception);
         this.response = response;
+        this.scanId = scanId;
     }
 
-    public static UploadOutput SUCCESS(@Nullable NameVersion projectAndVersion, String codeLocationName, String response) {
-        return new UploadOutput(projectAndVersion, codeLocationName, Result.SUCCESS, response, null, null);
+    public static UploadOutput SUCCESS(@Nullable NameVersion projectAndVersion, String codeLocationName, String response, String scanId) {
+        return new UploadOutput(projectAndVersion, codeLocationName, Result.SUCCESS, response, null, null, scanId);
     }
 
     public static UploadOutput FAILURE(@Nullable NameVersion projectAndVersion, String codeLocationName, String errorMessage, Exception exception) {
-        return new UploadOutput(projectAndVersion, codeLocationName, Result.FAILURE, null, errorMessage, exception);
+        return new UploadOutput(projectAndVersion, codeLocationName, Result.FAILURE, null, errorMessage, exception, null);
     }
 
     public static UploadOutput FAILURE(@Nullable NameVersion projectAndVersion, String codeLocationName, String response, String errorMessage, Exception exception) {
-        return new UploadOutput(projectAndVersion, codeLocationName, Result.FAILURE, response, errorMessage, exception);
+        return new UploadOutput(projectAndVersion, codeLocationName, Result.FAILURE, response, errorMessage, exception, null);
     }
 
     public Optional<String> getResponse() {
         return Optional.ofNullable(response);
     }
+
+	public String getScanId() {
+		return scanId;
+	}
 
 }
