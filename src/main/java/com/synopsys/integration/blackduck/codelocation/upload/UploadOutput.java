@@ -24,6 +24,10 @@ public class UploadOutput extends CodeLocationOutput {
         this.response = response;
         this.scanId = scanId;
     }
+    
+    public static UploadOutput SUCCESS(@Nullable NameVersion projectAndVersion, String codeLocationName, String response) {
+        return new UploadOutput(projectAndVersion, codeLocationName, Result.SUCCESS, response, null, null, null);
+    }
 
     public static UploadOutput SUCCESS(@Nullable NameVersion projectAndVersion, String codeLocationName, String response, String scanId) {
         return new UploadOutput(projectAndVersion, codeLocationName, Result.SUCCESS, response, null, null, scanId);
@@ -41,8 +45,8 @@ public class UploadOutput extends CodeLocationOutput {
         return Optional.ofNullable(response);
     }
 
-	public String getScanId() {
-		return scanId;
+	public Optional<String> getScanId() {
+		return Optional.ofNullable(scanId);
 	}
 
 }

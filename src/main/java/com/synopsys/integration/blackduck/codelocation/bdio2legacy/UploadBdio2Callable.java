@@ -62,7 +62,7 @@ public class UploadBdio2Callable implements Callable<UploadOutput> {
     private UploadOutput executeRequest(BlackDuckResponseRequest request) throws IOException {
         try (Response response = blackDuckApiClient.execute(request)) {
             String responseString = response.getContentString();
-            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString, null);
+            return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, responseString);
         } catch (IntegrationException e) {
             return UploadOutput.FAILURE(projectAndVersion, codeLocationName, e.getMessage(), e);
         }
