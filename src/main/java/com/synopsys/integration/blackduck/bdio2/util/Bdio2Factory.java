@@ -179,7 +179,13 @@ public class Bdio2Factory {
                 }
             } else {
                 Component component = componentFromDependency(dependency);
-                linkComponentDependency.dependency(new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component));
+                com.blackducksoftware.bdio2.model.Dependency dependencyEntry = new com.blackducksoftware.bdio2.model.Dependency().dependsOn(component);
+
+                if (dependency.getScope() != null) {
+                    dependencyEntry = dependencyEntry.scope(dependency.getScope());
+                }
+
+                linkComponentDependency.dependency(dependencyEntry);
 
                 if (!existingComponents.containsKey(dependency.getExternalId())) {
                     addedComponents.add(component);

@@ -44,7 +44,7 @@ class Bdio2FactoryTest {
         DependencyGraph dependencyGraph = Mockito.mock(DependencyGraph.class);
         Set<Dependency> dependencies = new HashSet<>();
         ProjectDependency subProjectDependency = new ProjectDependency(subProjectName, subProjectVersion, subProjectExternalId);
-        Dependency componentDependency = new Dependency(componentExternalId);
+        Dependency componentDependency = new Dependency(componentExternalId, null);
         dependencies.add(subProjectDependency);
         dependencies.add(componentDependency);
         Mockito.when(dependencyGraph.getDirectDependencies()).thenReturn(dependencies);
