@@ -81,7 +81,7 @@ public class BlackDuckApiClientTestIT {
         BlackDuckSingleRequest<ProjectView> requestSingle = new BlackDuckSingleRequest<>(blackDuckRequestBuilder, projectViewUrlSingleResponse, new PagingDefaultsEditor(), new AcceptHeaderEditor(blackDuckMediaTypeDiscoveryVerifier));
         ProjectView retrievedById = blackDuckApiClient.getResponse(requestSingle);
         assertEquals(null, blackDuckMediaTypeDiscoveryVerifier.originalMediaType);
-        assertEquals("application/vnd.blackducksoftware.project-detail-4+json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
+        assertEquals("application/vnd.blackducksoftware.project-detail-5+json", blackDuckMediaTypeDiscoveryVerifier.discoveredMediaType);
     }
 
     private class BlackDuckMediaTypeDiscoveryVerifier extends BlackDuckMediaTypeDiscovery {
