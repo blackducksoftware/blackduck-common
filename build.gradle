@@ -23,9 +23,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2023.1.0.1-SNAPSHOT'
+    api 'com.synopsys.integration:blackduck-common-api:2023.4.0.1-SNAPSHOT'
     api 'com.synopsys.integration:phone-home-client:5.1.10-SNAPSHOT'
-
     api 'com.synopsys.integration:integration-bdio:26.0.9-SNAPSHOT'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
 
