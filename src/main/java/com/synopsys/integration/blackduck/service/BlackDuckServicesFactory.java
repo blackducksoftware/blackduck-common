@@ -8,6 +8,7 @@
 package com.synopsys.integration.blackduck.service;
 
 import java.io.File;
+import java.time.OffsetDateTime;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.synopsys.integration.blackduck.bdio2.Bdio2RetryAwareStreamUploader;
@@ -37,6 +39,7 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransformer;
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
+import com.synopsys.integration.blackduck.http.transform.adapters.OffsetDateTimeTypeAdapter;
 import com.synopsys.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckScanReadinessService;
@@ -92,7 +95,8 @@ public class BlackDuckServicesFactory {
     public static GsonBuilder createDefaultGsonBuilder() {
         return new GsonBuilder()
             .setLenient()
-            .setDateFormat(RestConstants.JSON_DATE_FORMAT);
+            .setDateFormat(RestConstants.JSON_DATE_FORMAT)
+            .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter());
     }
 
     public BlackDuckServicesFactory(IntEnvironmentVariables intEnvironmentVariables, ExecutorService executorService, IntLogger logger, BlackDuckHttpClient blackDuckHttpClient) {
