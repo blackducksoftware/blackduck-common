@@ -7,6 +7,8 @@
  */
 package com.synopsys.integration.blackduck.bdio2;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,11 +78,17 @@ public class Bdio2FileUploadService extends DataService {
         logger.debug("BDIO upload file count = " + count);
 
         BlackDuckRequestBuilderEditor editor = noOp -> {};
-        if (nameVersion != null) {
-            editor = builder -> builder
-                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
-                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
-        }
+//        if (nameVersion != null) {
+//            editor = (builder -> {
+//            	// TODO can't send non-ascii characters. Have to encode and have client and server agree on
+//            	// encoding. I think BD was moving away from these HTTP headers. Maybe we can just get things from
+//            	// the BDIO header file?
+//            	
+//            	builder
+//                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
+//                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
+//            });
+//        }
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
