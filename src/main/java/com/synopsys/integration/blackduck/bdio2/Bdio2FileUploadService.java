@@ -76,11 +76,6 @@ public class Bdio2FileUploadService extends DataService {
         logger.debug("BDIO upload file count = " + count);
 
         BlackDuckRequestBuilderEditor editor = noOp -> {};
-        if (nameVersion != null) {
-            editor = builder -> builder
-                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
-                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
-        }
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
