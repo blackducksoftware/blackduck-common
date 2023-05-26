@@ -25,6 +25,7 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransf
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.synopsys.integration.blackduck.version.BlackDuckVersion;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
@@ -39,13 +40,15 @@ public class BlackDuckApiClient {
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
+    private BlackDuckVersion blackDuckVersion;
 
-    public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
+	public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
+        this.blackDuckVersion = null;
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(UrlMultipleResponses<T> urlMultipleResponses) throws IntegrationException {
@@ -165,6 +168,14 @@ public class BlackDuckApiClient {
             throw new IntegrationException(e.getMessage(), e);
         }
     }
+    
+    public BlackDuckVersion getBlackDuckVersion() {
+		return blackDuckVersion;
+	}
+    
+	public void setBlackDuckVersion(BlackDuckVersion blackDuckVersion) {
+		this.blackDuckVersion = blackDuckVersion;
+	}
 
     private BlackDuckRequestBuilder createCommonGetRequestBuilder(HttpUrl url) {
         return new BlackDuckRequestBuilder().url(url);
