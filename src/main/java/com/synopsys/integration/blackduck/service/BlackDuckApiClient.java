@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
@@ -42,7 +43,7 @@ public class BlackDuckApiClient {
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private BlackDuckVersion blackDuckVersion;
 
-	public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
+    public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
@@ -169,13 +170,13 @@ public class BlackDuckApiClient {
         }
     }
     
-    public BlackDuckVersion getBlackDuckVersion() {
-		return blackDuckVersion;
-	}
+    public Optional<BlackDuckVersion> getBlackDuckVersion() {
+        return Optional.ofNullable(blackDuckVersion);
+    }
     
-	public void setBlackDuckVersion(BlackDuckVersion blackDuckVersion) {
-		this.blackDuckVersion = blackDuckVersion;
-	}
+    public void setBlackDuckVersion(BlackDuckVersion blackDuckVersion) {
+        this.blackDuckVersion = blackDuckVersion;
+    }
 
     private BlackDuckRequestBuilder createCommonGetRequestBuilder(HttpUrl url) {
         return new BlackDuckRequestBuilder().url(url);

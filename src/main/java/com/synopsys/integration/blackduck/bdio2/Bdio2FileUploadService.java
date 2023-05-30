@@ -95,8 +95,8 @@ public class Bdio2FileUploadService extends DataService {
     // project names and version names and do not need the REST headers which can have issues
     // with non-ASCII characters.
 	private boolean useOnlyBdioHeaders() {
-		if (blackDuckApiClient.getBlackDuckVersion() != null) {
-			BlackDuckVersion currentBlackDuckVersion = blackDuckApiClient.getBlackDuckVersion();
+		if (blackDuckApiClient.getBlackDuckVersion().isPresent()) {
+			BlackDuckVersion currentBlackDuckVersion = blackDuckApiClient.getBlackDuckVersion().get();
 			BlackDuckVersion requiresBdioHeadersVersion = new BlackDuckVersion(2023, 4, 1);
 			
 			return currentBlackDuckVersion.isAtLeast(requiresBdioHeadersVersion);
