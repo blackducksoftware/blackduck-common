@@ -20,6 +20,7 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.synopsys.integration.blackduck.version.BlackDuckVersion;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.NameVersion;
@@ -76,6 +77,11 @@ public class Bdio2FileUploadService extends DataService {
         logger.debug("BDIO upload file count = " + count);
 
         BlackDuckRequestBuilderEditor editor = noOp -> {};
+        if (nameVersion != null && !useOnlyBdioHeaders()) {
+            editor = builder -> builder
+                .addHeader(Bdio2StreamUploader.PROJECT_NAME_HEADER, nameVersion.getName())
+                .addHeader(Bdio2StreamUploader.VERSION_NAME_HEADER, nameVersion.getVersion());
+        }
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
@@ -84,5 +90,19 @@ public class Bdio2FileUploadService extends DataService {
 
         return jobExecutor.executeJob(bdio2UploadJob);
     }
+
+    // BlackDuck servers 2023.4.1 and later can use only BDIO header information for 
+    // project names and version names and do not need the REST headers which can have issues
+    // with non-ASCII characters.
+	private boolean useOnlyBdioHeaders() {
+		if (blackDuckApiClient.getBlackDuckVersion().isPresent()) {
+			BlackDuckVersion currentBlackDuckVersion = blackDuckApiClient.getBlackDuckVersion().get();
+			BlackDuckVersion requiresBdioHeadersVersion = new BlackDuckVersion(2023, 4, 1);
+			
+			return currentBlackDuckVersion.isAtLeast(requiresBdioHeadersVersion);
+		}
+        	
+		return false;
+	}
 
 }

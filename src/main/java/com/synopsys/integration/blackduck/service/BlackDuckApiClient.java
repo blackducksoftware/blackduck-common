@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
@@ -25,6 +26,7 @@ import com.synopsys.integration.blackduck.http.transform.BlackDuckResponseTransf
 import com.synopsys.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.synopsys.integration.blackduck.version.BlackDuckVersion;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpMethod;
 import com.synopsys.integration.rest.HttpUrl;
@@ -39,6 +41,7 @@ public class BlackDuckApiClient {
     private final BlackDuckJsonTransformer blackDuckJsonTransformer;
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
+    private BlackDuckVersion blackDuckVersion;
 
     public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
@@ -46,6 +49,7 @@ public class BlackDuckApiClient {
         this.blackDuckJsonTransformer = blackDuckJsonTransformer;
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
+        this.blackDuckVersion = null;
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(UrlMultipleResponses<T> urlMultipleResponses) throws IntegrationException {
@@ -164,6 +168,14 @@ public class BlackDuckApiClient {
         } catch (IOException e) {
             throw new IntegrationException(e.getMessage(), e);
         }
+    }
+    
+    public Optional<BlackDuckVersion> getBlackDuckVersion() {
+        return Optional.ofNullable(blackDuckVersion);
+    }
+    
+    public void setBlackDuckVersion(BlackDuckVersion blackDuckVersion) {
+        this.blackDuckVersion = blackDuckVersion;
     }
 
     private BlackDuckRequestBuilder createCommonGetRequestBuilder(HttpUrl url) {
