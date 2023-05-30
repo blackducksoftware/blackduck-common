@@ -25,6 +25,14 @@ public class BlackDuckVersion extends Stringable {
         return patch;
     }
 
+	/**
+	 * Compares this version of BlackDuck with the one in the other parameter.
+	 * 
+	 * @param other the BlackDuck version to compare to this one.
+	 * @return returns true if the other BlackDuck version is equal to (has the same
+	 *         major, minor, and patch) or later (is a greater version according to
+	 *         SemVer). Returns false otherwise.
+	 */
     public boolean isAtLeast(BlackDuckVersion other) {
         if (major > other.getMajor()) {
             return true;
