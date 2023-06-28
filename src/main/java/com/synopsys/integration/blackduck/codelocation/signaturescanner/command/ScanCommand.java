@@ -50,12 +50,13 @@ public class ScanCommand {
     private final ReducedPersistence reducedPersistence;
     @Nullable
     private final String correlationId;
+    private final String bomCompareMode;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
         ReducedPersistence reducedPersistence,
-        @Nullable String correlationId) {
+        @Nullable String correlationId, String bomCompareMode) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -82,6 +83,7 @@ public class ScanCommand {
         this.isRapid = isRapid;
         this.reducedPersistence = reducedPersistence;
         this.correlationId = correlationId;
+        this.bomCompareMode = bomCompareMode;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -138,6 +140,10 @@ public class ScanCommand {
 
         if (isRapid) {
             cmd.add("--no-persistence");
+            
+            // --no-persistence-mode should never be used without --no-persistence so
+            // only set it in this block.
+            cmd.add("--no-persistence-mode=" + bomCompareMode);
         }
 
         populateReducedPersistence(cmd);

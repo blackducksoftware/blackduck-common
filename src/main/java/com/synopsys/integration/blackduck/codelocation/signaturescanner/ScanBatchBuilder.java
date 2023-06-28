@@ -62,13 +62,15 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     private String correlationId;
 
     private List<ScanTarget> scanTargets = new ArrayList<>();
+    
+    private String bomCompareMode;
 
     @Override
     protected ScanBatch buildWithoutValidation() {
         BlackDuckOnlineProperties blackDuckOnlineProperties = new BlackDuckOnlineProperties(snippetMatching, uploadSource, licenseSearch, copyrightSearch);
         return new ScanBatch(outputDirectory, cleanupOutput, scanMemoryInMegabytes, dryRun, debug, verbose, scanCliOpts, additionalScanArguments,
             blackDuckOnlineProperties, individualFileMatching, blackDuckUrl, blackDuckUsername, blackDuckPassword, blackDuckApiToken, proxyInfo, alwaysTrustServerCertificate,
-            projectName, projectVersionName, scanTargets, isRapid, reducedPersistence, correlationId);
+            projectName, projectVersionName, scanTargets, isRapid, reducedPersistence, correlationId, bomCompareMode);
     }
 
     @Override
@@ -375,5 +377,9 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public String getCorrelationId() {
         return correlationId;
     }
-
+    
+    public ScanBatchBuilder bomCompareMode(String bomCompareMode) {
+    	this.bomCompareMode = bomCompareMode;
+    	return this;
+    }
 }
