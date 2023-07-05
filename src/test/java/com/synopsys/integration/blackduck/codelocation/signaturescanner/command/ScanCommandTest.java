@@ -200,7 +200,30 @@ public class ScanCommandTest {
     	List<String> commandList = createCommandList();
     	assertTrue(commandList.contains("--discard-unmatched-files"));
     }
+    
+    @Test
+    public void testNoPersistentModeSpecifiedWithRapidModeSpecified() throws IntegrationException {
+    	scanBatchBuilder.rapid(true);
+    	scanBatchBuilder.bomCompareMode("BOM_COMPARE_STRICT");
+    	List<String> commandList = createCommandList();
+    	assertTrue(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+    }
 
+    @Test
+    public void testNoPersistentModeNotSpecified() throws IntegrationException {
+    	scanBatchBuilder.rapid(false);
+    	List<String> commandList = createCommandList();
+    	assertFalse(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+    }
+    
+    @Test
+    public void testNoPersistentModeSpecifiedWithRapidModeNotSpecified() throws IntegrationException {
+    	scanBatchBuilder.rapid(false);
+    	scanBatchBuilder.bomCompareMode("BOM_COMPARE_STRICT");
+    	List<String> commandList = createCommandList();
+    	assertFalse(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+    }
+    
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
             scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
