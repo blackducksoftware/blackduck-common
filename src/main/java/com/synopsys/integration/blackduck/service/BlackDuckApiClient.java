@@ -133,7 +133,7 @@ public class BlackDuckApiClient {
         // add the 'missing' pieces back from view that could have been lost
         String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
-        		.addHeader("Accept",  "application/vnd.blackducksoftware.project-detail-5+json")
+       		.addHeader("Accept",  "application/vnd.blackducksoftware.project-detail-5+json")
                                                .putString(json, BodyContentConverter.DEFAULT)
                                                .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
