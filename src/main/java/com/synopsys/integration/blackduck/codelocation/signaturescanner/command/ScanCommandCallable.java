@@ -24,9 +24,11 @@ import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NameVersion;
+import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private static final List<String> DRY_RUN_FILES_TO_KEEP = Arrays.asList("data");
+    private static final int WINDOWS_CHARACTER_LIMIT = 32764;
 
     private final IntLogger logger;
     private final ScanPathsUtility scanPathsUtility;
@@ -58,6 +60,13 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             cmd.add(scanCommand.getTargetPath());
 
             commandToExecute = createPrintableCommand(cmd);
+            
+            if (OperatingSystemType.determineFromSystem().equals(OperatingSystemType.WINDOWS) 
+            		&& commandToExecute.length() > WINDOWS_CHARACTER_LIMIT) {
+        	    String errorMessage = "Unable to invoke the scan CLI as the length of the command would exceed the operating system limit.";
+        	    return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, null);              
+            }
+           
             logger.info(String.format("Black Duck CLI command: %s", commandToExecute));
 
             File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
