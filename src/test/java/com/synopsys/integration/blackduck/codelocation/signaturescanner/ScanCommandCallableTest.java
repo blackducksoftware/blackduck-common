@@ -29,42 +29,37 @@ import com.synopsys.integration.util.OperatingSystemType;
 public class ScanCommandCallableTest {
 
 	@Test
-	public void testLongWindowsPath() throws BlackDuckIntegrationException, IOException {
+	public void testLongWindowsPath() throws IOException, IntegrationException {
 		Path tempDirectory = Files.createTempDirectory("scan_command_test");
 		IntLogger logger = new PrintStreamIntLogger(System.out, LogLevel.INFO);
-
-        ScanPaths scanPaths = new ScanPaths("blah", "blah", "blah", "blah", false);
-        ScanPathsUtility spiedscanPathsUtility = Mockito.mock(ScanPathsUtility.class);
-        Mockito.when(spiedscanPathsUtility.searchForScanPaths(tempDirectory.toFile())).thenReturn(scanPaths);
-        Mockito.when(spiedscanPathsUtility.createSpecificRunOutputDirectory(tempDirectory.toFile())).thenReturn(new File(tempDirectory.toFile() + "/a"));
-        ScanBatchBuilder scanBatchBuilder = ScanBatch.newBuilder();
+        ScanPaths scanPaths = new ScanPaths("pathToJavaExecutable", "pathToCacerts", "pathToOneJar", "pathToScanExecutable", false);
         
+        ScanPathsUtility mockedScanPathsUtility = Mockito.mock(ScanPathsUtility.class);
+        Mockito.when(mockedScanPathsUtility.searchForScanPaths(tempDirectory.toFile())).thenReturn(scanPaths);
+        Mockito.when(mockedScanPathsUtility.createSpecificRunOutputDirectory(tempDirectory.toFile())).thenReturn(new File(tempDirectory.toFile() + "/temp"));
+        
+        ScanBatchBuilder scanBatchBuilder = ScanBatch.newBuilder();
+        scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
+        scanBatchBuilder.blackDuckApiToken("fake_token");
+        scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path"));
+        scanBatchBuilder.outputDirectory(tempDirectory.toFile());
+        ScanBatch scanBatch = scanBatchBuilder.build();
+        
+        // Create a very long command length so we are certain to blow past the Windows 32764 character API limit
         IntEnvironmentVariables intEnvironmentVariables = Mockito.mock(IntEnvironmentVariables.class);
         Mockito.when(intEnvironmentVariables.getValue("SCAN_CLI_OPTS")).thenReturn("x".repeat(38000));
 		
+        // Mock to return we are working on Windows regardless of where the tests are run
         Mockito.mockStatic(OperatingSystemType.class);
         Mockito.when(OperatingSystemType.determineFromSystem()).thenReturn(OperatingSystemType.WINDOWS);
         
-        try {
-            scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
-            scanBatchBuilder.blackDuckApiToken("fake_token");
-        } catch (IntegrationException e) {
-            e.printStackTrace();
-        }
-        scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path"));
-        scanBatchBuilder.outputDirectory(tempDirectory.toFile());
-        
-        ScanBatch scanBatch = scanBatchBuilder.build();
-        List<ScanCommand> scanCommands = scanBatch.createScanCommands(tempDirectory.toFile(), spiedscanPathsUtility, intEnvironmentVariables);
+        List<ScanCommand> scanCommands = scanBatch.createScanCommands(tempDirectory.toFile(), mockedScanPathsUtility, intEnvironmentVariables);
         ScanCommand scanCommand = scanCommands.get(0);
-
-		ScanCommandCallable scanCommandCallable = new ScanCommandCallable(logger, spiedscanPathsUtility, intEnvironmentVariables, scanCommand, false);
-		
+		ScanCommandCallable scanCommandCallable = new ScanCommandCallable(logger, mockedScanPathsUtility, intEnvironmentVariables, scanCommand, false);
 		ScanCommandOutput output = scanCommandCallable.call();
 		
 		Assertions.assertTrue(output.getErrorMessage().get().equals("Unable to invoke the scan CLI as the length of the command would exceed the operating system limit."));
 	
         FileUtils.deleteQuietly(tempDirectory.toFile());
 	}
-
 }
