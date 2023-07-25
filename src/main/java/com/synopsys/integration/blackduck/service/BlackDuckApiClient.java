@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.apache.http.HttpHeaders;
+
 import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
 import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.BlackDuckView;
 import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.synopsys.integration.blackduck.http.BlackDuckPageResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -42,6 +45,7 @@ public class BlackDuckApiClient {
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private BlackDuckVersion blackDuckVersion;
+	private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
 
     public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
@@ -50,6 +54,7 @@ public class BlackDuckApiClient {
         this.blackDuckResponseTransformer = blackDuckResponseTransformer;
         this.blackDuckResponsesTransformer = blackDuckResponsesTransformer;
         this.blackDuckVersion = null;
+        this.blackDuckMediaTypeDiscovery = new BlackDuckMediaTypeDiscovery();
     }
 
     public <T extends BlackDuckResponse> List<T> getAllResponses(UrlMultipleResponses<T> urlMultipleResponses) throws IntegrationException {
@@ -130,10 +135,13 @@ public class BlackDuckApiClient {
     // ------------------------------------------------
     public void put(BlackDuckView blackDuckView) throws IntegrationException {
         HttpUrl url = blackDuckView.getHref();
+        String mediaType = blackDuckMediaTypeDiscovery.determineMediaType(url);
+        
         // add the 'missing' pieces back from view that could have been lost
         String json = blackDuckJsonTransformer.producePatchedJson(blackDuckView);
         BlackDuckResponseRequest request = new BlackDuckRequestBuilder()
                                                .putString(json, BodyContentConverter.DEFAULT)
+                                               .addHeader(HttpHeaders.CONTENT_TYPE, mediaType)
                                                .buildBlackDuckResponseRequest(url);
         try (Response response = execute(request)) {
             // TODO: Why do we not return the response here? JM - 07/2021
