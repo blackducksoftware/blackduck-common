@@ -45,7 +45,7 @@ public class BlackDuckApiClient {
     private final BlackDuckResponseTransformer blackDuckResponseTransformer;
     private final BlackDuckResponsesTransformer blackDuckResponsesTransformer;
     private BlackDuckVersion blackDuckVersion;
-	private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
+    private BlackDuckMediaTypeDiscovery blackDuckMediaTypeDiscovery;
 
     public BlackDuckApiClient(BlackDuckHttpClient blackDuckHttpClient, BlackDuckJsonTransformer blackDuckJsonTransformer, BlackDuckResponseTransformer blackDuckResponseTransformer,
         BlackDuckResponsesTransformer blackDuckResponsesTransformer) {
