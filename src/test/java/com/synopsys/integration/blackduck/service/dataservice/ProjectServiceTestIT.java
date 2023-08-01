@@ -165,7 +165,9 @@ public class ProjectServiceTestIT {
         assertTrue(2 == ProjectServiceTestIT.project.getProjectTier());
         assertEquals("Initial Description", ProjectServiceTestIT.project.getDescription());
 
-        ProjectServiceTestIT.project.setName("New Name");
+        String newProjectName = "New Name";
+        ProjectServiceTestIT.project.setName(newProjectName);
+        deleteProjectIfExists(newProjectName);
         ProjectServiceTestIT.project.setProjectTier(4);
         ProjectServiceTestIT.project.setDescription("New Description");
         ProjectServiceTestIT.blackDuckApiClient.put(ProjectServiceTestIT.project);
