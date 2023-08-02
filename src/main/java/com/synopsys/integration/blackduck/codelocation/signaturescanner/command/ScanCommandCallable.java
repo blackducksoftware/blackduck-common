@@ -28,7 +28,7 @@ import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private static final List<String> DRY_RUN_FILES_TO_KEEP = Arrays.asList("data");
-    private static final int WINDOWS_CHARACTER_LIMIT = 32108;
+    public static final int WINDOWS_CHARACTER_LIMIT = 32108;
 
     private final IntLogger logger;
     private final ScanPathsUtility scanPathsUtility;

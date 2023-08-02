@@ -45,9 +45,9 @@ public class ScanCommandCallableTest {
         scanBatchBuilder.outputDirectory(tempDirectory.toFile());
         ScanBatch scanBatch = scanBatchBuilder.build();
         
-        // Create a very long command length so we are certain to blow past the Windows 32108 character API limit
+        // Create a command length that exceeds the Windows API character limit
         IntEnvironmentVariables intEnvironmentVariables = Mockito.mock(IntEnvironmentVariables.class);
-        Mockito.when(intEnvironmentVariables.getValue("SCAN_CLI_OPTS")).thenReturn("x".repeat(38000));
+        Mockito.when(intEnvironmentVariables.getValue("SCAN_CLI_OPTS")).thenReturn("x".repeat(ScanCommandCallable.WINDOWS_CHARACTER_LIMIT + 1));
 		
         // Mock to return we are working on Windows regardless of where the tests are run
         Mockito.mockStatic(OperatingSystemType.class);
