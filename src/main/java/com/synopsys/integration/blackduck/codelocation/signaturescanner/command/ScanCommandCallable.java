@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,11 +25,9 @@ import com.synopsys.integration.blackduck.service.model.StreamRedirectThread;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private static final List<String> DRY_RUN_FILES_TO_KEEP = Arrays.asList("data");
-    public static final int WINDOWS_CHARACTER_LIMIT = 32108;
 
     private final IntLogger logger;
     private final ScanPathsUtility scanPathsUtility;
@@ -60,12 +59,6 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             cmd.add(scanCommand.getTargetPath());
 
             commandToExecute = createPrintableCommand(cmd);
-            
-            if (OperatingSystemType.determineFromSystem().equals(OperatingSystemType.WINDOWS) 
-            		&& commandToExecute.length() > WINDOWS_CHARACTER_LIMIT) {
-        	    String errorMessage = "Unable to invoke the Signature Scanner as the length of the command would exceed the operating system limit.";
-        	    return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, null);              
-            }
            
             logger.info(String.format("Black Duck CLI command: %s", commandToExecute));
 
@@ -101,7 +94,12 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 }
             }
         } catch (Exception e) {
-            String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
+            String errorMessage = "";
+            if (e instanceof IOException && e.getMessage().contains("CreateProcess error=206")) {
+                errorMessage = "Unable to invoke the Signature Scanner as the length of the command would exceed the operating system limit.";
+            } else {
+                errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
+            }
             return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
