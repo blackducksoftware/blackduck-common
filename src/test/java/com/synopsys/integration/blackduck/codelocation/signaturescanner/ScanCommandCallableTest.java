@@ -58,7 +58,7 @@ public class ScanCommandCallableTest {
 		ScanCommandCallable scanCommandCallable = new ScanCommandCallable(logger, mockedScanPathsUtility, intEnvironmentVariables, scanCommand, false);
 		ScanCommandOutput output = scanCommandCallable.call();
 		
-		Assertions.assertTrue(output.getErrorMessage().get().equals("Unable to invoke the scan CLI as the length of the command would exceed the operating system limit."));
+		Assertions.assertTrue(output.getErrorMessage().get().equals("Unable to invoke the Signature Scanner as the length of the command would exceed the operating system limit."));
 	
         FileUtils.deleteQuietly(tempDirectory.toFile());
 	}

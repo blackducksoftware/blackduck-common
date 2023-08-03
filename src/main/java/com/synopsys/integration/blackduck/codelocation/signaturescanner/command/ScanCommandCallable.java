@@ -63,7 +63,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             
             if (OperatingSystemType.determineFromSystem().equals(OperatingSystemType.WINDOWS) 
             		&& commandToExecute.length() > WINDOWS_CHARACTER_LIMIT) {
-        	    String errorMessage = "Unable to invoke the scan CLI as the length of the command would exceed the operating system limit.";
+        	    String errorMessage = "Unable to invoke the Signature Scanner as the length of the command would exceed the operating system limit.";
         	    return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, null);              
             }
            
