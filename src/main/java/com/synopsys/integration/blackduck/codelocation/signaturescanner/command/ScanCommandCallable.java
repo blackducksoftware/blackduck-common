@@ -9,6 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,7 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
             cmd.add(scanCommand.getTargetPath());
 
             commandToExecute = createPrintableCommand(cmd);
+           
             logger.info(String.format("Black Duck CLI command: %s", commandToExecute));
 
             File standardOutFile = scanPathsUtility.createStandardOutFile(scanCommand.getOutputDirectory());
@@ -92,7 +94,12 @@ public class ScanCommandCallable implements Callable<ScanCommandOutput> {
                 }
             }
         } catch (Exception e) {
-            String errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
+            String errorMessage = "";
+            if (e instanceof IOException && e.getMessage().contains("CreateProcess error=206")) {
+                errorMessage = "Unable to invoke the Signature Scanner as the length of the command would exceed the operating system limit.";
+            } else {
+                errorMessage = String.format("There was a problem scanning target '%s': %s", scanCommand.getTargetPath(), e.getMessage());
+            }
             return ScanCommandOutput.FAILURE(projectAndVersion, codeLocationName, logger, scanCommand, commandToExecute, errorMessage, e);
         }
 
