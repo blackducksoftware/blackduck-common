@@ -23,7 +23,7 @@ import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectClone
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;

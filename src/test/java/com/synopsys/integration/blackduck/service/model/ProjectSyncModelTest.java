@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
 import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
 import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;

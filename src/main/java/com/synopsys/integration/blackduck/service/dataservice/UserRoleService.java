@@ -10,7 +10,7 @@ package com.synopsys.integration.blackduck.service.dataservice;
 import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectView;
+import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
 import com.synopsys.integration.blackduck.api.generated.view.RoleView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.RoleAssignmentRequest;
