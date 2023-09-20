@@ -212,7 +212,7 @@ public class BlackDuckServicesFactory {
         return new ProjectBomService(blackDuckApiClient, apiDiscovery, logger, createComponentService());
     }
 
-    public ReportBomService createBomReportService() {
+    public ReportBomService createReportBomService() {
         return new ReportBomService(this.getBlackDuckApiClient(), this.getApiDiscovery(), this.getLogger());
     }
 

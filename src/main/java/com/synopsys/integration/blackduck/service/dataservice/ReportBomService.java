@@ -12,9 +12,9 @@ import java.util.List;
 
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.BomReportView;
-import com.synopsys.integration.blackduck.api.manual.view.BomReportContentView;
-import com.synopsys.integration.blackduck.api.manual.component.BomReportRequest;
+import com.synopsys.integration.blackduck.api.manual.view.ReportBomView;
+import com.synopsys.integration.blackduck.api.manual.view.ReportBomContentView;
+import com.synopsys.integration.blackduck.api.manual.component.ReportBomRequest;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
 import com.synopsys.integration.blackduck.service.model.ProjectVersionWrapper;
@@ -79,14 +79,14 @@ public class ReportBomService extends DataService {
    * supporting interrution, timeout and retry count.
    * 
    * Attempts to download a Bill of Material by url/uuid when it becomes avaialble 
-   * and maps to a BomReportView, respectively.
+   * and maps to a ReportBomView, respectively.
    */
-  private static class BomDownloadJob implements ResilientJob<BomReportView> {
+  private static class BomDownloadJob implements ResilientJob<ReportBomView> {
     private BlackDuckApiClient blackDuckApiClient;
     private String jobName;
     private boolean complete;
     private HttpUrl uri;
-    private BomReportView BomReport;
+    private ReportBomView bomReport;
     
     /**
      * Constructor
@@ -106,7 +106,7 @@ public class ReportBomService extends DataService {
       try {
         // Wait while HTTP 412 Precondition failed is returned.
         // for some reason, there will always be a JSON array in the response.
-        BomReport = blackDuckApiClient.getResponse(uri.appendRelativeUrl("contents"), BomReportView.class);
+        blackDuckApiClient.getResponse(uri.appendRelativeUrl("contents"), ReportBomView.class);
         complete = true;
       } catch (IntegrationException e) {
         complete = false;
@@ -119,13 +119,13 @@ public class ReportBomService extends DataService {
     }
 
     @Override
-    public BomReportView onTimeout() throws IntegrationTimeoutException {
+    public ReportBomView onTimeout() throws IntegrationTimeoutException {
       throw new IntegrationTimeoutException("Not able to upload BDIO due to timeout.");
     }
 
     @Override
-    public BomReportView onCompletion() {
-      return BomReport;
+    public ReportBomView onCompletion() {
+      return bomReport;
     }
 
     @Override
@@ -152,8 +152,8 @@ public class ReportBomService extends DataService {
    * @return The request obect
    * @throws IllegalArgumentException 
    */
-  public BomReportRequest createRequest(String type, String format) throws IllegalArgumentException{
-    BomReportRequest request = new BomReportRequest();
+  public ReportBomRequest createRequest(String type, String format) throws IllegalArgumentException{
+    ReportBomRequest request = new ReportBomRequest();
     request.setReportType("Bom"); // Bom - static, optional?
     request.setReportFormat(BomRequestValidator.validateFormat(format).toUpperCase()); //JSON
     request.setSbomType(BomRequestValidator.validateType(type).toUpperCase()); // SPDX_22
@@ -167,7 +167,7 @@ public class ReportBomService extends DataService {
    * @return An URL to the scheduled report including the uuid of the report.
    * @throws IntegrationException
    */
-  public HttpUrl createReport(ProjectVersionView projectVersion, BomReportRequest reportRequest) throws IntegrationException {
+  public HttpUrl createReport(ProjectVersionView projectVersion, ReportBomRequest reportRequest) throws IntegrationException {
     // This is merely queing the report; it will be available upon completion
     HttpUrl versionUrl = projectVersion.getHref();
     log.info("Project Version URL for " + projectVersion.getVersionName() + ": " + versionUrl.toString());
@@ -189,7 +189,7 @@ public class ReportBomService extends DataService {
    * @return An URL to the scheduled report including the uuid of the report.
    * @throws IntegrationException
    */
-  public HttpUrl createReport(ProjectVersionWrapper wrapper, BomReportRequest reportRequest) throws IntegrationException {
+  public HttpUrl createReport(ProjectVersionWrapper wrapper, ReportBomRequest reportRequest) throws IntegrationException {
     // This is merely queing the report creation
     return createReport(wrapper.getProjectVersionView(), reportRequest);
   }
@@ -202,7 +202,7 @@ public class ReportBomService extends DataService {
    * @throws IntegrationException Something failed along the way (see stacktrace)
    * @throws InterruptedException Interrupted by user
    */
-  public BomReportView downloadReports(HttpUrl reportUrl, long timeout) throws IntegrationException, InterruptedException {
+  public ReportBomView downloadReports(HttpUrl reportUrl, long timeout) throws IntegrationException, InterruptedException {
 
     WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
     ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
@@ -221,7 +221,7 @@ public class ReportBomService extends DataService {
    * @throws IntegrationException Something failed along the way (see stacktrace)
    * @throws InterruptedException Interrupted by user
    */
-  public BomReportView downloadReports(HttpUrl reportUrl, long timeout, Logger log) throws IntegrationException, InterruptedException { 
+  public ReportBomView downloadReports(HttpUrl reportUrl, long timeout, Logger log) throws IntegrationException, InterruptedException { 
     this.log = log;
     return downloadReports(reportUrl, timeout);
   } 
