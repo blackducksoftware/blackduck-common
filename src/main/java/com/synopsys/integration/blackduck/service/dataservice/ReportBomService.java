@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * Blackduck API Data Service implementation to both, request and download Bill of Materials
  * reports from Black Duck Hub when it eventually becomes available.
  */
-public class BomReportService extends DataService {
+public class ReportBomService extends DataService {
 
-  private Logger log = LoggerFactory.getLogger(BomReportService.class);
+  private Logger log = LoggerFactory.getLogger(ReportBomService.class);
   private static final int BD_WAIT_AND_RETRY_INTERVAL = 5;
 
   // Internal class to validate user input arugments.
@@ -141,7 +141,7 @@ public class BomReportService extends DataService {
    * @param apiDiscovery For the superclass of a Blackduck DataService
    * @param logger For unified logging
    */
-  public BomReportService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+  public ReportBomService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
     super(blackDuckApiClient, apiDiscovery, logger);
   }
 
