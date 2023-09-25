@@ -7,7 +7,7 @@ project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '66.2.8-SNAPSHOT'
+version = '66.2.8-SNAPSHOT-c'
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2023.4.2.2'
+    api 'com.synopsys.integration:blackduck-common-api:2023.10.0.1-SNAPSHOT-b'
     api 'com.synopsys.integration:phone-home-client:5.1.10'
     api 'com.synopsys.integration:integration-bdio:26.0.9'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
