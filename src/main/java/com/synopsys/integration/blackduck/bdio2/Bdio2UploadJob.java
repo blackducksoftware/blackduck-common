@@ -73,7 +73,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
                 bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
             }
-        } catch (RetriableBdioUploadException e) {
+        } catch (RetriableBdioUploadException | InterruptedException e) {
             complete = false;
         }
     }
