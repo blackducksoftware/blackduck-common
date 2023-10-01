@@ -106,7 +106,7 @@ public class ReportBomService extends DataService {
       try {
         // Wait while HTTP 412 Precondition failed is returned.
         // for some reason, there will always be a JSON array in the response.
-        blackDuckApiClient.getResponse(uri.appendRelativeUrl("contents"), ReportBomView.class);
+        bomReport = blackDuckApiClient.getResponse(uri.appendRelativeUrl("contents"), ReportBomView.class);
         complete = true;
       } catch (IntegrationException e) {
         complete = false;
@@ -154,7 +154,7 @@ public class ReportBomService extends DataService {
    */
   public ReportBomRequest createRequest(String type, String format) throws IllegalArgumentException{
     ReportBomRequest request = new ReportBomRequest();
-    request.setReportType("Bom"); // Bom - static, optional?
+    request.setReportType("SBOM"); // SBOM - static, optional?
     request.setReportFormat(BomRequestValidator.validateFormat(format).toUpperCase()); //JSON
     request.setSbomType(BomRequestValidator.validateType(type).toUpperCase()); // SPDX_22
     return request;
@@ -175,7 +175,7 @@ public class ReportBomService extends DataService {
     // The request returns an empty response with HTTP 201 Created and an attribute "Link" in the reponse header.
     // Coincidentially, this is exactly what is returned by post().
     HttpUrl reportUrl = blackDuckApiClient.post(
-      versionUrl.appendRelativeUrl("Bom-reports"), reportRequest);
+      versionUrl.appendRelativeUrl("sbom-reports"), reportRequest);
 
     log.info("Report available from: " + reportUrl.toString());
     
@@ -206,10 +206,10 @@ public class ReportBomService extends DataService {
 
     WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
     ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
-    BomDownloadJob BomDownloadJob = new BomDownloadJob(blackDuckApiClient, "Awaiting Bom report completion", reportUrl);
+    BomDownloadJob bomDownloadJob = new BomDownloadJob(blackDuckApiClient, "Awaiting Bom report completion", reportUrl);
     ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
-    return jobExecutor.executeJob(BomDownloadJob);
+    return jobExecutor.executeJob(bomDownloadJob);
   }
 
   /**
