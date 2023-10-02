@@ -166,6 +166,10 @@ public class BlackDuckApiClient {
         blackDuckHttpClient.throwExceptionForError(response);
         return response;
     }
+    
+    public Response executeAndRetrieveResponse(BlackDuckResponseRequest request) throws IntegrationException {
+        return blackDuckHttpClient.execute(request);
+    }
 
     // ------------------------------------------------
     // posting and getting location header
