@@ -63,8 +63,8 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor);
-            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse, startTime, timeout);
+            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
             complete = true;
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
@@ -72,12 +72,12 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
                     Response chunkResponse = bdio2RetryAwareStreamUploader.append(uploadUrl, count, content, editor);
-                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse, startTime, timeout);
+                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse);
                 }
             }
             if (shouldFinishUpload) {
                 Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
-                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse, startTime, timeout);
+                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
             }
         } catch (RetriableBdioUploadException | InterruptedException e) {
             complete = false;

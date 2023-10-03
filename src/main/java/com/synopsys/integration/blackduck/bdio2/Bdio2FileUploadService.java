@@ -85,7 +85,7 @@ public class Bdio2FileUploadService extends DataService {
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
-        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload, timeout, clientStartTime);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload, clientStartTime, timeout);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
         return jobExecutor.executeJob(bdio2UploadJob);

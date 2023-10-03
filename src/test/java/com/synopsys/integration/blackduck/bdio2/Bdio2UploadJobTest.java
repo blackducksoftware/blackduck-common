@@ -30,7 +30,7 @@ public class Bdio2UploadJobTest {
     private final int waitInterval = 2;
 
     @Test
-    public void testRetryOnFailedHeaderUpload() throws IntegrationException, RetriableBdioUploadException {
+    public void testRetryOnFailedHeaderUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnStart();
         Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
         ResilientJobExecutor jobExecutor = getJobExecutor();
@@ -38,7 +38,7 @@ public class Bdio2UploadJobTest {
     }
 
     @Test
-    public void testRetryOnFailedChunkUpload() throws IntegrationException, RetriableBdioUploadException {
+    public void testRetryOnFailedChunkUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnAppend();
         Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
         ResilientJobExecutor jobExecutor = getJobExecutor();
@@ -46,35 +46,35 @@ public class Bdio2UploadJobTest {
     }
 
     @Test
-    public void testRetryOnFailedFinish() throws IntegrationException, RetriableBdioUploadException {
+    public void testRetryOnFailedFinish() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnFinish();
         Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
         ResilientJobExecutor jobExecutor = getJobExecutor();
         Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
     }
 
-    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnStart() throws IntegrationException, RetriableBdioUploadException {
+    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnStart() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
-        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any())).thenThrow(new RetriableBdioUploadException());
+        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyLong())).thenThrow(new RetriableBdioUploadException());
         return bdio2StreamUploader;
     }
 
-    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnAppend() throws IntegrationException, RetriableBdioUploadException {
+    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnAppend() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
         Response successResponse = Mockito.mock(Response.class);
         Mockito.when(successResponse.isStatusCodeSuccess()).thenReturn(true);
         Mockito.when(successResponse.getHeaderValue("location")).thenReturn("https://server.blackduck.com/api/endpoint/scanId");
-        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any())).thenReturn(successResponse);
+        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyLong())).thenReturn(successResponse);
         Mockito.when(bdio2StreamUploader.append(Mockito.any(HttpUrl.class), Mockito.anyInt(), Mockito.any(BdioFileContent.class), Mockito.any(BlackDuckRequestBuilderEditor.class))).thenThrow(new RetriableBdioUploadException());
         return bdio2StreamUploader;
     }
 
-    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnFinish() throws IntegrationException, RetriableBdioUploadException {
+    private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnFinish() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
         Response successResponse = Mockito.mock(Response.class);
         Mockito.when(successResponse.isStatusCodeSuccess()).thenReturn(true);
         Mockito.when(successResponse.getHeaderValue("location")).thenReturn("https://server.blackduck.com/api/endpoint/scanId");
-        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any())).thenReturn(successResponse);
+        Mockito.when(bdio2StreamUploader.start(Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.anyLong())).thenReturn(successResponse);
         Mockito.when(bdio2StreamUploader.append(Mockito.any(HttpUrl.class), Mockito.anyInt(), Mockito.any(BdioFileContent.class), Mockito.any(BlackDuckRequestBuilderEditor.class))).thenReturn(successResponse);
         Mockito.when(bdio2StreamUploader.finish(Mockito.any(), Mockito.anyInt(), Mockito.any())).thenThrow(new RetriableBdioUploadException());
         return bdio2StreamUploader;
