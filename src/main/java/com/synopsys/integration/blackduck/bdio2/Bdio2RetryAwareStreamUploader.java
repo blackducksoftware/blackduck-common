@@ -64,7 +64,7 @@ public class Bdio2RetryAwareStreamUploader {
         return response;
     }
     
-    public void onErrorThrowRetryableOrFailure(Response response) throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+    public void onErrorThrowRetryableOrFailure(Response response, long clientStartTime, long detectTimeout) throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         if (!response.isStatusCodeSuccess()) {
             if (isRetryableExitCode(response.getStatusCode())) {
                 logger.trace("Response status code {} is retryable", response.getStatusCode());
@@ -87,7 +87,7 @@ public class Bdio2RetryAwareStreamUploader {
     
     private boolean isDetectTimeoutExceededBy(long startTime, long waitInMillis, long detectTimeout) {
         long currentTime = System.currentTimeMillis();
-        return (currentTime - startTime + waitInMillis) > detectTimeout;
+        return (currentTime - startTime + waitInMillis) > (detectTimeout * 1000);
     }
 
     private Response translateRetryableExceptions(final IntegrationRestException e) throws RetriableBdioUploadException, IntegrationRestException {

@@ -21,11 +21,13 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
     private final Bdio2FileUploadService bdio2FileUploadService;
     private final UploadTarget uploadTarget;
     private final long timeout;
+    private final long clientStartTime;
 
-    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget, long timeout) {
+    public IntelligentPersistenceCallable(Bdio2FileUploadService bdio2FileUploadService, UploadTarget uploadTarget, long timeout, long clientStartTime) {
         this.bdio2FileUploadService = bdio2FileUploadService;
         this.uploadTarget = uploadTarget;
         this.timeout = timeout;
+        this.clientStartTime = clientStartTime;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
         NameVersion projectAndVersion = uploadTarget.getProjectAndVersion().orElse(null);
         String codeLocationName = uploadTarget.getCodeLocationName();
         try {
-            Bdio2UploadResult result = bdio2FileUploadService.uploadFile(uploadTarget, timeout);
+            Bdio2UploadResult result = bdio2FileUploadService.uploadFile(uploadTarget, timeout, clientStartTime);
             return UploadOutput.SUCCESS(projectAndVersion, codeLocationName, null, result.getScanId());
         } catch (Exception ex) {
             String errorMessage = String.format("Failed to upload file: %s because %s", uploadTarget.getUploadFile().getAbsolutePath(), ex.getMessage());

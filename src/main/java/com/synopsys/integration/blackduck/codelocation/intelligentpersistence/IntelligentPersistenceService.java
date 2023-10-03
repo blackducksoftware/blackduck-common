@@ -33,16 +33,16 @@ public class IntelligentPersistenceService extends DataService {
         this.codeLocationCreationService = codeLocationCreationService;
     }
 
-    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch, long timeoutInSeconds) {
-        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch, timeoutInSeconds);
+    public IntelligentPersistenceCodeLocationCreationRequest createUploadRequest(UploadBatch uploadBatch, long timeoutInSeconds, long clientStartTime) {
+        return new IntelligentPersistenceCodeLocationCreationRequest(uploadBatchRunner, uploadBatch, timeoutInSeconds, clientStartTime);
     }
 
     public CodeLocationCreationData<UploadBatchOutput> uploadBdio(CodeLocationCreationRequest<UploadBatchOutput> uploadRequest) throws IntegrationException {
         return codeLocationCreationService.createCodeLocations(uploadRequest);
     }
 
-    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException {
-        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, timeoutInSeconds);
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdio(UploadBatch uploadBatch, long timeoutInSeconds, long clientStartTime) throws IntegrationException {
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, timeoutInSeconds, clientStartTime);
         return uploadBdio(uploadRequest);
     }
 
@@ -50,8 +50,8 @@ public class IntelligentPersistenceService extends DataService {
         return codeLocationCreationService.createCodeLocationsAndWait(uploadRequest, timeoutInSeconds);
     }
 
-    public UploadBatchOutput uploadBdioAndWait(UploadBatch uploadBatch, long timeoutInSeconds) throws IntegrationException, InterruptedException {
-        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, (int) timeoutInSeconds);
+    public UploadBatchOutput uploadBdioAndWait(UploadBatch uploadBatch, long timeoutInSeconds, long clientStartTime) throws IntegrationException, InterruptedException {
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch, (int) timeoutInSeconds, clientStartTime);
         return uploadBdioAndWait(uploadRequest, timeoutInSeconds);
     }
 

@@ -48,18 +48,18 @@ public class Bdio2FileUploadService extends DataService {
         this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
     }
 
-    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout) throws IntegrationException, InterruptedException {
-        return uploadFile(uploadTarget, timeout, true, true);
+    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout, long clientStartTime) throws IntegrationException, InterruptedException {
+        return uploadFile(uploadTarget, timeout, true, true, clientStartTime);
     }
 
-    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload)
+    public Bdio2UploadResult uploadFile(UploadTarget uploadTarget, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime)
         throws IntegrationException, InterruptedException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, shouldUploadEntries, shouldFinishUpload);
+        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, shouldUploadEntries, shouldFinishUpload, clientStartTime);
     }
 
-    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload)
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime)
         throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
@@ -85,7 +85,7 @@ public class Bdio2FileUploadService extends DataService {
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
-        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload, timeout, clientStartTime);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
         return jobExecutor.executeJob(bdio2UploadJob);

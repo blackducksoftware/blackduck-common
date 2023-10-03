@@ -35,6 +35,8 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private HttpUrl uploadUrl;
     private String scanId;
     private boolean complete;
+    private long startTime;
+    private long timeout;
 
     public Bdio2UploadJob(
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader,
@@ -43,7 +45,9 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         BlackDuckRequestBuilderEditor editor,
         int count,
         boolean onlyUploadHeader,
-        boolean shouldFinishUpload
+        boolean shouldFinishUpload,
+        long startTime,
+        long timeout
     ) {
         this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
         this.header = header;
@@ -52,13 +56,15 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         this.count = count;
         this.shouldUploadEntries = onlyUploadHeader;
         this.shouldFinishUpload = shouldFinishUpload;
+        this.startTime = startTime;
+        this.timeout = timeout;
     }
 
     @Override
     public void attemptJob() throws IntegrationException {
         try {
             Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor);
-            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
+            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse, startTime, timeout);
             complete = true;
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
             scanId = parseScanIdFromUploadUrl(uploadUrl.string());
@@ -66,12 +72,12 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
                     Response chunkResponse = bdio2RetryAwareStreamUploader.append(uploadUrl, count, content, editor);
-                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse);
+                    bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(chunkResponse, startTime, timeout);
                 }
             }
             if (shouldFinishUpload) {
                 Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
-                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
+                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse, startTime, timeout);
             }
         } catch (RetriableBdioUploadException | InterruptedException e) {
             complete = false;
