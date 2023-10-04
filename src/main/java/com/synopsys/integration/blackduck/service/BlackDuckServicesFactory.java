@@ -51,6 +51,7 @@ import com.synopsys.integration.blackduck.service.dataservice.LicenseService;
 import com.synopsys.integration.blackduck.service.dataservice.NotificationService;
 import com.synopsys.integration.blackduck.service.dataservice.PolicyRuleService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectBomService;
+import com.synopsys.integration.blackduck.service.dataservice.ReportBomService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectGetService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectMappingService;
 import com.synopsys.integration.blackduck.service.dataservice.ProjectService;
@@ -209,6 +210,10 @@ public class BlackDuckServicesFactory {
 
     public ProjectBomService createProjectBomService() {
         return new ProjectBomService(blackDuckApiClient, apiDiscovery, logger, createComponentService());
+    }
+
+    public ReportBomService createReportBomService() {
+        return new ReportBomService(this.getBlackDuckApiClient(), this.getApiDiscovery(), this.getLogger());
     }
 
     public ProjectUsersService createProjectUsersService() {
