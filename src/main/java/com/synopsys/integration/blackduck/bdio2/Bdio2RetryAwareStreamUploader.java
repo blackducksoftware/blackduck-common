@@ -81,7 +81,7 @@ public class Bdio2RetryAwareStreamUploader {
         }
         return response;
     }
-    
+
     public void onErrorThrowRetryableOrFailure(Response response) throws IntegrationException, RetriableBdioUploadException {
         if (!response.isStatusCodeSuccess()) {
             if (isRetryableExitCode(response.getStatusCode())) {
