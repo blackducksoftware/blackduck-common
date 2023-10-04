@@ -9,6 +9,7 @@ bin/
 *.iml
 .idea/
 out/
+.vscode
 
 # build tool
 .gradle/
