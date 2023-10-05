@@ -22,7 +22,7 @@ import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 
 public class Bdio2RetryAwareStreamUploader {
-    private static final List<Integer> NON_RETRYABLE_EXIT_CODES = Arrays.asList(401, 402, 403, 404, 500);
+    private static final List<Integer> NON_RETRYABLE_EXIT_CODES = Arrays.asList(401, 402, 403, 404);
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Bdio2StreamUploader bdio2StreamUploader;
 
