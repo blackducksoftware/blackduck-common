@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
@@ -21,7 +22,7 @@ import com.synopsys.integration.rest.exception.IntegrationRestException;
 import com.synopsys.integration.rest.response.Response;
 
 public class Bdio2RetryAwareStreamUploader {
-    private static final List<Integer> NON_RETRYABLE_EXIT_CODES = Arrays.asList(401, 402, 403, 404, 500);
+    private static final List<Integer> NON_RETRYABLE_EXIT_CODES = Arrays.asList(401, 402, 403, 404);
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Bdio2StreamUploader bdio2StreamUploader;
 
@@ -29,11 +30,29 @@ public class Bdio2RetryAwareStreamUploader {
         this.bdio2StreamUploader = bdio2StreamUploader;
     }
 
-    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor)
-        throws RetriableBdioUploadException, IntegrationException {
+    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor, long clientStartTime, long clientTimeout)
+        throws RetriableBdioUploadException, IntegrationException, InterruptedException {
         logger.trace("Executing BDIO upload start operation; non-retryable status codes: {}", NON_RETRYABLE_EXIT_CODES);
         try {
-            return bdio2StreamUploader.start(header, editor);
+            Response response = bdio2StreamUploader.start(header, editor);
+            
+            // Retry if BlackDuck specifically told us how long to wait and we don't exceed the client timeout.
+            if (!response.isStatusCodeSuccess() && isRetryableExitCode(response.getStatusCode())) {
+                String retryAfterInSeconds = response.getHeaderValue("retry-after");
+                
+                if (null != retryAfterInSeconds && !retryAfterInSeconds.equals("0")) {
+                    long retryAfterInMillis = Integer.parseInt(retryAfterInSeconds) * 1000;
+                    
+                    if (isClientTimeoutExceededBy(clientStartTime, retryAfterInMillis, clientTimeout)) {
+                        throw new BlackDuckIntegrationException("Client timeout exceeded or will be exceeded due to server being busy.");
+                    }
+                    logger.trace("Waiting " + retryAfterInMillis + " milliseconds to retry BDIO upload start operation.");
+                    Thread.sleep(retryAfterInMillis);
+                    return start(header, editor, clientStartTime, clientTimeout);
+                }
+            }
+            
+            return response;
         } catch (IntegrationRestException e) {
             return translateRetryableExceptions(e);
         }
@@ -73,6 +92,11 @@ public class Bdio2RetryAwareStreamUploader {
             throw new IntegrationException(String.format("Bdio upload failed with non-retryable exit code: %d", response.getStatusCode()));
         }
         logger.trace("Response status code {} treated as success", response.getStatusCode());
+    }
+    
+    private boolean isClientTimeoutExceededBy(long startTime, long waitInMillis, long clientTimeout) {
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - startTime + waitInMillis) > (clientTimeout * 1000);
     }
 
     private Response translateRetryableExceptions(final IntegrationRestException e) throws RetriableBdioUploadException, IntegrationRestException {

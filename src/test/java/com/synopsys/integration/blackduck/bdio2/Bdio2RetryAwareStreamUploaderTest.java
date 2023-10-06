@@ -15,16 +15,43 @@ import com.synopsys.integration.rest.response.Response;
 class Bdio2RetryAwareStreamUploaderTest {
 
     @Test
-    void testStartRetriable() throws IntegrationException {
+    void testStartRetriable() throws IntegrationException, InterruptedException {
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrows512OnStart(editor, bdioFileContent);
         try {
-            bdio2RetryAwareStreamUploader.start(bdioFileContent, editor);
+            bdio2RetryAwareStreamUploader.start(bdioFileContent, editor, System.currentTimeMillis(), System.currentTimeMillis() + 10000);
             Assertions.fail("Expected RetriableBdioUploadException");
         } catch (RetriableBdioUploadException e) {
             // expected
         }
+    }
+    
+    @Test
+    void testStartRetryableWithRetryAfterHeader() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+        BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
+        BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
+        
+        Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
+        Response response = Mockito.mock(Response.class);
+        
+        Mockito.when(bdio2StreamUploader.start(bdioFileContent, editor)).thenReturn(response);
+        Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
+        
+        Mockito.when(response.getHeaderValue("retry-after"))
+            .thenReturn("1")
+            .thenReturn(null);
+        
+        Mockito.when(response.getStatusCode())
+            .thenReturn(429)
+            .thenReturn(200);
+        
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = new Bdio2RetryAwareStreamUploader(bdio2StreamUploader);
+        
+        bdio2RetryAwareStreamUploader.start(bdioFileContent, editor, System.currentTimeMillis(), System.currentTimeMillis() + 10000);
+        
+        // We should make two calls as the first is a 429 which we retry for and the second is a 200.
+        Mockito.verify(bdio2StreamUploader, Mockito.times(2)).start(bdioFileContent, editor);
     }
 
     @Test
@@ -56,12 +83,12 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @Test
-    void testStartNonRetriable() throws IntegrationException, RetriableBdioUploadException {
+    void testStartNonRetriable() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderThrow404OnStart(bdioFileContent, editor);
         try {
-            bdio2RetryAwareStreamUploader.start(bdioFileContent, editor);
+            bdio2RetryAwareStreamUploader.start(bdioFileContent, editor, System.currentTimeMillis(), System.currentTimeMillis() + 10000);
             Assertions.fail("Expected RetriableBdioUploadException");
         } catch (IntegrationException e) {
             // expected
@@ -69,7 +96,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @Test
-    void testNoExceptionStatusCodeAnalysisRetryable() throws IntegrationException {
+    void testNoExceptionStatusCodeAnalysisRetryable() throws IntegrationException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
         Response response400 = Mockito.mock(Response.class);
         Mockito.when(response400.isStatusCodeSuccess()).thenReturn(false);
@@ -83,7 +110,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @Test
-    void testNoExceptionStatusCodeAnalysisSuccess() throws IntegrationException, RetriableBdioUploadException {
+    void testNoExceptionStatusCodeAnalysisSuccess() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
         Response response200 = Mockito.mock(Response.class);
         Mockito.when(response200.isStatusCodeSuccess()).thenReturn(true);
@@ -92,7 +119,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
 
     @Test
-    void testNoExceptionStatusCodeAnalysisNonRetryable() throws IntegrationException, RetriableBdioUploadException {
+    void testNoExceptionStatusCodeAnalysisNonRetryable() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = mockBdio2RetryAwareStreamUploaderMinimal();
         Response response404 = Mockito.mock(Response.class);
         Mockito.when(response404.isStatusCodeSuccess()).thenReturn(false);

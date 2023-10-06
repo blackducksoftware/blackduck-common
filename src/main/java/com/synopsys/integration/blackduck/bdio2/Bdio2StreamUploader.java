@@ -58,7 +58,7 @@ public class Bdio2StreamUploader {
             .addHeader(HEADER_CONTENT_TYPE, contentType)
             .apply(editor)
             .buildBlackDuckResponseRequest(url);
-        return blackDuckApiClient.execute(request);
+        return blackDuckApiClient.executeAndRetrieveResponse(request);
     }
 
     public Response append(HttpUrl url, int count, BdioFileContent bdioFileContent, BlackDuckRequestBuilderEditor editor) throws IntegrationException {

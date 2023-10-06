@@ -83,7 +83,7 @@ class IntelligentPersistenceRecipeTest extends BasicRecipe {
 
         // now all the setup is done, we can upload the bdio2 file
         IntelligentPersistenceService intelligentPersistenceService = blackDuckServicesFactory.createIntelligentPersistenceService();
-        UploadBatchOutput uploadBatchOutput = intelligentPersistenceService.uploadBdioAndWait(uploadBatch, 120);
+        UploadBatchOutput uploadBatchOutput = intelligentPersistenceService.uploadBdioAndWait(uploadBatch, 120, 0);
         assertFalse(uploadBatchOutput.hasAnyFailures());
 
         // verify that we now have a bom with 1 component

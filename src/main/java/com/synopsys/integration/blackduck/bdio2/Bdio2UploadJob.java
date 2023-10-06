@@ -35,6 +35,8 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private HttpUrl uploadUrl;
     private String scanId;
     private boolean complete;
+    private long startTime;
+    private long timeout;
 
     public Bdio2UploadJob(
         Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader,
@@ -43,7 +45,9 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         BlackDuckRequestBuilderEditor editor,
         int count,
         boolean onlyUploadHeader,
-        boolean shouldFinishUpload
+        boolean shouldFinishUpload,
+        long startTime,
+        long timeout
     ) {
         this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
         this.header = header;
@@ -52,12 +56,14 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         this.count = count;
         this.shouldUploadEntries = onlyUploadHeader;
         this.shouldFinishUpload = shouldFinishUpload;
+        this.startTime = startTime;
+        this.timeout = timeout;
     }
 
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor);
+            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
             bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
             complete = true;
             uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
@@ -73,7 +79,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 Response finishResponse = bdio2RetryAwareStreamUploader.finish(uploadUrl, count, editor);
                 bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(finishResponse);
             }
-        } catch (RetriableBdioUploadException e) {
+        } catch (RetriableBdioUploadException | InterruptedException e) {
             complete = false;
         }
     }

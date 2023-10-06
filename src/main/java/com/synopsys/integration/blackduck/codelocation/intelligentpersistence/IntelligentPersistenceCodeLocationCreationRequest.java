@@ -16,15 +16,17 @@ public class IntelligentPersistenceCodeLocationCreationRequest extends CodeLocat
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final UploadBatch uploadBatch;
     private final long timeout;
+    private final long clientStartTime;
 
-    public IntelligentPersistenceCodeLocationCreationRequest(final IntelligentPersistenceBatchRunner uploadBatchRunner, final UploadBatch uploadBatch, final long timeout) {
+    public IntelligentPersistenceCodeLocationCreationRequest(final IntelligentPersistenceBatchRunner uploadBatchRunner, final UploadBatch uploadBatch, final long timeout, final long clientStartTime) {
         this.uploadBatchRunner = uploadBatchRunner;
         this.uploadBatch = uploadBatch;
         this.timeout = timeout;
+        this.clientStartTime = clientStartTime;
     }
 
     @Override
     public UploadBatchOutput executeRequest() throws BlackDuckIntegrationException {
-        return uploadBatchRunner.executeUploads(uploadBatch, timeout);
+        return uploadBatchRunner.executeUploads(uploadBatch, timeout, clientStartTime);
     }
 }
