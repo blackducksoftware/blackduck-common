@@ -30,7 +30,7 @@ public class Bdio2RetryAwareStreamUploader {
         this.bdio2StreamUploader = bdio2StreamUploader;
     }
 
-    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor, long clientStartTime, long detectTimeout)
+    public Response start(BdioFileContent header, BlackDuckRequestBuilderEditor editor, long clientStartTime, long clientTimeout)
         throws RetriableBdioUploadException, IntegrationException, InterruptedException {
         logger.trace("Executing BDIO upload start operation; non-retryable status codes: {}", NON_RETRYABLE_EXIT_CODES);
         try {
@@ -43,12 +43,12 @@ public class Bdio2RetryAwareStreamUploader {
                 if (null != retryAfterInSeconds && !retryAfterInSeconds.equals("0")) {
                     long retryAfterInMillis = Integer.parseInt(retryAfterInSeconds) * 1000;
                     
-                    if (isDetectTimeoutExceededBy(clientStartTime, retryAfterInMillis, detectTimeout)) {
-                        throw new BlackDuckIntegrationException("Detect timeout exceeded or will be exceeded due to server being busy.");
+                    if (isClientTimeoutExceededBy(clientStartTime, retryAfterInMillis, clientTimeout)) {
+                        throw new BlackDuckIntegrationException("Client timeout exceeded or will be exceeded due to server being busy.");
                     }
                     logger.trace("Waiting " + retryAfterInMillis + " milliseconds to retry BDIO upload start operation.");
                     Thread.sleep(retryAfterInMillis);
-                    return start(header, editor, clientStartTime, detectTimeout);
+                    return start(header, editor, clientStartTime, clientTimeout);
                 }
             }
             
@@ -94,9 +94,9 @@ public class Bdio2RetryAwareStreamUploader {
         logger.trace("Response status code {} treated as success", response.getStatusCode());
     }
     
-    private boolean isDetectTimeoutExceededBy(long startTime, long waitInMillis, long detectTimeout) {
+    private boolean isClientTimeoutExceededBy(long startTime, long waitInMillis, long clientTimeout) {
         long currentTime = System.currentTimeMillis();
-        return (currentTime - startTime + waitInMillis) > (detectTimeout * 1000);
+        return (currentTime - startTime + waitInMillis) > (clientTimeout * 1000);
     }
 
     private Response translateRetryableExceptions(final IntegrationRestException e) throws RetriableBdioUploadException, IntegrationRestException {
