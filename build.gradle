@@ -1,13 +1,16 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
-    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-dependencies.gradle', to: buildscript
+    ////////// START BUILDSCRIPT DEPENDENCY //////////
+dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.12.0" }
+
+////////// END BUILDSCRIPT DEPENDENCY //////////
 }
 
 project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '66.2.9-SNAPSHOT'
+version = '66.2.9'
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
