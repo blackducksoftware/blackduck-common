@@ -46,7 +46,7 @@ public class Bdio2RetryAwareStreamUploader {
                     if (isClientTimeoutExceededBy(clientStartTime, retryAfterInMillis, clientTimeout)) {
                         throw new BlackDuckIntegrationException("Client timeout exceeded or will be exceeded due to server being busy.");
                     }
-                    logger.trace("Waiting " + retryAfterInMillis + " milliseconds to retry BDIO upload start operation.");
+                    logger.debug("Received code {}. Waiting {} milliseconds to retry BDIO upload start operation.", response.getStatusCode(), retryAfterInMillis);
                     Thread.sleep(retryAfterInMillis);
                     return start(header, editor, clientStartTime, clientTimeout);
                 }
