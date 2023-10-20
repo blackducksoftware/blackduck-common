@@ -51,7 +51,7 @@ public class Bdio2RetryAwareStreamUploader {
                     Thread.sleep(retryAfterInMillis);
                     return start(header, editor, clientStartTime, clientTimeout);
                 } else if (response.getStatusCode() == TOO_MANY_REQUESTS_CODE){
-                	throw new BlackDuckIntegrationException("Server is busy and did not indicate how long to wait to retry or client was told not to retry.");
+                	throw new BlackDuckIntegrationException("The server is busy and did not specify retrying the request or provide a retry period.");
                 }
             }
             
