@@ -56,7 +56,7 @@ class Bdio2RetryAwareStreamUploaderTest {
     }
     
     @Test
-    void tetStartRetryableWithZeroRetryAfterHeader() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+    void testStartRetryableWithZeroRetryAfterHeader() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
         BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
         
