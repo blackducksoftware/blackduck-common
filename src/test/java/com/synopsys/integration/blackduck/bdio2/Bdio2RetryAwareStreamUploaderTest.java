@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.synopsys.integration.blackduck.bdio2.model.BdioFileContent;
+import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.rest.HttpUrl;
@@ -52,6 +53,31 @@ class Bdio2RetryAwareStreamUploaderTest {
         
         // We should make two calls as the first is a 429 which we retry for and the second is a 200.
         Mockito.verify(bdio2StreamUploader, Mockito.times(2)).start(bdioFileContent, editor);
+    }
+    
+    @Test
+    void tetStartRetryableWithZeroRetryAfterHeader() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+        BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
+        BdioFileContent bdioFileContent = Mockito.mock(BdioFileContent.class);
+        
+        Bdio2StreamUploader bdio2StreamUploader = Mockito.mock(Bdio2StreamUploader.class);
+        Response response = Mockito.mock(Response.class);
+        
+        Mockito.when(bdio2StreamUploader.start(bdioFileContent, editor)).thenReturn(response);
+        Mockito.when(response.isStatusCodeSuccess()).thenReturn(false);
+        
+        Mockito.when(response.getHeaderValue("retry-after")).thenReturn("0");
+        
+        Mockito.when(response.getStatusCode()).thenReturn(429);
+        
+        Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader = new Bdio2RetryAwareStreamUploader(bdio2StreamUploader);
+        
+        try {
+        	bdio2RetryAwareStreamUploader.start(bdioFileContent, editor, System.currentTimeMillis(), System.currentTimeMillis() + 10000);
+        	Assertions.fail("Expected BlackDuckIntegrationException");
+        } catch (BlackDuckIntegrationException e) {
+            // expected
+        }
     }
 
     @Test
