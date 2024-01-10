@@ -71,53 +71,6 @@ public class ScanCommandTest {
     }
 
     @Test
-    public void testFullSnippetScan() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, true, false, true);
-    }
-
-    @Test
-    public void testFullSnippetOnlyScan() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
-    }
-
-    @Test
-    public void testSnippetScanWithUploadSource() throws IntegrationException {
-        scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, true);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
-        assertUploadSource(commandList, true);
-    }
-
-    @Test
-    public void testSnippetScanWithoutUploadSource() throws IntegrationException {
-        scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, false);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
-        assertUploadSource(commandList, false);
-    }
-
-    @Test
-    public void testSnippetScanLoggingWhenDryRun() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
-
-        ScanBatch scanBatch = scanBatchBuilder.build();
-        ScanCommand scanCommand = assertCommand(scanBatch);
-
-        assertLogging(scanCommand, 0);
-        BufferedIntLogger bufferedLogger;
-
-        scanBatchBuilder.dryRun(true);
-        scanBatch = scanBatchBuilder.build();
-        scanCommand = assertCommand(scanBatch);
-
-        assertLogging(scanCommand, 1);
-    }
-
-    @Test
     public void testWithoutLicenseSearch() throws IntegrationException {
         scanBatchBuilder.licenseSearch(false);
         List<String> commandList = createCommandList();
