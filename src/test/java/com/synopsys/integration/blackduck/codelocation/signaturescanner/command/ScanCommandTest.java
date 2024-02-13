@@ -1,5 +1,6 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -206,7 +209,18 @@ public class ScanCommandTest {
     	scanBatchBuilder.rapid(true);
     	scanBatchBuilder.bomCompareMode("BOM_COMPARE_STRICT");
     	List<String> commandList = createCommandList();
-    	assertTrue(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+        assertKeyValuePairIsSet(commandList, "--no-persistence-mode", "BOM_COMPARE_STRICT");
+    }
+
+    @Test
+    public void testNoPersistenceModeOverridden() throws IntegrationException {
+        scanBatchBuilder.rapid(true);
+        scanBatchBuilder.bomCompareMode("BOM_COMPARE_STRICT");
+        scanBatchBuilder.additionalScanArguments("--no-persistence-mode SOME_OTHER_MODE");
+        List<String> commandList = createCommandList();
+
+        assertFalse(commandList.contains("BOM_COMPARE_STRICT"));
+        assertKeyValuePairIsSet(commandList, "--no-persistence-mode", "SOME_OTHER_MODE");
     }
 
     @Test
@@ -214,6 +228,8 @@ public class ScanCommandTest {
     	scanBatchBuilder.rapid(false);
     	List<String> commandList = createCommandList();
     	assertFalse(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+        assertFalse(commandList.contains("--no-persistence-mode"));
+        assertFalse(commandList.contains("BOM_COMPARE_STRICT"));
     }
     
     @Test
@@ -222,8 +238,40 @@ public class ScanCommandTest {
     	scanBatchBuilder.bomCompareMode("BOM_COMPARE_STRICT");
     	List<String> commandList = createCommandList();
     	assertFalse(commandList.contains("--no-persistence-mode=BOM_COMPARE_STRICT"));
+        assertFalse(commandList.contains("--no-persistence-mode"));
+        assertFalse(commandList.contains("BOM_COMPARE_STRICT"));
     }
-    
+
+    @Test
+    public void testExcludePatternsSpecified() throws IntegrationException {
+        List<String> commandList = createCommandList();
+
+        assertKeyValuePairIsSet(commandList, "--exclude", "/exclude-me/");
+        assertKeyValuePairIsSet(commandList, "--exclude", "/me-as-well/");
+    }
+
+    @Test
+    public void testExcludePatternsOverridden() throws IntegrationException {
+        scanBatchBuilder.additionalScanArguments("--exclude /xyz/ --exclude /abc/");
+        List<String> commandList = createCommandList();
+
+        assertKeyValuePairIsSet(commandList, "--exclude", "/abc/");
+        assertKeyValuePairIsSet(commandList, "--exclude", "/xyz/");
+
+        assertFalse(commandList.contains("/exclude-me/"));
+        assertFalse(commandList.contains("/me-as-well/"));
+    }
+
+    @Test
+    public void testAdditionalArgumentsSpecified() throws IntegrationException {
+        scanBatchBuilder.additionalScanArguments("--argX x --argY y --test");
+        List<String> commandList = createCommandList();
+
+        assertKeyValuePairIsSet(commandList, "--argX", "x");
+        assertKeyValuePairIsSet(commandList, "--argY", "y");
+        assertTrue(commandList.contains("--test"));
+    }
+
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {
         try {
             scanBatchBuilder.blackDuckUrl(new HttpUrl("http://fakeserver.com"));
@@ -231,7 +279,12 @@ public class ScanCommandTest {
         } catch (IntegrationException e) {
             e.printStackTrace();
         }
-        scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path"));
+
+        Set<String> exclusionPatterns = new HashSet<>();
+        exclusionPatterns.add("/exclude-me/");
+        exclusionPatterns.add("/me-as-well/");
+
+        scanBatchBuilder.addTarget(ScanTarget.createBasicTarget("fake_file_path", exclusionPatterns, null));
         scanBatchBuilder.outputDirectory(tempDirectory.toFile());
     }
 
@@ -273,15 +326,19 @@ public class ScanCommandTest {
     }
 
     private void assertIndividualFileMatching(List<String> commandList, IndividualFileMatching individualFileMatching) {
-        Optional<String> isIndividualFileMatching = commandList
-                                                        .stream()
-                                                        .filter(s -> s.contains("individualFileMatching"))
-                                                        .findAny();
         if (null == individualFileMatching) {
-            assertFalse(isIndividualFileMatching.isPresent());
+            assertEquals(-1, commandList.indexOf("--individualFileMatching"));
         } else {
-            assertEquals("--individualFileMatching=" + individualFileMatching, isIndividualFileMatching.get());
+            assertKeyValuePairIsSet(commandList, "--individualFileMatching", individualFileMatching.toString());
         }
     }
 
+    private void assertKeyValuePairIsSet(List<String> commandList, String key, String value) {
+        for (int i = 0; i < commandList.size() - 1; i++) {
+            if (key.equals(commandList.get(i)) && value.equals(commandList.get(i + 1))) {
+                return;
+            }
+        }
+        assertTrue(false, "Key/value pair not found");
+    }
 }
