@@ -1,7 +1,7 @@
 /*
  * blackduck-common
  *
- * Copyright (c) 2023 Synopsys, Inc.
+ * Copyright (c) 2024 Synopsys, Inc.
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
@@ -11,6 +11,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +55,10 @@ public class ScanCommand {
     private final String correlationId;
     private final String bomCompareMode;
 
+    private List<String> command;
+
+    private Map<String, List<Integer>> commandKeysToKeyRelatedIndices;
+
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
@@ -87,166 +94,190 @@ public class ScanCommand {
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
-        List<String> cmd = new ArrayList<>();
+        command = new ArrayList<>();
+        commandKeysToKeyRelatedIndices = new HashMap<>();
+
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
-        scannerPaths.addJavaAndOnePathArguments(cmd);
+        scannerPaths.addJavaAndOnePathArguments(command);
 
         if (proxyInfo.shouldUseProxy()) {
-            populateProxyDetails(cmd);
+            populateProxyDetails();
         }
 
-        populateScanCliOpts(cmd);
+        populateScanCliOpts();
 
-        cmd.add("-Xmx" + scanMemoryInMegabytes + "m");
-        scannerPaths.addScanExecutableArguments(cmd);
+        appendSingleArgument("-Xmx" + scanMemoryInMegabytes + "m");
+        scannerPaths.addScanExecutableArguments(command);
 
-        cmd.add("--no-prompt");
+        appendSingleArgument("--no-prompt");
 
         if (!dryRun) {
-            populateOnlineProperties(logger, cmd);
+            populateOnlineProperties(logger);
         } else {
-            populateOfflineProperties(logger, specificRunOutputDirectoryPath, cmd);
+            populateOfflineProperties(logger, specificRunOutputDirectoryPath);
         }
 
         if (verbose) {
-            cmd.add("-v");
+            appendSingleArgument("-v");
         }
         if (debug) {
-            cmd.add("--debug");
+            appendSingleArgument("--debug");
         }
 
-        cmd.add("--logDir");
-        cmd.add(specificRunOutputDirectoryPath);
+        appendKeyValuePair("--logDir", specificRunOutputDirectoryPath);
 
         // Only add the statusWriteDir option if Black Duck supports the statusWriteDir option
         // The scanStatusDirectoryPath is the same as the log directory path
         // The CLI will create a subdirectory for the status files
-        cmd.add("--statusWriteDir");
-        cmd.add(specificRunOutputDirectoryPath);
+        appendKeyValuePair("--statusWriteDir", specificRunOutputDirectoryPath);
 
-        populateProjectAndVersion(cmd);
+        populateProjectAndVersion();
 
         if (StringUtils.isNotBlank(name)) {
-            cmd.add("--name");
-            cmd.add(name);
+            appendKeyValuePair("--name", name);
         }
 
-        populateExcludePatterns(cmd);
+        populateExcludePatterns();
 
         if (null != individualFileMatching) {
-            cmd.add("--individualFileMatching=" + individualFileMatching);
+            appendKeyValuePair("--individualFileMatching", individualFileMatching.toString());
         }
 
         if (isRapid) {
-            cmd.add("--no-persistence");
+            appendSingleArgument("--no-persistence");
             
             // --no-persistence-mode should never be used without --no-persistence so
             // only set it in this block.
-            cmd.add("--no-persistence-mode=" + bomCompareMode);
+            appendKeyValuePair("--no-persistence-mode", bomCompareMode);
         }
 
-        populateReducedPersistence(cmd);
+        populateReducedPersistence();
 
         if (StringUtils.isNotBlank(correlationId)) {
-            cmd.add("--correlationId");
-            cmd.add(correlationId);
+            appendKeyValuePair("--correlationId", correlationId);
         }
 
         ScanCommandArgumentParser parser = new ScanCommandArgumentParser();
-        populateAdditionalScanArguments(cmd, parser);
+        populateAdditionalScanArgumentsAndRemoveOverridden(parser);
 
-        return cmd;
+        return command;
     }
 
-    private void populateReducedPersistence(List<String> cmd) {
+    private void appendSingleArgument(String arg) {
+        command.add(arg);
+    }
+
+    private void appendKeyValuePair(String key, String value) {
+        if (!commandKeysToKeyRelatedIndices.containsKey(key)) {
+            commandKeysToKeyRelatedIndices.put(key, new ArrayList<>());
+        }
+        List<Integer> indecesList = commandKeysToKeyRelatedIndices.get(key);
+
+        indecesList.add(command.size());     // track the index of the key
+        indecesList.add(command.size() + 1); // track the index of the value
+
+        appendSingleArgument(key);
+        appendSingleArgument(value);
+    }
+
+    private void populateReducedPersistence() {
         if (reducedPersistence != null) {
             if (reducedPersistence.equals(ReducedPersistence.DISCARD_UNMATCHED)) {
-                cmd.add("--discard-unmatched-files");
+                appendSingleArgument("--discard-unmatched-files");
             }
             if (reducedPersistence.equals(ReducedPersistence.RETAIN_UNMATCHED)) {
-                cmd.add("--retain-unmatched-files");
+                appendSingleArgument("--retain-unmatched-files");
             }
         }
     }
 
-    private void populateAdditionalScanArguments(List<String> cmd, ScanCommandArgumentParser parser) throws IntegrationException {
+    private void populateAdditionalScanArgumentsAndRemoveOverridden(ScanCommandArgumentParser parser) throws IntegrationException {
+        Set<Integer> overriddenArgIndices = new HashSet<>();
+
         List<String> arguments = parser.parse(additionalScanArguments);
+
         for (String argument : arguments) {
             if (StringUtils.isNotBlank(argument)) {
-                cmd.add(argument);
+                if (commandKeysToKeyRelatedIndices.containsKey(argument)) {
+                    overriddenArgIndices.addAll(commandKeysToKeyRelatedIndices.get(argument));
+                }
+                appendSingleArgument(argument);
             }
+        }
+
+        if (!overriddenArgIndices.isEmpty()) {
+            List<String> updatedCommand = new ArrayList<>();
+            for (int i = 0; i < command.size(); i++) {
+                if (!overriddenArgIndices.contains(i)) {
+                    updatedCommand.add(command.get(i));
+                }
+            }
+            command = updatedCommand;
         }
     }
 
-    private void populateExcludePatterns(List<String> cmd) {
+    private void populateExcludePatterns() {
         if (excludePatterns != null) {
             for (String exclusionPattern : excludePatterns) {
                 if (StringUtils.isNotBlank(exclusionPattern)) {
-                    cmd.add("--exclude");
-                    cmd.add(exclusionPattern);
+                    appendKeyValuePair("--exclude", exclusionPattern);
                 }
             }
         }
     }
 
-    private void populateProjectAndVersion(List<String> cmd) {
+    private void populateProjectAndVersion() {
         if (StringUtils.isNotBlank(projectName) && StringUtils.isNotBlank(versionName)) {
-            cmd.add("--project");
-            cmd.add(projectName);
-            cmd.add("--release");
-            cmd.add(versionName);
+            appendKeyValuePair("--project", projectName);
+            appendKeyValuePair("--release", versionName);
         }
     }
 
-    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath, List<String> cmd) {
+    private void populateOfflineProperties(IntLogger logger, String specificRunOutputDirectoryPath) {
         logger.info("You have configured this signature scan to run in dry run mode - no results will be submitted to Black Duck.");
         blackDuckOnlineProperties.warnIfOnlineIsNeeded(logger::warn);
 
         // The dryRunWriteDir is the same as the log directory path
         // The CLI will create a subdirectory for the json files
-        cmd.add("--dryRunWriteDir");
-        cmd.add(specificRunOutputDirectoryPath);
+        appendKeyValuePair("--dryRunWriteDir", specificRunOutputDirectoryPath);
     }
 
-    private void populateOnlineProperties(IntLogger logger, List<String> cmd) {
-        cmd.add("--scheme");
-        cmd.add(scheme);
-        cmd.add("--host");
-        cmd.add(host);
+    private void populateOnlineProperties(IntLogger logger) {
+        appendKeyValuePair("--scheme", scheme);
+        appendKeyValuePair("--host", host);
+
         logger.debug("Using the Black Duck hostname : '" + host + "'");
 
         if (StringUtils.isEmpty(blackDuckApiToken)) {
-            cmd.add("--username");
-            cmd.add(blackDuckUsername);
+            appendKeyValuePair("--username", blackDuckUsername);
         }
 
         int blackDuckPort = port;
         if (blackDuckPort > 0) {
-            cmd.add("--port");
-            cmd.add(Integer.toString(blackDuckPort));
+            appendKeyValuePair("--port", Integer.toString(blackDuckPort));
         } else {
             logger.warn("Could not find a port to use for the Server.");
         }
 
         if (runInsecure) {
-            cmd.add("--insecure");
+            appendSingleArgument("--insecure");
         }
 
-        blackDuckOnlineProperties.addOnlineCommands(cmd);
+        blackDuckOnlineProperties.addOnlineCommands(command);
     }
 
-    private void populateScanCliOpts(List<String> cmd) {
+    private void populateScanCliOpts() {
         if (StringUtils.isNotBlank(scanCliOpts)) {
             for (String scanOpt : scanCliOpts.split(" ")) {
                 if (StringUtils.isNotBlank(scanOpt)) {
-                    cmd.add(scanOpt);
+                    appendSingleArgument(scanOpt);
                 }
             }
         }
     }
 
-    private void populateProxyDetails(List<String> cmd) {
+    private void populateProxyDetails() {
         ProxyInfo blackDuckProxyInfo = proxyInfo;
         String proxyHost = blackDuckProxyInfo.getHost().orElse(null);
         int proxyPort = blackDuckProxyInfo.getPort();
@@ -254,21 +285,34 @@ public class ScanCommand {
         String proxyPassword = blackDuckProxyInfo.getPassword().orElse(null);
         String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
         String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
-        cmd.add("-Dhttp.proxyHost=" + proxyHost);
-        cmd.add("-Dhttp.proxyPort=" + proxyPort);
+
+        appendSingleArgument("-Dhttp.proxyHost");
+        appendSingleArgument(proxyHost);
+
+        appendSingleArgument("-Dhttp.proxyPort");
+        appendSingleArgument(Integer.toString(proxyPort));
+
         if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-            cmd.add("-Dhttp.proxyUser=" + proxyUsername);
-            cmd.add("-Dhttp.proxyPassword=" + proxyPassword);
+            appendSingleArgument("-Dhttp.proxyUser");
+            appendSingleArgument(proxyUsername);
+
+            appendSingleArgument("-Dhttp.proxyPassword");
+            appendSingleArgument(proxyPassword);
         } else {
             // CLI will ignore the proxy host and port if there are no credentials
-            cmd.add("-Dhttp.proxyUser=user");
-            cmd.add("-Dhttp.proxyPassword=password");
+            appendSingleArgument("-Dhttp.proxyUser");
+            appendSingleArgument("user");
+
+            appendSingleArgument("-Dhttp.proxyPassword");
+            appendSingleArgument("password");
         }
         if (StringUtils.isNotBlank(proxyNtlmDomain)) {
-            cmd.add("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
+            appendSingleArgument("-Dhttp.auth.ntlm.domain");
+            appendSingleArgument(proxyNtlmDomain);
         }
         if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
-            cmd.add("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
+            appendSingleArgument("-Dblackduck.http.auth.ntlm.workstation");
+            appendSingleArgument(proxyNtlmWorkstation);
         }
     }
 
