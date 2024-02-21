@@ -174,8 +174,8 @@ public class ScanCommand {
         }
         List<Integer> indecesList = commandKeysToKeyRelatedIndices.get(key);
 
-        indecesList.add(command.size());
-        indecesList.add(command.size() + 1);
+        indecesList.add(command.size());     // track the index of the key
+        indecesList.add(command.size() + 1); // track the index of the value
 
         appendSingleArgument(key);
         appendSingleArgument(value);
