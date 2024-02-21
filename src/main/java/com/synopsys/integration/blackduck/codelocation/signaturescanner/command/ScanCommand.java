@@ -57,7 +57,7 @@ public class ScanCommand {
 
     private List<String> command;
 
-    private Map<String, List<Integer>> commandKeysToKeyRelatedIndeces;
+    private Map<String, List<Integer>> commandKeysToKeyRelatedIndices;
 
     public ScanCommand(File signatureScannerInstallDirectory, File outputDirectory, boolean dryRun, ProxyInfo proxyInfo, String scanCliOpts, int scanMemoryInMegabytes, String scheme, String host, String blackDuckApiToken,
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
@@ -95,7 +95,7 @@ public class ScanCommand {
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
         command = new ArrayList<>();
-        commandKeysToKeyRelatedIndeces = new HashMap<>();
+        commandKeysToKeyRelatedIndices = new HashMap<>();
 
         logger.debug("Using this java installation : " + scannerPaths.getPathToJavaExecutable());
 
@@ -169,10 +169,10 @@ public class ScanCommand {
     }
 
     private void appendKeyValuePair(String key, String value) {
-        if (!commandKeysToKeyRelatedIndeces.containsKey(key)) {
-            commandKeysToKeyRelatedIndeces.put(key, new ArrayList<>());
+        if (!commandKeysToKeyRelatedIndices.containsKey(key)) {
+            commandKeysToKeyRelatedIndices.put(key, new ArrayList<>());
         }
-        List<Integer> indecesList = commandKeysToKeyRelatedIndeces.get(key);
+        List<Integer> indecesList = commandKeysToKeyRelatedIndices.get(key);
 
         indecesList.add(command.size());
         indecesList.add(command.size() + 1);
@@ -193,23 +193,23 @@ public class ScanCommand {
     }
 
     private void populateAdditionalScanArgumentsAndRemoveOverridden(ScanCommandArgumentParser parser) throws IntegrationException {
-        Set<Integer> overriddenArgIndexes = new HashSet<>();
+        Set<Integer> overriddenArgIndices = new HashSet<>();
 
         List<String> arguments = parser.parse(additionalScanArguments);
 
         for (String argument : arguments) {
             if (StringUtils.isNotBlank(argument)) {
-                if (commandKeysToKeyRelatedIndeces.containsKey(argument)) {
-                    overriddenArgIndexes.addAll(commandKeysToKeyRelatedIndeces.get(argument));
+                if (commandKeysToKeyRelatedIndices.containsKey(argument)) {
+                    overriddenArgIndices.addAll(commandKeysToKeyRelatedIndices.get(argument));
                 }
                 appendSingleArgument(argument);
             }
         }
 
-        if (overriddenArgIndexes.size() > 0) {
+        if (!overriddenArgIndices.isEmpty()) {
             List<String> updatedCommand = new ArrayList<>();
             for (int i = 0; i < command.size(); i++) {
-                if (!overriddenArgIndexes.contains(i)) {
+                if (!overriddenArgIndices.contains(i)) {
                     updatedCommand.add(command.get(i));
                 }
             }
