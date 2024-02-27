@@ -286,33 +286,23 @@ public class ScanCommand {
         String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
         String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
 
-        appendSingleArgument("-Dhttp.proxyHost");
-        appendSingleArgument(proxyHost);
+        appendSingleArgument("-Dhttp.proxyHost=" + proxyHost);
 
-        appendSingleArgument("-Dhttp.proxyPort");
-        appendSingleArgument(Integer.toString(proxyPort));
+        appendSingleArgument("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
 
         if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-            appendSingleArgument("-Dhttp.proxyUser");
-            appendSingleArgument(proxyUsername);
-
-            appendSingleArgument("-Dhttp.proxyPassword");
-            appendSingleArgument(proxyPassword);
+            appendSingleArgument("-Dhttp.proxyUser=" + proxyUsername);
+            appendSingleArgument("-Dhttp.proxyPassword=" + proxyPassword);
         } else {
             // CLI will ignore the proxy host and port if there are no credentials
-            appendSingleArgument("-Dhttp.proxyUser");
-            appendSingleArgument("user");
-
-            appendSingleArgument("-Dhttp.proxyPassword");
-            appendSingleArgument("password");
+            appendSingleArgument("-Dhttp.proxyUser=user");
+            appendSingleArgument("-Dhttp.proxyPassword=password");
         }
         if (StringUtils.isNotBlank(proxyNtlmDomain)) {
-            appendSingleArgument("-Dhttp.auth.ntlm.domain");
-            appendSingleArgument(proxyNtlmDomain);
+            appendSingleArgument("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
         }
         if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
-            appendSingleArgument("-Dblackduck.http.auth.ntlm.workstation");
-            appendSingleArgument(proxyNtlmWorkstation);
+            appendSingleArgument("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
         }
     }
 
