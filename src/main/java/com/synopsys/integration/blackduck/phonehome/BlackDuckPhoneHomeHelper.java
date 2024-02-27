@@ -23,7 +23,6 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.phonehome.PhoneHomeClient;
 import com.synopsys.integration.phonehome.PhoneHomeResponse;
 import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.google.analytics.GoogleAnalyticsConstants;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
 import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
 import com.synopsys.integration.util.IntEnvironmentVariables;
@@ -35,15 +34,11 @@ public class BlackDuckPhoneHomeHelper {
     private final BlackDuckRegistrationService blackDuckRegistrationService;
     private final IntEnvironmentVariables intEnvironmentVariables;
 
-    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory) {
-        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, new NoThreadExecutorService());
+    public static BlackDuckPhoneHomeHelper createPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, String apiSecret, String measurementId) {
+        return BlackDuckPhoneHomeHelper.createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, apiSecret, measurementId, new NoThreadExecutorService());
     }
 
-    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService) {
-        return createAsynchronousPhoneHomeHelper(blackDuckServicesFactory, executorService, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID);
-    }
-
-    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, ExecutorService executorService, String trackingId) {
+    public static BlackDuckPhoneHomeHelper createAsynchronousPhoneHomeHelper(BlackDuckServicesFactory blackDuckServicesFactory, String apiSecret, String measurementId, ExecutorService executorService) {
         BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         IntLogger intLogger = blackDuckServicesFactory.getLogger();
@@ -51,19 +46,16 @@ public class BlackDuckPhoneHomeHelper {
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServicesFactory.getBlackDuckHttpClient();
         HttpClientBuilder httpClientBuilder = blackDuckHttpClient.getHttpClientBuilder();
         Gson gson = blackDuckServicesFactory.getGson();
-        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, httpClientBuilder, gson, trackingId);
+        PhoneHomeClient phoneHomeClient = BlackDuckPhoneHomeHelper.createPhoneHomeClient(intLogger, httpClientBuilder, gson, apiSecret, measurementId);
 
         PhoneHomeService phoneHomeService = PhoneHomeService.createAsynchronousPhoneHomeService(intLogger, phoneHomeClient, executorService);
 
         return new BlackDuckPhoneHomeHelper(intLogger, phoneHomeService, blackDuckRegistrationService, intEnvironmentVariables);
     }
 
-    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson) {
-        return createPhoneHomeClient(intLogger, httpClientBuilder, gson, GoogleAnalyticsConstants.PRODUCTION_INTEGRATIONS_TRACKING_ID);
-    }
-
-    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson, String trackingId) {
-        return new PhoneHomeClient(intLogger, httpClientBuilder, gson, trackingId);
+    public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson, String apiSecret, String measurementId) {
+        //return new PhoneHomeClient(intLogger, httpClientBuilder, gson, apiSecret, measurementId);
+        return new PhoneHomeClient(intLogger, httpClientBuilder, gson, measurementId);
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
