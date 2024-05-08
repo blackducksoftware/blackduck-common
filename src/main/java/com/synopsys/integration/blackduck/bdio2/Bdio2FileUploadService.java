@@ -31,6 +31,7 @@ import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";
+    private static final String FILE_NAME_BDIO_HEADER_PB = "bdio-header.pb";
     private static final int BD_WAIT_AND_RETRY_INTERVAL = 30;
 
     private final Bdio2ContentExtractor bdio2Extractor;
@@ -65,12 +66,12 @@ public class Bdio2FileUploadService extends DataService {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
         }
         BdioFileContent header = bdioFiles.stream()
-            .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+            .filter(content -> content.getFileName().equals(FILE_NAME_BDIO_HEADER_PB) || content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
             .findFirst()
-            .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file" + FILE_NAME_BDIO_HEADER_JSONLD + "."));
+            .orElseThrow(() -> new BlackDuckIntegrationException("Cannot find BDIO header file by name of " + FILE_NAME_BDIO_HEADER_JSONLD + " or " +FILE_NAME_BDIO_HEADER_PB+ "."));
 
         List<BdioFileContent> remainingFiles = bdioFiles.stream()
-            .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD))
+            .filter(content -> !content.getFileName().equals(FILE_NAME_BDIO_HEADER_JSONLD) && !content.getFileName().equals(FILE_NAME_BDIO_HEADER_PB))
             .collect(Collectors.toList());
 
         int count = remainingFiles.size();
