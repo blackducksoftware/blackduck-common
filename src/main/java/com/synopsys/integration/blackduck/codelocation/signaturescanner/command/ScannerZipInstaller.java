@@ -82,25 +82,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
         this.installDirectory = installDirectory;
     }
 
-//    public File installOrUpdateScanner_new() throws IOException, IntegrationException, ArchiveException {
-//        File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
-//        scannerExpansionDirectory.mkdirs();
-//
-//        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.SCAN_CLI_VERSION_FILENAME);
-//
-//        // OS
-//        if (!versionFile.exists()) {
-//            logger.info("Scan CLI version file does not exist, assuming fresh install.");
-//            // download latest sig scan from BD server
-//            // return
-//            downloadSignatureScanner_new(scannerExpansionDirectory, null); // also what we read from the version file could be corrupt so request would fail
-//        }
-//        String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
-//        // download sig scan from BD server but compare to current version first
-//        downloadSignatureScanner_new(scannerExpansionDirectory, localScannerVersion);
-//        return installDirectory;
-//    }
-
     /**
      * The Black Duck Signature Scanner (scan-cli) will be downloaded if it has not
      * previously been downloaded or if it has been updated on the server. The
@@ -178,72 +159,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
             throw new BlackDuckIntegrationException(String.format("The Black Duck Signature Scanner url (%s) is not valid.", url));
         }
     }
-
-//    private String downloadSignatureScanner_new(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScanCliVersion) throws IntegrationException, IOException, ArchiveException {
-//        StringBuilder url = new StringBuilder(blackDuckServerUrl.string());
-//        url.append("/api/tools/scan.cli.zip/versions/latest/platforms/macosx");
-//        HttpUrl newScanCliDownloadUrl = new HttpUrl(url.toString());
-//
-//        logger.debug(String.format("Downloading scan-cli to '%s' from '%s'.", scannerExpansionDirectory.getAbsolutePath(), newScanCliDownloadUrl));
-//        // OS
-//        // version header
-//            // " If the Accept-Version header is absent or if it is present and doesn’t match the version offered by the server, then Black Duck provides the bits for download"
-//        // make the request
-//        BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder()
-//                .url(newScanCliDownloadUrl)
-//                .addHeader("Accept-Version", "");
-//        // handle response, whatever that looks like? how are the bits downloaded to the appropriate install directory and "unzipped"?
-//        BlackDuckRequest<BlackDuckResponse, UrlSingleResponse<BlackDuckResponse>> request = BlackDuckRequest.createSingleRequest(
-//                requestBuilder,
-//                newScanCliDownloadUrl,
-//                BlackDuckResponse.class
-//        );
-//
-//
-//        try (Response response = blackDuckHttpClient.execute(request)) {
-//            logger.info("Downloading the Black Duck Signature Scanner from new apiiii.");
-//            try (InputStream responseStream = response.getContent()) {
-//                logger.info(String.format(
-//                        "If your Black Duck server has changed, the contents of %s may change which could involve deleting files - please do not place items in the expansion directory as this directory is assumed to be under blackduck-common control.",
-//                        scannerExpansionDirectory.getAbsolutePath()));
-//                cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
-//            }
-//
-//            ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
-//            File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
-//            File oneJar = new File(scanPaths.getPathToOneJar());
-//            File scanExecutable = new File(scanPaths.getPathToScanExecutable());
-//            javaExecutable.setExecutable(true);
-//            oneJar.setExecutable(true);
-//            scanExecutable.setExecutable(true);
-//
-//            Certificate serverCertificate = signatureScannerClient.getServerCertificate();
-//
-//            keyStoreHelper.updateKeyStoreWithServerCertificate(newScanCliDownloadUrl.url().getHost(), serverCertificate, scanPaths.getPathToCacerts());
-//
-//            logger.info("Black Duck Signature Scanner downloaded successfully.");
-//        }
-//
-//
-////        try (Response response = blackDuckHttpClient.execute(request)) {
-////            if (response.isStatusCodeSuccess()) {
-////                logger.debug("Deleting existing file.");
-////                FileUtils.deleteQuietly(installDirectory);
-////                logger.debug("Writing to file.");
-////                InputStream jarBytesInputStream = response.getContent();
-////                FileUtils.copyInputStreamToFile(jarBytesInputStream, installDirectory);
-////                logger.debug("Successfully wrote response to file.");
-////                return response.getHeaderValue("Version");
-////            } else if (response.getStatusCode() == 304) {
-////                logger.debug("Present scan-cli Scanner installation is up to date - skipping download.");
-////                return localScanCliVersion;
-////            } else {
-////                logger.trace("Unable to download artifact. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());
-////                throw new IntegrationException("Unable to download artifact. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());
-////            }
-////        }
-//        return "uhm";
-//    }
 
     /**
      * Description TODO
