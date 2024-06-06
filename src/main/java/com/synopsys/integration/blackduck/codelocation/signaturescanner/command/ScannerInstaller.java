@@ -13,4 +13,5 @@ import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationExceptio
 
 public interface ScannerInstaller {
     File installOrUpdateScanner() throws BlackDuckIntegrationException;
+
 }
