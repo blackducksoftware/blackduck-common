@@ -20,28 +20,24 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
 import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
-import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScannerZipInstaller implements ScannerInstaller {
-    // new URL = GET /api/tools/{toolName}/versions/{version}/platforms/{platform}
-    private static final String PLATFORM_PARAMETER_KEY = "platform";
+    private static final String PLATFORM_PARAMETER_KEY = "platforms";
     private static final String MAC_PLATFORM_PARAMETER_VALUE = "macosx";
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
 
-    private static final String SCAN_CLI_TOOL_DOWNLOAD_URL = "api/tools/scan.cli.zip/versions/latest";
+    private static final String SCAN_CLI_TOOL_DOWNLOAD_URL = "api/tools/scan.cli.zip/versions/latest/";
 
     public static final String BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY = "Black_Duck_Scan_Installation";
     public static final String SCAN_CLI_VERSION_FILENAME = "scan-cli-version.txt";
@@ -105,7 +101,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
         File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.SCAN_CLI_VERSION_FILENAME); // TODO what should we do with the old file?
+        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.SCAN_CLI_VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -161,7 +157,10 @@ public class ScannerZipInstaller implements ScannerInstaller {
     }
 
     /**
-     * Description TODO
+     * Calls /api/tools to download the latest available version of the Signature Scanner tool. If we provide the
+     * Accept-Version header, but it is blank or doesn’t match the version offered by the server, then Black Duck
+     * provides the bits for download. If the Accept-Version header matches the version offered by the server, then the
+     * we already have the same version and do not need to redownload.
      * @param scannerExpansionDirectory
      * @param downloadUrl
      * @param localScannerVersion
@@ -170,8 +169,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
      */
     private String downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException {
         logger.debug(String.format("Downloading scan-cli to '%s' from '%s'.", scannerExpansionDirectory.getAbsolutePath(), downloadUrl));
-            // " If the Accept-Version header is absent or if it is present and doesn’t match the version offered by
-            // the server, then Black Duck provides the bits for download"
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder()
                 .url(downloadUrl)
                 .addHeader("Accept-Version", localScannerVersion);
@@ -184,7 +181,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
 
         try (Response response = blackDuckHttpClient.execute(downloadRequest)) {
             if (response.isStatusCodeSuccess()) {
-                logger.info("Downloading the Black Duck Signature Scanner ~~from new API~~.");
+                logger.info("Downloading the Black Duck Signature Scanner.");
                 // if response is 200 OK then we got the bits for download so do the unzipping.
                 try (InputStream responseStream = response.getContent()) {
                     logger.info(String.format(
@@ -192,8 +189,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
                             scannerExpansionDirectory.getAbsolutePath()));
                     cleanupZipExpander.expand(responseStream, scannerExpansionDirectory);
                 }
-//                logger.debug("Deleting existing file."); // TODO should we be deleting previous version?
-//                FileUtils.deleteQuietly(installDirectory);
                 ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
                 File javaExecutable = new File(scanPaths.getPathToJavaExecutable());
                 File oneJar = new File(scanPaths.getPathToOneJar());
@@ -214,7 +209,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
                  logger.debug("Local signature scanner version is up to date - skipping download.");
                 return localScannerVersion;
             } else {
-                // TOME else response is anything else, something went wrong? Or maybe its thrown via some other method and no need to do it here?
                 throw new IntegrationException();
             }
         }

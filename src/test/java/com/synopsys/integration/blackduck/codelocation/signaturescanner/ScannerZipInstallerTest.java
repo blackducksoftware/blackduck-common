@@ -33,7 +33,7 @@ import com.synopsys.integration.util.OperatingSystemType;
 class ScannerZipInstallerTest {
     @Test
     void testActualDownload() throws Exception {
-        String signatureScannerDownloadPath = TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH.fromEnvironment();
+        String signatureScannerDownloadPath = TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH.fromEnvironment(); // TOME sort out where env variables come from in Jenkins pipeline
         String blackDuckUrl = TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL.fromEnvironment();
         String blackDuckUsername = TestingPropertyKey.TEST_USERNAME.fromEnvironment();
         String blackDuckPassword = TestingPropertyKey.TEST_PASSWORD.fromEnvironment();
@@ -50,8 +50,6 @@ class ScannerZipInstallerTest {
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
-        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(blackDuckHttpClient, logger);
-        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, IntEnvironmentVariables.includeSystemEnv(), operatingSystemType);

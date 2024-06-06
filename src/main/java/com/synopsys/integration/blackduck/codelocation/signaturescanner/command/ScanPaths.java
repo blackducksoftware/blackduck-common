@@ -9,7 +9,7 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 
 import java.util.List;
 
-public class ScanPaths { // TOME wots this
+public class ScanPaths {
     private final String pathToJavaExecutable;
     private final String pathToCacerts;
     private final String pathToOneJar;
