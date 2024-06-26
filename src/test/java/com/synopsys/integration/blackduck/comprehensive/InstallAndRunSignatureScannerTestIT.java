@@ -107,7 +107,7 @@ class InstallAndRunSignatureScannerTestIT {
         ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(
             logger,
             new SignatureScannerClient(blackDuckHttpClient),
-            blackDuckRegistrationService,
+            blackDuckHttpClient,
             cleanupZipExpander,
             scanPathsUtility,
             noOpKeyStoreHelper,
@@ -126,7 +126,7 @@ class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             blackDuckServerUrl,
             operatingSystemType,
             installDirectory);

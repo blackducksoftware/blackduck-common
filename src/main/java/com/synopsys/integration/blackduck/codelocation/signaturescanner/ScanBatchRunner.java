@@ -65,7 +65,7 @@ public class ScanBatchRunner {
         ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(
             logger,
             signatureScannerClient,
-            blackDuckRegistrationService,
+            blackDuckHttpClient,
             cleanupZipExpander,
             scanPathsUtility,
             keyStoreHelper,
