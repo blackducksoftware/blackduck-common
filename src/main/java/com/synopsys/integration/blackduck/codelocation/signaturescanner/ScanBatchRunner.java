@@ -60,11 +60,9 @@ public class ScanBatchRunner {
         File signatureScannerInstallDirectory
     ) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
-        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(
             logger,
-            signatureScannerClient,
             blackDuckHttpClient,
             cleanupZipExpander,
             scanPathsUtility,

@@ -57,7 +57,7 @@ class ScannerZipInstallerTest {
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             new HttpUrl(blackDuckUrl),
             operatingSystemType,
             downloadTarget);

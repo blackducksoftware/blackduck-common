@@ -43,7 +43,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
     public static final String SCAN_CLI_VERSION_FILENAME = "scan-cli-version.txt";
 
     private final IntLogger logger;
-    private final SignatureScannerClient signatureScannerClient; // TOME maybe nuke?
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
@@ -54,7 +53,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
 
     public ScannerZipInstaller(
         IntLogger logger,
-        SignatureScannerClient signatureScannerClient,
         BlackDuckHttpClient blackDuckHttpClient,
         CleanupZipExpander cleanupZipExpander,
         ScanPathsUtility scanPathsUtility,
@@ -68,7 +66,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
         }
 
         this.logger = logger;
-        this.signatureScannerClient = signatureScannerClient;
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
@@ -179,7 +176,7 @@ public class ScannerZipInstaller implements ScannerInstaller {
                 BlackDuckResponse.class
         );
 
-        try (Response response = blackDuckHttpClient.execute(downloadRequest)) {
+        try (Response response = blackDuckHttpClient.execute(downloadRequest)) { // TOME maybe i should instead call executeGetRequest and it wont have the offset/limit stuff?
             if (response.isStatusCodeSuccess()) {
                 logger.info("Downloading the Black Duck Signature Scanner.");
                 // if response is 200 OK then we got the bits for download so do the unzipping.
@@ -196,9 +193,6 @@ public class ScannerZipInstaller implements ScannerInstaller {
                 javaExecutable.setExecutable(true);
                 oneJar.setExecutable(true);
                 scanExecutable.setExecutable(true);
-
-                Certificate serverCertificate = signatureScannerClient.getServerCertificate(); // TOME not sure if this is needed?
-                keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), serverCertificate, scanPaths.getPathToCacerts());
 
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
                 String latestScannerVersion = response.getHeaderValue("Version");
