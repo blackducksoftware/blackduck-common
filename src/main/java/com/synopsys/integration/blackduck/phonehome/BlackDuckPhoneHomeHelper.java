@@ -54,8 +54,7 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public static PhoneHomeClient createPhoneHomeClient(IntLogger intLogger, HttpClientBuilder httpClientBuilder, Gson gson, String apiSecret, String measurementId) {
-        //return new PhoneHomeClient(intLogger, httpClientBuilder, gson, apiSecret, measurementId);
-        return new PhoneHomeClient(intLogger, httpClientBuilder, gson, measurementId);
+        return new PhoneHomeClient(intLogger, httpClientBuilder, gson, apiSecret, measurementId);
     }
 
     public BlackDuckPhoneHomeHelper(IntLogger logger, PhoneHomeService phoneHomeService, BlackDuckRegistrationService blackDuckRegistrationService,
