@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +28,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.OldApiScannerInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -104,7 +101,7 @@ class InstallAndRunSignatureScannerTestIT {
 
         // first, run a scan with an install that will NOT update the embedded keystore, which should fail
         KeyStoreHelper noOpKeyStoreHelper = new NoOpKeyStoreHelper();
-        ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(
+        OldApiScannerInstaller installerWithoutKeyStoreManagement = new OldApiScannerInstaller(
             logger,
             new SignatureScannerClient(blackDuckHttpClient),
             blackDuckRegistrationService,
@@ -126,7 +123,7 @@ class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        OldApiScannerInstaller installerWithKeyStoreManagement = new OldApiScannerInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             blackDuckServerUrl,
             operatingSystemType,
             installDirectory);

@@ -29,7 +29,7 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
 
-public class ScannerZipInstaller extends ApiScannerInstaller {
+public class OldApiScannerInstaller extends ApiScannerInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";
     public static final String WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-windows.zip";
     public static final String MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-macosx.zip";
@@ -47,7 +47,7 @@ public class ScannerZipInstaller extends ApiScannerInstaller {
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
 
-    public ScannerZipInstaller(
+    public OldApiScannerInstaller(
         IntLogger logger,
         SignatureScannerClient signatureScannerClient,
         BlackDuckRegistrationService blackDuckRegistrationService,
@@ -93,10 +93,10 @@ public class ScannerZipInstaller extends ApiScannerInstaller {
             }
         }
 
-        File scannerExpansionDirectory = new File(installDirectory, ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
+        File scannerExpansionDirectory = new File(installDirectory, OldApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
+        File versionFile = new File(scannerExpansionDirectory, OldApiScannerInstaller.VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -137,11 +137,11 @@ public class ScannerZipInstaller extends ApiScannerInstaller {
         }
 
         if (OperatingSystemType.MAC == operatingSystemType) {
-            url.append(ScannerZipInstaller.MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
+            url.append(OldApiScannerInstaller.MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
         } else if (OperatingSystemType.WINDOWS == operatingSystemType) {
-            url.append(ScannerZipInstaller.WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
+            url.append(OldApiScannerInstaller.WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
         } else {
-            url.append(ScannerZipInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
+            url.append(OldApiScannerInstaller.DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX);
         }
 
         try {

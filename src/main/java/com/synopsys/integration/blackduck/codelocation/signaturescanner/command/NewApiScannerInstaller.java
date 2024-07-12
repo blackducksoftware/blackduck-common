@@ -208,9 +208,13 @@ public class NewApiScannerInstaller extends ApiScannerInstaller {
         }
     }
 
+    /**
+     * Deletes legacy version file that may be left behind if client had previously installed scan-cli using {@link OldApiScannerInstaller}
+     * @param scannerExpansionDirectory
+     */
     private void removeOldVersionFileIfExists(File scannerExpansionDirectory) {
         try {
-            File oldVersionFile = new File(scannerExpansionDirectory, ScannerZipInstaller.VERSION_FILENAME);
+            File oldVersionFile = new File(scannerExpansionDirectory, OldApiScannerInstaller.VERSION_FILENAME);
             oldVersionFile.delete();
         } catch (Exception e) {
             logger.trace("Could not delete old Signature Scanner version file.");

@@ -76,7 +76,7 @@ public class ScanPathsUtility {
 
         boolean managedByLibrary = false;
         File installDirectory = directory;
-        final File[] blackDuckScanInstallationDirectories = directory.listFiles(file -> ScannerZipInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
+        final File[] blackDuckScanInstallationDirectories = directory.listFiles(file -> OldApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY.equals(file.getName()));
         if (blackDuckScanInstallationDirectories.length == 1) {
             logger.debug("The directory structure was likely created by the installer");
             installDirectory = findFirstFilteredFile(blackDuckScanInstallationDirectories[0], EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER, "No scan.cli directories could be found in %s.");
