@@ -77,7 +77,7 @@ class InstallAndRunSignatureScannerTestIT {
     }
 
     @Test
-    void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
+    void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException { // TOME review this
         // here, we do not want to automatically trust the server's certificate
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = intHttpClientTestHelper.getBlackDuckServerConfigBuilder();
         blackDuckServerConfigBuilder.setTrustCert(false);
@@ -106,7 +106,8 @@ class InstallAndRunSignatureScannerTestIT {
         KeyStoreHelper noOpKeyStoreHelper = new NoOpKeyStoreHelper();
         ScannerZipInstaller installerWithoutKeyStoreManagement = new ScannerZipInstaller(
             logger,
-            blackDuckHttpClient,
+            new SignatureScannerClient(blackDuckHttpClient),
+            blackDuckRegistrationService,
             cleanupZipExpander,
             scanPathsUtility,
             noOpKeyStoreHelper,
@@ -125,7 +126,7 @@ class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ScannerZipInstaller installerWithKeyStoreManagement = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             blackDuckServerUrl,
             operatingSystemType,
             installDirectory);

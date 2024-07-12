@@ -50,6 +50,8 @@ class ScannerZipInstallerTest {
 
         BlackDuckServerConfig blackDuckServerConfig = blackDuckServerConfigBuilder.build();
         BlackDuckHttpClient blackDuckHttpClient = blackDuckServerConfig.createBlackDuckHttpClient(logger);
+        BlackDuckServicesFactory blackDuckServicesFactory = blackDuckServerConfig.createBlackDuckServicesFactory(blackDuckHttpClient, logger);
+        BlackDuckRegistrationService blackDuckRegistrationService = blackDuckServicesFactory.createBlackDuckRegistrationService();
 
         OperatingSystemType operatingSystemType = OperatingSystemType.determineFromSystem();
         ScanPathsUtility scanPathsUtility = new ScanPathsUtility(logger, IntEnvironmentVariables.includeSystemEnv(), operatingSystemType);
@@ -57,7 +59,7 @@ class ScannerZipInstallerTest {
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ScannerZipInstaller scannerZipInstaller = new ScannerZipInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             new HttpUrl(blackDuckUrl),
             operatingSystemType,
             downloadTarget);

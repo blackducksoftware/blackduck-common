@@ -34,7 +34,7 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final ScannerInstaller scannerInstaller;
 
-    public static ScanBatchRunner createDefault(
+    public static ScanBatchRunner createDefault( // TOME called on by IT only, is this used by Alert?
         IntLogger logger,
         BlackDuckHttpClient blackDuckHttpClient,
         BlackDuckRegistrationService blackDuckRegistrationService,
@@ -60,10 +60,12 @@ public class ScanBatchRunner {
         File signatureScannerInstallDirectory
     ) {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
+        SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(
             logger,
-            blackDuckHttpClient,
+            signatureScannerClient,
+            blackDuckRegistrationService,
             cleanupZipExpander,
             scanPathsUtility,
             keyStoreHelper,
@@ -75,11 +77,11 @@ public class ScanBatchRunner {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerZipInstaller);
     }
 
-    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) {
+    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) { // TOME Called from Detect for existing scanner
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, new ExistingScannerInstaller(existingInstallDirectory));
     }
 
-    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {
+    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) { // TOME this is what Detect calls.
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerInstaller);
     }
 
