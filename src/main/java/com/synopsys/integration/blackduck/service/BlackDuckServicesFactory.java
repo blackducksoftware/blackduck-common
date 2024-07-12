@@ -143,7 +143,7 @@ public class BlackDuckServicesFactory {
         return new Bdio2FileUploadService(blackDuckApiClient, apiDiscovery, logger, new Bdio2ContentExtractor(), bdio2RetryAwareStreamUploader);
     }
 
-    public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) { // TOME not called by Detect, only called by an IT... is Alert using this?
+    public SignatureScannerService createSignatureScannerService(File signatureScannerInstallDirectory) {
         ScanBatchRunner scanBatchRunner = ScanBatchRunner.createDefault(
             logger,
             blackDuckHttpClient,

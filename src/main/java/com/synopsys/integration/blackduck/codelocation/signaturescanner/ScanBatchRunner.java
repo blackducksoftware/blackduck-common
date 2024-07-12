@@ -34,7 +34,7 @@ public class ScanBatchRunner {
     private final ScanCommandRunner scanCommandRunner;
     private final ScannerInstaller scannerInstaller;
 
-    public static ScanBatchRunner createDefault( // TOME called on by IT only, is this used by Alert?
+    public static ScanBatchRunner createDefault(
         IntLogger logger,
         BlackDuckHttpClient blackDuckHttpClient,
         BlackDuckRegistrationService blackDuckRegistrationService,
@@ -77,11 +77,11 @@ public class ScanBatchRunner {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerZipInstaller);
     }
 
-    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) { // TOME Called from Detect for existing scanner
+    public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, new ExistingScannerInstaller(existingInstallDirectory));
     }
 
-    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) { // TOME this is what Detect calls.
+    public static ScanBatchRunner createComplete(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, ScannerInstaller scannerInstaller) {
         return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerInstaller);
     }
 
