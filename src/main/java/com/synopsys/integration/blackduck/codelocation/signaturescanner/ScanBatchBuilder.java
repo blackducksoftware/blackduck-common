@@ -384,4 +384,9 @@ public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     	this.bomCompareMode = bomCompareMode;
     	return this;
     }
+    
+    public ScanBatchBuilder csvArchive(boolean csvArchive) {
+    	this.csvArchive = csvArchive;
+    	return this;
+    }
 }
