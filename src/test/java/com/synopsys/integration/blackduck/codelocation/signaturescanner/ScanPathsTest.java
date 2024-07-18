@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.OldApiScannerInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -134,7 +134,7 @@ public class ScanPathsTest {
     }
 
     private String getScannerPath() {
-        return OldApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY + File.separator + "scanner";
+        return ZipApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY + File.separator + "scanner";
     }
 
     private void createMacSetup(File tempDirectory) throws IOException {

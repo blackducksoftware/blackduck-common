@@ -28,7 +28,7 @@ import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatc
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.ScanBatchRunner;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.SignatureScannerService;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.OldApiScannerInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -101,7 +101,7 @@ class InstallAndRunSignatureScannerTestIT {
 
         // first, run a scan with an install that will NOT update the embedded keystore, which should fail
         KeyStoreHelper noOpKeyStoreHelper = new NoOpKeyStoreHelper();
-        OldApiScannerInstaller installerWithoutKeyStoreManagement = new OldApiScannerInstaller(
+        ZipApiScannerInstaller installerWithoutKeyStoreManagement = new ZipApiScannerInstaller(
             logger,
             new SignatureScannerClient(blackDuckHttpClient),
             blackDuckRegistrationService,
@@ -123,7 +123,7 @@ class InstallAndRunSignatureScannerTestIT {
         // second, run a scan with an install that DOES update the embedded keystore, which should succeed
         logger.resetAllLogs();
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        OldApiScannerInstaller installerWithKeyStoreManagement = new OldApiScannerInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ZipApiScannerInstaller installerWithKeyStoreManagement = new ZipApiScannerInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             blackDuckServerUrl,
             operatingSystemType,
             installDirectory);

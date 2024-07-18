@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.OldApiScannerInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -59,11 +59,11 @@ class ScannerZipInstallerTest {
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        OldApiScannerInstaller oldApiScannerInstaller = new OldApiScannerInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
+        ZipApiScannerInstaller zipApiScannerInstaller = new ZipApiScannerInstaller(logger, new SignatureScannerClient(blackDuckHttpClient), blackDuckRegistrationService, cleanupZipExpander, scanPathsUtility, keyStoreHelper,
             new HttpUrl(blackDuckUrl),
             operatingSystemType,
             downloadTarget);
-        oldApiScannerInstaller.installOrUpdateScanner();
+        zipApiScannerInstaller.installOrUpdateScanner();
 
         ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());

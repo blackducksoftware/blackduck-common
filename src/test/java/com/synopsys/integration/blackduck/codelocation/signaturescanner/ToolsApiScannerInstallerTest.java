@@ -1,6 +1,6 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.NewApiScannerInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ToolsApiScannerInstaller;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
@@ -22,7 +22,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NewApiScannerInstallerTest {
+public class ToolsApiScannerInstallerTest {
 
     @Test
     void testActualDownload() throws Exception {
@@ -51,10 +51,10 @@ public class NewApiScannerInstallerTest {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        NewApiScannerInstaller newApiScannerInstaller = new NewApiScannerInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl(blackDuckUrl),
+        ToolsApiScannerInstaller toolsApiScannerInstaller = new ToolsApiScannerInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl(blackDuckUrl),
                 operatingSystemType,
                 downloadTarget);
-        newApiScannerInstaller.installOrUpdateScanner();
+        toolsApiScannerInstaller.installOrUpdateScanner();
 
         ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(downloadTarget);
         assertTrue(scanPaths.isManagedByLibrary());

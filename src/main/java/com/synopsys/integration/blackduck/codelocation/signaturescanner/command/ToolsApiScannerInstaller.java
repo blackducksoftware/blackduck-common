@@ -29,8 +29,8 @@ import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
 
-public class NewApiScannerInstaller extends ApiScannerInstaller {
-    // This new API for downloading the scan-cli is only called on for BD versions 2024.7.0 or newer
+public class ToolsApiScannerInstaller extends ApiScannerInstaller {
+    // The tools API for downloading the scan-cli is called on by Detect for BD versions 2024.7.0 or newer
     public static final BlackDuckVersion MIN_BLACK_DUCK_VERSION = new BlackDuckVersion(2024, 7, 0);
 
     private static final String LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL = "api/tools/scan.cli.zip/versions/latest/";
@@ -39,7 +39,6 @@ public class NewApiScannerInstaller extends ApiScannerInstaller {
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
 
-    public static final String BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY = "Black_Duck_Scan_Installation";
     public static final String SCAN_CLI_VERSION_FILENAME = "scan-cli-version.txt";
 
     private final IntLogger logger;
@@ -50,7 +49,7 @@ public class NewApiScannerInstaller extends ApiScannerInstaller {
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
 
-    public NewApiScannerInstaller(
+    public ToolsApiScannerInstaller(
             IntLogger logger,
             BlackDuckHttpClient blackDuckHttpClient,
             CleanupZipExpander cleanupZipExpander,
@@ -92,10 +91,10 @@ public class NewApiScannerInstaller extends ApiScannerInstaller {
             }
         }
 
-        File scannerExpansionDirectory = new File(installDirectory, NewApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
+        File scannerExpansionDirectory = new File(installDirectory, ToolsApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, NewApiScannerInstaller.SCAN_CLI_VERSION_FILENAME);
+        File versionFile = new File(scannerExpansionDirectory, ToolsApiScannerInstaller.SCAN_CLI_VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -209,12 +208,12 @@ public class NewApiScannerInstaller extends ApiScannerInstaller {
     }
 
     /**
-     * Deletes legacy version file that may be left behind if client had previously installed scan-cli using {@link OldApiScannerInstaller}
+     * Deletes legacy version file that may be left behind if client had previously installed scan-cli using {@link ZipApiScannerInstaller}
      * @param scannerExpansionDirectory
      */
     private void removeOldVersionFileIfExists(File scannerExpansionDirectory) {
         try {
-            File oldVersionFile = new File(scannerExpansionDirectory, OldApiScannerInstaller.VERSION_FILENAME);
+            File oldVersionFile = new File(scannerExpansionDirectory, ZipApiScannerInstaller.VERSION_FILENAME);
             oldVersionFile.delete();
         } catch (Exception e) {
             logger.trace("Could not delete old Signature Scanner version file.");
