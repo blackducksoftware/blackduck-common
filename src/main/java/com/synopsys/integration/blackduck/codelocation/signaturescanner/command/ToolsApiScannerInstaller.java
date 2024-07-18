@@ -10,7 +10,6 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
@@ -20,7 +19,6 @@ import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.version.BlackDuckVersion;
 import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.io.FileUtils;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.exception.IntegrationException;

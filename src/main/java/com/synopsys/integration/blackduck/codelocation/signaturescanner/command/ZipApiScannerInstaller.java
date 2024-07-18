@@ -10,13 +10,10 @@ package com.synopsys.integration.blackduck.codelocation.signaturescanner.command
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.security.cert.Certificate;
 
 import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
