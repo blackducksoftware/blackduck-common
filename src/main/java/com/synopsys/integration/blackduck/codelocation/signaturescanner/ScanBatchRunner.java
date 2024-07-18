@@ -11,7 +11,12 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ExistingScannerInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerInstaller;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
