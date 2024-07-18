@@ -198,7 +198,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 return latestScannerVersion;
             } else if (response.getStatusCode() == 304) {
                 // If no need to update, response is HTTP 304 Not modified
-                logger.debug("Locally installed signature scanner version is up to date - skipping download.");
+                logger.debug("Locally installed Signature Scanner version is up to date - skipping download.");
                 return localScannerVersion;
             } else {
                 logger.debug("Unable to download Signature Scanner. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());
