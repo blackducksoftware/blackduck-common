@@ -51,7 +51,7 @@ public class RoleService extends DataService {
         return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
-    private BlackDuckRequestFilter createScopeFilter(String scope) {
+    public static BlackDuckRequestFilter createScopeFilter(String scope) {
         return BlackDuckRequestFilter.createFilterWithSingleValue("scope", scope);
     }
 
