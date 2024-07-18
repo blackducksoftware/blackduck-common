@@ -11,13 +11,8 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ExistingScannerInstaller;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanCommandRunner;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerInstaller;
-import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ScannerZipInstaller;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import com.synopsys.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.SignatureScannerClient;
@@ -62,7 +57,7 @@ public class ScanBatchRunner {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         SignatureScannerClient signatureScannerClient = new SignatureScannerClient(blackDuckHttpClient);
         KeyStoreHelper keyStoreHelper = new KeyStoreHelper(logger);
-        ScannerInstaller scannerZipInstaller = new ScannerZipInstaller(
+        ScannerInstaller zipApiScannerInstaller = new ZipApiScannerInstaller(
             logger,
             signatureScannerClient,
             blackDuckRegistrationService,
@@ -74,7 +69,7 @@ public class ScanBatchRunner {
             signatureScannerInstallDirectory
         );
 
-        return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, scannerZipInstaller);
+        return new ScanBatchRunner(intEnvironmentVariables, scanPathsUtility, scanCommandRunner, zipApiScannerInstaller);
     }
 
     public static ScanBatchRunner createWithNoInstaller(IntEnvironmentVariables intEnvironmentVariables, ScanPathsUtility scanPathsUtility, ScanCommandRunner scanCommandRunner, File existingInstallDirectory) {
