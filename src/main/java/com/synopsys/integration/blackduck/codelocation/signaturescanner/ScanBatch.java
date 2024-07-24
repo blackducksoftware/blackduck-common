@@ -233,6 +233,6 @@ public class ScanBatch extends Stringable implements Buildable {
     }
     
     public boolean isCsvArchive() {
-    	return isCsvArchive();
+    	return csvArchive;
     }
 }
