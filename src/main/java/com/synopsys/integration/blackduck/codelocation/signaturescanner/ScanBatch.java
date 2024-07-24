@@ -231,4 +231,8 @@ public class ScanBatch extends Stringable implements Buildable {
     public String getCorrelationId() {
         return correlationId;
     }
+    
+    public boolean isCsvArchive() {
+    	return isCsvArchive();
+    }
 }
