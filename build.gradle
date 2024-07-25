@@ -1,7 +1,16 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
     ////////// START BUILDSCRIPT DEPENDENCY //////////
-dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.12.0" }
+dependencies {
+    classpath ("com.synopsys.integration:common-gradle-plugin:1.12.0")
+}
+
+    repositories {
+        maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
+        // Below has buuild-info-extractor 2.13.13
+        maven { url "https://dl.bintray.com/jfrog/jfrog-jars" }
+        maven { url "https://artifactory.internal.synopsys.com/artifactory/jcenter-cache" }
+    }
 
 ////////// END BUILDSCRIPT DEPENDENCY //////////
 }
@@ -23,6 +32,8 @@ versionFile << version
 
 repositories {
     maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
+    // Below has magpie 0.6.0
+    maven { url "https://artifactory.internal.synopsys.com/artifactory/jcenter-cache" }
 }
 
 dependencies {
