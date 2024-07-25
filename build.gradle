@@ -1,7 +1,14 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
     ////////// START BUILDSCRIPT DEPENDENCY //////////
-dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.12.0" }
+    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
+
+    ext {
+        javaTargetCompatibility = 8
+        javaSourceCompatibility = 8
+    }
+
+    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
 
 ////////// END BUILDSCRIPT DEPENDENCY //////////
 }
@@ -23,6 +30,9 @@ versionFile << version
 
 repositories {
     maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
+    maven { url "https://artifactory.internal.synopsys.com/artifactory/jcenter-cache" }
+//    maven { url "https://jfrog.bintray.com/jfrog-jars" }
+    maven { url "https://dl.bintray.com/jfrog/jfrog-jars/" }
 }
 
 dependencies {
