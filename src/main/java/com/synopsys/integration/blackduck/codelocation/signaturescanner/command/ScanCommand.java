@@ -54,6 +54,7 @@ public class ScanCommand {
     @Nullable
     private final String correlationId;
     private final String bomCompareMode;
+    private final boolean csvArchive;
 
     private List<String> command;
 
@@ -63,7 +64,7 @@ public class ScanCommand {
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
         ReducedPersistence reducedPersistence,
-        @Nullable String correlationId, String bomCompareMode) {
+        @Nullable String correlationId, String bomCompareMode, boolean csvArchive) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -91,6 +92,7 @@ public class ScanCommand {
         this.reducedPersistence = reducedPersistence;
         this.correlationId = correlationId;
         this.bomCompareMode = bomCompareMode;
+        this.csvArchive = csvArchive;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -123,6 +125,10 @@ public class ScanCommand {
         }
         if (debug) {
             appendSingleArgument("--debug");
+        }
+        
+        if (csvArchive) {
+            appendKeyValuePair("--outputFormat", "csv");
         }
 
         appendKeyValuePair("--logDir", specificRunOutputDirectoryPath);

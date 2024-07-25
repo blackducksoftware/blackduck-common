@@ -60,11 +60,12 @@ public class ScanBatch extends Stringable implements Buildable {
     @Nullable
     private final String correlationId;
     private final String bomCompareMode;
+    private final boolean csvArchive;
 
     public ScanBatch(File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
         String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
-        List<ScanTarget> scanTargets, boolean isRapid, ReducedPersistence reducedPersistence, @Nullable String correlationId, String bomCompareMode) {
+        List<ScanTarget> scanTargets, boolean isRapid, ReducedPersistence reducedPersistence, @Nullable String correlationId, String bomCompareMode, boolean csvArchive) {
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
@@ -88,6 +89,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.reducedPersistence = reducedPersistence;
         this.correlationId = correlationId;
         this.bomCompareMode = bomCompareMode;
+        this.csvArchive = csvArchive;
     }
 
     /**
@@ -129,7 +131,7 @@ public class ScanBatch extends Stringable implements Buildable {
         ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
             blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
             individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid, reducedPersistence, correlationId,
-            bomCompareMode);
+            bomCompareMode, csvArchive);
         scanCommands.add(scanCommand);
     }
 
@@ -228,5 +230,9 @@ public class ScanBatch extends Stringable implements Buildable {
     @Nullable
     public String getCorrelationId() {
         return correlationId;
+    }
+    
+    public boolean isCsvArchive() {
+    	return csvArchive;
     }
 }
