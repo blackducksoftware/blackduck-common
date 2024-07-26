@@ -11,11 +11,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.security.cert.Certificate;
 
 import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.request.BlackDuckRequest;
 import com.synopsys.integration.blackduck.version.BlackDuckVersion;
 import org.apache.commons.compress.archivers.ArchiveException;
@@ -28,6 +30,8 @@ import com.synopsys.integration.rest.HttpUrl;
 import com.synopsys.integration.rest.response.Response;
 import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     // The tools API for downloading the scan-cli is called on by Detect for BD versions 2024.7.0 or newer
@@ -45,6 +49,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
     private final ScanPathsUtility scanPathsUtility;
+    private final KeyStoreHelper keyStoreHelper;
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
@@ -54,6 +59,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             BlackDuckHttpClient blackDuckHttpClient,
             CleanupZipExpander cleanupZipExpander,
             ScanPathsUtility scanPathsUtility,
+            KeyStoreHelper keyStoreHelper,
             HttpUrl blackDuckServerUrl,
             OperatingSystemType operatingSystemType,
             File installDirectory
@@ -66,6 +72,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         this.blackDuckHttpClient = blackDuckHttpClient;
         this.cleanupZipExpander = cleanupZipExpander;
         this.scanPathsUtility = scanPathsUtility;
+        this.keyStoreHelper = keyStoreHelper;
         this.blackDuckServerUrl = blackDuckServerUrl;
         this.operatingSystemType = operatingSystemType;
         this.installDirectory = installDirectory;
@@ -194,6 +201,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 oneJar.setExecutable(true);
                 scanExecutable.setExecutable(true);
 
+                if (connectAndGetServerCertificate(downloadUrl)!= null) {
+                    keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), connectAndGetServerCertificate(downloadUrl), scanPaths.getPathToCacerts());
+                }
+
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
                 return latestScannerVersion;
             } else if (response.getStatusCode() == 304) {
@@ -220,4 +231,19 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         }
     }
 
+
+    private Certificate connectAndGetServerCertificate(HttpUrl httpsServer) {
+        HttpsURLConnection httpsConnection = null;
+        try {
+            httpsConnection = (HttpsURLConnection) httpsServer.url().openConnection();
+            httpsConnection.connect();
+            Certificate[] certificates = httpsConnection.getServerCertificates();
+            httpsConnection.disconnect();
+
+            return certificates[0];
+        } catch (IOException e) {
+            logger.errorAndDebug("Could not get Black Duck server certificate which is required for managing the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
+            return null;
+        }
+    }
 }

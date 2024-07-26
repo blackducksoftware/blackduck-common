@@ -7,6 +7,7 @@ import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.synopsys.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.synopsys.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
+import com.synopsys.integration.blackduck.keystore.KeyStoreHelper;
 import com.synopsys.integration.blackduck.service.BlackDuckServicesFactory;
 import com.synopsys.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.synopsys.integration.log.BufferedIntLogger;
@@ -51,7 +52,7 @@ public class ToolsApiScannerInstallerTest {
         CleanupZipExpander cleanupZipExpander = new CleanupZipExpander(logger);
         File downloadTarget = new File(signatureScannerDownloadPath);
 
-        ToolsApiScannerInstaller toolsApiScannerInstaller = new ToolsApiScannerInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new HttpUrl(blackDuckUrl),
+        ToolsApiScannerInstaller toolsApiScannerInstaller = new ToolsApiScannerInstaller(logger, blackDuckHttpClient, cleanupZipExpander, scanPathsUtility, new KeyStoreHelper(logger), new HttpUrl(blackDuckUrl),
                 operatingSystemType,
                 downloadTarget);
         toolsApiScannerInstaller.installOrUpdateScanner();
