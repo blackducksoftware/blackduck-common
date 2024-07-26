@@ -201,8 +201,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 oneJar.setExecutable(true);
                 scanExecutable.setExecutable(true);
 
-                if (connectAndGetServerCertificate(downloadUrl)!= null) {
-                    keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), connectAndGetServerCertificate(downloadUrl), scanPaths.getPathToCacerts());
+
+                Certificate certificate = connectAndGetServerCertificate(downloadUrl);
+                if (certificate != null) {
+                    keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), certificate, scanPaths.getPathToCacerts());
                 }
 
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
@@ -239,8 +241,11 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             httpsConnection.connect();
             Certificate[] certificates = httpsConnection.getServerCertificates();
             httpsConnection.disconnect();
-
-            return certificates[0];
+            if (certificates.length > 0) {
+                return certificates[0];
+            } else {
+                throw new IOException();
+            }
         } catch (IOException e) {
             logger.errorAndDebug("Could not get Black Duck server certificate which is required for managing the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
             return null;
