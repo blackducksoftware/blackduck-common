@@ -73,7 +73,7 @@ class InstallAndRunSignatureScannerTestIT {
         FileUtils.deleteQuietly(scannerDirectoryPath);
     }
 
-//    @Test
+    @Test
     void testInstallingAndRunningSignatureScanner() throws IOException, InterruptedException, IntegrationException {
         // here, we do not want to automatically trust the server's certificate
         BlackDuckServerConfigBuilder blackDuckServerConfigBuilder = intHttpClientTestHelper.getBlackDuckServerConfigBuilder();
