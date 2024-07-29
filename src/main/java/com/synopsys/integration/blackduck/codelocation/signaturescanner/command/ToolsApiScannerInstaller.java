@@ -43,8 +43,6 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
 
-    public static final String SCAN_CLI_VERSION_FILENAME = "scan-cli-version.txt";
-
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
     private final CleanupZipExpander cleanupZipExpander;
@@ -98,10 +96,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             }
         }
 
-        File scannerExpansionDirectory = new File(installDirectory, ToolsApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
+        File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, ToolsApiScannerInstaller.SCAN_CLI_VERSION_FILENAME);
+        File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -112,7 +110,6 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 // Version file creation should happen after successful download
                 logger.debug("The version file has not been created yet so creating it now.");
                 FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
-                removeOldVersionFileIfExists(scannerExpansionDirectory);
                 return installDirectory;
             }
             // A version file exists, so we have to compare to determine if a download should occur.
@@ -219,20 +216,6 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             }
         }
     }
-
-    /**
-     * Deletes legacy version file that may be left behind if client had previously installed scan-cli using {@link ZipApiScannerInstaller}
-     * @param scannerExpansionDirectory
-     */
-    private void removeOldVersionFileIfExists(File scannerExpansionDirectory) {
-        try {
-            File oldVersionFile = new File(scannerExpansionDirectory, ZipApiScannerInstaller.VERSION_FILENAME);
-            oldVersionFile.delete();
-        } catch (Exception e) {
-            logger.trace("Could not delete old Signature Scanner version file.");
-        }
-    }
-
 
     private Certificate connectAndGetServerCertificate(HttpUrl httpsServer) {
         HttpsURLConnection httpsConnection = null;

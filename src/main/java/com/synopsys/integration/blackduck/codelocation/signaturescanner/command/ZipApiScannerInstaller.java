@@ -34,7 +34,6 @@ public class ZipApiScannerInstaller extends ApiScannerInstaller {
     public static final String WINDOWS_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-windows.zip";
     public static final String MAC_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli-macosx.zip";
 
-    public static final String VERSION_FILENAME = "blackDuckVersion.txt";
 
     private final IntLogger logger;
     private final SignatureScannerClient signatureScannerClient;
@@ -92,10 +91,10 @@ public class ZipApiScannerInstaller extends ApiScannerInstaller {
             }
         }
 
-        File scannerExpansionDirectory = new File(installDirectory, ZipApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
+        File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, ZipApiScannerInstaller.VERSION_FILENAME);
+        File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
