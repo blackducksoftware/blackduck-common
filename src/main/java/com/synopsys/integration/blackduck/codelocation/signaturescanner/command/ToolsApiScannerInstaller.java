@@ -228,7 +228,6 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             httpsConnection.disconnect();
             if (certificates.length > 0) {
                 keyStoreHelper.updateKeyStoreWithServerCertificate(httpsServer.url().getHost(), certificates[0], scanPaths.getPathToCacerts());
-                return ;
             } else {
                 throw new IOException();
             }
