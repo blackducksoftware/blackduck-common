@@ -233,7 +233,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 throw new IOException();
             }
         } catch (SSLHandshakeException e) {
-            logger.error("less verbose error, change me");
+            logger.warn("Automatically trusting server certificates - not recommended for production use.");
         } catch (IOException e) {
             logger.errorAndDebug("Could not get Black Duck server certificate which is required for managing the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
         }
