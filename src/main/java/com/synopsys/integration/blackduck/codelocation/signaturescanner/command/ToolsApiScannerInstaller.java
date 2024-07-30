@@ -32,6 +32,7 @@ import com.synopsys.integration.util.CleanupZipExpander;
 import com.synopsys.integration.util.OperatingSystemType;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
 
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     // The tools API for downloading the scan-cli is called on by Detect for BD versions 2024.7.0 or newer
@@ -199,16 +200,17 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 scanExecutable.setExecutable(true);
 
 
-                Certificate certificate = connectAndGetServerCertificate(downloadUrl);
-                if (certificate != null) {
-                    keyStoreHelper.updateKeyStoreWithServerCertificate(downloadUrl.url().getHost(), certificate, scanPaths.getPathToCacerts());
-                }
+                connectAndGetServerCertificate(downloadUrl, scanPaths);
 
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
                 return latestScannerVersion;
             } else if (response.getStatusCode() == 304) {
                 // If no need to update, response is HTTP 304 Not modified
                 logger.debug("Locally installed Signature Scanner version is up to date - skipping download.");
+
+                ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
+                connectAndGetServerCertificate(downloadUrl, scanPaths);
+
                 return localScannerVersion;
             } else {
                 logger.debug("Unable to download Signature Scanner. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());
@@ -217,7 +219,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         }
     }
 
-    private Certificate connectAndGetServerCertificate(HttpUrl httpsServer) {
+    private void connectAndGetServerCertificate(HttpUrl httpsServer, ScanPaths scanPaths) {
         HttpsURLConnection httpsConnection = null;
         try {
             httpsConnection = (HttpsURLConnection) httpsServer.url().openConnection();
@@ -225,13 +227,14 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             Certificate[] certificates = httpsConnection.getServerCertificates();
             httpsConnection.disconnect();
             if (certificates.length > 0) {
-                return certificates[0];
+                keyStoreHelper.updateKeyStoreWithServerCertificate(httpsServer.url().getHost(), certificates[0], scanPaths.getPathToCacerts());
             } else {
                 throw new IOException();
             }
+        } catch (SSLHandshakeException e) {
+            logger.warn("Automatically trusting server certificates - not recommended for production use.");
         } catch (IOException e) {
             logger.errorAndDebug("Could not get Black Duck server certificate which is required for managing the local keystore - communicating to the server will have to be configured manually: " + e.getMessage(), e);
-            return null;
         }
     }
 }
