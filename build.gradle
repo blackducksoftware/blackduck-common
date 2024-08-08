@@ -25,13 +25,16 @@ versionFile.mkdirs()
 versionFile.delete()
 versionFile << version
 
+final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
+
 repositories {
+    maven { url "${internalRepoHost}/artifactory/jcenter" }
     maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
 }
 
 dependencies {
     api 'com.synopsys.integration:blackduck-common-api:2023.4.2.5'
-    api 'com.synopsys.integration:phone-home-client:6.0.0'
+    api 'com.synopsys.integration:phone-home-client:6.0.0-SNAPSHOT'
     api 'com.synopsys.integration:integration-bdio:26.0.13'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
 
