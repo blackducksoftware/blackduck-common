@@ -1,6 +1,13 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
-    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-dependencies.gradle', to: buildscript
+    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
+
+    ext {
+        javaTargetCompatibility = 8
+        javaSourceCompatibility = 8
+    }
+
+    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
 }
 
 project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
@@ -23,11 +30,10 @@ repositories {
 }
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2023.4.2.2'
+    api 'com.synopsys.integration:blackduck-common-api:2023.4.2.5'
     api 'com.synopsys.integration:phone-home-client:6.0.0'
-    api 'com.synopsys.integration:integration-bdio:26.0.9'
+    api 'com.synopsys.integration:integration-bdio:26.0.13'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
-
 
     testImplementation 'com.google.guava:guava:31.1-jre'
 

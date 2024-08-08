@@ -62,6 +62,19 @@ public class UserServiceTestIT {
     }
 
     @Test
+    public void getServerRolesForUserTestIT() throws IntegrationException {
+        UserGroupService service = blackDuckServicesFactory.createUserGroupService();
+        String username = UserServiceTestIT.INT_HTTP_CLIENT_TEST_HELPER.getTestUsername();
+
+        UserView userView = service.getUserByUsername(username).get();
+
+        assertNotNull(userView);
+
+        List<RoleAssignmentView> serverRolesForUser = service.getServerRolesForUser(userView);
+        assertTrue(serverRolesForUser.size() > 0);
+    }
+
+    @Test
     public void testAddingGroupToProject() throws IntegrationException {
         String userGroupName = "user-group-test" + System.currentTimeMillis();
         ProjectView projectView = null;

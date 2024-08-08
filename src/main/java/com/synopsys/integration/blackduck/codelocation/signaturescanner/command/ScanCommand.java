@@ -54,6 +54,7 @@ public class ScanCommand {
     @Nullable
     private final String correlationId;
     private final String bomCompareMode;
+    private final boolean csvArchive;
 
     private List<String> command;
 
@@ -63,7 +64,7 @@ public class ScanCommand {
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
         ReducedPersistence reducedPersistence,
-        @Nullable String correlationId, String bomCompareMode) {
+        @Nullable String correlationId, String bomCompareMode, boolean csvArchive) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -91,6 +92,7 @@ public class ScanCommand {
         this.reducedPersistence = reducedPersistence;
         this.correlationId = correlationId;
         this.bomCompareMode = bomCompareMode;
+        this.csvArchive = csvArchive;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -123,6 +125,10 @@ public class ScanCommand {
         }
         if (debug) {
             appendSingleArgument("--debug");
+        }
+        
+        if (csvArchive) {
+            appendKeyValuePair("--outputFormat", "csv");
         }
 
         appendKeyValuePair("--logDir", specificRunOutputDirectoryPath);
@@ -286,33 +292,23 @@ public class ScanCommand {
         String proxyNtlmDomain = blackDuckProxyInfo.getNtlmDomain().orElse(null);
         String proxyNtlmWorkstation = blackDuckProxyInfo.getNtlmWorkstation().orElse(null);
 
-        appendSingleArgument("-Dhttp.proxyHost");
-        appendSingleArgument(proxyHost);
+        appendSingleArgument("-Dhttp.proxyHost=" + proxyHost);
 
-        appendSingleArgument("-Dhttp.proxyPort");
-        appendSingleArgument(Integer.toString(proxyPort));
+        appendSingleArgument("-Dhttp.proxyPort=" + Integer.toString(proxyPort));
 
         if (StringUtils.isNotBlank(proxyUsername) && StringUtils.isNotBlank(proxyPassword)) {
-            appendSingleArgument("-Dhttp.proxyUser");
-            appendSingleArgument(proxyUsername);
-
-            appendSingleArgument("-Dhttp.proxyPassword");
-            appendSingleArgument(proxyPassword);
+            appendSingleArgument("-Dhttp.proxyUser=" + proxyUsername);
+            appendSingleArgument("-Dhttp.proxyPassword=" + proxyPassword);
         } else {
             // CLI will ignore the proxy host and port if there are no credentials
-            appendSingleArgument("-Dhttp.proxyUser");
-            appendSingleArgument("user");
-
-            appendSingleArgument("-Dhttp.proxyPassword");
-            appendSingleArgument("password");
+            appendSingleArgument("-Dhttp.proxyUser=user");
+            appendSingleArgument("-Dhttp.proxyPassword=password");
         }
         if (StringUtils.isNotBlank(proxyNtlmDomain)) {
-            appendSingleArgument("-Dhttp.auth.ntlm.domain");
-            appendSingleArgument(proxyNtlmDomain);
+            appendSingleArgument("-Dhttp.auth.ntlm.domain=" + proxyNtlmDomain);
         }
         if (StringUtils.isNotBlank(proxyNtlmWorkstation)) {
-            appendSingleArgument("-Dblackduck.http.auth.ntlm.workstation");
-            appendSingleArgument(proxyNtlmWorkstation);
+            appendSingleArgument("-Dblackduck.http.auth.ntlm.workstation=" + proxyNtlmWorkstation);
         }
     }
 

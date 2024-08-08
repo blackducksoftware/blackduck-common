@@ -1,6 +1,5 @@
 package com.synopsys.integration.blackduck.codelocation.signaturescanner.command;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -30,6 +28,9 @@ import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.log.LogLevel;
 import com.synopsys.integration.log.PrintStreamIntLogger;
 import com.synopsys.integration.rest.HttpUrl;
+import com.synopsys.integration.rest.credentials.CredentialsBuilder;
+import com.synopsys.integration.rest.proxy.ProxyInfo;
+import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
 import com.synopsys.integration.util.IntEnvironmentVariables;
 import com.synopsys.integration.util.OperatingSystemType;
 
@@ -270,6 +271,43 @@ public class ScanCommandTest {
         assertKeyValuePairIsSet(commandList, "--argX", "x");
         assertKeyValuePairIsSet(commandList, "--argY", "y");
         assertTrue(commandList.contains("--test"));
+    }
+
+    @Test
+    public void testNoProxyDetailsAreSetByDefault() throws IntegrationException {
+        List<String> commandList = createCommandList();
+
+        for (String arg : commandList) {
+            assertFalse(arg.contains("-Dhttp.proxy"));
+            assertFalse(arg.contains("-Dhttp.auth"));
+            assertFalse(arg.contains("-Dblackduck.http"));
+        }
+    }
+
+    @Test
+    public void testProxyDetailsAreSet() throws IntegrationException {
+        ProxyInfoBuilder proxyInfoBuilder = ProxyInfo.newBuilder();
+
+        CredentialsBuilder credentialsBuilder = new CredentialsBuilder();
+        credentialsBuilder.setUsernameAndPassword("some_username", "some_password");
+
+        proxyInfoBuilder.setCredentials(credentialsBuilder.build());
+        proxyInfoBuilder.setHost("some_host");
+        proxyInfoBuilder.setNtlmDomain("some_domain");
+        proxyInfoBuilder.setNtlmWorkstation("some_workstation");
+        proxyInfoBuilder.setPort(443);
+
+        ProxyInfo proxyInfo = proxyInfoBuilder.build();
+        scanBatchBuilder.proxyInfo(proxyInfo);
+
+        List<String> commandList = createCommandList();
+
+        assertTrue(commandList.contains("-Dhttp.proxyHost=some_host"));
+        assertTrue(commandList.contains("-Dhttp.proxyPort=443"));
+        assertTrue(commandList.contains("-Dhttp.proxyUser=some_username"));
+        assertTrue(commandList.contains("-Dhttp.proxyPassword=some_password"));
+        assertTrue(commandList.contains("-Dhttp.auth.ntlm.domain=some_domain"));
+        assertTrue(commandList.contains("-Dblackduck.http.auth.ntlm.workstation=some_workstation"));
     }
 
     private void populateBuilder(ScanBatchBuilder scanBatchBuilder) {

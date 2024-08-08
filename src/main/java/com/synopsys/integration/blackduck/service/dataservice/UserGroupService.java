@@ -19,12 +19,15 @@ import java.util.function.Predicate;
 import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.response.AssignedProjectView;
 import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
+import com.synopsys.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
+import com.synopsys.integration.blackduck.api.generated.view.RoleView;
 import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
 import com.synopsys.integration.blackduck.service.BlackDuckApiClient;
 import com.synopsys.integration.blackduck.service.DataService;
+import com.synopsys.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.log.IntLogger;
 import com.synopsys.integration.rest.HttpUrl;
@@ -114,6 +117,20 @@ public class UserGroupService extends DataService {
         roleSet.addAll(getRolesForUser(userView));
         roleSet.addAll(getInheritedRolesForUser(userView));
         return new ArrayList(roleSet);
+    }
+
+    public List<RoleAssignmentView> getServerRolesForUser(UserView userView) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = new BlackDuckRequestBuilder()
+                                                              .commonGet()
+                                                              .addBlackDuckFilter(RoleService.createScopeFilter(
+                                                                  RoleService.SERVER_SCOPE
+                                                              ));
+
+        BlackDuckMultipleRequest<RoleAssignmentView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(
+            userView.metaRolesLink()
+        );
+
+        return blackDuckApiClient.getAllResponses(requestMultiple);
     }
 
     public Optional<UserGroupView> getGroupByName(String groupName) throws IntegrationException {
