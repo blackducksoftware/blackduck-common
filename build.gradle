@@ -30,6 +30,7 @@ final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
 repositories {
     maven { url "${internalRepoHost}/artifactory/jcenter" }
     maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
+    maven { url "https://sig-repo.synopsys.com/artifactory/bds-integrations-snapshot/" }
 }
 
 dependencies {
