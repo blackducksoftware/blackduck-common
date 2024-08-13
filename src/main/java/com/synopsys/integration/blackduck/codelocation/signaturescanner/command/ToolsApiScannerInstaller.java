@@ -134,8 +134,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         StringBuilder url = new StringBuilder(blackDuckServerUrl.string());
         if (!blackDuckServerUrl.string().endsWith("/")) {
             url.append("/");
-            url.append(LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL);
         }
+        url.append(LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL);
 
         String platform;
         if (OperatingSystemType.MAC == operatingSystemType) {
