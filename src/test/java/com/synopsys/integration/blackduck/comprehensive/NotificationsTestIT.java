@@ -40,7 +40,7 @@ public class NotificationsTestIT {
     private static final long FIVE_MINUTES = 5 * 60 * 1000;
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
 
-//    @Test
+    @Test
     public void testProjectNotifications() throws IntegrationException, InterruptedException {
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
 
