@@ -1,4 +1,4 @@
-package com.synopsys.integration.blackduck.codelocation.signaturescanner;
+package com.synopsys.integration.blackduck.comprehensive;
 
 import com.synopsys.integration.blackduck.TimingExtension;
 import com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ToolsApiScannerInstaller;
@@ -31,22 +31,23 @@ import static com.synopsys.integration.blackduck.codelocation.signaturescanner.c
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
-public class ToolsApiScannerInstallerTest {
+public class ToolsApiScannerInstallerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private static File scannerInstallationDirectory;
     public void setUp() {
-        scannerInstallationDirectory = new File(intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH)); // TOME test case will create any parent directories if needed, but note that only the child most dir will be cleaned up...
+        // The provided TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH will be created during this test if it does not exist, including any parent directories in the path. However, in the @AfterAll cleanup, only the child most directory will be deleted.
+        scannerInstallationDirectory = new File(intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH));
     }
 
-//    @AfterAll
+    @AfterAll
     public static void deleteTemporarySignatureScannerInstallDirectory() {
         FileUtils.deleteQuietly(scannerInstallationDirectory);
     }
     @Test
-    void testFreshDownload() throws Exception {
+    void testFreshDownload_followedByAnUpdate() throws Exception {
         setUp();
         downloadSignatureScanner();
-        // Tweak version file so we pretend the installed version in part 1 of this test is a different major version than the BD server the test is connected to
+        // Tweak version file so we pretend the installed version in part 1 of this test is a lower major version than the BD server this IT is connected to
         decrementMajorVersionOfInstalledSignatureScanner();
         // Attempt a subsequent download request that will upgrade always
         downloadSignatureScanner();
