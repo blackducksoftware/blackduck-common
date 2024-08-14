@@ -169,8 +169,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     protected String downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException {
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder()
                 .url(downloadUrl)
-                .addHeader("Version", localScannerVersion)
-                .addHeader("Accept-Version", "ANY");
+                .addHeader("Version", localScannerVersion);
+        if (!localScannerVersion.isEmpty()) {
+            requestBuilder.addHeader("Accept-Version", "ANY");
+        }
 
         BlackDuckRequest<BlackDuckResponse, UrlSingleResponse<BlackDuckResponse>> downloadRequest = BlackDuckRequest.createSingleRequest(
                 requestBuilder,
