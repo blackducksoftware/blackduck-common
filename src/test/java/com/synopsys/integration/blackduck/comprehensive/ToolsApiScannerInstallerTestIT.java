@@ -51,7 +51,6 @@ public class ToolsApiScannerInstallerTestIT {
         decrementMajorVersionOfInstalledSignatureScanner();
         // Attempt a subsequent download request that will upgrade always
         downloadSignatureScanner();
-        deleteTemporarySignatureScannerInstallDirectory();
     }
 
     private void downloadSignatureScanner() throws BlackDuckIntegrationException {
