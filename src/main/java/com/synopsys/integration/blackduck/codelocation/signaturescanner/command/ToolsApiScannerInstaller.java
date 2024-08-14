@@ -134,8 +134,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         StringBuilder url = new StringBuilder(blackDuckServerUrl.string());
         if (!blackDuckServerUrl.string().endsWith("/")) {
             url.append("/");
-            url.append(LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL);
         }
+        url.append(LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL);
 
         String platform;
         if (OperatingSystemType.MAC == operatingSystemType) {
@@ -170,6 +170,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder()
                 .url(downloadUrl)
                 .addHeader("Version", localScannerVersion);
+//                .addHeader("Accept-Version", "ANY");
 
         BlackDuckRequest<BlackDuckResponse, UrlSingleResponse<BlackDuckResponse>> downloadRequest = BlackDuckRequest.createSingleRequest(
                 requestBuilder,
