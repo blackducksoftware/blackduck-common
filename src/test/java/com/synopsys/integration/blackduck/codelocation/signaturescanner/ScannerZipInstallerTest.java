@@ -33,10 +33,8 @@ import com.synopsys.integration.util.OperatingSystemType;
 class ScannerZipInstallerTest {
     @Test
     void testActualDownload() throws Exception {
-        String signatureScannerDownloadPath = TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH.fromEnvironment(); // "/tmp" where?
-        System.out.println("scanner download path from system.getEnv() is:" + signatureScannerDownloadPath);
+        String signatureScannerDownloadPath = TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH.fromEnvironment();
         String blackDuckUrl = TestingPropertyKey.TEST_BLACK_DUCK_SERVER_URL.fromEnvironment();
-        System.out.println("blackduck url from system.getEnv() is:" + blackDuckUrl);
         String blackDuckUsername = TestingPropertyKey.TEST_USERNAME.fromEnvironment();
         String blackDuckPassword = TestingPropertyKey.TEST_PASSWORD.fromEnvironment();
         assertTrue(StringUtils.isNotBlank(signatureScannerDownloadPath));

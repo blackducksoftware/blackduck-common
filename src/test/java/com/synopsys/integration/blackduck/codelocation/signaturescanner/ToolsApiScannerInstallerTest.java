@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static com.synopsys.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.VERSION_FILENAME;
 
@@ -33,19 +34,23 @@ import static com.synopsys.integration.blackduck.codelocation.signaturescanner.c
 public class ToolsApiScannerInstallerTest {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private static File scannerInstallationDirectory;
-    @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         scannerInstallationDirectory = new File(intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH)); // TOME test case will create any parent directories if needed, but note that only the child most dir will be cleaned up...
     }
 
-    @AfterAll
+//    @AfterAll
     public static void deleteTemporarySignatureScannerInstallDirectory() {
         FileUtils.deleteQuietly(scannerInstallationDirectory);
     }
     @Test
     void testFreshDownload() throws Exception {
+        setUp();
         downloadSignatureScanner();
-        testSubsequentDownload_differentMajorVersion();
+        // Tweak version file so we pretend the installed version in part 1 of this test is a different major version than the BD server the test is connected to
+        decrementMajorVersionOfInstalledSignatureScanner();
+        // Attempt a subsequent download request that will upgrade always
+        downloadSignatureScanner();
+        deleteTemporarySignatureScannerInstallDirectory();
     }
 
     private void downloadSignatureScanner() throws BlackDuckIntegrationException {
@@ -83,17 +88,27 @@ public class ToolsApiScannerInstallerTest {
         assertTrue(new File(scanPaths.getPathToScanExecutable()).canExecute());
     }
 
-    private void testSubsequentDownload_differentMajorVersion() throws IOException, BlackDuckIntegrationException {
-        File versionFile = new File(scannerInstallationDirectory, VERSION_FILENAME);
-        String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
-        String[] semVerParts = localScannerVersion.split("\\.");
-        int majorVersion = Integer.parseInt(semVerParts[0]);
-        int previousMajorVersion =- majorVersion;
-        semVerParts[0] = String.valueOf(previousMajorVersion);
-        String pretendInstalledScannedVersion = String.join(".", semVerParts);
-        FileUtils.writeStringToFile(versionFile, pretendInstalledScannedVersion, Charset.defaultCharset());
-        //do a subsequent download
-        downloadSignatureScanner();
-    }
+    /**
+     * Takes a version string like "2024.7.0" and changes it to "2023.7.0". This is so we can confirm the api/tools
+     * download request is successful even when upgrading/downgrading from a different major version.
+     * We use the term "major version" loosely here since BD server versions do not follow semantic versioning but
+     * this matches the logic on the server side since "major version" upgrades/downgrades fail unless our request
+     * includes the Accept-Version: ANY header. Confirms fix for IDETECT-4455 and would highlight potential breaking
+     * scan-cli versioning changes on the server side.
+     * @throws IOException, BlackDuckIntegrationException
+     */
+    private void decrementMajorVersionOfInstalledSignatureScanner() {
+        try {
+            File versionFile = new File(scannerInstallationDirectory.toString() + "/" + BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY, VERSION_FILENAME);
+            String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+            String[] semVerParts = localScannerVersion.split("\\.");
+            int majorVersion = Integer.parseInt(semVerParts[0]);
+            int previousMajorVersion = majorVersion - 1;
+            semVerParts[0] = String.valueOf(previousMajorVersion);
+            String pretendInstalledScannedVersion = String.join(".", semVerParts);
+            FileUtils.writeStringToFile(versionFile, pretendInstalledScannedVersion, Charset.defaultCharset());
+        } catch (IOException e) {
 
+        }
+    }
 }
