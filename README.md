@@ -1,5 +1,6 @@
 ## Overview ##
-The blackduck-common library supplies convenient communication with a Black Duck server through rest Api's as well as providing convenient ways to download the CLI and execute it.
+The blackduck-common library supplies convenient communication with a Black Duck server through REST API's as well as providing convenient ways to download the CLI and execute it.
+To run integration tests, create a test.properties file under src/test/resources and populate the relevant key-value pairs (See TestingPropertyKey enum for possible keys). 
 
 ## Build ##
 
