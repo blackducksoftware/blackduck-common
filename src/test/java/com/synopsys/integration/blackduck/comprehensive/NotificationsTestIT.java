@@ -51,8 +51,8 @@ public class NotificationsTestIT {
         IntLogger logger = intHttpClientTestHelper.createIntLogger(intHttpClientTestHelper.getTestLogLevel());
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
 
-        String projectName = "notifications_test_" + System.currentTimeMillis(); // TOME also fails to clean up
-        String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
+        String projectName = "notifications_test_" + System.currentTimeMillis(); // TODO add afterAll() to clean any projects/version created
+        String projectVersionName = "notifications_test_version_" + System.currentTimeMillis(); // TOME left behind on 25 notifications_test_ projects in butler
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
@@ -71,13 +71,27 @@ public class NotificationsTestIT {
         notificationTypes.add(NotificationType.PROJECT_VERSION.name());
 
         // CREATE
-        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel); // TOME did this succeed? prob not b/c it already exists?
-        logger.info("created project version 1");
+        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
         ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
         // DELETE
         blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView()); // TOME looks to be successful, v#2 on BD
-        blackDuckApiClient.delete(projectVersionWrapper.getProjectView()); // TOME deleting #1
+        blackDuckApiClient.delete(projectVersionWrapper.getProjectView()); // TOME deleting #1, fails intermittently and leaves project version behind when test case exits
+        // TODO option 1: sleep and/or retry
+        // TODO option 2: just retry on jenkins .. though sometimes it very consistently fails ... ?
+        // TODO change the notifications to something else since this test is really about just checking the correct notifications are sent?
+            // other possible notifications:
+        /**
+         *     BOM_EDIT,
+         *     LICENSE_LIMIT,
+         *     POLICY_OVERRIDE,
+         *     PROJECT,
+         *     PROJECT_VERSION,
+         *     RULE_VIOLATION,
+         *     RULE_VIOLATION_CLEARED,
+         *     VERSION_BOM_CODE_LOCATION_BOM_COMPUTED,
+         *     VULNERABILITY;
+         */
 
         // two project version create
         // one project version delete, one project delete
