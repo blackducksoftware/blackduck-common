@@ -80,6 +80,11 @@ public class IntHttpClientTestHelper {
         return getBlackDuckServerConfigBuilder().build();
     }
 
+    public LogLevel getTestLogLevel() {
+        // defaults to INFO if none or invalid value is provided in test.properties
+        return LogLevel.fromString(IntHttpClientTestHelper.testProperties.getProperty(TestingPropertyKey.INTEGRATION_TEST_LOG_LEVEL.toString()));
+    }
+
     public BlackDuckServerConfigBuilder getBlackDuckServerConfigBuilder() {
         BlackDuckServerConfigBuilder builder;
 

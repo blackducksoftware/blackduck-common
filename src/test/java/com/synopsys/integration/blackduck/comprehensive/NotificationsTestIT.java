@@ -2,6 +2,7 @@ package com.synopsys.integration.blackduck.comprehensive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
+import com.synopsys.integration.log.BufferedIntLogger;
+import com.synopsys.integration.log.IntLogger;
+import com.synopsys.integration.log.LogLevel;
+import com.synopsys.integration.log.PrintStreamIntLogger;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,9 +48,10 @@ public class NotificationsTestIT {
 
     @Test
     public void testProjectNotifications() throws IntegrationException, InterruptedException {
-        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+        IntLogger logger = intHttpClientTestHelper.createIntLogger(intHttpClientTestHelper.getTestLogLevel());
+        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
 
-        String projectName = "notifications_test_" + System.currentTimeMillis();
+        String projectName = "notifications_test_" + System.currentTimeMillis(); // TOME also fails to clean up
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
@@ -64,12 +71,13 @@ public class NotificationsTestIT {
         notificationTypes.add(NotificationType.PROJECT_VERSION.name());
 
         // CREATE
-        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
+        ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel); // TOME did this succeed? prob not b/c it already exists?
+        logger.info("created project version 1");
         ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
         // DELETE
-        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView());
-        blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
+        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView()); // TOME looks to be successful, v#2 on BD
+        blackDuckApiClient.delete(projectVersionWrapper.getProjectView()); // TOME deleting #1
 
         // two project version create
         // one project version delete, one project delete
