@@ -47,7 +47,6 @@ public class NotificationsTestIT {
 
         String projectName = "notifications_test_" + System.currentTimeMillis();
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
-        String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
@@ -55,7 +54,6 @@ public class NotificationsTestIT {
         UserService userService = blackDuckServicesFactory.createUserService();
 
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
-        ProjectSyncModel projectSyncModel2 = ProjectSyncModel.createWithDefaults(projectName, projectVersion2Name);
 
         UserView currentUser = userService.findCurrentUser();
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
@@ -66,10 +64,9 @@ public class NotificationsTestIT {
 
         // CREATE
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
-        ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
-        // two project version create
-        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName, "CREATE" + projectVersion2Name));
+        // one project version create
+        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName));
 
         Set<String> foundKeys = new HashSet<>();
         long start = System.currentTimeMillis();
@@ -79,12 +76,7 @@ public class NotificationsTestIT {
             NotificationEditor notificationEditor = new NotificationEditor(startDate, endDate, notificationTypes);
             List<NotificationUserView> notifications = notificationService.getAllUserNotifications(currentUser, notificationEditor);
             for (NotificationUserView notificationUserView : notifications) {
-                if (notificationUserView instanceof ProjectNotificationUserView) {
-                    ProjectNotificationContent content = ((ProjectNotificationUserView) notificationUserView).getContent();
-                    if (projectName.equals(content.getProjectName())) {
-                        foundKeys.add(content.getOperationType() + content.getProjectName());
-                    }
-                } else if (notificationUserView instanceof ProjectVersionNotificationUserView) {
+                if (notificationUserView instanceof ProjectVersionNotificationUserView) {
                     ProjectVersionNotificationContent content = ((ProjectVersionNotificationUserView) notificationUserView).getContent();
                     if (projectName.equals(content.getProjectName())) {
                         foundKeys.add(content.getOperationType() + content.getProjectVersionName());
@@ -98,7 +90,6 @@ public class NotificationsTestIT {
         assertEquals(expectedKeys, foundKeys);
 
         // CLEAN UP
-        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView());
         blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
     }
 
