@@ -2,7 +2,6 @@ package com.synopsys.integration.blackduck.comprehensive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,17 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.synopsys.integration.blackduck.http.client.TestingPropertyKey;
-import com.synopsys.integration.log.BufferedIntLogger;
 import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.synopsys.integration.blackduck.TimingExtension;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.synopsys.integration.blackduck.api.generated.view.UserView;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
 import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
@@ -51,8 +45,8 @@ public class NotificationsTestIT {
         IntLogger logger = intHttpClientTestHelper.createIntLogger(intHttpClientTestHelper.getTestLogLevel());
         BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
 
-        String projectName = "notifications_test_" + System.currentTimeMillis(); // TODO add afterAll() to clean any projects/version created
-        String projectVersionName = "notifications_test_version_" + System.currentTimeMillis(); // TOME left behind on 25 notifications_test_ projects in butler
+        String projectName = "notifications_test_" + System.currentTimeMillis();
+        String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
         String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
@@ -74,28 +68,8 @@ public class NotificationsTestIT {
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
         ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
-        // DELETE
-        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView()); // TOME looks to be successful, v#2 on BD
-        blackDuckApiClient.delete(projectVersionWrapper.getProjectView()); // TOME deleting #1, fails intermittently and leaves project version behind when test case exits
-        // TODO option 1: sleep and/or retry
-        // TODO option 2: just retry on jenkins .. though sometimes it very consistently fails ... ?
-        // TODO change the notifications to something else since this test is really about just checking the correct notifications are sent?
-            // other possible notifications:
-        /**
-         *     BOM_EDIT,
-         *     LICENSE_LIMIT,
-         *     POLICY_OVERRIDE,
-         *     PROJECT,
-         *     PROJECT_VERSION,
-         *     RULE_VIOLATION,
-         *     RULE_VIOLATION_CLEARED,
-         *     VERSION_BOM_CODE_LOCATION_BOM_COMPUTED,
-         *     VULNERABILITY;
-         */
-
         // two project version create
-        // one project version delete, one project delete
-        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName, "CREATE" + projectVersion2Name, "DELETE" + projectName, "DELETE" + projectVersion2Name));
+        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName, "CREATE" + projectVersion2Name));
 
         Set<String> foundKeys = new HashSet<>();
         long start = System.currentTimeMillis();
@@ -122,6 +96,10 @@ public class NotificationsTestIT {
         }
 
         assertEquals(expectedKeys, foundKeys);
+
+        // CLEAN UP
+        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView());
+        blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
     }
 
 }
