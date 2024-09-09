@@ -3835,7 +3835,7 @@
       }
     },
     {
-      "name": "SB_synopsys-detect-junit",
+      "name": "SB_blackduck-detect-junit",
       "projectLevelAdjustments": true,
       "cloneCategories": [
         "VULN_DATA",
@@ -3968,7 +3968,7 @@
       }
     },
     {
-      "name": "Synopsys",
+      "name": "Black Duck",
       "projectLevelAdjustments": true,
       "cloneCategories": [
         "VULN_DATA",
@@ -4034,7 +4034,7 @@
       }
     },
     {
-      "name": "Synopsys Detect",
+      "name": "Black Duck Detect",
       "projectLevelAdjustments": true,
       "cloneCategories": [
         "VULN_DATA",
@@ -4100,7 +4100,7 @@
       }
     },
     {
-      "name": "synopsys-detect",
+      "name": "blackduck-detect",
       "projectLevelAdjustments": true,
       "cloneCategories": [
         "VULN_DATA",
@@ -4166,7 +4166,7 @@
       }
     },
     {
-      "name": "synopsys-detect-junit",
+      "name": "blackduck-detect-junit",
       "projectLevelAdjustments": false,
       "cloneCategories": [],
       "customSignatureEnabled": false,

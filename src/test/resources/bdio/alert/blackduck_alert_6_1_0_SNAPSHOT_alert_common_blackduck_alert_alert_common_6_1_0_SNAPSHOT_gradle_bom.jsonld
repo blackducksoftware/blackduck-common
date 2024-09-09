@@ -65,7 +65,7 @@
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/blackduck-common/47.1.1",
+        "related": "http:maven/com.blackduck.integration/blackduck-common/47.1.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -101,7 +101,7 @@
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/issuetracker-jira/0.0.12",
+        "related": "http:maven/com.blackduck.integration/issuetracker-jira/0.0.12",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -1909,17 +1909,17 @@
   {
     "name": "blackduck-common",
     "revision": "47.1.1",
-    "@id": "http:maven/com.synopsys.integration/blackduck-common/47.1.1",
+    "@id": "http:maven/com.blackduck.integration/blackduck-common/47.1.1",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:blackduck-common:47.1.1",
+      "externalId": "com.blackduck.integration:blackduck-common:47.1.1",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "blackduck-common",
         "version": "47.1.1"
       }
@@ -1930,19 +1930,19 @@
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/integration-reporting/1.0.2",
+        "related": "http:maven/com.blackduck.integration/integration-reporting/1.0.2",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/integration-bdio/21.0.1",
+        "related": "http:maven/com.blackduck.integration/integration-bdio/21.0.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/phone-home-client/1.0.2",
+        "related": "http:maven/com.blackduck.integration/phone-home-client/1.0.2",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/blackduck-common-api/2019.12.0.7",
+        "related": "http:maven/com.blackduck.integration/blackduck-common-api/2019.12.0.7",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -2667,24 +2667,24 @@
   {
     "name": "integration-reporting",
     "revision": "1.0.2",
-    "@id": "http:maven/com.synopsys.integration/integration-reporting/1.0.2",
+    "@id": "http:maven/com.blackduck.integration/integration-reporting/1.0.2",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:integration-reporting:1.0.2",
+      "externalId": "com.blackduck.integration:integration-reporting:1.0.2",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "integration-reporting",
         "version": "1.0.2"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-common/20.1.1",
+        "related": "http:maven/com.blackduck.integration/integration-common/20.1.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
@@ -2696,17 +2696,17 @@
   {
     "name": "integration-common",
     "revision": "20.1.1",
-    "@id": "http:maven/com.synopsys.integration/integration-common/20.1.1",
+    "@id": "http:maven/com.blackduck.integration/integration-common/20.1.1",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:integration-common:20.1.1",
+      "externalId": "com.blackduck.integration:integration-common:20.1.1",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "integration-common",
         "version": "20.1.1"
       }
@@ -3002,24 +3002,24 @@
   {
     "name": "integration-bdio",
     "revision": "21.0.1",
-    "@id": "http:maven/com.synopsys.integration/integration-bdio/21.0.1",
+    "@id": "http:maven/com.blackduck.integration/integration-bdio/21.0.1",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:integration-bdio:21.0.1",
+      "externalId": "com.blackduck.integration:integration-bdio:21.0.1",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "integration-bdio",
         "version": "21.0.1"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-common/20.1.1",
+        "related": "http:maven/com.blackduck.integration/integration-common/20.1.1",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -3027,24 +3027,24 @@
   {
     "name": "phone-home-client",
     "revision": "1.0.2",
-    "@id": "http:maven/com.synopsys.integration/phone-home-client/1.0.2",
+    "@id": "http:maven/com.blackduck.integration/phone-home-client/1.0.2",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:phone-home-client:1.0.2",
+      "externalId": "com.blackduck.integration:phone-home-client:1.0.2",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "phone-home-client",
         "version": "1.0.2"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-common/20.1.1",
+        "related": "http:maven/com.blackduck.integration/integration-common/20.1.1",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -3052,24 +3052,24 @@
   {
     "name": "blackduck-common-api",
     "revision": "2019.12.0.7",
-    "@id": "http:maven/com.synopsys.integration/blackduck-common-api/2019.12.0.7",
+    "@id": "http:maven/com.blackduck.integration/blackduck-common-api/2019.12.0.7",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:blackduck-common-api:2019.12.0.7",
+      "externalId": "com.blackduck.integration:blackduck-common-api:2019.12.0.7",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "blackduck-common-api",
         "version": "2019.12.0.7"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-rest/1.0.5",
+        "related": "http:maven/com.blackduck.integration/integration-rest/1.0.5",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -3077,24 +3077,24 @@
   {
     "name": "integration-rest",
     "revision": "1.0.5",
-    "@id": "http:maven/com.synopsys.integration/integration-rest/1.0.5",
+    "@id": "http:maven/com.blackduck.integration/integration-rest/1.0.5",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:integration-rest:1.0.5",
+      "externalId": "com.blackduck.integration:integration-rest:1.0.5",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "integration-rest",
         "version": "1.0.5"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-common/20.1.1",
+        "related": "http:maven/com.blackduck.integration/integration-common/20.1.1",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -4635,28 +4635,28 @@
   {
     "name": "issuetracker-jira",
     "revision": "0.0.12",
-    "@id": "http:maven/com.synopsys.integration/issuetracker-jira/0.0.12",
+    "@id": "http:maven/com.blackduck.integration/issuetracker-jira/0.0.12",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:issuetracker-jira:0.0.12",
+      "externalId": "com.blackduck.integration:issuetracker-jira:0.0.12",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "issuetracker-jira",
         "version": "0.0.12"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/int-jira-common/0.7.1",
+        "related": "http:maven/com.blackduck.integration/int-jira-common/0.7.1",
         "relationshipType": "DYNAMIC_LINK"
       },
       {
-        "related": "http:maven/com.synopsys.integration/issuetracker-common/0.0.5",
+        "related": "http:maven/com.blackduck.integration/issuetracker-common/0.0.5",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -4664,24 +4664,24 @@
   {
     "name": "int-jira-common",
     "revision": "0.7.1",
-    "@id": "http:maven/com.synopsys.integration/int-jira-common/0.7.1",
+    "@id": "http:maven/com.blackduck.integration/int-jira-common/0.7.1",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:int-jira-common:0.7.1",
+      "externalId": "com.blackduck.integration:int-jira-common:0.7.1",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "int-jira-common",
         "version": "0.7.1"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/integration-rest/1.0.5",
+        "related": "http:maven/com.blackduck.integration/integration-rest/1.0.5",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]
@@ -4689,24 +4689,24 @@
   {
     "name": "issuetracker-common",
     "revision": "0.0.5",
-    "@id": "http:maven/com.synopsys.integration/issuetracker-common/0.0.5",
+    "@id": "http:maven/com.blackduck.integration/issuetracker-common/0.0.5",
     "@type": "Component",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:issuetracker-common:0.0.5",
+      "externalId": "com.blackduck.integration:issuetracker-common:0.0.5",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "issuetracker-common",
         "version": "0.0.5"
       }
     },
     "relationship": [
       {
-        "related": "http:maven/com.synopsys.integration/blackduck-common/47.1.1",
+        "related": "http:maven/com.blackduck.integration/blackduck-common/47.1.1",
         "relationshipType": "DYNAMIC_LINK"
       }
     ]

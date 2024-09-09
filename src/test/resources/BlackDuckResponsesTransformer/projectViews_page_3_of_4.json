@@ -1191,7 +1191,7 @@
       }
     },
     {
-      "name": "SB_synopsys-detect-junit",
+      "name": "SB_blackduck-detect-junit",
       "projectLevelAdjustments": true,
       "cloneCategories": [
         "VULN_DATA",
