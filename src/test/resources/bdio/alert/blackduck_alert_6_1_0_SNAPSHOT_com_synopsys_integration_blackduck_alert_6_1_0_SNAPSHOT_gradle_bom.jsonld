@@ -1,7 +1,7 @@
 [
   {
     "specVersion": "1.1.0",
-    "spdx:name": "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom",
+    "spdx:name": "blackduck-alert/6.1.0-SNAPSHOT/com.blackduck.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom",
     "creationInfo": {
       "spdx:creator": [
         "Tool: Detect-6.2.1",
@@ -16,17 +16,17 @@
   {
     "name": "blackduck-alert-junit",
     "revision": "6.1.0-SNAPSHOT",
-    "@id": "http:maven/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT",
+    "@id": "http:maven/com.blackduck.integration/blackduck-alert/6.1.0-SNAPSHOT",
     "@type": "Project",
     "externalIdentifier": {
       "externalSystemTypeId": "maven",
-      "externalId": "com.synopsys.integration:blackduck-alert:6.1.0-SNAPSHOT",
+      "externalId": "com.blackduck.integration:blackduck-alert:6.1.0-SNAPSHOT",
       "externalIdMetaData": {
         "forge": {
           "name": "maven",
           "separator": ":"
         },
-        "group": "com.synopsys.integration",
+        "group": "com.blackduck.integration",
         "name": "blackduck-alert",
         "version": "6.1.0-SNAPSHOT"
       }
