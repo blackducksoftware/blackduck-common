@@ -7,10 +7,10 @@ buildscript {
         javaSourceCompatibility = 8
     }
 
-    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
+    dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
 }
 
-project.ext.moduleName = 'com.synopsys.integration.blackduck-common'
+project.ext.moduleName = 'com.blackduck.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
@@ -18,9 +18,9 @@ version = '66.2.32-SNAPSHOT'
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
-apply plugin: 'com.synopsys.integration.library'
+apply plugin: 'com.blackduck.integration.library'
 
-final def versionFile = new File("${projectDir}/src/main/resources/com/synopsys/integration/blackduck/version.txt")
+final def versionFile = new File("${projectDir}/src/main/resources/com/blackduck/integration/blackduck/version.txt")
 versionFile.mkdirs()
 versionFile.delete()
 versionFile << version
@@ -29,14 +29,14 @@ final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
 
 repositories {
     maven { url "${internalRepoHost}/artifactory/jcenter" }
-    maven { url "https://sig-repo.synopsys.com/bds-bdio-release" }
-    maven { url "https://sig-repo.synopsys.com/artifactory/bds-integrations-snapshot/" }
+    maven { url "https://repo.blackduck.com/bds-bdio-release" }
+    maven { url "https://repo.blackduck.com/artifactory/bds-integrations-snapshot/" }
 }
 
 dependencies {
-    api 'com.synopsys.integration:blackduck-common-api:2023.4.2.5'
-    api 'com.synopsys.integration:phone-home-client:6.0.1'
-    api 'com.synopsys.integration:integration-bdio:26.0.13'
+    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.5'
+    api 'com.blackduck.integration:phone-home-client:6.0.1'
+    api 'com.blackduck.integration:integration-bdio:26.0.13'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
 
     testImplementation 'com.google.guava:guava:31.1-jre'
