@@ -73,7 +73,7 @@ public class IssueServiceTestIT {
         project = projectVersionWrapper.getProjectView();
 
         // add some components to the BOM
-        ExternalId blackDuckCommon = externalIdFactory.createMavenExternalId("com.blackduck.integration", "blackduck-common", "50.0.0");
+        ExternalId blackDuckCommon = externalIdFactory.createMavenExternalId("com.blackducksoftware.integration", "blackduck-common", "45.0.7");
         ExternalId apacheFileUpload = externalIdFactory.createMavenExternalId("commons-fileupload", "commons-fileupload");
         projectBomService.addComponentToProjectVersion(blackDuckCommon, projectVersionWrapper.getProjectVersionView());
         projectBomService.addComponentToProjectVersion(apacheFileUpload, projectVersionWrapper.getProjectVersionView());

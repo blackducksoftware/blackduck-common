@@ -61,7 +61,7 @@ public class ProjectBomServiceTestIT {
         List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(0, bomComponents.size());
 
-        ExternalId externalId = new ExternalIdFactory().createMavenExternalId("com.blackduck.integration", "blackduck-common", "47.0.0");
+        ExternalId externalId = new ExternalIdFactory().createMavenExternalId("com.blackducksoftware.integration", "blackduck-common", "45.0.7");
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
         bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
@@ -127,9 +127,9 @@ public class ProjectBomServiceTestIT {
         String projectName = "get_active_policies_test";
         String projectVersionName = "1.0.0";
         String testPolicyName = "testPolicy";
-        String componentGroup = "com.blackduck.integration";
+        String componentGroup = "com.blackducksoftware.integration";
         String componentName = "blackduck-common";
-        String componentVersion = "47.0.0";
+        String componentVersion = "45.0.7";
         ExternalId componentExternalId = externalIdFactory.createMavenExternalId(componentGroup, componentName, componentVersion);
 
         // delete the project, if it exists
