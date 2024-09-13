@@ -1,29 +1,25 @@
 package com.blackduck.integration.blackduck.configuration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.net.URL;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.http.client.TestingPropertyKey;
+import com.blackduck.integration.blackduck.useragent.BlackDuckCommon;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.SilentIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.RestConstants;
+import com.blackduck.integration.rest.client.ConnectionResult;
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.useragent.BlackDuckCommon;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.rest.client.ConnectionResult;
-import com.synopsys.integration.util.NameVersion;
+import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

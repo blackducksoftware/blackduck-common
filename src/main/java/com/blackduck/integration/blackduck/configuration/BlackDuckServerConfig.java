@@ -7,33 +7,32 @@
  */
 package com.blackduck.integration.blackduck.configuration;
 
-import static com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
+import com.blackduck.integration.blackduck.http.client.ApiTokenBlackDuckHttpClient;
+import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
+import com.blackduck.integration.blackduck.http.client.CredentialsBlackDuckHttpClient;
+import com.blackduck.integration.blackduck.http.client.cache.CachingHttpClient;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.builder.Buildable;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.SilentIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.credentials.Credentials;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import com.blackduck.integration.rest.response.ErrorResponse;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.rest.support.AuthenticationSupport;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.NameVersion;
+import com.blackduck.integration.util.Stringable;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
-import com.blackduck.integration.blackduck.http.client.cache.CachingHttpClient;
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.blackduck.integration.blackduck.http.client.ApiTokenBlackDuckHttpClient;
-import com.blackduck.integration.blackduck.http.client.CredentialsBlackDuckHttpClient;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.builder.Buildable;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.response.ErrorResponse;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.rest.support.AuthenticationSupport;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.util.Stringable;
+import static com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
 
 public class BlackDuckServerConfig extends Stringable implements Buildable {
     @Deprecated

@@ -1,30 +1,16 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import com.synopsys.integration.blackduck.api.core.ResourceLink;
-import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
+import com.blackduck.integration.blackduck.api.core.ResourceLink;
+import com.blackduck.integration.blackduck.api.core.ResourceMetadata;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.view.CodeLocationView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
+import com.blackduck.integration.blackduck.api.manual.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationWaitJobCondition;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
@@ -32,16 +18,24 @@ import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
 import com.blackduck.integration.blackduck.service.model.NotificationTaskRange;
 import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.blackduck.integration.blackduck.service.request.NotificationEditor;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.util.NameVersion;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CodeLocationWaitJobConditionTest {
-    private final HttpUrl codeLocationsUrl = new HttpUrl("https://synopsys.com/codelocations");
+    private final HttpUrl codeLocationsUrl = new HttpUrl("https://blackduck.com/codelocations");
     private final UrlMultipleResponses<CodeLocationView> codeLocationResponses = new UrlMultipleResponses<>(codeLocationsUrl, CodeLocationView.class);
-    private final HttpUrl codeLocationUrl = new HttpUrl("https://synopsys.com/codelocations/2.71828182845");
+    private final HttpUrl codeLocationUrl = new HttpUrl("https://blackduck.com/codelocations/2.71828182845");
 
     public CodeLocationWaitJobConditionTest() throws IntegrationException {}
 

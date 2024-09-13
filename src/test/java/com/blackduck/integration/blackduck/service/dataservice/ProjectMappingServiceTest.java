@@ -1,24 +1,23 @@
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectMappingView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.exception.IntegrationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectMappingView;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
-import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.exception.IntegrationException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

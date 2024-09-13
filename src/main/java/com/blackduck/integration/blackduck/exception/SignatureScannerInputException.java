@@ -7,7 +7,7 @@
  */
 package com.blackduck.integration.blackduck.exception;
 
-import com.synopsys.integration.exception.IntegrationException;
+import com.blackduck.integration.exception.IntegrationException;
 
 public class SignatureScannerInputException extends IntegrationException {
     public SignatureScannerInputException() {

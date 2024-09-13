@@ -7,17 +7,17 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.blackduck.api.enumeration.RankedSeverityType;
+import com.blackduck.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.NameValuePairView;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.blackduck.integration.blackduck.api.enumeration.RankedSeverityType;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.NameValuePairView;
 
 public class PolicyStatusDescription {
     private final ProjectVersionPolicyStatusView policyStatusItem;

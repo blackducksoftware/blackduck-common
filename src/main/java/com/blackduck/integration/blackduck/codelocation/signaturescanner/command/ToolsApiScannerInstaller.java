@@ -7,32 +7,30 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
+import com.blackduck.integration.blackduck.version.BlackDuckVersion;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.util.CleanupZipExpander;
+import com.blackduck.integration.util.OperatingSystemType;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.io.FileUtils;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLHandshakeException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.Certificate;
-
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
-import com.blackduck.integration.blackduck.version.BlackDuckVersion;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.io.FileUtils;
-
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.OperatingSystemType;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLHandshakeException;
 
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     // The tools API for downloading the scan-cli is called on by Detect for BD versions 2024.7.0 or newer

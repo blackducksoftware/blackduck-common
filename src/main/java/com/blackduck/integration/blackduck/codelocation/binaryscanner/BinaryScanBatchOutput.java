@@ -7,12 +7,12 @@
  */
 package com.blackduck.integration.blackduck.codelocation.binaryscanner;
 
-import java.util.List;
-
 import com.blackduck.integration.blackduck.codelocation.CodeLocationBatchOutput;
 import com.blackduck.integration.blackduck.codelocation.Result;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
+import com.blackduck.integration.log.IntLogger;
+
+import java.util.List;
 
 public class BinaryScanBatchOutput extends CodeLocationBatchOutput<BinaryScanOutput> {
     public BinaryScanBatchOutput(List<BinaryScanOutput> outputs) {

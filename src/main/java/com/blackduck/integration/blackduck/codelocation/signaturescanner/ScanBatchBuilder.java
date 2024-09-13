@@ -7,24 +7,19 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.blackduck.integration.builder.BuilderStatus;
+import com.blackduck.integration.builder.IntegrationBuilder;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ReducedPersistence;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.synopsys.integration.builder.BuilderStatus;
-import com.synopsys.integration.builder.IntegrationBuilder;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
 
 public class ScanBatchBuilder extends IntegrationBuilder<ScanBatch> {
     public static final int DEFAULT_MEMORY_IN_MEGABYTES = 4096;

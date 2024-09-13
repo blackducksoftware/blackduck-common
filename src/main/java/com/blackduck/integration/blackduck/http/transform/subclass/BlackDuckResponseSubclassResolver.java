@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.http.transform.subclass;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
 
 public abstract class BlackDuckResponseSubclassResolver<T extends BlackDuckResponse> {
     protected Gson gson;

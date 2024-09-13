@@ -7,21 +7,20 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.*;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.client.SignatureScannerClient;
 import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
 import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.CleanupZipExpander;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.OperatingSystemType;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class ScanBatchRunner {
     private final IntEnvironmentVariables intEnvironmentVariables;

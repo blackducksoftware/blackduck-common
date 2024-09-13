@@ -7,15 +7,14 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.log.IntLogger;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.log.IntLogger;
 
 public class ScannerSplitStream extends OutputStream {
     // https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html

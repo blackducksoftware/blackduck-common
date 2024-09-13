@@ -7,8 +7,8 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
 
 public class ProjectVersionWrapper {
     private ProjectView projectView;

@@ -7,18 +7,17 @@
  */
 package com.blackduck.integration.blackduck.http.client.cache;
 
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
+import com.blackduck.integration.rest.request.Request;
+import com.blackduck.integration.rest.response.Response;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
-
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
 
 public class CacheableResponse implements Response {
     private final Request request;

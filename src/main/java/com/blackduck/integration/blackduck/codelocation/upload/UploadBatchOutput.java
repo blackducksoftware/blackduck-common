@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.codelocation.upload;
 
-import java.util.List;
-
 import com.blackduck.integration.blackduck.codelocation.CodeLocationBatchOutput;
+
+import java.util.List;
 
 public class UploadBatchOutput extends CodeLocationBatchOutput<UploadOutput> {
     public UploadBatchOutput(final List<UploadOutput> outputs) {

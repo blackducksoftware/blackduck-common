@@ -7,6 +7,14 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.function.ThrowingSupplier;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.OperatingSystemType;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -17,15 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.function.ThrowingSupplier;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
 
 public class ScanPathsUtility {
     public static final String STANDARD_OUT_FILENAME = "CLI_Output.txt";

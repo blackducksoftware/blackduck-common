@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.codelocation.binaryscanner;
 
-import java.io.File;
+import com.blackduck.integration.util.NameVersion;
 
-import com.synopsys.integration.util.NameVersion;
+import java.io.File;
 
 public class BinaryScan {
     private final File binaryFile;

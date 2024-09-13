@@ -1,13 +1,12 @@
 package com.blackduck.integration.blackduck;
 
-import java.lang.reflect.Method;
-import java.util.Date;
-
+import com.blackduck.integration.rest.RestConstants;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.synopsys.integration.rest.RestConstants;
+import java.lang.reflect.Method;
+import java.util.Date;
 
 public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
     private static final String START_TIME = "start time";

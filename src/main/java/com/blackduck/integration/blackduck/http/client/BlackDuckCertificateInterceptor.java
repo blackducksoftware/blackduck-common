@@ -7,16 +7,15 @@
  */
 package com.blackduck.integration.blackduck.http.client;
 
-import java.io.IOException;
-import java.security.cert.Certificate;
-
-import javax.net.ssl.SSLSession;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.conn.ManagedHttpClientConnection;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
+
+import javax.net.ssl.SSLSession;
+import java.io.IOException;
+import java.security.cert.Certificate;
 
 public class BlackDuckCertificateInterceptor implements HttpResponseInterceptor {
     @Override

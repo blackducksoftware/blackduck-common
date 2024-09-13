@@ -1,8 +1,8 @@
 package com.blackduck.integration.blackduck.http.transform;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.OriginSourceType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
+import com.blackduck.integration.blackduck.api.core.BlackDuckView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.OriginSourceType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
 
 public class ProjectViewWithoutDescription extends BlackDuckView {
     private java.util.List<ProjectCloneCategoriesType> cloneCategories;

@@ -1,23 +1,22 @@
 package com.blackduck.integration.blackduck.http.client.cache;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 public class CachingHttpClientTestIT {

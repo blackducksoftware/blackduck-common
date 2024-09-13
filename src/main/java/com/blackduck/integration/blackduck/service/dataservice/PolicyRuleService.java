@@ -7,25 +7,25 @@
  */
 package com.blackduck.integration.blackduck.service.dataservice;
 
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.response.ComponentsView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.PolicyRuleView;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.DataService;
+import com.blackduck.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.blackduck.integration.blackduck.service.DataService;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
 
 public class PolicyRuleService extends DataService {
     private final UrlMultipleResponses<PolicyRuleView> policyRulesResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.POLICY_RULES_PATH);

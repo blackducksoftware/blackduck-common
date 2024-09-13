@@ -7,15 +7,14 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
-import java.io.File;
-import java.util.Optional;
-
-import org.apache.commons.io.FilenameUtils;
-
 import com.blackduck.integration.blackduck.codelocation.CodeLocationOutput;
 import com.blackduck.integration.blackduck.codelocation.Result;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.NameVersion;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.util.Optional;
 
 public class ScanCommandOutput extends CodeLocationOutput {
     public static final String DRY_RUN_RESULT_DIRECTORY = "data";

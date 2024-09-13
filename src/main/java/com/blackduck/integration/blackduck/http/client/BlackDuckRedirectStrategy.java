@@ -7,8 +7,6 @@
  */
 package com.blackduck.integration.blackduck.http.client;
 
-import java.net.URI;
-
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
@@ -17,6 +15,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.HttpContext;
+
+import java.net.URI;
 
 public class BlackDuckRedirectStrategy implements RedirectStrategy {
     private LaxRedirectStrategy baseRedirectStrategy = new LaxRedirectStrategy();

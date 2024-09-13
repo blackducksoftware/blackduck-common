@@ -1,31 +1,30 @@
 package com.blackduck.integration.blackduck.codelocation.binaryscanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.util.Date;
-import java.util.Optional;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.view.CodeLocationView;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.codelocation.Result;
+import com.blackduck.integration.blackduck.comprehensive.BlackDuckServices;
+import com.blackduck.integration.blackduck.comprehensive.VerifyNotifications;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.service.dataservice.ProjectServiceTestIT;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.log.LogLevel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.blackduck.integration.blackduck.codelocation.Result;
-import com.blackduck.integration.blackduck.comprehensive.BlackDuckServices;
-import com.blackduck.integration.blackduck.comprehensive.VerifyNotifications;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.LogLevel;
+import java.io.File;
+import java.util.Date;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

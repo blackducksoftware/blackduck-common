@@ -1,6 +1,20 @@
 package com.blackduck.integration.blackduck.http.client;
 
-import static org.junit.Assert.fail;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.LogLevel;
+import com.blackduck.integration.log.PrintStreamIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpClient;
 
 import java.io.File;
 import java.io.InputStream;
@@ -11,22 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.HttpClient;
-
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.util.IntEnvironmentVariables;
+import static org.junit.Assert.fail;
 
 public class IntHttpClientTestHelper {
     private static Properties testProperties;

@@ -1,16 +1,13 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.List;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommandArgumentParser;
+import com.blackduck.integration.blackduck.exception.SignatureScannerInputException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
-import com.blackduck.integration.blackduck.exception.SignatureScannerInputException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScanCommandArgumentParserTest {
     private ScanCommandArgumentParser parser = new ScanCommandArgumentParser();

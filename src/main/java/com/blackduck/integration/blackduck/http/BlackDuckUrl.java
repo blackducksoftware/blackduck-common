@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.http;
 
-import java.util.List;
+import com.blackduck.integration.rest.HttpUrl;
 
-import com.synopsys.integration.rest.HttpUrl;
+import java.util.List;
 
 /**
  * A url of the form:

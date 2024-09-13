@@ -7,22 +7,15 @@
  */
 package com.blackduck.integration.blackduck.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import org.apache.http.HttpHeaders;
-
-import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
+import com.blackduck.integration.blackduck.api.core.BlackDuckComponent;
+import com.blackduck.integration.blackduck.api.core.BlackDuckPath;
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.BlackDuckView;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.blackduck.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.transform.BlackDuckJsonTransformer;
 import com.blackduck.integration.blackduck.http.transform.BlackDuckResponseTransformer;
@@ -30,11 +23,17 @@ import com.blackduck.integration.blackduck.http.transform.BlackDuckResponsesTran
 import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
 import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
 import com.blackduck.integration.blackduck.version.BlackDuckVersion;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.body.BodyContentConverter;
-import com.synopsys.integration.rest.response.Response;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpMethod;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.body.BodyContentConverter;
+import com.blackduck.integration.rest.response.Response;
+import org.apache.http.HttpHeaders;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class BlackDuckApiClient {
     //TODO ejk - create tests to exercise this endpoint - find out what version the slash is not required in

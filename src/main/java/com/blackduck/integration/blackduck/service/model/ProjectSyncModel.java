@@ -7,28 +7,21 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ProjectRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectCloneCategoriesType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseLicensesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionLicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.ComplexLicenseRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
-import com.synopsys.integration.util.NameVersion;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class ProjectSyncModel {
     // these fields are currently not supported - if you need to create a

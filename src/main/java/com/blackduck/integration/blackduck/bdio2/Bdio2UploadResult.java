@@ -7,7 +7,7 @@
  */
 package com.blackduck.integration.blackduck.bdio2;
 
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.HttpUrl;
 
 public class Bdio2UploadResult {
     private final HttpUrl uploadUrl;

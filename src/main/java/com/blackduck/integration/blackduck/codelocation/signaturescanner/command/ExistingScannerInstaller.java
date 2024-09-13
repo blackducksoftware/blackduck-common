@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
-import java.io.File;
-
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+
+import java.io.File;
 
 public class ExistingScannerInstaller implements ScannerInstaller {
     private final File existingInstallDirectory;

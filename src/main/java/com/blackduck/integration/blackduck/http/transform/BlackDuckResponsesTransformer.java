@@ -7,6 +7,18 @@
  */
 package com.blackduck.integration.blackduck.http.transform;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.response.Response;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,19 +26,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
-
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.response.Response;
 
 public class BlackDuckResponsesTransformer {
     private final BlackDuckHttpClient blackDuckHttpClient;

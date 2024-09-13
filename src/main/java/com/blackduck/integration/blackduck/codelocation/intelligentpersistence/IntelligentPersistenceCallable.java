@@ -7,15 +7,14 @@
  */
 package com.blackduck.integration.blackduck.codelocation.intelligentpersistence;
 
-import java.util.concurrent.Callable;
-
 import com.blackduck.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.blackduck.integration.blackduck.bdio2.Bdio2UploadResult;
-import org.jetbrains.annotations.Nullable;
-
 import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.util.NameVersion;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.Callable;
 
 public class IntelligentPersistenceCallable implements Callable<UploadOutput> {
     private final Bdio2FileUploadService bdio2FileUploadService;

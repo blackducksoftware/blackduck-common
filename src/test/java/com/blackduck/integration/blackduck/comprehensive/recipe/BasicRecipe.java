@@ -1,17 +1,11 @@
 package com.blackduck.integration.blackduck.comprehensive.recipe;
 
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-
-import org.junit.jupiter.api.BeforeEach;
-
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.ProjectRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackduck.integration.blackduck.api.generated.view.CodeLocationView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ProjectRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.blackduck.integration.blackduck.codelocation.bdio2legacy.Bdio2UploadService;
 import com.blackduck.integration.blackduck.codelocation.bdiolegacy.UploadBatchRunner;
@@ -20,17 +14,17 @@ import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.dataservice.CodeLocationService;
-import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
-import com.blackduck.integration.blackduck.service.dataservice.PolicyRuleService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectBomService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectUsersService;
+import com.blackduck.integration.blackduck.service.dataservice.*;
 import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 public class BasicRecipe {
     public static final String PROJECT_NAME = "My Recipe Project";

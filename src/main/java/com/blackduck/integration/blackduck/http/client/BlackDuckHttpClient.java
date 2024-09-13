@@ -7,21 +7,20 @@
  */
 package com.blackduck.integration.blackduck.http.client;
 
-import java.util.Optional;
-
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlResponse;
 import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import com.blackduck.integration.rest.response.ErrorResponse;
+import com.blackduck.integration.rest.response.Response;
+import com.google.gson.Gson;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlResponse;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.response.ErrorResponse;
-import com.synopsys.integration.rest.response.Response;
+import java.util.Optional;
 
 public interface BlackDuckHttpClient {
     <T extends BlackDuckResponse, U extends UrlResponse<T>> Response execute(BlackDuckRequest<T, U> blackDuckRequest) throws IntegrationException;

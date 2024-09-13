@@ -7,6 +7,10 @@
  */
 package com.blackduck.integration.blackduck.useragent;
 
+import com.blackduck.integration.util.NameVersion;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -15,14 +19,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.util.NameVersion;
-
 public class BlackDuckCommon {
     public static final String NAME = "BlackDuckCommon";
-    public static final String VERSION_RESOURCE_PATH = "com/synopsys/integration/blackduck/version.txt";
+    public static final String VERSION_RESOURCE_PATH = "com/blackduck/integration/blackduck/version.txt";
     public static final List<String> JAVA_PROPERTIES = Arrays.asList("java.vendor", "java.version", "os.arch", "os.name", "os.version");
 
     public static UserAgentItem createUserAgentItem() {

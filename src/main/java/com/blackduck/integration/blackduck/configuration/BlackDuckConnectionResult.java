@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.configuration;
 
-import java.util.Optional;
-
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.synopsys.integration.rest.client.ConnectionResult;
+import com.blackduck.integration.rest.client.ConnectionResult;
+
+import java.util.Optional;
 
 public class BlackDuckConnectionResult extends ConnectionResult {
     public static final BlackDuckConnectionResult BLACK_DUCK_SUCCESS(int httpStatusCode, BlackDuckHttpClient blackDuckHttpClient) {

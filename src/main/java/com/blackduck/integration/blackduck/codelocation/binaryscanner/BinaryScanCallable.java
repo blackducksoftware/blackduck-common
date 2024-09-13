@@ -7,22 +7,22 @@
  */
 package com.blackduck.integration.blackduck.codelocation.binaryscanner;
 
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.manual.response.BlackDuckStringResponse;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.util.NameVersion;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
-import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.util.NameVersion;
 
 public class BinaryScanCallable implements Callable<BinaryScanOutput> {
     private final BlackDuckApiClient blackDuckApiClient;

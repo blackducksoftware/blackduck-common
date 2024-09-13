@@ -1,19 +1,18 @@
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.NameValuePairView;
+import com.blackduck.integration.blackduck.service.model.PolicyStatusDescription;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionPolicyStatusComponentVersionPolicyViolationDetailsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyStatusView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.NameValuePairView;
-import com.blackduck.integration.blackduck.service.model.PolicyStatusDescription;
+import java.util.ArrayList;
+import java.util.List;
 
 @ExtendWith(TimingExtension.class)
 public class PolicyStatusDescriptionTest {

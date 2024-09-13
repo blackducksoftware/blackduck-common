@@ -1,15 +1,13 @@
 package com.blackduck.integration.blackduck.useragent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.blackduck.integration.blackduck.useragent.BlackDuckCommon;
-import com.blackduck.integration.blackduck.useragent.UserAgentItem;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BlackDuckCommonTest {
     @Test

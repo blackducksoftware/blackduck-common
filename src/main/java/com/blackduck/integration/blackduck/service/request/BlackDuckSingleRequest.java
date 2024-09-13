@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.service.request;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
 
 public class BlackDuckSingleRequest<T extends BlackDuckResponse> extends BlackDuckRequest<T, UrlSingleResponse<T>> {
     public BlackDuckSingleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlSingleResponse<T> urlResponse) {

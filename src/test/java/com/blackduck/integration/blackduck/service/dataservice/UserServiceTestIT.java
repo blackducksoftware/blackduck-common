@@ -1,34 +1,29 @@
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Set;
-
 import com.blackduck.integration.blackduck.TimingExtension;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.RoleAssignmentView;
-import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.UserRequest;
+import com.blackduck.integration.blackduck.api.core.BlackDuckView;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.view.RoleAssignmentView;
+import com.blackduck.integration.blackduck.api.generated.view.UserGroupView;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.UserGroupRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.UserRequest;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
 import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -195,7 +190,7 @@ public class UserServiceTestIT {
         userRequest.setFirstName("Test User");
         userRequest.setLastName("IntegrationTest");
         userRequest.setActive(active);
-        userRequest.setEmail("noreply@synopsys.com");
+        userRequest.setEmail("noreply@blackduck.com");
         userRequest.setPassword("53CUR17y7hR0ugH085Cur17y");
 
         UserView userView = userService.findUserByUsername(userName).orElse(null);

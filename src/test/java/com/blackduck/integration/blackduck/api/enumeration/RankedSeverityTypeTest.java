@@ -1,15 +1,14 @@
 package com.blackduck.integration.blackduck.api.enumeration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.blackduck.integration.blackduck.TimingExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(TimingExtension.class)
 public class RankedSeverityTypeTest {

@@ -7,18 +7,18 @@
  */
 package com.blackduck.integration.blackduck.codelocation.intelligentpersistence;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-
 import com.blackduck.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
+import com.blackduck.integration.log.IntLogger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class IntelligentPersistenceBatchRunner {
     private final IntLogger logger;

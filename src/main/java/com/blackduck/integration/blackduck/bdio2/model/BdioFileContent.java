@@ -7,7 +7,7 @@
  */
 package com.blackduck.integration.blackduck.bdio2.model;
 
-import com.synopsys.integration.util.Stringable;
+import com.blackduck.integration.util.Stringable;
 
 public class BdioFileContent extends Stringable {
     private final String fileName;

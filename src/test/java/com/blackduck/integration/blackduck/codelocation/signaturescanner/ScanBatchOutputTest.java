@@ -1,6 +1,13 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.SilentIntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.NameVersion;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,22 +15,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.ScanBatch;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.ScanBatchBuilder;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.ScanBatchOutput;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.SilentIntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NameVersion;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScanBatchOutputTest {
     @Test

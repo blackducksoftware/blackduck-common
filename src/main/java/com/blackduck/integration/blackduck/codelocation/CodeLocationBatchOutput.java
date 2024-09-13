@@ -7,17 +7,11 @@
  */
 package com.blackduck.integration.blackduck.codelocation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.util.NameVersion;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class CodeLocationBatchOutput<T extends CodeLocationOutput> implements Iterable<T> {
     private final Map<String, Integer> successfulCodeLocationNamesToExpectedNotificationCounts;

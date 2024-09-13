@@ -1,31 +1,23 @@
 package com.blackduck.integration.blackduck.codelocation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.blackduck.integration.blackduck.codelocation.CodeLocationsRetriever;
+import com.blackduck.integration.blackduck.api.core.ResourceLink;
+import com.blackduck.integration.blackduck.api.core.ResourceMetadata;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.view.CodeLocationView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.synopsys.integration.blackduck.api.core.ResourceLink;
-import com.synopsys.integration.blackduck.api.core.ResourceMetadata;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class CodeLocationsRetrieverTest {
-    private final HttpUrl url = new HttpUrl("https://www.synopsys.com");
+    private final HttpUrl url = new HttpUrl("https://www.blackduck.com");
 
     public CodeLocationsRetrieverTest() throws IntegrationException {}
 
@@ -71,11 +63,11 @@ public class CodeLocationsRetrieverTest {
     private Map<String, String> expectedResults() {
         Map<String, String> results = new HashMap<>();
 
-        results.put("https://www.synopsys.com/codelocations/1", "frodo");
-        results.put("https://www.synopsys.com/codelocations/2", "sam");
-        results.put("https://www.synopsys.com/codelocations/3", "aragorn");
-        results.put("https://www.synopsys.com/codelocations/4", "legolas");
-        results.put("https://www.synopsys.com/codelocations/5", "gimli");
+        results.put("https://www.blackduck.com/codelocations/1", "frodo");
+        results.put("https://www.blackduck.com/codelocations/2", "sam");
+        results.put("https://www.blackduck.com/codelocations/3", "aragorn");
+        results.put("https://www.blackduck.com/codelocations/4", "legolas");
+        results.put("https://www.blackduck.com/codelocations/5", "gimli");
 
         return results;
     }

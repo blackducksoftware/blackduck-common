@@ -1,17 +1,14 @@
 package com.blackduck.integration.blackduck.http;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.blackduck.integration.blackduck.http.BlackDuckUrl;
-import com.blackduck.integration.blackduck.http.BlackDuckUrlSearchTerm;
-import org.junit.jupiter.api.Test;
-
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BlackDuckUrlTest {
     @Test

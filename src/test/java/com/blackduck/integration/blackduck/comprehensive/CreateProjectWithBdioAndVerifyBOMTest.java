@@ -1,52 +1,47 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.view.CodeLocationView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
+import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationData;
+import com.blackduck.integration.blackduck.codelocation.bdiolegacy.BdioUploadService;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
 import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.blackduck.service.request.NotificationEditor;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.LogLevel;
+import com.blackduck.integration.log.PrintStreamIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.RestConstants;
+import com.blackduck.integration.util.NameVersion;
+import com.blackduck.integration.wait.ResilientJobConfig;
+import com.blackduck.integration.wait.WaitJob;
+import com.blackduck.integration.wait.WaitJobCondition;
+import com.blackduck.integration.wait.tracker.WaitIntervalTracker;
+import com.blackduck.integration.wait.tracker.WaitIntervalTrackerFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.generated.view.CodeLocationView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationData;
-import com.blackduck.integration.blackduck.codelocation.bdiolegacy.BdioUploadService;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
-import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.blackduck.integration.blackduck.service.request.NotificationEditor;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.wait.ResilientJobConfig;
-import com.synopsys.integration.wait.WaitJob;
-import com.synopsys.integration.wait.WaitJobCondition;
-import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
-import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
+import java.io.File;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -61,13 +56,13 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     public static final List<String> CODE_LOCATION_NAMES = Arrays.asList(
         "blackduck-alert/6.1.0-SNAPSHOT/alert-common/blackduck-alert/alert-common/6.1.0-SNAPSHOT gradle/bom"
         , "blackduck-alert/6.1.0-SNAPSHOT/alert-database/blackduck-alert/alert-database/6.1.0-SNAPSHOT gradle/bom"
-        , "blackduck-alert/6.1.0-SNAPSHOT/com.synopsys.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
+        , "blackduck-alert/6.1.0-SNAPSHOT/com.blackduck.integration/blackduck-alert/6.1.0-SNAPSHOT gradle/bom"
     );
 
     public static final String[] BDIO_FILE_NAMES = new String[] {
         "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_common_blackduck_alert_alert_common_6_1_0_SNAPSHOT_gradle_bom.jsonld"
         , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_alert_database_blackduck_alert_alert_database_6_1_0_SNAPSHOT_gradle_bom.jsonld"
-        , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_synopsys_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
+        , "bdio/alert/blackduck_alert_6_1_0_SNAPSHOT_com_blackduck_integration_blackduck_alert_6_1_0_SNAPSHOT_gradle_bom.jsonld"
     };
 
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();

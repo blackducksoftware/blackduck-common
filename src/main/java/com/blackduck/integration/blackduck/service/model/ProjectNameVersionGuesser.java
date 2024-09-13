@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class ProjectNameVersionGuesser {
     public static final String DATE_FORMAT = "yyyy-MM-dd";

@@ -7,13 +7,13 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.blackduck.api.generated.component.RiskProfileCountsView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.RiskPriorityType;
+import com.blackduck.integration.blackduck.api.generated.view.RiskProfileView;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.synopsys.integration.blackduck.api.generated.component.RiskProfileCountsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType;
-import com.synopsys.integration.blackduck.api.generated.view.RiskProfileView;
 
 public class RiskProfileCounts {
     private final Map<RiskPriorityType, BigDecimal> countsMap;

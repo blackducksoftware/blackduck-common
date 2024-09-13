@@ -7,35 +7,24 @@
  */
 package com.blackduck.integration.blackduck.http;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.blackduck.integration.blackduck.api.manual.response.BlackDuckResponseResponse;
+import com.blackduck.integration.blackduck.api.manual.response.BlackDuckStringResponse;
+import com.blackduck.integration.blackduck.service.request.*;
+import com.blackduck.integration.rest.HttpMethod;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.body.*;
+import com.blackduck.integration.rest.request.Request;
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.http.HttpHeaders;
-import org.apache.http.entity.ContentType;
-
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.api.manual.response.BlackDuckResponseResponse;
-import com.synopsys.integration.blackduck.api.manual.response.BlackDuckStringResponse;
-import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
-import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
-import com.blackduck.integration.blackduck.service.request.BlackDuckSingleRequest;
-import com.blackduck.integration.blackduck.service.request.BlackDuckStringRequest;
-import com.synopsys.integration.rest.HttpMethod;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.body.BodyContent;
-import com.synopsys.integration.rest.body.FileBodyContent;
-import com.synopsys.integration.rest.body.MapBodyContent;
-import com.synopsys.integration.rest.body.MultipartBodyContent;
-import com.synopsys.integration.rest.body.ObjectBodyContent;
-import com.synopsys.integration.rest.body.StringBodyContent;
-import com.synopsys.integration.rest.request.Request;
 
 public class BlackDuckRequestBuilder {
     public static final String LIMIT_PARAMETER = "limit";

@@ -7,13 +7,12 @@
  */
 package com.blackduck.integration.blackduck.codelocation.upload;
 
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.blackduck.integration.blackduck.codelocation.CodeLocationOutput;
 import com.blackduck.integration.blackduck.codelocation.Result;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.util.NameVersion;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class UploadOutput extends CodeLocationOutput {
     private final String response;

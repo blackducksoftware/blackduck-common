@@ -7,11 +7,11 @@
  */
 package com.blackduck.integration.blackduck.bdio2.model;
 
-import java.util.List;
-
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
+
+import java.util.List;
 
 public class Bdio2Document {
     private final BdioMetadata bdioMetadata;

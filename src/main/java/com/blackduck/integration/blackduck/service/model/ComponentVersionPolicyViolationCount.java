@@ -7,15 +7,14 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.NameValuePairView;
+import com.blackduck.integration.util.Stringable;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.NameValuePairView;
-import com.synopsys.integration.util.Stringable;
 
 public class ComponentVersionPolicyViolationCount extends Stringable {
     public PolicyRuleSeverityType name;

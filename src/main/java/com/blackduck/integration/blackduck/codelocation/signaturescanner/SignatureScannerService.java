@@ -7,18 +7,18 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import java.util.Set;
-
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.blackduck.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationData;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationWaitResult;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.DataService;
 import com.blackduck.integration.blackduck.service.model.NotificationTaskRange;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.NameVersion;
+
+import java.util.Set;
 
 public class SignatureScannerService extends DataService {
     private final ScanBatchRunner scanBatchRunner;

@@ -7,8 +7,8 @@
  */
 package com.blackduck.integration.blackduck.codelocation.bdiolegacy;
 
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationRequest;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 

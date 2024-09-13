@@ -7,28 +7,28 @@
  */
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.response.ComponentsView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.LicenseView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
 import com.blackduck.integration.blackduck.http.BlackDuckQuery;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseLicensesView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionLicenseView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomLicenseView;
 import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 public class LicenseService extends DataService {
     private final ComponentService componentDataService;

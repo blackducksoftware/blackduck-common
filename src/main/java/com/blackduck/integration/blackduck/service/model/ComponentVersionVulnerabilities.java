@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
-import java.util.List;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.VulnerabilityView;
 
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
+import java.util.List;
 
 public class ComponentVersionVulnerabilities {
     private final ComponentVersionView componentVersionView;

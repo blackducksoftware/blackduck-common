@@ -1,10 +1,9 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommandQuoteParser;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScanCommandQuoteParserTest {
     private ScanCommandQuoteParser parser = new ScanCommandQuoteParser();

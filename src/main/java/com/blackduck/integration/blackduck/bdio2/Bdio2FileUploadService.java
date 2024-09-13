@@ -7,12 +7,7 @@
  */
 package com.blackduck.integration.blackduck.bdio2;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
-
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
 import com.blackduck.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
 import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
@@ -21,13 +16,17 @@ import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
 import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
 import com.blackduck.integration.blackduck.version.BlackDuckVersion;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.wait.ResilientJobConfig;
-import com.synopsys.integration.wait.ResilientJobExecutor;
-import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
-import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.NameVersion;
+import com.blackduck.integration.wait.ResilientJobConfig;
+import com.blackduck.integration.wait.ResilientJobExecutor;
+import com.blackduck.integration.wait.tracker.WaitIntervalTracker;
+import com.blackduck.integration.wait.tracker.WaitIntervalTrackerFactory;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Bdio2FileUploadService extends DataService {
     private static final String FILE_NAME_BDIO_HEADER_JSONLD = "bdio-header.jsonld";

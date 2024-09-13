@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.service.request;
 
+import com.blackduck.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.api.generated.discovery.BlackDuckMediaTypeDiscovery;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.HttpUrl;
 
 /**
  * When requesting resources from Black Duck, a default ACCEPT header of

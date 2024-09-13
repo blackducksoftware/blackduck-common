@@ -7,12 +7,12 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.blackduck.api.generated.component.ComponentMatchedFilesItemsFilePathView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.UsageType;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import com.synopsys.integration.blackduck.api.generated.component.ComponentMatchedFilesItemsFilePathView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.UsageType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
 
 public class MatchedFilesModel {
     private final String path;

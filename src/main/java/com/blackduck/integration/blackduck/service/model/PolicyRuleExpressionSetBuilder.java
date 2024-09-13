@@ -7,28 +7,28 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleComponentUsageValueSetType;
 import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
 import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionType;
 import com.blackduck.integration.blackduck.api.enumeration.ReviewStatusType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.LicenseView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsParametersView;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionExpressionsView;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleExpressionOperatorType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionDistributionType;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentView;
+import com.blackduck.integration.blackduck.api.generated.view.LicenseView;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.ProjectVersionPhaseType;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.RestConstants;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.RestConstants;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * The intention here is to provide a reasonable api on top of policy rule

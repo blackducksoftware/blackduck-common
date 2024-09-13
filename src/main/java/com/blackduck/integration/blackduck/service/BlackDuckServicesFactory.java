@@ -7,10 +7,7 @@
  */
 package com.blackduck.integration.blackduck.service;
 
-import java.io.File;
-import java.time.OffsetDateTime;
-import java.util.concurrent.ExecutorService;
-
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.bdio2.Bdio2FileUploadService;
 import com.blackduck.integration.blackduck.bdio2.Bdio2RetryAwareStreamUploader;
 import com.blackduck.integration.blackduck.bdio2.Bdio2StreamUploader;
@@ -33,37 +30,21 @@ import com.blackduck.integration.blackduck.http.transform.BlackDuckResponseTrans
 import com.blackduck.integration.blackduck.http.transform.BlackDuckResponsesTransformer;
 import com.blackduck.integration.blackduck.http.transform.adapters.OffsetDateTimeTypeAdapter;
 import com.blackduck.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
+import com.blackduck.integration.blackduck.service.dataservice.*;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.RestConstants;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.IntegrationEscapeUtil;
+import com.blackduck.integration.util.NoThreadExecutorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.blackduck.integration.blackduck.service.dataservice.BlackDuckScanReadinessService;
-import com.blackduck.integration.blackduck.service.dataservice.CodeLocationService;
-import com.blackduck.integration.blackduck.service.dataservice.ComponentService;
-import com.blackduck.integration.blackduck.service.dataservice.IacScanUploadService;
-import com.blackduck.integration.blackduck.service.dataservice.IssueService;
-import com.blackduck.integration.blackduck.service.dataservice.LicenseService;
-import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
-import com.blackduck.integration.blackduck.service.dataservice.PolicyRuleService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectBomService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectGetService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectMappingService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectUsersService;
-import com.blackduck.integration.blackduck.service.dataservice.RoleService;
-import com.blackduck.integration.blackduck.service.dataservice.TagService;
-import com.blackduck.integration.blackduck.service.dataservice.UserGroupService;
-import com.blackduck.integration.blackduck.service.dataservice.UserRoleService;
-import com.blackduck.integration.blackduck.service.dataservice.UserService;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.IntegrationEscapeUtil;
-import com.synopsys.integration.util.NoThreadExecutorService;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.io.File;
+import java.time.OffsetDateTime;
+import java.util.concurrent.ExecutorService;
 
 public class BlackDuckServicesFactory {
     public static final ExecutorService NO_THREAD_EXECUTOR_SERVICE = new NoThreadExecutorService();

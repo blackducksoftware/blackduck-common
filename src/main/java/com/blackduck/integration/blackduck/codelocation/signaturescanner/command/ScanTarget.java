@@ -7,15 +7,14 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 
 public class ScanTarget {
     private final String path;

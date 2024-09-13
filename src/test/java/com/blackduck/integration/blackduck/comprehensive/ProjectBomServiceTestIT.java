@@ -1,32 +1,16 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.bdio.model.externalid.ExternalIdFactory;
 import com.blackduck.integration.blackduck.TimingExtension;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import org.junit.Assume;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
 import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleCategoryType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionPolicyRulesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleCategoryType;
+import com.blackduck.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
+import com.blackduck.integration.blackduck.api.generated.view.*;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
 import com.blackduck.integration.blackduck.service.dataservice.PolicyRuleService;
@@ -35,8 +19,19 @@ import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
 import com.blackduck.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
 import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
 import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import org.junit.Assume;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -66,7 +61,7 @@ public class ProjectBomServiceTestIT {
         List<ProjectVersionComponentVersionView> bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
         assertEquals(0, bomComponents.size());
 
-        ExternalId externalId = new ExternalIdFactory().createMavenExternalId("com.synopsys.integration", "blackduck-common", "47.0.0");
+        ExternalId externalId = new ExternalIdFactory().createMavenExternalId("com.blackduck.integration", "blackduck-common", "47.0.0");
         projectBomService.addComponentToProjectVersion(externalId, projectVersionWrapper.getProjectVersionView());
 
         bomComponents = projectBomService.getComponentsForProjectVersion(projectVersionWrapper.getProjectVersionView());
@@ -132,7 +127,7 @@ public class ProjectBomServiceTestIT {
         String projectName = "get_active_policies_test";
         String projectVersionName = "1.0.0";
         String testPolicyName = "testPolicy";
-        String componentGroup = "com.synopsys.integration";
+        String componentGroup = "com.blackduck.integration";
         String componentName = "blackduck-common";
         String componentVersion = "47.0.0";
         ExternalId componentExternalId = externalIdFactory.createMavenExternalId(componentGroup, componentName, componentVersion);

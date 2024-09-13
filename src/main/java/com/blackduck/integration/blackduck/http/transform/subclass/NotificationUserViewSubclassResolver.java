@@ -7,21 +7,10 @@
  */
 package com.blackduck.integration.blackduck.http.transform.subclass;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.manual.view.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.manual.view.BomEditNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.ComponentUnknownVersionNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.LicenseLimitNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.PolicyOverrideNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.RuleViolationClearedNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.RuleViolationNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.UnknownNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VulnerabilityNotificationUserView;
 
 public class NotificationUserViewSubclassResolver extends BlackDuckResponseSubclassResolver<NotificationUserView> {
     public NotificationUserViewSubclassResolver(Gson gson) {

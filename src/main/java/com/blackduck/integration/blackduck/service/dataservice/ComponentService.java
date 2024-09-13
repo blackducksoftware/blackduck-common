@@ -7,31 +7,30 @@
  */
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
+import com.blackduck.integration.blackduck.api.generated.response.ComponentsView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentView;
+import com.blackduck.integration.blackduck.api.generated.view.VulnerabilityView;
 import com.blackduck.integration.blackduck.http.BlackDuckMediaTypes;
 import com.blackduck.integration.blackduck.http.BlackDuckQuery;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
-import org.apache.commons.lang3.StringUtils;
-
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentVersionUpgradeGuidanceView;
-import com.synopsys.integration.blackduck.api.generated.response.ComponentsView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentView;
-import com.synopsys.integration.blackduck.api.generated.view.VulnerabilityView;
 import com.blackduck.integration.blackduck.service.model.ComponentVersionVulnerabilities;
 import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class ComponentService extends DataService {
     public static final Function<List<ComponentsView>, Optional<ComponentsView>> FIRST_OR_EMPTY_RESULT =

@@ -7,15 +7,15 @@
  */
 package com.blackduck.integration.blackduck.bdio2.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
+import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioWriter;
 import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
-import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 public class Bdio2Writer {
     public BdioWriter createBdioWriter(OutputStream outputStream, BdioMetadata bdioMetadata) {

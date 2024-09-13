@@ -7,27 +7,26 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.client.SignatureScannerClient;
+import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
+import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.request.Request;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.util.CleanupZipExpander;
+import com.blackduck.integration.util.OperatingSystemType;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.Certificate;
-
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.http.client.SignatureScannerClient;
-import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
-import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.OperatingSystemType;
 
 public class ZipApiScannerInstaller extends ApiScannerInstaller {
     public static final String DEFAULT_SIGNATURE_SCANNER_DOWNLOAD_URL_SUFFIX = "download/scan.cli.zip";

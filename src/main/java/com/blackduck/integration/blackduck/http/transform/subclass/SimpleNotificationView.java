@@ -7,8 +7,8 @@
  */
 package com.blackduck.integration.blackduck.http.transform.subclass;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckView;
-import com.synopsys.integration.blackduck.api.manual.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.core.BlackDuckView;
+import com.blackduck.integration.blackduck.api.manual.enumeration.NotificationType;
 
 public class SimpleNotificationView extends BlackDuckView {
     public NotificationType type;

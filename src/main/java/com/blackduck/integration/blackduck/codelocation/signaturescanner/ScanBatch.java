@@ -7,27 +7,20 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.*;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.builder.Buildable;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.Stringable;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.BlackDuckOnlineProperties;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.IndividualFileMatching;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ReducedPersistence;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommand;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanTarget;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.SnippetMatching;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.builder.Buildable;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.Stringable;
 
 public class ScanBatch extends Stringable implements Buildable {
     public static ScanBatchBuilder newBuilder() {

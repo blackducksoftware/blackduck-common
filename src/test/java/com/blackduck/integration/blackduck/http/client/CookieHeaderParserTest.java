@@ -1,11 +1,10 @@
 package com.blackduck.integration.blackduck.http.client;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CookieHeaderParserTest {
     public static final String BEARER_TOKEN = "bearertoken";

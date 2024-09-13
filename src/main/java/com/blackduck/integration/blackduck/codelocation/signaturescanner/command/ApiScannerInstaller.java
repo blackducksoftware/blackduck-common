@@ -8,8 +8,8 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
 import org.apache.commons.compress.archivers.ArchiveException;
 
 import java.io.File;

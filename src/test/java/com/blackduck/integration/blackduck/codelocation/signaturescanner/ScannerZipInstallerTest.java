@@ -1,18 +1,9 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-
 import com.blackduck.integration.blackduck.TimingExtension;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
 import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
 import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
@@ -21,12 +12,20 @@ import com.blackduck.integration.blackduck.http.client.TestingPropertyKey;
 import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
 import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.util.CleanupZipExpander;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.OperatingSystemType;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(TimingExtension.class)
 @Tag("integration")

@@ -1,18 +1,16 @@
 package com.blackduck.integration.blackduck.http.transform.subclass;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectVersionNotificationView;
+import com.blackduck.integration.blackduck.api.manual.view.VulnerabilityNotificationView;
+import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import com.blackduck.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-
-import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationView;
-import com.synopsys.integration.blackduck.api.manual.view.VulnerabilityNotificationView;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BlackDuckResponseResolverTest {
     @Test

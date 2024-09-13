@@ -7,19 +7,19 @@
  */
 package com.blackduck.integration.blackduck.codelocation.bdiolegacy;
 
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.log.IntLogger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.log.IntLogger;
 
 public class UploadBatchRunner {
     private final IntLogger logger;

@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.bdio2.model;
 
-import java.util.Optional;
-
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class GitInfo {
     @Nullable

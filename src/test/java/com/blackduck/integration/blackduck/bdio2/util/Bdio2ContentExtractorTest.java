@@ -1,16 +1,14 @@
 package com.blackduck.integration.blackduck.bdio2.util;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 
-import com.blackduck.integration.blackduck.bdio2.util.Bdio2ContentExtractor;
-import org.junit.jupiter.api.Test;
-
-import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class Bdio2ContentExtractorTest {
     @Test

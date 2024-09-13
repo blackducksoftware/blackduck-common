@@ -7,13 +7,12 @@
  */
 package com.blackduck.integration.blackduck.codelocation.upload;
 
-import java.io.File;
-import java.util.Optional;
-
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
-import com.synopsys.integration.util.NameVersion;
+import java.io.File;
+import java.util.Optional;
 
 public class UploadTarget {
     @Nullable

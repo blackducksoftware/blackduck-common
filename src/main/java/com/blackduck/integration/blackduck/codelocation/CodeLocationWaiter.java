@@ -7,20 +7,20 @@
  */
 package com.blackduck.integration.blackduck.codelocation;
 
-import java.util.Set;
-
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
 import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
 import com.blackduck.integration.blackduck.service.model.NotificationTaskRange;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.wait.ResilientJobConfig;
-import com.synopsys.integration.wait.ResilientJobExecutor;
-import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
-import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.NameVersion;
+import com.blackduck.integration.wait.ResilientJobConfig;
+import com.blackduck.integration.wait.ResilientJobExecutor;
+import com.blackduck.integration.wait.tracker.WaitIntervalTracker;
+import com.blackduck.integration.wait.tracker.WaitIntervalTrackerFactory;
+
+import java.util.Set;
 
 public class CodeLocationWaiter {
     private final IntLogger logger;

@@ -1,16 +1,15 @@
 package com.blackduck.integration.blackduck.service.dataservice;
 
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.view.ScanReadinessView;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.exception.IntegrationException;
 import org.junit.Assume;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.api.generated.view.ScanReadinessView;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.exception.IntegrationException;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

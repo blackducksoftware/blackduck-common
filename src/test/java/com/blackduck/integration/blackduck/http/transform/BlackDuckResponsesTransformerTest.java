@@ -1,6 +1,25 @@
 package com.blackduck.integration.blackduck.http.transform;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
+import com.blackduck.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.LogLevel;
+import com.blackduck.integration.log.PrintStreamIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
+import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -9,27 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.blackduck.integration.blackduck.TimingExtension;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
-
-import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.http.transform.subclass.BlackDuckResponseResolver;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(TimingExtension.class)
 public class BlackDuckResponsesTransformerTest {

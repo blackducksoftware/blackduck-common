@@ -7,28 +7,24 @@
  */
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.view.UserGroupView;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.AssignedUserGroupRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.AssignedUserRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.response.AssignedUserGroupView;
+import com.blackduck.integration.blackduck.api.manual.temporary.view.AssignedUserView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.synopsys.integration.blackduck.api.generated.view.UserGroupView;
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.AssignedUserGroupRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.AssignedUserRequest;
-import com.synopsys.integration.blackduck.api.manual.temporary.response.AssignedUserGroupView;
-import com.synopsys.integration.blackduck.api.manual.temporary.view.AssignedUserView;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProjectUsersService extends DataService {
     private final UserGroupService userGroupService;

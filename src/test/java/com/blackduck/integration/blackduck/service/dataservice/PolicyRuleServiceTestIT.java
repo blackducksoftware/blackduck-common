@@ -1,27 +1,26 @@
 package com.blackduck.integration.blackduck.service.dataservice;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
+import com.blackduck.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleCategoryType;
+import com.blackduck.integration.blackduck.api.generated.view.PolicyRuleView;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import com.blackduck.integration.blackduck.api.enumeration.PolicyRuleConditionOperatorType;
-import com.synopsys.integration.blackduck.api.generated.component.PolicyRuleExpressionView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleCategoryType;
-import com.synopsys.integration.blackduck.api.generated.view.PolicyRuleView;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.model.PolicyRuleExpressionSetBuilder;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 public class PolicyRuleServiceTestIT {

@@ -7,11 +7,11 @@
  */
 package com.blackduck.integration.blackduck.api.enumeration;
 
+import com.blackduck.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.synopsys.integration.blackduck.api.generated.enumeration.PolicyRuleSeverityType;
 
 public enum RankedSeverityType {
     UNSPECIFIED(PolicyRuleSeverityType.UNSPECIFIED),

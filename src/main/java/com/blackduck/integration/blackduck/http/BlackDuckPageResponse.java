@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.http;
 
-import java.util.List;
+import com.blackduck.integration.blackduck.api.core.BlackDuckComponent;
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckComponent;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import java.util.List;
 
 public class BlackDuckPageResponse<T extends BlackDuckResponse> extends BlackDuckComponent {
     private int totalCount;

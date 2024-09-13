@@ -7,24 +7,23 @@
  */
 package com.blackduck.integration.blackduck.codelocation.bdio2legacy;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Callable;
-
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.util.NameVersion;
 import org.apache.http.entity.ContentType;
 import org.jetbrains.annotations.Nullable;
 
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadOutput;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
-import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.util.NameVersion;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Callable;
 
 public class UploadBdio2Callable implements Callable<UploadOutput> {
     private final BlackDuckApiClient blackDuckApiClient;

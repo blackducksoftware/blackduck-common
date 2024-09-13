@@ -7,11 +7,11 @@
  */
 package com.blackduck.integration.blackduck.useragent;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class UserAgentBuilder {
     private List<UserAgentItem> userAgentItems = new ArrayList<>();

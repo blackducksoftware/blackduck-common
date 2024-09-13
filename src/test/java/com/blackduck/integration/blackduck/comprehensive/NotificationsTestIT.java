@@ -1,28 +1,14 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.component.ProjectNotificationContent;
+import com.blackduck.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectNotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
 import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.ProjectNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.component.ProjectVersionNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.ProjectVersionNotificationUserView;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
 import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
@@ -31,7 +17,15 @@ import com.blackduck.integration.blackduck.service.dataservice.UserService;
 import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
 import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.blackduck.integration.blackduck.service.request.NotificationEditor;
-import com.synopsys.integration.exception.IntegrationException;
+import com.blackduck.integration.exception.IntegrationException;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

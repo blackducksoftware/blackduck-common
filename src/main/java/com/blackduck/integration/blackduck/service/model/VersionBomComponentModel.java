@@ -7,21 +7,17 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
+import com.blackduck.integration.blackduck.api.generated.component.ProjectVersionComponentVersionActivityDataView;
+import com.blackduck.integration.blackduck.api.generated.component.ProjectVersionComponentVersionLicensesView;
+import com.blackduck.integration.blackduck.api.generated.component.ProjectVersionComponentVersionReviewedDetailsView;
+import com.blackduck.integration.blackduck.api.generated.enumeration.*;
+import com.blackduck.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.VersionBomOriginView;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionActivityDataView;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionLicensesView;
-import com.synopsys.integration.blackduck.api.generated.component.ProjectVersionComponentVersionReviewedDetailsView;
-import com.synopsys.integration.blackduck.api.generated.enumeration.RiskPriorityType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.UsageType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentPolicyStatusType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.MatchType;
-import com.synopsys.integration.blackduck.api.generated.enumeration.ProjectVersionComponentReviewStatusType;
-import com.synopsys.integration.blackduck.api.generated.view.ComponentMatchedFilesView;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
-import com.synopsys.integration.blackduck.api.manual.temporary.component.VersionBomOriginView;
 
 public class VersionBomComponentModel {
     private final ProjectVersionComponentVersionView component;

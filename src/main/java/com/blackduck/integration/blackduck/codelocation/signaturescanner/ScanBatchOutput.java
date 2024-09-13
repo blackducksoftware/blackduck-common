@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import java.util.List;
-
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationBatchOutput;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanCommandOutput;
+
+import java.util.List;
 
 public class ScanBatchOutput extends CodeLocationBatchOutput<ScanCommandOutput> {
     public ScanBatchOutput(final List<ScanCommandOutput> scanCommandOutputs) {

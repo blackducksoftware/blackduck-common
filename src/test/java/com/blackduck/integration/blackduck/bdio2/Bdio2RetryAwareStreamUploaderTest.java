@@ -1,20 +1,16 @@
 package com.blackduck.integration.blackduck.bdio2;
 
-import com.blackduck.integration.blackduck.bdio2.Bdio2RetryAwareStreamUploader;
-import com.blackduck.integration.blackduck.bdio2.Bdio2StreamUploader;
-import com.blackduck.integration.blackduck.bdio2.RetriableBdioUploadException;
+import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
+import com.blackduck.integration.rest.response.Response;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
-import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.response.Response;
 
 class Bdio2RetryAwareStreamUploaderTest {
 

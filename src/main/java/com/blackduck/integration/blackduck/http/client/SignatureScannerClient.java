@@ -7,24 +7,22 @@
  */
 package com.blackduck.integration.blackduck.http.client;
 
-import java.io.IOException;
-import java.security.cert.Certificate;
-import java.util.Optional;
-
-import javax.net.ssl.SSLContext;
-
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.client.IntHttpClient;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import com.blackduck.integration.rest.request.Request;
+import com.blackduck.integration.rest.response.Response;
+import com.google.gson.Gson;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import com.google.gson.Gson;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.client.IntHttpClient;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.request.Request;
-import com.synopsys.integration.rest.response.Response;
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.security.cert.Certificate;
+import java.util.Optional;
 
 public class SignatureScannerClient extends IntHttpClient {
     public static final String PEER_CERTIFICATES = "PEER_CERTIFICATES";

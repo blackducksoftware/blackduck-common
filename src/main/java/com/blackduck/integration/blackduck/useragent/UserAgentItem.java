@@ -7,12 +7,10 @@
  */
 package com.blackduck.integration.blackduck.useragent;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 
-import com.synopsys.integration.util.NameVersion;
+import java.util.Optional;
 
 public class UserAgentItem {
     public static final String UNKNOWN = "unknown";

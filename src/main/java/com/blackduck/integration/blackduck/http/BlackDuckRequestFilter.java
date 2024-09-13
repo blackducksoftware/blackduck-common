@@ -7,12 +7,7 @@
  */
 package com.blackduck.integration.blackduck.http;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Some requests to Black Duck can be filtered. There can be one more more

@@ -1,26 +1,27 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
 import com.blackduck.integration.blackduck.TimingExtension;
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.blackduck.integration.blackduck.http.client.TestingPropertyKey;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ToolsApiScannerInstaller;
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ToolsApiScannerInstaller;
 import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
 import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import com.synopsys.integration.blackduck.http.client.*;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
+import com.blackduck.integration.blackduck.http.client.TestingPropertyKey;
 import com.blackduck.integration.blackduck.keystore.KeyStoreHelper;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.util.CleanupZipExpander;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.util.CleanupZipExpander;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.File;
@@ -28,8 +29,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.VERSION_FILENAME;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

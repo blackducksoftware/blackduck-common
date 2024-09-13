@@ -1,8 +1,16 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationView;
+import com.blackduck.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
+import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
+import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
+import com.blackduck.integration.blackduck.service.request.NotificationEditor;
+import com.blackduck.integration.exception.IntegrationException;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -10,17 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.synopsys.integration.blackduck.api.generated.view.UserView;
-import com.synopsys.integration.blackduck.api.manual.component.VersionBomCodeLocationBomComputedNotificationContent;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.VersionBomCodeLocationBomComputedNotificationView;
-import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
-import com.blackduck.integration.blackduck.service.request.NotificationEditor;
-import com.synopsys.integration.exception.IntegrationException;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VerifyNotifications {
     public static void verify(UserView currentUser, BlackDuckRegistrationService blackDuckRegistrationService, NotificationService notificationService, Date userStartDate, Date systemStartDate) throws IntegrationException {

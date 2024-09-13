@@ -1,12 +1,27 @@
 package com.blackduck.integration.blackduck.configuration;
 
-import static com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
+import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
+import com.blackduck.integration.builder.BuilderProperties;
+import com.blackduck.integration.builder.BuilderPropertyKey;
+import com.blackduck.integration.builder.BuilderStatus;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.LogLevel;
+import com.blackduck.integration.log.PrintStreamIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.credentials.Credentials;
+import com.blackduck.integration.rest.credentials.CredentialsBuilder;
+import com.blackduck.integration.rest.proxy.ProxyInfo;
+import com.blackduck.integration.rest.proxy.ProxyInfoBuilder;
+import com.blackduck.integration.rest.support.AuthenticationSupport;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.NameVersion;
+import com.blackduck.integration.util.NoThreadExecutorService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -16,31 +31,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
-import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
-import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.synopsys.integration.builder.BuilderProperties;
-import com.synopsys.integration.builder.BuilderPropertyKey;
-import com.synopsys.integration.builder.BuilderStatus;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.credentials.Credentials;
-import com.synopsys.integration.rest.credentials.CredentialsBuilder;
-import com.synopsys.integration.rest.proxy.ProxyInfo;
-import com.synopsys.integration.rest.proxy.ProxyInfoBuilder;
-import com.synopsys.integration.rest.support.AuthenticationSupport;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NameVersion;
-import com.synopsys.integration.util.NoThreadExecutorService;
+import static com.blackduck.integration.blackduck.configuration.BlackDuckServerConfigKeys.KEYS;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BlackDuckServerConfigBuilderTest {
     public static final String API_TOKEN = "a valid API_TOKEN_KEY";

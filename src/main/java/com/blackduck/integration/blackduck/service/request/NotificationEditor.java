@@ -7,6 +7,12 @@
  */
 package com.blackduck.integration.blackduck.service.request;
 
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestFilter;
+import com.blackduck.integration.rest.RestConstants;
+import com.blackduck.integration.util.Stringable;
+
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.Date;
@@ -14,12 +20,6 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.blackduck.integration.blackduck.http.BlackDuckRequestFilter;
-import com.synopsys.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
-import com.synopsys.integration.rest.RestConstants;
-import com.synopsys.integration.util.Stringable;
 
 public class NotificationEditor extends Stringable implements BlackDuckRequestBuilderEditor {
     public static final List<String> ALL_NOTIFICATION_TYPES = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());

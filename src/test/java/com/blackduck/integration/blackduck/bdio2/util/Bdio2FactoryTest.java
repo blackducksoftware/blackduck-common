@@ -1,23 +1,21 @@
 package com.blackduck.integration.blackduck.bdio2.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.blackduck.integration.bdio.graph.DependencyGraph;
+import com.blackduck.integration.bdio.model.dependency.Dependency;
+import com.blackduck.integration.bdio.model.dependency.ProjectDependency;
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.bdio.model.externalid.ExternalIdFactory;
+import com.blackducksoftware.bdio2.model.Component;
+import com.blackducksoftware.bdio2.model.Project;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.blackduck.integration.blackduck.bdio2.util.Bdio2Factory;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import com.blackducksoftware.bdio2.model.Component;
-import com.blackducksoftware.bdio2.model.Project;
-import com.synopsys.integration.bdio.graph.DependencyGraph;
-import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.synopsys.integration.bdio.model.externalid.ExternalIdFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Bdio2FactoryTest {
     @Test

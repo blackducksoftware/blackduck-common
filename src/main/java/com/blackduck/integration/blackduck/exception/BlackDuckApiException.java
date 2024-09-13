@@ -7,8 +7,8 @@
  */
 package com.blackduck.integration.blackduck.exception;
 
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
 
 public class BlackDuckApiException extends IntegrationException {
     private final IntegrationRestException originalIntegrationRestException;

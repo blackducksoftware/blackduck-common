@@ -1,13 +1,12 @@
 package com.blackduck.integration.blackduck.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.blackduck.integration.blackduck.TimingExtension;
 import com.blackduck.integration.blackduck.service.model.ProjectNameVersionGuess;
 import com.blackduck.integration.blackduck.service.model.ProjectNameVersionGuesser;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(TimingExtension.class)
 public class ProjectNameVersionGuesserTest {

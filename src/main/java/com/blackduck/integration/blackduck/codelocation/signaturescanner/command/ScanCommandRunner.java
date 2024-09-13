@@ -7,15 +7,15 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.exception.ScanFailedException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import com.blackduck.integration.blackduck.exception.ScanFailedException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
 
 public class ScanCommandRunner {
     private final IntLogger logger;

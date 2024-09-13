@@ -1,19 +1,12 @@
 package com.blackduck.integration.blackduck.codelocation.signaturescanner;
 
-import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
+import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
 import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ZipApiScannerInstaller;
+import com.blackduck.integration.log.BufferedIntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -21,11 +14,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPaths;
-import com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility;
-import com.synopsys.integration.log.BufferedIntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.OperatingSystemType;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ScanPathsUtility.BDS_JAVA_HOME;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(TimingExtension.class)
 public class ScanPathsTest {

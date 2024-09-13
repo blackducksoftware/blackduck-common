@@ -1,8 +1,26 @@
 package com.blackduck.integration.blackduck.comprehensive.recipe;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.blackduck.integration.bdio.graph.ProjectDependencyGraph;
+import com.blackduck.integration.bdio.model.dependency.Dependency;
+import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
+import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
+import com.blackduck.integration.blackduck.bdio2.model.GitInfo;
+import com.blackduck.integration.blackduck.bdio2.model.ProjectInfo;
+import com.blackduck.integration.blackduck.bdio2.util.Bdio2Factory;
+import com.blackduck.integration.blackduck.bdio2.util.Bdio2Writer;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
+import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.util.NameVersion;
+import com.blackducksoftware.bdio2.Bdio;
+import com.blackducksoftware.bdio2.BdioMetadata;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,35 +32,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.blackduck.integration.blackduck.TimingExtension;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.blackducksoftware.bdio2.Bdio;
-import com.blackducksoftware.bdio2.BdioMetadata;
-import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
-import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.blackduck.api.generated.view.ProjectVersionComponentVersionView;
-import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
-import com.blackduck.integration.blackduck.bdio2.model.GitInfo;
-import com.blackduck.integration.blackduck.bdio2.model.ProjectInfo;
-import com.blackduck.integration.blackduck.bdio2.util.Bdio2Factory;
-import com.blackduck.integration.blackduck.bdio2.util.Bdio2Writer;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatch;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadBatchOutput;
-import com.blackduck.integration.blackduck.codelocation.upload.UploadTarget;
-import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.util.NameVersion;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
 class Bdio2UploadRecipeTest extends BasicRecipe {
     public static final String CODE_LOCATION_NAME = "bdio2 code location junit";
     public static final NameVersion PROJECT = new NameVersion("bdio2uploadtest-" + UUID.randomUUID().toString(), "test");
-    private static final String GROUP_NAME = "com.synopsys.integration";
+    private static final String GROUP_NAME = "com.blackduck.integration";
 
     @AfterEach
     void cleanup() throws IntegrationException {

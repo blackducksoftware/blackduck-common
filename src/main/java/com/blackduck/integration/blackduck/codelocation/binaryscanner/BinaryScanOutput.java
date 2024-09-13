@@ -7,14 +7,13 @@
  */
 package com.blackduck.integration.blackduck.codelocation.binaryscanner;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.blackduck.integration.blackduck.codelocation.CodeLocationOutput;
 import com.blackduck.integration.blackduck.codelocation.Result;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.rest.exception.IntegrationRestException;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.util.NameVersion;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.util.NameVersion;
+import org.jetbrains.annotations.Nullable;
 
 public class BinaryScanOutput extends CodeLocationOutput {
     private final String response;

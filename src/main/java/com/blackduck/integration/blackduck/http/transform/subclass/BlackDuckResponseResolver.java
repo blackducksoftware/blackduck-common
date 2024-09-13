@@ -7,14 +7,14 @@
  */
 package com.blackduck.integration.blackduck.http.transform.subclass;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationUserView;
-import com.synopsys.integration.blackduck.api.manual.view.NotificationView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BlackDuckResponseResolver {
     private final Gson gson;

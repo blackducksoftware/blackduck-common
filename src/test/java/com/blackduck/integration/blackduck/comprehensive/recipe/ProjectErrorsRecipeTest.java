@@ -1,19 +1,18 @@
 package com.blackduck.integration.blackduck.comprehensive.recipe;
 
-import java.util.Optional;
-
 import com.blackduck.integration.blackduck.TimingExtension;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.exception.BlackDuckApiException;
+import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.exception.IntegrationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.synopsys.integration.blackduck.api.manual.view.ProjectView;
-import com.blackduck.integration.blackduck.exception.BlackDuckApiException;
-import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
-import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
-import com.synopsys.integration.exception.IntegrationException;
+import java.util.Optional;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)

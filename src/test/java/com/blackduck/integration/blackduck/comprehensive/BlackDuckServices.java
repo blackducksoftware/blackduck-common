@@ -1,24 +1,16 @@
 package com.blackduck.integration.blackduck.comprehensive;
 
-import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.codelocation.CodeLocationCreationService;
 import com.blackduck.integration.blackduck.configuration.BlackDuckServerConfig;
+import com.blackduck.integration.blackduck.http.client.IntHttpClientTestHelper;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
-import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
-import com.blackduck.integration.blackduck.service.dataservice.CodeLocationService;
-import com.blackduck.integration.blackduck.service.dataservice.ComponentService;
-import com.blackduck.integration.blackduck.service.dataservice.NotificationService;
-import com.blackduck.integration.blackduck.service.dataservice.PolicyRuleService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectBomService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectService;
-import com.blackduck.integration.blackduck.service.dataservice.ProjectUsersService;
-import com.blackduck.integration.blackduck.service.dataservice.UserService;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.LogLevel;
-import com.synopsys.integration.log.PrintStreamIntLogger;
+import com.blackduck.integration.blackduck.service.dataservice.*;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.LogLevel;
+import com.blackduck.integration.log.PrintStreamIntLogger;
 
 public class BlackDuckServices {
     public IntLogger logger;

@@ -14,7 +14,7 @@ project.ext.moduleName = 'com.blackduck.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '66.2.32-SNAPSHOT'
+version = '67.0.0-SNAPSHOT'
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
@@ -34,9 +34,9 @@ repositories {
 }
 
 dependencies {
-    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.5'
-    api 'com.blackduck.integration:phone-home-client:6.0.1'
-    api 'com.blackduck.integration:integration-bdio:26.0.13'
+    api 'com.blackduck.integration:blackduck-common-api:2023.10.0.5'
+    api 'com.blackduck.integration:phone-home-client:7.0.0'
+    api 'com.blackduck.integration:integration-bdio:27.0.0'
     api 'com.blackducksoftware.bdio:bdio2:3.2.5'
 
     testImplementation 'com.google.guava:guava:31.1-jre'

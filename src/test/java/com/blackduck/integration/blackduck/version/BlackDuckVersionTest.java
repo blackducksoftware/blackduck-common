@@ -1,11 +1,9 @@
 package com.blackduck.integration.blackduck.version;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.blackduck.integration.blackduck.version.BlackDuckVersion;
-
-import org.junit.jupiter.api.Test;
 
 public class BlackDuckVersionTest {
 

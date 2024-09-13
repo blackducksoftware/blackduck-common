@@ -7,22 +7,14 @@
  */
 package com.blackduck.integration.blackduck.bdio2.util;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.blackduck.integration.bdio.graph.DependencyGraph;
+import com.blackduck.integration.bdio.graph.ProjectDependencyGraph;
+import com.blackduck.integration.bdio.model.dependency.Dependency;
+import com.blackduck.integration.bdio.model.dependency.ProjectDependency;
+import com.blackduck.integration.bdio.model.externalid.ExternalId;
+import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
+import com.blackduck.integration.blackduck.bdio2.model.ProjectInfo;
+import com.blackduck.integration.util.NameVersion;
 import com.blackducksoftware.bdio2.BdioMetadata;
 import com.blackducksoftware.bdio2.BdioObject;
 import com.blackducksoftware.bdio2.LegacyUtilities;
@@ -30,14 +22,15 @@ import com.blackducksoftware.bdio2.model.Component;
 import com.blackducksoftware.bdio2.model.Project;
 import com.blackducksoftware.common.value.Product;
 import com.blackducksoftware.common.value.ProductList;
-import com.synopsys.integration.bdio.graph.DependencyGraph;
-import com.synopsys.integration.bdio.graph.ProjectDependencyGraph;
-import com.synopsys.integration.bdio.model.dependency.Dependency;
-import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
-import com.synopsys.integration.bdio.model.externalid.ExternalId;
-import com.blackduck.integration.blackduck.bdio2.model.Bdio2Document;
-import com.blackduck.integration.blackduck.bdio2.model.ProjectInfo;
-import com.synopsys.integration.util.NameVersion;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Bdio2Factory {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -152,7 +145,7 @@ public class Bdio2Factory {
                     // passing subProjectFunction: component::dependency on line 124 might look better (but be more nonsensical?)
                     String subprojectExternalId = dependency.getExternalId().toString();
                     logger.warn(
-                        "Sipping subproject {}. Failed to add the subproject to the graph because subprojects cannot be dependencies of components. Please contact Synopsys support.",
+                        "Sipping subproject {}. Failed to add the subproject to the graph because subprojects cannot be dependencies of components. Please contact Black Duck support.",
                         subprojectExternalId
                     );
                     continue;

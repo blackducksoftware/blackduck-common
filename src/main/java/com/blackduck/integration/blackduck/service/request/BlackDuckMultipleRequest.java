@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.service.request;
 
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.core.response.UrlMultipleResponses;
 
 public class BlackDuckMultipleRequest<T extends BlackDuckResponse> extends BlackDuckRequest<T, UrlMultipleResponses<T>> {
     public BlackDuckMultipleRequest(BlackDuckRequestBuilder blackDuckRequestBuilder, UrlMultipleResponses<T> urlResponse) {

@@ -7,6 +7,15 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
+import com.blackduck.integration.blackduck.service.model.ScannerSplitStream;
+import com.blackduck.integration.blackduck.service.model.StreamRedirectThread;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.NameVersion;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,16 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.blackduck.integration.blackduck.service.model.ScannerSplitStream;
-import com.blackduck.integration.blackduck.service.model.StreamRedirectThread;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NameVersion;
 
 public class ScanCommandCallable implements Callable<ScanCommandOutput> {
     private static final List<String> DRY_RUN_FILES_TO_KEEP = Arrays.asList("data");

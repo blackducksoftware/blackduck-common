@@ -7,13 +7,12 @@
  */
 package com.blackduck.integration.blackduck.codelocation.signaturescanner.command;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.blackduck.integration.blackduck.exception.MismatchedQuotesException;
 import com.blackduck.integration.blackduck.exception.SignatureScannerInputException;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class ScanCommandArgumentParser {
     public List<String> parse(String command) throws SignatureScannerInputException {

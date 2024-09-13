@@ -7,23 +7,22 @@
  */
 package com.blackduck.integration.blackduck.bdio2;
 
-import java.nio.charset.StandardCharsets;
-
+import com.blackduck.integration.blackduck.api.core.BlackDuckPath;
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckPath;
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
-import com.blackduck.integration.blackduck.service.request.BlackDuckResponseRequest;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
+import java.nio.charset.StandardCharsets;
 
 public class Bdio2StreamUploader {
     // IDETECT-2756

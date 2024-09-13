@@ -7,7 +7,7 @@
  */
 package com.blackduck.integration.blackduck.version;
 
-import com.synopsys.integration.util.Stringable;
+import com.blackduck.integration.util.Stringable;
 
 public class BlackDuckVersion extends Stringable {
     private final int major;

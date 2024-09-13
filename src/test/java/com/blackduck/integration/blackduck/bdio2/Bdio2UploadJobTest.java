@@ -1,27 +1,23 @@
 package com.blackduck.integration.blackduck.bdio2;
 
-import java.util.Collections;
-
-import com.blackduck.integration.blackduck.bdio2.Bdio2RetryAwareStreamUploader;
-import com.blackduck.integration.blackduck.bdio2.Bdio2UploadJob;
-import com.blackduck.integration.blackduck.bdio2.RetriableBdioUploadException;
+import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
+import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.exception.IntegrationTimeoutException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.log.Slf4jIntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.response.Response;
+import com.blackduck.integration.wait.ResilientJobConfig;
+import com.blackduck.integration.wait.ResilientJobExecutor;
+import com.blackduck.integration.wait.tracker.WaitIntervalTracker;
+import com.blackduck.integration.wait.tracker.WaitIntervalTrackerFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
-import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
-import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuilderEditor;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.exception.IntegrationTimeoutException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.log.Slf4jIntLogger;
-import com.synopsys.integration.rest.HttpUrl;
-import com.synopsys.integration.rest.response.Response;
-import com.synopsys.integration.wait.ResilientJobConfig;
-import com.synopsys.integration.wait.ResilientJobExecutor;
-import com.synopsys.integration.wait.tracker.WaitIntervalTracker;
-import com.synopsys.integration.wait.tracker.WaitIntervalTrackerFactory;
+import java.util.Collections;
 
 public class Bdio2UploadJobTest {
     private final IntLogger logger = new Slf4jIntLogger(LoggerFactory.getLogger(this.getClass()));

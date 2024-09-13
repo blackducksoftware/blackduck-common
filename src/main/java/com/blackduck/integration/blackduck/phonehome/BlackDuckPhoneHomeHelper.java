@@ -7,26 +7,25 @@
  */
 package com.blackduck.integration.blackduck.phonehome;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.service.BlackDuckServicesFactory;
 import com.blackduck.integration.blackduck.service.dataservice.BlackDuckRegistrationService;
 import com.blackduck.integration.blackduck.service.model.BlackDuckServerData;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.phonehome.PhoneHomeClient;
+import com.blackduck.integration.phonehome.PhoneHomeResponse;
+import com.blackduck.integration.phonehome.PhoneHomeService;
+import com.blackduck.integration.phonehome.request.PhoneHomeRequestBody;
+import com.blackduck.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
+import com.blackduck.integration.util.IntEnvironmentVariables;
+import com.blackduck.integration.util.NoThreadExecutorService;
+import com.google.gson.Gson;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import com.google.gson.Gson;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.phonehome.PhoneHomeClient;
-import com.synopsys.integration.phonehome.PhoneHomeResponse;
-import com.synopsys.integration.phonehome.PhoneHomeService;
-import com.synopsys.integration.phonehome.request.PhoneHomeRequestBody;
-import com.synopsys.integration.phonehome.request.PhoneHomeRequestBodyBuilder;
-import com.synopsys.integration.util.IntEnvironmentVariables;
-import com.synopsys.integration.util.NoThreadExecutorService;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 public class BlackDuckPhoneHomeHelper {
     private final IntLogger logger;

@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.configuration;
 
+import com.blackduck.integration.builder.BuilderPropertyKey;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import com.synopsys.integration.builder.BuilderPropertyKey;
 
 public class BlackDuckServerConfigKeys {
     public static final BlackDuckServerConfigKeys KEYS = new BlackDuckServerConfigKeys();

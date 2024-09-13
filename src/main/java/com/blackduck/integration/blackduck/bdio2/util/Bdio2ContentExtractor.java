@@ -7,22 +7,17 @@
  */
 package com.blackduck.integration.blackduck.bdio2.util;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
+import com.blackduck.integration.exception.IntegrationException;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.blackduck.integration.blackduck.bdio2.model.BdioFileContent;
-import com.synopsys.integration.exception.IntegrationException;
 
 public class Bdio2ContentExtractor {
 

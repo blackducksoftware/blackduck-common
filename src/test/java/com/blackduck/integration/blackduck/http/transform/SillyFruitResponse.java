@@ -1,8 +1,8 @@
 package com.blackduck.integration.blackduck.http.transform;
 
-import java.util.List;
+import com.blackduck.integration.blackduck.api.core.BlackDuckResponse;
 
-import com.synopsys.integration.blackduck.api.core.BlackDuckResponse;
+import java.util.List;
 
 public class SillyFruitResponse extends BlackDuckResponse {
     public String name;

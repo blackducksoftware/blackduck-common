@@ -7,18 +7,18 @@
  */
 package com.blackduck.integration.blackduck.service.dataservice;
 
+import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.response.CurrentVersionView;
+import com.blackduck.integration.blackduck.api.generated.view.RegistrationView;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
-import com.blackduck.integration.blackduck.service.request.BlackDuckSingleRequest;
-import com.synopsys.integration.blackduck.api.core.response.UrlSingleResponse;
-import com.synopsys.integration.blackduck.api.generated.discovery.ApiDiscovery;
-import com.synopsys.integration.blackduck.api.generated.response.CurrentVersionView;
-import com.synopsys.integration.blackduck.api.generated.view.RegistrationView;
 import com.blackduck.integration.blackduck.service.model.BlackDuckServerData;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.log.IntLogger;
-import com.synopsys.integration.rest.HttpUrl;
+import com.blackduck.integration.blackduck.service.request.BlackDuckSingleRequest;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
 
 public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();

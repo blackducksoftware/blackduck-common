@@ -7,9 +7,9 @@
  */
 package com.blackduck.integration.blackduck.service.model;
 
-import java.util.Optional;
+import com.blackduck.integration.rest.HttpUrl;
 
-import com.synopsys.integration.rest.HttpUrl;
+import java.util.Optional;
 
 public class BlackDuckServerData {
     private final HttpUrl url;

@@ -7,13 +7,12 @@
  */
 package com.blackduck.integration.blackduck.bdio2.model;
 
-import java.util.Optional;
-
+import com.blackduck.integration.bdio.model.dependency.ProjectDependency;
+import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
-import com.synopsys.integration.bdio.model.dependency.ProjectDependency;
-import com.synopsys.integration.util.NameVersion;
+import java.util.Optional;
 
 // Additional fields for the bdio-header.jsonld file
 public class ProjectInfo {

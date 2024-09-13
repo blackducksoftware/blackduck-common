@@ -7,11 +7,10 @@
  */
 package com.blackduck.integration.blackduck.codelocation;
 
-import java.util.Optional;
-
+import com.blackduck.integration.util.NameVersion;
 import org.jetbrains.annotations.Nullable;
 
-import com.synopsys.integration.util.NameVersion;
+import java.util.Optional;
 
 public abstract class CodeLocationOutput {
     private final Result result;

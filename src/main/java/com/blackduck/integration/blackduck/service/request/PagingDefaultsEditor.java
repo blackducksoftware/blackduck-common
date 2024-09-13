@@ -7,10 +7,10 @@
  */
 package com.blackduck.integration.blackduck.service.request;
 
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 
 /**
  * Often, a request to Black Duck will need to have defaults set for paging. If
