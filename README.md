@@ -1,7 +1,5 @@
 ## Overview ##
 The blackduck-common library supplies convenient communication with a Black Duck server through REST API's as well as providing convenient ways to download the CLI and execute it.
-To run integration tests, create a test.properties file under src/test/resources and populate the relevant key-value pairs (See TestingPropertyKey enum for possible keys). 
-
 ## Build ##
 
 [![Build Status](https://travis-ci.org/blackducksoftware/blackduck-common.svg?branch=master)](https://travis-ci.org/blackducksoftware/blackduck-common)
@@ -15,3 +13,7 @@ You can download the latest release from Maven Central.
 
 ## Documentation ##
 All documentation for blackduck-common can be found on the base project:  https://github.com/blackducksoftware/blackduck-common/wiki
+
+## Tests ##
+To run integration tests, create a test.properties file under src/test/resources and populate the relevant key-value pairs (See TestingPropertyKey enum for possible keys). 
+

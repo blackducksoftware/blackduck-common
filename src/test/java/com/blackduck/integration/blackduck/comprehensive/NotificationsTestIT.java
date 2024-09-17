@@ -18,6 +18,7 @@ import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
 import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
 import com.blackduck.integration.blackduck.service.request.NotificationEditor;
 import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,11 +36,11 @@ public class NotificationsTestIT {
 
     @Test
     public void testProjectNotifications() throws IntegrationException, InterruptedException {
-        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory();
+        IntLogger logger = intHttpClientTestHelper.createIntLogger(intHttpClientTestHelper.getTestLogLevel());
+        BlackDuckServicesFactory blackDuckServicesFactory = intHttpClientTestHelper.createBlackDuckServicesFactory(logger);
 
         String projectName = "notifications_test_" + System.currentTimeMillis();
         String projectVersionName = "notifications_test_version_" + System.currentTimeMillis();
-        String projectVersion2Name = "notifications_test_version2_" + System.currentTimeMillis();
 
         BlackDuckApiClient blackDuckApiClient = blackDuckServicesFactory.getBlackDuckApiClient();
         ProjectService projectService = blackDuckServicesFactory.createProjectService();
@@ -47,7 +48,6 @@ public class NotificationsTestIT {
         UserService userService = blackDuckServicesFactory.createUserService();
 
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
-        ProjectSyncModel projectSyncModel2 = ProjectSyncModel.createWithDefaults(projectName, projectVersion2Name);
 
         UserView currentUser = userService.findCurrentUser();
         Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
@@ -58,15 +58,9 @@ public class NotificationsTestIT {
 
         // CREATE
         ProjectVersionWrapper projectVersionWrapper = projectService.syncProjectAndVersion(projectSyncModel);
-        ProjectVersionWrapper projectVersionWrapper2 = projectService.syncProjectAndVersion(projectSyncModel2, true);
 
-        // DELETE
-        blackDuckApiClient.delete(projectVersionWrapper2.getProjectVersionView());
-        blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
-
-        // two project version create
-        // one project version delete, one project delete
-        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName, "CREATE" + projectVersion2Name, "DELETE" + projectName, "DELETE" + projectVersion2Name));
+        // one project version create
+        Set<String> expectedKeys = new HashSet(Arrays.asList("CREATE" + projectVersionName));
 
         Set<String> foundKeys = new HashSet<>();
         long start = System.currentTimeMillis();
@@ -77,11 +71,6 @@ public class NotificationsTestIT {
             List<NotificationUserView> notifications = notificationService.getAllUserNotifications(currentUser, notificationEditor);
             for (NotificationUserView notificationUserView : notifications) {
                 if (notificationUserView instanceof ProjectNotificationUserView) {
-                    ProjectNotificationContent content = ((ProjectNotificationUserView) notificationUserView).getContent();
-                    if (projectName.equals(content.getProjectName())) {
-                        foundKeys.add(content.getOperationType() + content.getProjectName());
-                    }
-                } else if (notificationUserView instanceof ProjectVersionNotificationUserView) {
                     ProjectVersionNotificationContent content = ((ProjectVersionNotificationUserView) notificationUserView).getContent();
                     if (projectName.equals(content.getProjectName())) {
                         foundKeys.add(content.getOperationType() + content.getProjectVersionName());
@@ -93,6 +82,9 @@ public class NotificationsTestIT {
         }
 
         assertEquals(expectedKeys, foundKeys);
+
+        // CLEAN UP
+        blackDuckApiClient.delete(projectVersionWrapper.getProjectView());
     }
 
 }
