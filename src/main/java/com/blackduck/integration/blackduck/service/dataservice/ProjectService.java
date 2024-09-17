@@ -1,0 +1,156 @@
+/*
+ * blackduck-common
+ *
+ * Copyright (c) 2024 Black Duck Software, Inc.
+ *
+ * Use subject to the terms and conditions of the Black Duck Software End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ */
+package com.blackduck.integration.blackduck.service.dataservice;
+
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.view.ProjectVersionView;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ProjectRequest;
+import com.blackduck.integration.blackduck.api.manual.temporary.component.ProjectVersionRequest;
+import com.blackduck.integration.blackduck.api.manual.view.ProjectView;
+import com.blackduck.integration.blackduck.exception.BlackDuckIntegrationException;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.DataService;
+import com.blackduck.integration.blackduck.service.model.ProjectSyncModel;
+import com.blackduck.integration.blackduck.service.model.ProjectVersionWrapper;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.util.NameVersion;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+public class ProjectService extends DataService {
+    private final UrlMultipleResponses<ProjectView> projectsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.PROJECTS_PATH);
+    private final ProjectGetService projectGetService;
+
+    public ProjectService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, ProjectGetService projectGetService) {
+        super(blackDuckApiClient, apiDiscovery, logger);
+        this.projectGetService = projectGetService;
+    }
+
+    public List<ProjectView> getAllProjects() throws IntegrationException {
+        return blackDuckApiClient.getAllResponses(projectsResponses);
+    }
+
+    public ProjectVersionWrapper createProject(ProjectRequest projectRequest) throws IntegrationException {
+        HttpUrl projectUrl = blackDuckApiClient.post(projectsResponses.getUrl(), projectRequest);
+        ProjectView projectView = blackDuckApiClient.getResponse(projectUrl, ProjectView.class);
+        if (null == projectRequest.getVersionRequest()) {
+            return new ProjectVersionWrapper(projectView);
+        }
+
+        Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectView, projectRequest.getVersionRequest().getVersionName());
+        return new ProjectVersionWrapper(projectView, projectVersionView.orElse(null));
+    }
+
+    public List<ProjectVersionView> getAllProjectVersions(ProjectView projectView) throws IntegrationException {
+        return blackDuckApiClient.getAllResponses(projectView.metaVersionsLink());
+    }
+
+    public ProjectVersionView createProjectVersion(ProjectView projectView, ProjectVersionRequest projectVersionRequest) throws IntegrationException {
+        if (!projectView.hasLink(ProjectView.VERSIONS_LINK)) {
+            throw new BlackDuckIntegrationException(String.format("The supplied projectView does not have the link (%s) to create a version.", ProjectView.VERSIONS_LINK));
+        }
+        HttpUrl projectVersionUrl = blackDuckApiClient.post(projectView.getFirstLink(ProjectView.VERSIONS_LINK), projectVersionRequest);
+        return blackDuckApiClient.getResponse(projectVersionUrl, ProjectVersionView.class);
+    }
+
+    public List<ProjectView> getAllProjectMatches(String projectName) throws IntegrationException {
+        return projectGetService.getAllProjectMatches(projectName);
+    }
+
+    public List<ProjectView> getProjectMatches(String projectName, int limit) throws IntegrationException {
+        return projectGetService.getProjectMatches(projectName, limit);
+    }
+
+    public Optional<ProjectView> getProjectByName(String projectName) throws IntegrationException {
+        return projectGetService.getProjectViewByProjectName(projectName);
+    }
+
+    public Optional<ProjectVersionView> getProjectVersion(ProjectView project, String projectVersionName) throws IntegrationException {
+        return projectGetService.getProjectVersionViewByProjectVersionName(project, projectVersionName);
+    }
+
+    public Optional<ProjectVersionWrapper> getProjectVersion(NameVersion projectAndVersion) throws IntegrationException {
+        return getProjectVersion(projectAndVersion.getName(), projectAndVersion.getVersion());
+    }
+
+    public Optional<ProjectVersionWrapper> getProjectVersion(String projectName, String projectVersionName) throws IntegrationException {
+        Optional<ProjectView> projectView = getProjectByName(projectName);
+        if (projectView.isPresent()) {
+            Optional<ProjectVersionView> projectVersionView = getProjectVersion(projectView.get(), projectVersionName);
+
+            if (projectVersionView.isPresent()) {
+                return Optional.of(new ProjectVersionWrapper(projectView.get(), projectVersionView.get()));
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<ProjectVersionView> getNewestProjectVersion(ProjectView projectView) throws IntegrationException {
+        List<ProjectVersionView> projectVersionViews = getAllProjectVersions(projectView);
+        return projectVersionViews.stream().max(Comparator.comparing(ProjectVersionView::getCreatedAt));
+    }
+
+    public void updateProject(ProjectView projectView) throws IntegrationException {
+        blackDuckApiClient.put(projectView);
+    }
+
+    public void updateProjectVersion(ProjectVersionView projectVersionView) throws IntegrationException {
+        blackDuckApiClient.put(projectVersionView);
+    }
+
+    public ProjectVersionWrapper syncProjectAndVersion(ProjectSyncModel projectSyncModel) throws IntegrationException {
+        return syncProjectAndVersion(projectSyncModel, false);
+    }
+
+    public ProjectVersionWrapper syncProjectAndVersion(ProjectSyncModel projectSyncModel, boolean performUpdate) throws IntegrationException {
+        String projectName = projectSyncModel.getName();
+
+        Optional<ProjectView> optionalProjectView = getProjectByName(projectName);
+        if (!optionalProjectView.isPresent()) {
+            logger.info(String.format("The %s project was not found, so it will be created - if a version was included, it will also be created.", projectName));
+            ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
+            return createProject(projectRequest);
+        }
+
+        ProjectView projectView = optionalProjectView.get();
+        if (performUpdate) {
+            logger.info(String.format("The %s project was found and performUpdate=true, so it will be updated.", projectName));
+            projectSyncModel.populateProjectView(projectView);
+            blackDuckApiClient.put(projectView);
+            projectView = blackDuckApiClient.getResponse(projectView.getHref(), ProjectView.class);
+        }
+        ProjectVersionView projectVersionView = null;
+
+        if (projectSyncModel.shouldHandleProjectVersion()) {
+            String projectVersionName = projectSyncModel.getVersionName();
+            Optional<ProjectVersionView> optionalProjectVersionView = getProjectVersion(projectView, projectVersionName);
+            if (optionalProjectVersionView.isPresent()) {
+                projectVersionView = optionalProjectVersionView.get();
+                if (performUpdate) {
+                    logger.info(String.format("The %s version was found and performUpdate=true, so the version will be updated.", projectVersionName));
+                    projectSyncModel.populateProjectVersionView(projectVersionView);
+                    blackDuckApiClient.put(projectVersionView);
+                    projectVersionView = blackDuckApiClient.getResponse(projectVersionView.getHref(), ProjectVersionView.class);
+                }
+            } else {
+                logger.info(String.format("The %s version was not found, so it will be created under the %s project.", projectVersionName, projectName));
+                ProjectVersionRequest projectVersionRequest = projectSyncModel.createProjectVersionRequest();
+                projectVersionView = createProjectVersion(projectView, projectVersionRequest);
+            }
+        }
+
+        return new ProjectVersionWrapper(projectView, projectVersionView);
+    }
+
+}

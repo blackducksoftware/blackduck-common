@@ -12,7 +12,7 @@ jdk:
 notifications:
   email:
     recipients:
-    - starlabs@synopsys.com
+    - starlabs@blackduck.com
 
 script:
 - "./gradlew clean build"

@@ -1,0 +1,139 @@
+/*
+ * blackduck-common
+ *
+ * Copyright (c) 2024 Black Duck Software, Inc.
+ *
+ * Use subject to the terms and conditions of the Black Duck Software End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ */
+package com.blackduck.integration.blackduck.service.dataservice;
+
+import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponses;
+import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
+import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.api.manual.temporary.enumeration.NotificationType;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationUserView;
+import com.blackduck.integration.blackduck.api.manual.view.NotificationView;
+import com.blackduck.integration.blackduck.http.BlackDuckPageDefinition;
+import com.blackduck.integration.blackduck.http.BlackDuckPageResponse;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestFilter;
+import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
+import com.blackduck.integration.blackduck.service.DataService;
+import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
+import com.blackduck.integration.blackduck.service.request.NotificationEditor;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.log.IntLogger;
+
+import java.util.Date;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class NotificationService extends DataService {
+    // ejk - to get all notifications:
+    // <blackduckserver>/api/notifications?startDate=2019-07-01T00:00:00.000Z&endDate=2019-07-15T00:00:00.000Z&filter=notificationType:BOM_EDIT&filter=notificationType:LICENSE_LIMIT&filter=notificationType:POLICY_OVERRIDE&filter=notificationType:RULE_VIOLATION&filter=notificationType:RULE_VIOLATION_CLEARED&filter=notificationType:VERSION_BOM_CODE_LOCATION_BOM_COMPUTED&filter=notificationType:VULNERABILITY&filter=notificationType:PROJECT&filter=notificationType:PROJECT_VERSION
+
+    private final UrlMultipleResponses<NotificationView> notificationsResponses = apiDiscovery.metaMultipleResponses(ApiDiscovery.NOTIFICATIONS_PATH);
+    private final Function<UserView, UrlMultipleResponses<NotificationUserView>> userNotificationsResponses = (userView) -> userView.metaNotificationsLink();
+
+    public NotificationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger) {
+        super(blackDuckApiClient, apiDiscovery, logger);
+    }
+
+    public List<NotificationView> getAllNotifications(NotificationEditor notificationEditor) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        List<NotificationView> possiblyPoorlyFilteredNotifications = blackDuckApiClient.getAllResponses(requestMultiple);
+        return reallyFilterNotifications(possiblyPoorlyFilteredNotifications, notificationEditor.getNotificationTypesToInclude());
+    }
+
+    public List<NotificationUserView> getAllUserNotifications(UserView userView, NotificationEditor notificationEditor) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor);
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        List<NotificationUserView> possiblyPoorlyFilteredNotifications = blackDuckApiClient.getAllResponses(requestMultiple);
+        return reallyFilterNotifications(possiblyPoorlyFilteredNotifications, notificationEditor.getNotificationTypesToInclude());
+    }
+
+    public BlackDuckPageResponse<NotificationView> getPageOfNotifications(NotificationEditor notificationEditor, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor)
+                                                              .setBlackDuckPageDefinition(blackDuckPageDefinition);
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        return blackDuckApiClient.getPageResponse(requestMultiple);
+    }
+
+    public BlackDuckPageResponse<NotificationUserView> getPageOfUserNotifications(UserView userView, NotificationEditor notificationEditor, BlackDuckPageDefinition blackDuckPageDefinition) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createNotificationRequestBuilder(notificationEditor)
+                                                              .setBlackDuckPageDefinition(blackDuckPageDefinition);
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        return blackDuckApiClient.getPageResponse(requestMultiple);
+    }
+
+    /**
+     * @return The java.util.Date of the most recent notification. If there are no notifications, the current date will be returned. This can set an initial start time window for all future notifications.
+     * @throws IntegrationException
+     */
+    public Date getLatestNotificationDate() throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
+        BlackDuckMultipleRequest<NotificationView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(notificationsResponses);
+        List<NotificationView> notifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
+        return getFirstCreatedAtDate(notifications);
+    }
+
+    /**
+     * @return The java.util.Date of the most recent notification in the user's stream. If there are no notifications, the current date will be returned. This can set an initial start time window for all future notifications.
+     * @throws IntegrationException
+     */
+    public Date getLatestUserNotificationDate(UserView userView) throws IntegrationException {
+        BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
+        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
+        List<NotificationUserView> userNotifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
+        return getFirstCreatedAtDate(userNotifications);
+    }
+
+    private Date getFirstCreatedAtDate(List<? extends NotificationView> notifications) {
+        if (notifications.size() == 1) {
+            return notifications.get(0).getCreatedAt();
+        } else {
+            return new Date();
+        }
+    }
+
+    private BlackDuckRequestBuilder createLatestDateRequestBuilder() {
+        return new BlackDuckRequestBuilder()
+                   .commonGet()
+                   .addBlackDuckFilter(createFilterForAllKnownTypes());
+    }
+
+    private List<String> getAllKnownNotificationTypes() {
+        List<String> allKnownTypes = Stream.of(NotificationType.values()).map(Enum::name).collect(Collectors.toList());
+        return allKnownTypes;
+    }
+
+    private BlackDuckRequestFilter createFilterForAllKnownTypes() {
+        return createFilterForSpecificTypes(getAllKnownNotificationTypes());
+    }
+
+    private BlackDuckRequestFilter createFilterForSpecificTypes(List<String> notificationTypesToInclude) {
+        return BlackDuckRequestFilter.createFilterWithMultipleValues("notificationType", notificationTypesToInclude);
+    }
+
+    private BlackDuckRequestBuilder createNotificationRequestBuilder(NotificationEditor notificationEditor) {
+        return new BlackDuckRequestBuilder()
+                   .commonGet()
+                   .apply(notificationEditor);
+    }
+
+    /*
+    ejk - We can not trust the filtering from the Black Duck API. There have
+    been at least 2 instances where the lack of filtering created customer
+    issues, so we will do this in perpetuity.
+    */
+    private <T extends NotificationView> List<T> reallyFilterNotifications(List<T> notifications, List<String> notificationTypesToInclude) {
+        return notifications
+                   .stream()
+                   .filter(notification -> notificationTypesToInclude.contains(notification.getType().name()))
+                   .collect(Collectors.toList());
+    }
+
+}
