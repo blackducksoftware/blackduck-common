@@ -70,7 +70,7 @@ public class NotificationsTestIT {
             NotificationEditor notificationEditor = new NotificationEditor(startDate, endDate, notificationTypes);
             List<NotificationUserView> notifications = notificationService.getAllUserNotifications(currentUser, notificationEditor);
             for (NotificationUserView notificationUserView : notifications) {
-                if (notificationUserView instanceof ProjectNotificationUserView) {
+                if (notificationUserView instanceof ProjectVersionNotificationUserView) {
                     ProjectVersionNotificationContent content = ((ProjectVersionNotificationUserView) notificationUserView).getContent();
                     if (projectName.equals(content.getProjectName())) {
                         foundKeys.add(content.getOperationType() + content.getProjectVersionName());
