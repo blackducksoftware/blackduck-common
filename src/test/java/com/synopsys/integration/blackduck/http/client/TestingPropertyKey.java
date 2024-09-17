@@ -51,7 +51,8 @@ public enum TestingPropertyKey {
     TEST_VULNERABLE_COMPONENT_NAME,
     TEST_VULNERABLE_COMPONENT_MIN_VULNERABILITIES,
     TEST_VULNERABLE_COMPONENT_VULNERABILITY_NAME,
-    LOG_DETAILS_TO_CONSOLE;
+    LOG_DETAILS_TO_CONSOLE,
+    INTEGRATION_TEST_LOG_LEVEL;
 
     public String fromEnvironment() {
         return System.getenv(name());
