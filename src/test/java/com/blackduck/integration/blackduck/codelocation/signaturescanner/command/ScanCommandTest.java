@@ -61,49 +61,35 @@ public class ScanCommandTest {
     public void testSnippetScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING);
         List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, true, false, false);
+        assertSnippetCommands(commandList, true, false);
     }
 
     @Test
     public void testSnippetOnlyScan() throws IntegrationException {
         scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING_ONLY);
         List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, false);
-    }
-
-    @Test
-    public void testFullSnippetScan() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, true, false, true);
-    }
-
-    @Test
-    public void testFullSnippetOnlyScan() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY);
-        List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
+        assertSnippetCommands(commandList, false, true);
     }
 
     @Test
     public void testSnippetScanWithUploadSource() throws IntegrationException {
-        scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, true);
+        scanBatchBuilder.uploadSource(SnippetMatching.SNIPPET_MATCHING_ONLY, true);
         List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
+        assertSnippetCommands(commandList, false, true);
         assertUploadSource(commandList, true);
     }
 
     @Test
     public void testSnippetScanWithoutUploadSource() throws IntegrationException {
-        scanBatchBuilder.uploadSource(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY, false);
+        scanBatchBuilder.uploadSource(SnippetMatching.SNIPPET_MATCHING_ONLY, false);
         List<String> commandList = createCommandList();
-        assertSnippetCommands(commandList, false, true, true);
+        assertSnippetCommands(commandList, false, true);
         assertUploadSource(commandList, false);
     }
 
     @Test
     public void testSnippetScanLoggingWhenDryRun() throws IntegrationException {
-        scanBatchBuilder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING);
+        scanBatchBuilder.snippetMatching(SnippetMatching.SNIPPET_MATCHING);
 
         ScanBatch scanBatch = scanBatchBuilder.build();
         ScanCommand scanCommand = assertCommand(scanBatch);
@@ -346,10 +332,9 @@ public class ScanCommandTest {
         return scanCommands.get(0);
     }
 
-    private void assertSnippetCommands(List<String> commandList, boolean containsSnippetMatching, boolean containsSnippetMatchingOnly, boolean containsFullSnippetScan) {
+    private void assertSnippetCommands(List<String> commandList, boolean containsSnippetMatching, boolean containsSnippetMatchingOnly) {
         assertEquals(containsSnippetMatching, commandList.contains("--snippet-matching"));
         assertEquals(containsSnippetMatchingOnly, commandList.contains("--snippet-matching-only"));
-        assertEquals(containsFullSnippetScan, commandList.contains("--full-snippet-scan"));
     }
 
     private void assertLicenseSearch(List<String> commandList, boolean licenseSearch) {

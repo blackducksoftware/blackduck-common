@@ -81,7 +81,7 @@ public class ScanBatchBuilderTest {
     public void testUploadSourceWithSnippetMatching() {
         ScanBatchBuilder builder = createInitialValidBuilder();
         builder.uploadSource(true);
-        builder.snippetMatching(SnippetMatching.FULL_SNIPPET_MATCHING_ONLY);
+        builder.snippetMatching(SnippetMatching.SNIPPET_MATCHING_ONLY);
         assertTrue(builder.isValid());
     }
 
