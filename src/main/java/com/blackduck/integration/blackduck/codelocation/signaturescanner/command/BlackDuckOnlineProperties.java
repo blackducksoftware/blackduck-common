@@ -20,7 +20,6 @@ public class BlackDuckOnlineProperties {
 
     private final boolean snippetMatchingFlag;
     private final boolean snippetMatchingOnlyFlag;
-    private final boolean fullSnippetScanFlag;
 
     public BlackDuckOnlineProperties(SnippetMatching snippetMatchingMode, boolean uploadSource, boolean licenseSearch, boolean copyrightSearch) {
         this.snippetMatchingMode = snippetMatchingMode;
@@ -28,9 +27,8 @@ public class BlackDuckOnlineProperties {
         this.licenseSearch = licenseSearch;
         this.copyrightSearch = copyrightSearch;
 
-        snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode;
-        snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
-        fullSnippetScanFlag = SnippetMatching.FULL_SNIPPET_MATCHING == snippetMatchingMode || SnippetMatching.FULL_SNIPPET_MATCHING_ONLY == snippetMatchingMode;
+        snippetMatchingFlag = SnippetMatching.SNIPPET_MATCHING == snippetMatchingMode;
+        snippetMatchingOnlyFlag = SnippetMatching.SNIPPET_MATCHING_ONLY == snippetMatchingMode;
     }
 
     public boolean isOnlineCapabilityNeeded() {
@@ -43,10 +41,6 @@ public class BlackDuckOnlineProperties {
                 cmd.add("--snippet-matching");
             } else {
                 cmd.add("--snippet-matching-only");
-            }
-
-            if (fullSnippetScanFlag) {
-                cmd.add("--full-snippet-scan");
             }
         }
 
@@ -79,10 +73,6 @@ public class BlackDuckOnlineProperties {
 
     public boolean isSnippetMatchingOnly() {
         return snippetMatchingOnlyFlag;
-    }
-
-    public boolean isFullSnippetScan() {
-        return fullSnippetScanFlag;
     }
 
     public boolean isUploadSource() {

@@ -370,10 +370,6 @@ public class ScanCommand {
         return blackDuckOnlineProperties.isSnippetMatchingOnly();
     }
 
-    public boolean isFullSnippetScan() {
-        return blackDuckOnlineProperties.isFullSnippetScan();
-    }
-
     public boolean isUploadSource() {
         return blackDuckOnlineProperties.isUploadSource();
     }
