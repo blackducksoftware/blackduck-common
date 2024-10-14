@@ -122,7 +122,11 @@ public class ScanCommand {
         }
         
         if (csvArchive) {
-            appendKeyValuePair("--outputFormat", "csv");
+            if (dryRun) {
+                appendKeyValuePair("--outputFormat", "csv");
+            } else {
+                appendSingleArgument("--upload-csv");
+            }
         }
 
         appendKeyValuePair("--logDir", specificRunOutputDirectoryPath);
