@@ -24,6 +24,7 @@ public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();
     private final UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaCurrentVersionLink();
     private final HttpUrl blackDuckUrl;
+    private static final ThreadLocal<Boolean> isRegistrationIdFetchAllowed = ThreadLocal.withInitial(() -> true);
 
     public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, HttpUrl blackDuckUrl) {
         super(blackDuckApiClient, apiDiscovery, logger);
@@ -45,11 +46,23 @@ public class BlackDuckRegistrationService extends DataService {
         CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
         String registrationId = null;
         try {
-            // We need to wrap this because this will most likely fail unless they are running as an admin
-            registrationId = getRegistrationId();
+            if (isRegistrationIdFetchAllowed()) {
+                // We need to wrap this because this will most likely fail unless they are running as an admin
+                registrationId = getRegistrationId();
+            }
         } catch (IntegrationException e) {
+            // The user is not admin. So, this should prevent the fetching of the registrationId again
+            setRegistrationIdFetchAllowed(false);
+            logger.warn("Failed to fetch registration ID: " + e.getMessage());
         }
         return new BlackDuckServerData(blackDuckUrl, currentVersionView.getVersion(), registrationId);
     }
 
+    private boolean isRegistrationIdFetchAllowed() {
+        return isRegistrationIdFetchAllowed.get();
+    }
+
+    private void setRegistrationIdFetchAllowed(boolean allowed) {
+        isRegistrationIdFetchAllowed.set(allowed);
+    }
 }
