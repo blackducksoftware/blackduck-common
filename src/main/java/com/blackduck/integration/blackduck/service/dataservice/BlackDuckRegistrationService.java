@@ -11,6 +11,7 @@ import com.blackduck.integration.blackduck.api.core.response.UrlSingleResponse;
 import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.api.generated.response.CurrentVersionView;
 import com.blackduck.integration.blackduck.api.generated.view.RegistrationView;
+import com.blackduck.integration.blackduck.exception.BlackDuckApiException;
 import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
 import com.blackduck.integration.blackduck.service.BlackDuckApiClient;
 import com.blackduck.integration.blackduck.service.DataService;
@@ -19,6 +20,7 @@ import com.blackduck.integration.blackduck.service.request.BlackDuckSingleReques
 import com.blackduck.integration.exception.IntegrationException;
 import com.blackduck.integration.log.IntLogger;
 import com.blackduck.integration.rest.HttpUrl;
+import com.blackduck.integration.rest.exception.IntegrationRestException;
 
 public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();
@@ -51,9 +53,7 @@ public class BlackDuckRegistrationService extends DataService {
                 registrationId = getRegistrationId();
             }
         } catch (IntegrationException e) {
-            // The user is not admin. So, this should prevent the fetching of the registrationId again
-            setRegistrationIdFetchAllowed(false);
-            logger.warn("Failed to fetch registration ID: " + e.getMessage());
+            handleForbiddenExceptionAndSetFlag(e);
         }
         return new BlackDuckServerData(blackDuckUrl, currentVersionView.getVersion(), registrationId);
     }
@@ -64,5 +64,15 @@ public class BlackDuckRegistrationService extends DataService {
 
     private void setRegistrationIdFetchAllowed(boolean allowed) {
         isRegistrationIdFetchAllowed.set(allowed);
+    }
+
+    private void handleForbiddenExceptionAndSetFlag(IntegrationException e) {
+        if (e instanceof BlackDuckApiException) {
+            BlackDuckApiException apiException = (BlackDuckApiException) e;
+            if (apiException.getBlackDuckErrorCode().contains("core.rest.unauthorized")) {
+                logger.warn("Failed to fetch registration id. The current user is not authorized.");
+                setRegistrationIdFetchAllowed(false);
+            }
+        }
     }
 }
