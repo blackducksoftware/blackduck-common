@@ -20,7 +20,6 @@ import com.blackduck.integration.blackduck.service.request.BlackDuckSingleReques
 import com.blackduck.integration.exception.IntegrationException;
 import com.blackduck.integration.log.IntLogger;
 import com.blackduck.integration.rest.HttpUrl;
-import com.blackduck.integration.rest.exception.IntegrationRestException;
 
 public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();
@@ -49,7 +48,6 @@ public class BlackDuckRegistrationService extends DataService {
         String registrationId = null;
         try {
             if (isRegistrationIdFetchAllowed()) {
-                // We need to wrap this because this will most likely fail unless they are running as an admin
                 registrationId = getRegistrationId();
             }
         } catch (IntegrationException e) {
