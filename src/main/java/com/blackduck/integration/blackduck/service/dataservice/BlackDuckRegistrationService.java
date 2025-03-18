@@ -24,7 +24,7 @@ public class BlackDuckRegistrationService extends DataService {
     private final UrlSingleResponse<RegistrationView> registrationResponse = apiDiscovery.metaRegistrationLink();
     private final UrlSingleResponse<CurrentVersionView> currentVersionResponse = apiDiscovery.metaCurrentVersionLink();
     private final HttpUrl blackDuckUrl;
-    private static final ThreadLocal<Boolean> isSystemAdministrator = ThreadLocal.withInitial(() -> true);
+    private static final ThreadLocal<Boolean> adminOperationAttempted = ThreadLocal.withInitial(() -> false);
 
     public BlackDuckRegistrationService(BlackDuckApiClient blackDuckApiClient, ApiDiscovery apiDiscovery, IntLogger logger, HttpUrl blackDuckUrl) {
         super(blackDuckApiClient, apiDiscovery, logger);
@@ -42,11 +42,12 @@ public class BlackDuckRegistrationService extends DataService {
         return registrationView.getRegistrationId();
     }
 
-    public BlackDuckServerData getBlackDuckServerData() throws IntegrationException {
+    public BlackDuckServerData getBlackDuckServerData(boolean isAdmin) throws IntegrationException {
+        setAdminOperationAttempted(isAdmin);
         CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
         String registrationId = null;
         try {
-            if (isSystemAdministrator()) {
+            if (shouldAttemptAdminOperations()) {
                 registrationId = getRegistrationId();
             }
         } catch (IntegrationException e) {
@@ -55,16 +56,15 @@ public class BlackDuckRegistrationService extends DataService {
         return new BlackDuckServerData(blackDuckUrl, currentVersionView.getVersion(), registrationId);
     }
 
-    public BlackDuckServerData getBlackDuckServerData(boolean isSystemAdministrator) throws IntegrationException {
-        setSystemAdministrator(isSystemAdministrator);
-        return getBlackDuckServerData();
+    public BlackDuckServerData getBlackDuckServerData() throws IntegrationException {
+        return getBlackDuckServerData(shouldAttemptAdminOperations());
     }
 
-    private boolean isSystemAdministrator() {
-        return isSystemAdministrator.get();
+    private boolean shouldAttemptAdminOperations() {
+        return adminOperationAttempted.get();
     }
 
-    private void setSystemAdministrator(boolean isAdmin) {
-        isSystemAdministrator.set(isAdmin);
+    private void setAdminOperationAttempted(boolean isAdmin) {
+        adminOperationAttempted.set(isAdmin);
     }
 }
