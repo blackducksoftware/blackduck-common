@@ -23,7 +23,7 @@ import com.blackduck.integration.util.NameVersion;
 import java.util.Set;
 
 public class IntelligentPersistenceService extends DataService {
-    public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.intelligent-persistence-scan-1-ld-2+json";
+    public static final String CONTENT_TYPE = "application/vnd.blackducksoftware.intelligent-persistence-scan-2-ld-2+json";
     private final IntelligentPersistenceBatchRunner uploadBatchRunner;
     private final CodeLocationCreationService codeLocationCreationService;
 
