@@ -85,6 +85,7 @@ public class BlackDuckPhoneHomeHelper {
 
         try {
             boolean isAdminOperationAllowed = Boolean.parseBoolean(metaData.getOrDefault("isAdminOperationAllowed", "false"));
+            metaData.remove("isAdminOperationAllowed");
             BlackDuckServerData blackDuckServerData = blackDuckRegistrationService.getBlackDuckServerData(isAdminOperationAllowed);
             registrationKey = blackDuckServerData.getRegistrationKey().orElse(PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE);
             blackDuckUrl = blackDuckServerData.getUrl().string();
