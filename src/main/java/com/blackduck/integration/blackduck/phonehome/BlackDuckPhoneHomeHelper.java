@@ -69,8 +69,12 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     public PhoneHomeResponse handlePhoneHome(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
+        return handlePhoneHome(integrationRepoName, integrationVersion, metaData, true, artifactModules);
+    }
+
+    public PhoneHomeResponse handlePhoneHome(String integrationRepoName, String integrationVersion, Map<String, String> metaData, boolean isAdminOperationAllowed, String... artifactModules) {
         try {
-            PhoneHomeRequestBody phoneHomeRequestBody = createPhoneHomeRequestBody(integrationRepoName, integrationVersion, metaData, artifactModules);
+            PhoneHomeRequestBody phoneHomeRequestBody = createPhoneHomeRequestBody(integrationRepoName, integrationVersion, metaData, isAdminOperationAllowed, artifactModules);
             return phoneHomeService.phoneHome(phoneHomeRequestBody, getEnvironmentVariables());
         } catch (Exception e) {
             logger.debug("Problem phoning home: " + e.getMessage(), e);
@@ -79,13 +83,15 @@ public class BlackDuckPhoneHomeHelper {
     }
 
     private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, String... artifactModules) {
+        return createPhoneHomeRequestBody(integrationRepoName, integrationVersion, metaData, true, artifactModules);
+    }
+
+    private PhoneHomeRequestBody createPhoneHomeRequestBody(String integrationRepoName, String integrationVersion, Map<String, String> metaData, boolean isAdminOperationAllowed, String... artifactModules) {
         String registrationKey = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
         String blackDuckUrl = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
         String blackDuckVersion = PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE;
 
         try {
-            boolean isAdminOperationAllowed = Boolean.parseBoolean(metaData.getOrDefault("isAdminOperationAllowed", "false"));
-            metaData.remove("isAdminOperationAllowed");
             BlackDuckServerData blackDuckServerData = blackDuckRegistrationService.getBlackDuckServerData(isAdminOperationAllowed);
             registrationKey = blackDuckServerData.getRegistrationKey().orElse(PhoneHomeRequestBody.UNKNOWN_FIELD_VALUE);
             blackDuckUrl = blackDuckServerData.getUrl().string();
@@ -111,5 +117,4 @@ public class BlackDuckPhoneHomeHelper {
         }
         return Collections.emptyMap();
     }
-
 }
