@@ -90,6 +90,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setReleaseComments("release comments");
         projectSyncModel.setReleasedOn(new Date());
         projectSyncModel.setVersionLicenseUrl("versionLicenseUrl");
+        projectSyncModel.setUpdate(true);
 
         assertFalse(((Set) setFields.get(projectSyncModel)).isEmpty());
         assertEquals(allFields, setFields.get(projectSyncModel));
@@ -128,6 +129,7 @@ public class ProjectSyncModelTest {
         projectSyncModel.setName("project name");
         projectSyncModel.setVersionName("version name");
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
+        projectSyncModel.setUpdate(true);
 
         ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
         assertEquals("project name", projectRequest.getName());
@@ -144,6 +146,7 @@ public class ProjectSyncModelTest {
         assertEquals(releasedOn, projectRequest.getVersionRequest().getReleasedOn());
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectRequest.getVersionRequest().getPhase());
         assertEquals(ProjectVersionDistributionType.INTERNAL, projectRequest.getVersionRequest().getDistribution());
+        assertEquals(true, projectRequest.getVersionRequest().getUpdate());
     }
 
 }
