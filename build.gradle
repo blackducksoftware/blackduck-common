@@ -30,11 +30,11 @@ final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
 repositories {
     maven { url "${internalRepoHost}/artifactory/jcenter" }
     maven { url "https://repo.blackduck.com/bds-bdio-release" }
-    maven { url "https://repo.blackduck.com/artifactory/bds-integrations-snapshot/" }
+    maven { url "${internalRepoHost}/artifactory/bds-integrations-snapshot/" }
 }
 
 dependencies {
-    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.8'
+    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.9'
     api 'com.blackduck.integration:phone-home-client:7.0.0'
     api 'com.blackduck.integration:integration-bdio:27.0.0'
     api 'com.blackducksoftware.bdio:bdio2:3.2.12'

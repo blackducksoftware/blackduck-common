@@ -49,6 +49,7 @@ public class ProjectSyncModel {
     public static final Field RELEASE_COMMENTS_FIELD = ProjectSyncModel.getFieldSafely("releaseComments");
     public static final Field RELEASED_ON_FIELD = ProjectSyncModel.getFieldSafely("releasedOn");
     public static final Field VERSION_NAME_FIELD = ProjectSyncModel.getFieldSafely("versionName");
+    public static final Field UPDATE_FIELD = ProjectSyncModel.getFieldSafely("update");
 
     // version license fields
     public static final Field VERSION_LICENSE_URL_FIELD = ProjectSyncModel.getFieldSafely("versionLicenseUrl");
@@ -71,6 +72,7 @@ public class ProjectSyncModel {
     private String releaseComments;
     private Date releasedOn;
     private String versionName;
+    private Boolean update;
 
     // version license fields
     private String versionLicenseUrl;
@@ -136,6 +138,7 @@ public class ProjectSyncModel {
         projectVersionRequest.setCloneFromReleaseUrl(cloneFromReleaseUrl);
         projectVersionRequest.setReleasedOn(releasedOn);
         projectVersionRequest.setNickname(nickname);
+        projectVersionRequest.setUpdate(update);
         if (fieldSet(ProjectSyncModel.VERSION_LICENSE_URL_FIELD)) {
             // A ProjectVersionRequest with a ComplexLicenseRequest that has a null license url triggers a failure
             projectVersionRequest.setLicense(createComplexLicenseRequest());
@@ -381,5 +384,14 @@ public class ProjectSyncModel {
     public void setVersionLicenseUrl(String versionLicenseUrl) {
         this.versionLicenseUrl = versionLicenseUrl;
         fieldsWithSetValues.add(ProjectSyncModel.VERSION_LICENSE_URL_FIELD);
+    }
+
+    public Boolean getUpdate() {
+        return update;
+    }
+
+    public void setUpdate(Boolean update) {
+        this.update = update;
+        fieldsWithSetValues.add(ProjectSyncModel.UPDATE_FIELD);
     }
 }
