@@ -52,4 +52,11 @@ public class BlackDuckRegistrationService extends DataService {
         return new BlackDuckServerData(blackDuckUrl, currentVersionView.getVersion(), registrationId);
     }
 
+    public BlackDuckServerData getBlackDuckServerData(boolean isAdminOperationAllowed) throws IntegrationException {
+        if (isAdminOperationAllowed) {
+            return getBlackDuckServerData();
+        }
+        CurrentVersionView currentVersionView = blackDuckApiClient.getResponse(currentVersionResponse);
+        return new BlackDuckServerData(blackDuckUrl, currentVersionView.getVersion(), null);
+    }
 }
