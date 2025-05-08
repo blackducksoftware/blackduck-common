@@ -31,6 +31,7 @@ import java.nio.charset.Charset;
 import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY;
 import static com.blackduck.integration.blackduck.codelocation.signaturescanner.command.ApiScannerInstaller.VERSION_FILENAME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Tag("integration")
 @ExtendWith(TimingExtension.class)
@@ -38,6 +39,8 @@ public class ToolsApiScannerInstallerTestIT {
     private final IntHttpClientTestHelper intHttpClientTestHelper = new IntHttpClientTestHelper();
     private static File scannerInstallationDirectory;
     public void setUp() {
+        // delete directory just in case this test's previous run was interrupted unexpectedly and the AfterAll method was skipped
+        FileUtils.deleteQuietly(scannerInstallationDirectory);
         // The provided TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH will be created during this test if it does not exist, including any parent directories in the path. However, in the @AfterAll cleanup, only the child most directory will be deleted.
         scannerInstallationDirectory = new File(intHttpClientTestHelper.getProperty(TestingPropertyKey.TEST_BLACKDUCK_SIGNATURE_SCANNER_DOWNLOAD_PATH));
     }
@@ -50,8 +53,8 @@ public class ToolsApiScannerInstallerTestIT {
     void testFreshDownload_followedByAnUpdate() throws Exception {
         setUp();
         downloadSignatureScanner();
-        // Tweak version file so we pretend the installed version in part 1 of this test is a lower major version than the BD server this IT is connected to
-        decrementMajorVersionOfInstalledSignatureScanner();
+        // Tweak version file so we pretend the installed version in part 1 of this test is a lower major version than the BD server this the test is actually connected to
+        incrementMajorVersionOfInstalledSignatureScanner();
         // Attempt a subsequent download request that will upgrade always
         downloadSignatureScanner();
     }
@@ -92,26 +95,23 @@ public class ToolsApiScannerInstallerTestIT {
     }
 
     /**
-     * Takes a version string like "2024.7.0" and changes it to "2023.7.0". This is so we can confirm the api/tools
-     * download request is successful even when upgrading/downgrading from a different major version.
-     * We use the term "major version" loosely here since BD server versions do not follow semantic versioning but
-     * this matches the logic on the server side since "major version" upgrades/downgrades fail unless our request
-     * includes the Accept-Version: ANY header. Confirms fix for IDETECT-4455 and would highlight potential breaking
-     * scan-cli versioning changes on the server side.
+     * Takes a version string like "x.y.z" and changes it to "x+1.y.z". This is so we can confirm the api/tools
+     * download request is successful even when upgrading/downgrading across major versions. (Which requires the
+     * Accept-Version: ANY header (IDETECT-4455))
      * @throws IOException, BlackDuckIntegrationException
      */
-    private void decrementMajorVersionOfInstalledSignatureScanner() {
+    private void incrementMajorVersionOfInstalledSignatureScanner() {
         try {
             File versionFile = new File(scannerInstallationDirectory.toString() + "/" + BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY, VERSION_FILENAME);
             String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
             String[] semVerParts = localScannerVersion.split("\\.");
             int majorVersion = Integer.parseInt(semVerParts[0]);
-            int previousMajorVersion = majorVersion - 1;
+            int previousMajorVersion = majorVersion + 1;
             semVerParts[0] = String.valueOf(previousMajorVersion);
             String pretendInstalledScannedVersion = String.join(".", semVerParts);
             FileUtils.writeStringToFile(versionFile, pretendInstalledScannedVersion, Charset.defaultCharset());
         } catch (IOException e) {
-
+            fail("There was a problem while incrementing major version in " + VERSION_FILENAME);
         }
     }
 }
