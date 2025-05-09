@@ -177,9 +177,6 @@ public class ProjectBomServiceTestIT {
         Optional<List<ProjectVersionPolicyRulesView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
 
-        System.out.println("Active Policies Present: " + activePolicies.isPresent());
-        activePolicies.ifPresent(policies -> System.out.println("Policies Size: " + policies.size()));
-
         Assertions.assertFalse(activePolicies.get().isEmpty());
 
         Assertions.assertTrue(activePolicies.get().stream()
