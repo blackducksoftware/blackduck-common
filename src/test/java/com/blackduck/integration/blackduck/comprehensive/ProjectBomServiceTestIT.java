@@ -171,11 +171,12 @@ public class ProjectBomServiceTestIT {
         }
         policyRuleService.createPolicyRule(policyRule);
 
-        Thread.sleep(10000); // need this to give Black Duck enough time to check the project version against the policy rule
+        Thread.sleep(60000); // need this to give Black Duck enough time to check the project version against the policy rule
 
         // query projectBomService to see if project version has violated rule
         Optional<List<ProjectVersionPolicyRulesView>> activePolicies = projectBomService.getActivePoliciesForVersion(projectVersionView);
         Assertions.assertTrue(activePolicies.isPresent());
+
         Assertions.assertFalse(activePolicies.get().isEmpty());
 
         Assertions.assertTrue(activePolicies.get().stream()
