@@ -20,6 +20,7 @@ public class UploadTarget {
     private final String codeLocationName;
     private final File uploadFile;
     private final String mediaType;
+    private String scanId;
 
     private UploadTarget(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) throws IllegalArgumentException {
         if (StringUtils.isBlank(codeLocationName)) {
@@ -30,6 +31,14 @@ public class UploadTarget {
         this.codeLocationName = codeLocationName;
         this.uploadFile = uploadFile;
         this.mediaType = mediaType;
+    }
+    
+    public void setScanId(String scanId) {
+    	this.scanId = scanId;
+    }
+    
+    public String getScanId() {
+    	return scanId;
     }
 
     public static UploadTarget createDefault(String codeLocationName, File uploadFile) {
