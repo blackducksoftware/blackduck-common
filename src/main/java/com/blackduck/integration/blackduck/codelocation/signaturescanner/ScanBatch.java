@@ -54,11 +54,12 @@ public class ScanBatch extends Stringable implements Buildable {
     private final String correlationId;
     private final String bomCompareMode;
     private final boolean csvArchive;
+    private final boolean scassScan;
 
     public ScanBatch(File outputDirectory, boolean cleanupOutput, int scanMemoryInMegabytes, boolean dryRun, boolean debug, boolean verbose,
         String scanCliOpts, String additionalScanArguments, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, HttpUrl blackDuckUrl,
         String blackDuckUsername, String blackDuckPassword, String blackDuckApiToken, ProxyInfo proxyInfo, boolean runInsecure, String projectName, String projectVersionName,
-        List<ScanTarget> scanTargets, boolean isRapid, ReducedPersistence reducedPersistence, @Nullable String correlationId, String bomCompareMode, boolean csvArchive) {
+        List<ScanTarget> scanTargets, boolean isRapid, ReducedPersistence reducedPersistence, @Nullable String correlationId, String bomCompareMode, boolean csvArchive, boolean scassScan) {
         this.outputDirectory = outputDirectory;
         this.cleanupOutput = cleanupOutput;
         this.scanMemoryInMegabytes = scanMemoryInMegabytes;
@@ -83,6 +84,7 @@ public class ScanBatch extends Stringable implements Buildable {
         this.correlationId = correlationId;
         this.bomCompareMode = bomCompareMode;
         this.csvArchive = csvArchive;
+        this.scassScan = scassScan;
     }
 
     /**
@@ -124,7 +126,7 @@ public class ScanBatch extends Stringable implements Buildable {
         ScanCommand scanCommand = new ScanCommand(signatureScannerInstallDirectory, commandOutputDirectory, commandDryRun, proxyInfo, scanCliOptsToUse, scanMemoryInMegabytes, commandScheme, commandHost,
             blackDuckApiToken, blackDuckUsername, blackDuckPassword, commandPort, runInsecure, scanTarget.getCodeLocationName(), blackDuckOnlineProperties,
             individualFileMatching, scanTarget.getExclusionPatterns(), additionalScanArguments, scanTarget.getPath(), verbose, debug, projectName, projectVersionName, isRapid, reducedPersistence, correlationId,
-            bomCompareMode, csvArchive);
+            bomCompareMode, csvArchive, scassScan);
         scanCommands.add(scanCommand);
     }
 
