@@ -91,8 +91,8 @@ public class ComponentService extends DataService {
     }
 
     public Optional<ComponentView> getComponentView(ComponentsView searchResult) throws IntegrationException {
-        if (StringUtils.isNotBlank(searchResult.getVersion())) {
-            HttpUrl url = new HttpUrl(searchResult.getVersion());
+        if (StringUtils.isNotBlank(searchResult.getComponent())) {
+            HttpUrl url = new HttpUrl(searchResult.getComponent());
             return Optional.ofNullable(blackDuckApiClient.getResponse(url, ComponentView.class));
         } else {
             return Optional.empty();
