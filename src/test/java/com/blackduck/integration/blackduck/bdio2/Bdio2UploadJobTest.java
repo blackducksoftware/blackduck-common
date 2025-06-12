@@ -24,29 +24,29 @@ public class Bdio2UploadJobTest {
     private final int timeout = 10;
     private final int waitInterval = 2;
 
-//    @Test
-//    public void testRetryOnFailedHeaderUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
-//        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnStart();
-//        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
-//        ResilientJobExecutor jobExecutor = getJobExecutor();
-//        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
-//    }
+    @Test
+    public void testRetryOnFailedHeaderUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnStart();
+        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
+        ResilientJobExecutor jobExecutor = getJobExecutor();
+        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
+    }
 
-//    @Test
-//    public void testRetryOnFailedChunkUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
-//        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnAppend();
-//        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
-//        ResilientJobExecutor jobExecutor = getJobExecutor();
-//        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
-//    }
+    @Test
+    public void testRetryOnFailedChunkUpload() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnAppend();
+        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
+        ResilientJobExecutor jobExecutor = getJobExecutor();
+        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
+    }
 
-//    @Test
-//    public void testRetryOnFailedFinish() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
-//        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnFinish();
-//        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
-//        ResilientJobExecutor jobExecutor = getJobExecutor();
-//        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
-//    }
+    @Test
+    public void testRetryOnFailedFinish() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
+        Bdio2RetryAwareStreamUploader bdio2StreamUploader = getUploaderThatThrowsRetriableOnFinish();
+        Bdio2UploadJob bdio2UploadJob = getUploadJob(bdio2StreamUploader);
+        ResilientJobExecutor jobExecutor = getJobExecutor();
+        Assertions.assertThrows(IntegrationTimeoutException.class, () -> jobExecutor.executeJob(bdio2UploadJob));
+    }
 
     private Bdio2RetryAwareStreamUploader getUploaderThatThrowsRetriableOnStart() throws IntegrationException, RetriableBdioUploadException, InterruptedException {
         Bdio2RetryAwareStreamUploader bdio2StreamUploader = Mockito.mock(Bdio2RetryAwareStreamUploader.class);
@@ -82,10 +82,10 @@ public class Bdio2UploadJobTest {
         return new ResilientJobExecutor(jobConfig);
     }
 
-//    private Bdio2UploadJob getUploadJob(Bdio2RetryAwareStreamUploader bdio2StreamUploader) {
-//        BdioFileContent header = new BdioFileContent("bdio-header.jsonld", "");
-//        BdioFileContent entry = new BdioFileContent("bdio-entry-00.jsonld", "");
-//        BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
-//        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), editor, 2, true, true, System.currentTimeMillis(), System.currentTimeMillis() * 1000);
-//    }
+    private Bdio2UploadJob getUploadJob(Bdio2RetryAwareStreamUploader bdio2StreamUploader) {
+        BdioFileContent header = new BdioFileContent("bdio-header.jsonld", "");
+        BdioFileContent entry = new BdioFileContent("bdio-entry-00.jsonld", "");
+        BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
+        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), editor, 2, true, true, System.currentTimeMillis(), System.currentTimeMillis() * 1000, null, null);
+    }
 }
