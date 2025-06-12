@@ -7,6 +7,7 @@
  */
 package com.blackduck.integration.blackduck.codelocation.upload;
 
+import com.blackduck.integration.rest.HttpUrl;
 import com.blackduck.integration.util.NameVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,7 @@ public class UploadTarget {
     private final File uploadFile;
     private final String mediaType;
     private String scanId;
+    private HttpUrl blackDuckUrl;
 
     private UploadTarget(@Nullable NameVersion projectAndVersion, String codeLocationName, File uploadFile, String mediaType) throws IllegalArgumentException {
         if (StringUtils.isBlank(codeLocationName)) {
@@ -39,6 +41,12 @@ public class UploadTarget {
     
     public String getScanId() {
     	return scanId;
+    }
+
+    public void setBlackDuckUrl(HttpUrl blackDuckUrl) { this.blackDuckUrl = blackDuckUrl; }
+
+    public HttpUrl getBlackDuckUrl() {
+        return blackDuckUrl;
     }
 
     public static UploadTarget createDefault(String codeLocationName, File uploadFile) {
