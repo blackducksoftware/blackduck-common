@@ -34,6 +34,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private HttpUrl uploadUrl;
     private String scanId;
     private boolean complete;
+    private HttpUrl blackDuckUrl;
     private long startTime;
     private long timeout;
 
@@ -46,7 +47,9 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         boolean onlyUploadHeader,
         boolean shouldFinishUpload,
         long startTime,
-        long timeout
+        long timeout, 
+        String scanId,
+        HttpUrl blackDuckUrl
     ) {
         this.bdio2RetryAwareStreamUploader = bdio2RetryAwareStreamUploader;
         this.header = header;
@@ -57,16 +60,22 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         this.shouldFinishUpload = shouldFinishUpload;
         this.startTime = startTime;
         this.timeout = timeout;
+        this.scanId = scanId;
+        this.blackDuckUrl = blackDuckUrl;
     }
 
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
-            bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
+            if(isLegacyWorkFlow()){
+                Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
+                bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
+                uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
+                scanId = parseScanIdFromUploadUrl(uploadUrl.string());
+            } else {
+                uploadUrl = new HttpUrl(blackDuckUrl + "api/intelligent-persistence-scans/" + scanId);
+            }
             complete = true;
-            uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
-            scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             if (shouldUploadEntries) {
                 logger.debug(String.format("Starting upload to %s", uploadUrl.string()));
                 for (BdioFileContent content : bdioEntries) {
@@ -86,6 +95,10 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private String parseScanIdFromUploadUrl(String uploadUrl) {
         String[] pieces = uploadUrl.split("/");
         return pieces[pieces.length - 1];
+    }
+
+    private boolean isLegacyWorkFlow() {
+        return scanId == null || scanId.isEmpty() || blackDuckUrl == null || blackDuckUrl.toString().isEmpty();
     }
 
     @Override

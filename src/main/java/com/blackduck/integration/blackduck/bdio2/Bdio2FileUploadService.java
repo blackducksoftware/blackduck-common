@@ -18,6 +18,7 @@ import com.blackduck.integration.blackduck.service.request.BlackDuckRequestBuild
 import com.blackduck.integration.blackduck.version.BlackDuckVersion;
 import com.blackduck.integration.exception.IntegrationException;
 import com.blackduck.integration.log.IntLogger;
+import com.blackduck.integration.rest.HttpUrl;
 import com.blackduck.integration.util.NameVersion;
 import com.blackduck.integration.wait.ResilientJobConfig;
 import com.blackduck.integration.wait.ResilientJobExecutor;
@@ -55,10 +56,10 @@ public class Bdio2FileUploadService extends DataService {
         throws IntegrationException, InterruptedException {
         logger.debug(String.format("Uploading BDIO file %s", uploadTarget.getUploadFile()));
         List<BdioFileContent> bdioFileContentList = bdio2Extractor.extractContent(uploadTarget.getUploadFile());
-        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, shouldUploadEntries, shouldFinishUpload, clientStartTime);
+        return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, shouldUploadEntries, shouldFinishUpload, clientStartTime, uploadTarget.getScanId(), uploadTarget.getBlackDuckUrl());
     }
 
-    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime)
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime, String scanId, HttpUrl blackDuckUrl)
         throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
@@ -84,7 +85,7 @@ public class Bdio2FileUploadService extends DataService {
 
         WaitIntervalTracker waitIntervalTracker = WaitIntervalTrackerFactory.createConstant(timeout, BD_WAIT_AND_RETRY_INTERVAL);
         ResilientJobConfig jobConfig = new ResilientJobConfig(logger, System.currentTimeMillis(), waitIntervalTracker);
-        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload, clientStartTime, timeout);
+        Bdio2UploadJob bdio2UploadJob = new Bdio2UploadJob(bdio2RetryAwareStreamUploader, header, remainingFiles, editor, count, shouldUploadEntries, shouldFinishUpload, clientStartTime, timeout, scanId, blackDuckUrl);
         ResilientJobExecutor jobExecutor = new ResilientJobExecutor(jobConfig);
 
         return jobExecutor.executeJob(bdio2UploadJob);

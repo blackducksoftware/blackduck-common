@@ -86,6 +86,6 @@ public class Bdio2UploadJobTest {
         BdioFileContent header = new BdioFileContent("bdio-header.jsonld", "");
         BdioFileContent entry = new BdioFileContent("bdio-entry-00.jsonld", "");
         BlackDuckRequestBuilderEditor editor = Mockito.mock(BlackDuckRequestBuilderEditor.class);
-        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), editor, 2, true, true, System.currentTimeMillis(), System.currentTimeMillis() * 1000);
+        return new Bdio2UploadJob(bdio2StreamUploader, header, Collections.singletonList(entry), editor, 2, true, true, System.currentTimeMillis(), System.currentTimeMillis() * 1000, null, null);
     }
 }
