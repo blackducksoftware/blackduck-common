@@ -67,7 +67,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            if(scanId == null || scanId.isEmpty() || blackDuckUrl == null || blackDuckUrl.toString().isEmpty()) {
+            if(isLegacyWorkFlow()){
                 Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
                 bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
                 uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
@@ -95,6 +95,10 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private String parseScanIdFromUploadUrl(String uploadUrl) {
         String[] pieces = uploadUrl.split("/");
         return pieces[pieces.length - 1];
+    }
+
+    private boolean isLegacyWorkFlow() {
+        return scanId == null || scanId.isEmpty() || blackDuckUrl == null || blackDuckUrl.toString().isEmpty();
     }
 
     @Override
