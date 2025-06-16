@@ -68,7 +68,8 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     @Override
     public void attemptJob() throws IntegrationException {
         try {
-            if(isLegacyWorkFlow()){
+            // This scenario is for BD versions 2024.10.0 and below where SCASS is not implemented
+            if(isOldNonSCASSWorkflow()){
                 Response headerResponse = bdio2RetryAwareStreamUploader.start(header, editor, startTime, timeout);
                 bdio2RetryAwareStreamUploader.onErrorThrowRetryableOrFailure(headerResponse);
                 uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
@@ -98,7 +99,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
         return pieces[pieces.length - 1];
     }
 
-    private boolean isLegacyWorkFlow() {
+    private boolean isOldNonSCASSWorkflow() {
         return scanId == null || scanId.isEmpty() || blackDuckUrl == null || blackDuckUrl.toString().isEmpty();
     }
 
