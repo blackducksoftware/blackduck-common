@@ -157,7 +157,6 @@ public class ScanCommand {
             // only set it in this block.
             appendKeyValuePair("--no-persistence-mode", bomCompareMode);
         }
-        
 
         if (scassScan) {
             appendSingleArgument("--scass-scan");
