@@ -49,6 +49,7 @@ public class ScanCommand {
     private final String correlationId;
     private final String bomCompareMode;
     private final boolean csvArchive;
+    private final boolean scassScan;
 
     private List<String> command;
 
@@ -58,7 +59,7 @@ public class ScanCommand {
         String blackDuckUsername, String blackDuckPassword, int port, boolean runInsecure, String name, BlackDuckOnlineProperties blackDuckOnlineProperties, IndividualFileMatching individualFileMatching, Set<String> excludePatterns,
         String additionalScanArguments, String targetPath, boolean verbose, boolean debug, String projectName, String versionName, boolean isRapid,
         ReducedPersistence reducedPersistence,
-        @Nullable String correlationId, String bomCompareMode, boolean csvArchive) {
+        @Nullable String correlationId, String bomCompareMode, boolean csvArchive, boolean scassScan) {
         this.signatureScannerInstallDirectory = signatureScannerInstallDirectory;
         this.outputDirectory = outputDirectory;
         this.dryRun = dryRun;
@@ -87,6 +88,7 @@ public class ScanCommand {
         this.correlationId = correlationId;
         this.bomCompareMode = bomCompareMode;
         this.csvArchive = csvArchive;
+        this.scassScan = scassScan;
     }
 
     public List<String> createCommandForProcessBuilder(IntLogger logger, ScanPaths scannerPaths, String specificRunOutputDirectoryPath) throws IllegalArgumentException, IntegrationException {
@@ -154,6 +156,10 @@ public class ScanCommand {
             // --no-persistence-mode should never be used without --no-persistence so
             // only set it in this block.
             appendKeyValuePair("--no-persistence-mode", bomCompareMode);
+        }
+
+        if (scassScan) {
+            appendSingleArgument("--scass-scan");
         }
 
         populateReducedPersistence();
