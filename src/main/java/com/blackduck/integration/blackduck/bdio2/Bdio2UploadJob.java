@@ -22,6 +22,7 @@ import java.util.List;
 public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String UPLOAD_JOB_NAME = "bdio upload";
+    private static final String INTELLIGENT_PERSISTANCE_API_ENDPOINT = "api/intelligent-persistence-scans/";
 
     private final Bdio2RetryAwareStreamUploader bdio2RetryAwareStreamUploader;
     private final BdioFileContent header;
@@ -73,7 +74,7 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
                 scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             } else {
-                uploadUrl = new HttpUrl(blackDuckUrl + "api/intelligent-persistence-scans/" + scanId);
+                uploadUrl = new HttpUrl(blackDuckUrl + INTELLIGENT_PERSISTANCE_API_ENDPOINT + scanId);
             }
             complete = true;
             if (shouldUploadEntries) {
