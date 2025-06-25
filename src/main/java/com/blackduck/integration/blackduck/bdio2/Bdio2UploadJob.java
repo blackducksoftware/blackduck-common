@@ -75,6 +75,9 @@ public class Bdio2UploadJob implements ResilientJob<Bdio2UploadResult> {
                 uploadUrl = new HttpUrl(headerResponse.getHeaderValue("location"));
                 scanId = parseScanIdFromUploadUrl(uploadUrl.string());
             } else {
+                if(!blackDuckUrl.string().endsWith("/")) {
+                    blackDuckUrl = new HttpUrl(blackDuckUrl + "/");
+                }
                 uploadUrl = new HttpUrl(blackDuckUrl + INTELLIGENT_PERSISTANCE_API_ENDPOINT + scanId);
             }
             complete = true;
