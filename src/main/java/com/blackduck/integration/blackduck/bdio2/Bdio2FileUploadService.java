@@ -59,7 +59,7 @@ public class Bdio2FileUploadService extends DataService {
         return uploadFiles(bdioFileContentList, uploadTarget.getProjectAndVersion().orElse(null), timeout, shouldUploadEntries, shouldFinishUpload, clientStartTime, uploadTarget.getScanId(), uploadTarget.getBlackDuckUrl());
     }
 
-    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime, String scanId, HttpUrl blackDuckUrl)
+    private Bdio2UploadResult uploadFiles(List<BdioFileContent> bdioFiles, @Nullable NameVersion nameVersion, long timeout, boolean shouldUploadEntries, boolean shouldFinishUpload, long clientStartTime, @Nullable String scanId, @Nullable HttpUrl blackDuckUrl)
         throws IntegrationException, InterruptedException {
         if (bdioFiles.isEmpty()) {
             throw new IllegalArgumentException("BDIO files cannot be empty.");
