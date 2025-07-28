@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.Certificate;
 
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
@@ -41,6 +43,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String MAC_PLATFORM_PARAMETER_VALUE = "macosx";
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
+    private static final String ALPINE_PLATFORM_PARAMETER_VALUE = "alpine_linux";
 
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -50,6 +53,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
+    private final String osArchitecture;
 
     public ToolsApiScannerInstaller(
             IntLogger logger,
@@ -59,7 +63,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             KeyStoreHelper keyStoreHelper,
             HttpUrl blackDuckServerUrl,
             OperatingSystemType operatingSystemType,
-            File installDirectory
+            File installDirectory,
+            String osArchitecture
     ) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
@@ -73,6 +78,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         this.blackDuckServerUrl = blackDuckServerUrl;
         this.operatingSystemType = operatingSystemType;
         this.installDirectory = installDirectory;
+        this.osArchitecture = osArchitecture;
     }
 
     /**
@@ -140,8 +146,14 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = MAC_PLATFORM_PARAMETER_VALUE;
         } else if (OperatingSystemType.WINDOWS == operatingSystemType) {
             platform = WINDOWS_PLATFORM_PARAMETER_VALUE;
-        } else {
+        } else if (OperatingSystemType.LINUX == operatingSystemType && !isAlpineLinux()) {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
+        } else {
+            platform = ALPINE_PLATFORM_PARAMETER_VALUE;
+        }
+
+        if(osArchitecture.equals("arm64")) {
+            platform = platform + "_arm64";
         }
 
         url.append(PLATFORM_PARAMETER_KEY + "/" + platform);
@@ -151,6 +163,29 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         } catch (IntegrationException e) {
             throw new BlackDuckIntegrationException(String.format("The Black Duck Signature Scanner url (%s) is not valid.", url));
         }
+    }
+
+    private boolean isAlpineLinux() {
+        if(new File("/etc/alpine-release").exists()) {
+            return true;
+        } else if(new File("/etc/os-release").exists()) {
+            try {
+                String osRelease = new String(Files.readAllBytes(Paths.get("/etc/os-release")));
+                return osRelease.toLowerCase().contains("alpine");
+            } catch (IOException e) {
+                logger.trace("There was a problem reading the os-release file", e);
+                return false;
+            }
+        } else if(new File("/usr/lib/os-release").exists()) {
+            try {
+                String osRelease = new String(Files.readAllBytes(Paths.get("/usr/lib/os-release")));
+                return osRelease.toLowerCase().contains("alpine");
+            } catch (IOException e) {
+                logger.trace("There was a problem reading the os-release file", e);
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
