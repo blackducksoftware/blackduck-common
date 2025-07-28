@@ -19,7 +19,6 @@ import com.blackduck.integration.util.IntEnvironmentVariables;
 import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -82,8 +81,7 @@ public class ToolsApiScannerInstallerTestIT {
                 new KeyStoreHelper(logger),
                 blackDuckServerUrl,
                 operatingSystemType,
-                scannerInstallationDirectory,
-                SystemUtils.OS_ARCH);
+                scannerInstallationDirectory);
         toolsApiScannerInstaller.installOrUpdateScanner();
 
         ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerInstallationDirectory);
