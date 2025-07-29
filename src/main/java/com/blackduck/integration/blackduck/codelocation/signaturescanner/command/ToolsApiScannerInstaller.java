@@ -141,10 +141,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
         String platform;
 
-        //we give precedence to env variable which will be provided via to customers who want to specifically set the variable to tell us if this is alpine_linux
-        //Documentation will say to only use that for alpine and no other OS to keep it simple, corresponding check will be done in Detect and passed on  here
+        // we give precedence to env variable which will be provided by the customers who want to specifically set the variable to tell us if this is alpine_linux
+        // Documentation will say to only use that for alpine and no other OS to keep it simple, corresponding check will be done in Detect and passed on to this class
         // if the code goes to else if conditions that means env variable was not provided, and we will fall back to regular approach
-        if(OperatingSystemType.ALPINE_LINUX == operatingSystemType) {
+        if (OperatingSystemType.ALPINE_LINUX == operatingSystemType) {
             platform = ALPINE_PLATFORM_PARAMETER_VALUE;
         } else if (OperatingSystemType.MAC == operatingSystemType) {
             platform = MAC_PLATFORM_PARAMETER_VALUE;
