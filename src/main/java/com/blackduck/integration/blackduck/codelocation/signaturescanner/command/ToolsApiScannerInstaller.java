@@ -45,6 +45,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
     private static final String ALPINE_PLATFORM_PARAMETER_VALUE = "alpine_linux";
+    private static final String ALPINE_OS_RELEASE_PATH = "/etc/alpine-release";
+    private static final String OS_RELEASE_PATH = "/etc/os-release";
+    private static final String OS_RELEASE_ALTERNATE_PATH = "/usr/lib/os-release";
 
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -170,19 +173,19 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     }
 
     private boolean isAlpineLinux() {
-        if(new File("/etc/alpine-release").exists()) {
+        if(new File(ALPINE_OS_RELEASE_PATH).exists()) {
             return true;
-        } else if(new File("/etc/os-release").exists()) {
+        } else if(new File(OS_RELEASE_PATH).exists()) {
             try {
-                String osRelease = new String(Files.readAllBytes(Paths.get("/etc/os-release")));
+                String osRelease = new String(Files.readAllBytes(Paths.get(OS_RELEASE_PATH)));
                 return osRelease.toLowerCase().contains("alpine");
             } catch (IOException e) {
                 logger.trace("There was a problem reading the os-release file", e);
                 return false;
             }
-        } else if(new File("/usr/lib/os-release").exists()) {
+        } else if(new File(OS_RELEASE_ALTERNATE_PATH).exists()) {
             try {
-                String osRelease = new String(Files.readAllBytes(Paths.get("/usr/lib/os-release")));
+                String osRelease = new String(Files.readAllBytes(Paths.get(OS_RELEASE_ALTERNATE_PATH)));
                 return osRelease.toLowerCase().contains("alpine");
             } catch (IOException e) {
                 logger.trace("There was a problem reading the os-release file", e);
