@@ -23,6 +23,7 @@ import com.blackduck.integration.util.CleanupZipExpander;
 import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
@@ -30,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.cert.Certificate;
 
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
@@ -41,6 +44,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String MAC_PLATFORM_PARAMETER_VALUE = "macosx";
     private static final String LINUX_PLATFORM_PARAMETER_VALUE = "linux";
     private static final String WINDOWS_PLATFORM_PARAMETER_VALUE = "windows";
+    private static final String ALPINE_PLATFORM_PARAMETER_VALUE = "alpine_linux";
+    private static final String ALPINE_OS_RELEASE_PATH = "/etc/alpine-release";
+    private static final String OS_RELEASE_PATH = "/etc/os-release";
+    private static final String OS_RELEASE_ALTERNATE_PATH = "/usr/lib/os-release";
 
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -136,12 +143,24 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         url.append(LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL);
 
         String platform;
-        if (OperatingSystemType.MAC == operatingSystemType) {
+
+        // we give precedence to env variable which will be provided by the customers who want to specifically set the variable to tell us if this is alpine_linux
+        // Documentation will say to only use that for alpine and no other OS to keep it simple, corresponding check will be done in Detect and passed on to this class
+        // if the code goes to else if conditions that means env variable was not provided, and we will fall back to regular approach
+        if (OperatingSystemType.ALPINE_LINUX == operatingSystemType) {
+            platform = ALPINE_PLATFORM_PARAMETER_VALUE;
+        } else if (OperatingSystemType.MAC == operatingSystemType) {
             platform = MAC_PLATFORM_PARAMETER_VALUE;
         } else if (OperatingSystemType.WINDOWS == operatingSystemType) {
             platform = WINDOWS_PLATFORM_PARAMETER_VALUE;
+        } else if (OperatingSystemType.LINUX == operatingSystemType && isAlpineLinux()) {
+            platform = ALPINE_PLATFORM_PARAMETER_VALUE;
         } else {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
+        }
+
+        if(SystemUtils.OS_ARCH.equals("arm64")) {
+            platform = platform + "_arm64";
         }
 
         url.append(PLATFORM_PARAMETER_KEY + "/" + platform);
@@ -151,6 +170,29 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         } catch (IntegrationException e) {
             throw new BlackDuckIntegrationException(String.format("The Black Duck Signature Scanner url (%s) is not valid.", url));
         }
+    }
+
+    private boolean isAlpineLinux() {
+        if(new File(ALPINE_OS_RELEASE_PATH).exists()) {
+            return true;
+        } else if(new File(OS_RELEASE_PATH).exists()) {
+            try {
+                String osRelease = new String(Files.readAllBytes(Paths.get(OS_RELEASE_PATH)));
+                return osRelease.toLowerCase().contains("alpine");
+            } catch (IOException e) {
+                logger.trace("There was a problem reading the os-release file", e);
+                return false;
+            }
+        } else if(new File(OS_RELEASE_ALTERNATE_PATH).exists()) {
+            try {
+                String osRelease = new String(Files.readAllBytes(Paths.get(OS_RELEASE_ALTERNATE_PATH)));
+                return osRelease.toLowerCase().contains("alpine");
+            } catch (IOException e) {
+                logger.trace("There was a problem reading the os-release file", e);
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
