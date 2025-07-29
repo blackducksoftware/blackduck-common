@@ -159,7 +159,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
         }
 
-        if(SystemUtils.OS_ARCH.equals("arm64")) {
+        if (SystemUtils.OS_ARCH.equals("aarch64") || SystemUtils.OS_ARCH.equals("arm64")) {
             platform = platform + "_arm64";
         }
 
