@@ -144,10 +144,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = MAC_PLATFORM_PARAMETER_VALUE;
         } else if (OperatingSystemType.WINDOWS == operatingSystemType) {
             platform = WINDOWS_PLATFORM_PARAMETER_VALUE;
-        } else if (OperatingSystemType.LINUX == operatingSystemType && !isAlpineLinux()) {
-            platform = LINUX_PLATFORM_PARAMETER_VALUE;
-        } else {
+        } else if (OperatingSystemType.LINUX == operatingSystemType && isAlpineLinux()) {
             platform = ALPINE_PLATFORM_PARAMETER_VALUE;
+        } else {
+            platform = LINUX_PLATFORM_PARAMETER_VALUE;
         }
 
         if(SystemUtils.OS_ARCH.equals("arm64")) {
