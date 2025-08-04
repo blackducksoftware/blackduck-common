@@ -23,7 +23,6 @@ import com.blackduck.integration.util.CleanupZipExpander;
 import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
@@ -38,6 +37,7 @@ import java.security.cert.Certificate;
 public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     // The tools API for downloading the scan-cli is called on by Detect for BD versions 2024.7.0 or newer
     public static final BlackDuckVersion MIN_BLACK_DUCK_VERSION = new BlackDuckVersion(2024, 7, 0);
+    public static final BlackDuckVersion MIN_ARM_BLACK_DUCK_VERSION = new BlackDuckVersion(2025, 7, 0);
 
     private static final String LATEST_SCAN_CLI_TOOL_DOWNLOAD_URL = "api/tools/scan.cli.zip/versions/latest/";
     private static final String PLATFORM_PARAMETER_KEY = "platforms";
@@ -57,6 +57,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private final HttpUrl blackDuckServerUrl;
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
+    private final String osArchitecture;
 
     public ToolsApiScannerInstaller(
             IntLogger logger,
@@ -66,7 +67,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             KeyStoreHelper keyStoreHelper,
             HttpUrl blackDuckServerUrl,
             OperatingSystemType operatingSystemType,
-            File installDirectory
+            File installDirectory,
+            String osArchitecture
     ) {
         if (null == blackDuckServerUrl) {
             throw new IllegalArgumentException("A Black Duck server url must be provided.");
@@ -80,6 +82,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         this.blackDuckServerUrl = blackDuckServerUrl;
         this.operatingSystemType = operatingSystemType;
         this.installDirectory = installDirectory;
+        this.osArchitecture = osArchitecture;
     }
 
     /**
@@ -159,7 +162,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
         }
 
-        if (SystemUtils.OS_ARCH.equals("aarch64") || SystemUtils.OS_ARCH.equals("arm64")) {
+        if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
             platform = platform + "_arm64";
         }
 
