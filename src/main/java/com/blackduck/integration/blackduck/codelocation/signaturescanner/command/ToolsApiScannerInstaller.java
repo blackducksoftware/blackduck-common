@@ -176,6 +176,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     }
 
     private boolean isAlpineLinux() {
+        if (!osArchitecture.equals("aarch64") && !osArchitecture.equals("arm64")) {
+            return false;
+        }
+
         if(new File(ALPINE_OS_RELEASE_PATH).exists()) {
             return true;
         } else if(new File(OS_RELEASE_PATH).exists()) {
