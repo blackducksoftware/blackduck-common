@@ -34,6 +34,8 @@ public class ProjectSyncModel {
     // project fields
     public static final Field CLONE_CATEGORIES_FIELD = ProjectSyncModel.getFieldSafely("cloneCategories");
     public static final Field CUSTOM_SIGNATURE_ENABLED_FIELD = ProjectSyncModel.getFieldSafely("customSignatureEnabled");
+    public static final Field DEEP_LICENSE_DATA_ENABLED_FIELD = ProjectSyncModel.getFieldSafely("deepLicenseDataEnabled");
+    public static final Field DEEP_LICENSE_DATA_SNIPPET_ENABLED_FIELD = ProjectSyncModel.getFieldSafely("deepLicenseDataSnippetEnabled");
     public static final Field DESCRIPTION_FIELD = ProjectSyncModel.getFieldSafely("description");
     public static final Field NAME_FIELD = ProjectSyncModel.getFieldSafely("name");
     public static final Field PROJECT_LEVEL_ADJUSTMENTS_FIELD = ProjectSyncModel.getFieldSafely("projectLevelAdjustments");
@@ -57,6 +59,8 @@ public class ProjectSyncModel {
     // project fields
     private List<ProjectCloneCategoriesType> cloneCategories;
     private Boolean customSignatureEnabled;
+    private Boolean deepLicenseDataEnabled;
+    private Boolean deepLicenseDataSnippetEnabled;
     private String description;
     private String name;
     private Boolean projectLevelAdjustments;
@@ -123,6 +127,8 @@ public class ProjectSyncModel {
         projectRequest.setProjectGroup(projectGroup);
         projectRequest.setCloneCategories(cloneCategories);
         projectRequest.setCustomSignatureEnabled(customSignatureEnabled);
+        projectRequest.setDeepLicenseDataEnabled(deepLicenseDataEnabled);
+        projectRequest.setDeepLicenseDataSnippetEnabled(deepLicenseDataSnippetEnabled);
 
         projectRequest.setVersionRequest(createProjectVersionRequest());
 
@@ -162,6 +168,14 @@ public class ProjectSyncModel {
             projectView.setCustomSignatureEnabled(customSignatureEnabled);
         }
 
+        if (fieldSet(ProjectSyncModel.DEEP_LICENSE_DATA_ENABLED_FIELD)) {
+            projectView.setDeepLicenseDataEnabledEnabled(deepLicenseDataEnabled);
+        }
+        
+        if (fieldSet(ProjectSyncModel.DEEP_LICENSE_DATA_SNIPPET_ENABLED_FIELD)) {
+            projectView.setDeepLicenseDataSnippetEnabled(deepLicenseDataSnippetEnabled);
+        }
+        
         if (fieldSet(ProjectSyncModel.DESCRIPTION_FIELD)) {
             projectView.setDescription(description);
         }
@@ -254,6 +268,24 @@ public class ProjectSyncModel {
     public void setCustomSignatureEnabled(Boolean customSignatureEnabled) {
         this.customSignatureEnabled = customSignatureEnabled;
         fieldsWithSetValues.add(ProjectSyncModel.CUSTOM_SIGNATURE_ENABLED_FIELD);
+    }
+    
+    public Boolean getDeepLicenseDataEnabled() {
+        return deepLicenseDataEnabled;
+    }
+
+    public void setDeepLicenseDataEnabledEnabled(Boolean deepLicenseDataEnabled) {
+        this.deepLicenseDataEnabled = deepLicenseDataEnabled;
+        fieldsWithSetValues.add(ProjectSyncModel.DEEP_LICENSE_DATA_ENABLED_FIELD);
+    }
+    
+    public Boolean getDeepLicenseDataSnippetEnabled() {
+        return deepLicenseDataSnippetEnabled;
+    }
+
+    public void setDeepLicenseDataSnippetEnabled(Boolean deepLicenseDataSnippetEnabled) {
+        this.deepLicenseDataSnippetEnabled = deepLicenseDataSnippetEnabled;
+        fieldsWithSetValues.add(ProjectSyncModel.DEEP_LICENSE_DATA_SNIPPET_ENABLED_FIELD);
     }
 
     public String getDescription() {
