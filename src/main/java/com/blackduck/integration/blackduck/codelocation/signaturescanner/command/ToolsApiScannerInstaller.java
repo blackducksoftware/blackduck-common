@@ -109,20 +109,31 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         scannerExpansionDirectory.mkdirs();
 
         File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
+        File architectureFile = new File(scannerExpansionDirectory, ARCHITECTURE_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
             String scannerVersion;
-            if (!versionFile.exists()) {
-                logger.info("No version file exists, assuming this is new installation and the signature scanner should be downloaded.");
+            if (!versionFile.exists() || !architectureFile.exists()) {
+                logger.info("No version or architecture file exists, assuming this requires a new installation and the signature scanner should be downloaded.");
                 scannerVersion = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, "");
                 // Version file creation should happen after successful download
                 logger.debug("The version file has not been created yet so creating it now.");
                 FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
+                // Creating the architecture file for storing the last downloaded scan cli architecture value
+                FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
                 return installDirectory;
             }
+
             // A version file exists, so we have to compare to determine if a download should occur.
             String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+            // An architecture file exists, so we will compare the architecture to determine if a download should occur
+            String localArchitecture = FileUtils.readFileToString(architectureFile, Charset.defaultCharset());
+
+            if(!localArchitecture.equals(osArchitecture)) {
+                localScannerVersion = "";
+            }
+
             logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
             // We will call the tool download API and update our local signature scanner only if it happens to be outdated.
             scannerVersion = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
