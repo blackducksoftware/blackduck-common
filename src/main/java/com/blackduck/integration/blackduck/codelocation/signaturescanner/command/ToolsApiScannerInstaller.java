@@ -133,7 +133,6 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             // Initiate a fresh download and update architecture value in file
             if(!localArchitecture.equals(osArchitecture)) {
                 localScannerVersion = "";
-                FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
             }
 
             logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
@@ -142,6 +141,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             // Update version file if needed
             if (localScannerVersion != scannerVersion) {
                 FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
+            }
+            if(!localArchitecture.equals(osArchitecture)) {
+                FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
             }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
