@@ -130,8 +130,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             // An architecture file exists, so we will compare the architecture to determine if a download should occur
             String localArchitecture = FileUtils.readFileToString(architectureFile, Charset.defaultCharset());
 
+            // Initiate a fresh download and update architecture value in file
             if(!localArchitecture.equals(osArchitecture)) {
                 localScannerVersion = "";
+                FileUtils.writeStringToFile(versionFile, osArchitecture, Charset.defaultCharset());
             }
 
             logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
