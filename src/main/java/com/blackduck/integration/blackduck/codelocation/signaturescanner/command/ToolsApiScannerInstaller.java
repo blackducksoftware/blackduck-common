@@ -109,7 +109,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         scannerExpansionDirectory.mkdirs();
 
         File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
-        File architectureFile = new File(scannerExpansionDirectory, ARCHITECTURE_FILENAME);
+        File architectureDirectory = new File(installDirectory, ARCHITECTURE_FILE_DIRECTORY);
+        architectureDirectory.mkdirs();
+        File architectureFile = new File(architectureDirectory, ARCHITECTURE_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -139,12 +141,10 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             // We will call the tool download API and update our local signature scanner only if it happens to be outdated.
             scannerVersion = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
             // Update version file if needed
-            if (localScannerVersion != scannerVersion) {
+            if (!localScannerVersion.equals(scannerVersion)) {
                 FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
             }
-            if(!localArchitecture.equals(osArchitecture)) {
-                FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
-            }
+            FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
         }
