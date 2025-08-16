@@ -36,6 +36,7 @@ public class ScanPathsUtility {
     private static final String OTHER_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java");
     private static final String CACERTS_PATH = "lib" + File.separator + "security" + File.separator + "cacerts";
     private static final String STANDALONE_JAR_PATH = "cache" + File.separator + "scan.cli.impl-standalone.jar";
+    public static final String ARCHITECTURE_FILENAME = "scanCliArchitecture.txt";
 
     private static final FileFilter EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER = file -> !file.isHidden() && !file.getName().contains("windows") && file.isDirectory();
     private static final FileFilter JRE_DIRECTORY_FILTER = file -> "jre".equalsIgnoreCase(file.getName()) && file.isDirectory();
@@ -49,6 +50,8 @@ public class ScanPathsUtility {
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final OperatingSystemType operatingSystemType;
 
+    private File architectureFile;
+    
     public ScanPathsUtility(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType) {
         this.logger = logger;
         this.intEnvironmentVariables = intEnvironmentVariables;
@@ -83,6 +86,8 @@ public class ScanPathsUtility {
         } else {
             logger.debug(String.format("The directory structure was likely created manually - be sure the jre folder exists in: %s", installDirectory.getAbsolutePath()));
         }
+
+        architectureFile = new File(installDirectory, ARCHITECTURE_FILENAME); 
 
         final File jreContentsDirectory = findFirstFilteredFile(installDirectory, JRE_DIRECTORY_FILTER, "Could not find the 'jre' directory in %s.");
 
@@ -217,6 +222,10 @@ public class ScanPathsUtility {
         }
 
         return javaHomeSupplier.get();
+    }
+
+    public File getArchitectureFile() {
+        return architectureFile;
     }
 
 }

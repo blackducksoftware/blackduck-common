@@ -18,8 +18,6 @@ import java.io.IOException;
 public abstract class ApiScannerInstaller implements ScannerInstaller {
     public static final String BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY = "Black_Duck_Scan_Installation";
     public static final String VERSION_FILENAME = "blackDuckVersion.txt";
-    public static final String ARCHITECTURE_FILENAME = "scanCliArchitecture.txt";
-    public static final String ARCHITECTURE_FILE_DIRECTORY = "Scan_CLI_Architecture";
 
     @Override
     public abstract File installOrUpdateScanner() throws BlackDuckIntegrationException;

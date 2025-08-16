@@ -99,7 +99,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(installDirectory);
                 if (!scanPaths.isManagedByLibrary()) {
                     return installDirectory;
-                }
+                }         
             } catch (BlackDuckIntegrationException ignored) {
                 // a valid scanPaths could not be found so we will need to attempt an install
             }
@@ -107,11 +107,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
         File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
-
+        File architectureFile = scanPathsUtility.getArchitectureFile();
         File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
-        File architectureDirectory = new File(installDirectory, ARCHITECTURE_FILE_DIRECTORY);
-        architectureDirectory.mkdirs();
-        File architectureFile = new File(architectureDirectory, ARCHITECTURE_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         try {
@@ -123,6 +120,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 logger.debug("The version file has not been created yet so creating it now.");
                 FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
                 // Creating the architecture file for storing the last downloaded scan cli architecture value
+                // The architecture file needs to be re-initialized since the scan-cli directory was newly created in above step
+                architectureFile = scanPathsUtility.getArchitectureFile();
                 FileUtils.writeStringToFile(architectureFile, osArchitecture, Charset.defaultCharset());
                 return installDirectory;
             }
