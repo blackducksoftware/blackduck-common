@@ -24,6 +24,6 @@ public abstract class ApiScannerInstaller implements ScannerInstaller {
 
     protected abstract HttpUrl getDownloadUrl() throws BlackDuckIntegrationException;
 
-    protected abstract String downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException;
+    protected abstract Object downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException;
 
 }
