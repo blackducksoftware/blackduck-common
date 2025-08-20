@@ -100,8 +100,8 @@ public class ScanPathsUtility {
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
-        scanCliMetadataFile = findFirstFilteredFile(installDirectory, METADATA_FILE_FILTER, "Could not find the metadata file in %s");
-
+        scanCliMetadataFile = new File(installDirectory, METADATA_FILE_NAME);
+    
         return new ScanPaths(pathToJavaExecutable, pathToCacerts, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
