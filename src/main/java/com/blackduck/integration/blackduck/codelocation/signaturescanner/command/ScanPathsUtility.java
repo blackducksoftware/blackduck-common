@@ -43,7 +43,6 @@ public class ScanPathsUtility {
     private static final FileFilter JRE_DIRECTORY_FILTER = file -> "jre".equalsIgnoreCase(file.getName()) && file.isDirectory();
     private static final FileFilter LIB_DIRECTORY_FILTER = file -> "lib".equalsIgnoreCase(file.getName()) && file.isDirectory();
     private static final FileFilter SCAN_CLI_JAR_FILE_FILTER = file -> file.getName().startsWith("scan.cli") && file.getName().endsWith(".jar") && file.isFile();
-    private static final FileFilter METADATA_FILE_FILTER = file -> file.getName().equals(METADATA_FILE_NAME);
 
     // this will allow for multiple threads to always get a unique number
     private final AtomicInteger defaultMultiThreadingId = new AtomicInteger(0);

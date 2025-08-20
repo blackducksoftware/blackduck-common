@@ -46,6 +46,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String ALPINE_OS_RELEASE_PATH = "/etc/alpine-release";
     private static final String OS_RELEASE_PATH = "/etc/os-release";
     private static final String OS_RELEASE_ALTERNATE_PATH = "/usr/lib/os-release";
+    private static final String ARM64_CONSTANT = "arm64";
+    private static final String AARCH64_CONSTANT = "aarch64";
+    private static final String X64_CONSTANT = "x64";
 
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -137,14 +140,20 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             String localScannerVersion = scanCliMetadata.getToolVersion();
             
             String localArchitecture = scanCliMetadata.getArch();
-            if(localArchitecture.equals("arm64")) {
-                if (!osArchitecture.equals("aarch64") && !osArchitecture.equals("arm64")) {
+            if (localArchitecture.equals(ARM64_CONSTANT)) {
+                if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
                     localScannerVersion = "";
                 }
-            } else if (localArchitecture.equals("x64")) {
-                if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
+            } else if (localArchitecture.equals(X64_CONSTANT)) {
+                if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
                     localScannerVersion = "";
                 }
+            }
+
+            String os = scanCliMetadata.getOs();
+
+            if(!checkOSValue(os)) {
+                localScannerVersion = "";
             }
 
             logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
@@ -156,6 +165,21 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
         return installDirectory;
+    }
+
+    private boolean checkOSValue(String os) {
+
+        if (os.equals(MAC_PLATFORM_PARAMETER_VALUE) && !operatingSystemType.equals(OperatingSystemType.MAC)) {
+            return false;
+        } else if (os.equals(WINDOWS_PLATFORM_PARAMETER_VALUE) && !operatingSystemType.equals(OperatingSystemType.WINDOWS)) {
+            return false;
+        } else if (os.equals(ALPINE_PLATFORM_PARAMETER_VALUE) && isAlpineLinux() && !(operatingSystemType.equals(OperatingSystemType.ALPINE_LINUX) || operatingSystemType.equals(OperatingSystemType.LINUX))) {
+            return false;
+        } else if (os.equals(LINUX_PLATFORM_PARAMETER_VALUE) && !(operatingSystemType.equals(OperatingSystemType.LINUX))) {
+            return false;
+        }
+
+        return true;
     }
 
     protected HttpUrl getDownloadUrl() throws BlackDuckIntegrationException {
@@ -182,8 +206,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
         }
 
-        if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
-            platform = platform + "_arm64";
+        if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
+            platform = platform + "_" + ARM64_CONSTANT;
         }
 
         url.append(PLATFORM_PARAMETER_KEY + "/" + platform);
@@ -196,7 +220,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     }
 
     private boolean isAlpineLinux() {
-        if (!osArchitecture.equals("aarch64") && !osArchitecture.equals("arm64")) {
+        if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
             return false;
         }
 
