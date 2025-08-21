@@ -124,6 +124,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 String localScannerVersion = scanCliMetadata.getToolVersion();
                 
                 String localArchitecture = scanCliMetadata.getArch();
+
+                // Doing the check to see if the current expected architecture value and the already existing architecture mismatch, if it does setting the version to empty triggers a fresh download
                 if (localArchitecture.equals(ARM64_CONSTANT)) {
                     if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
                         localScannerVersion = "";
@@ -163,6 +165,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     }
 
     private boolean checkOSValue(String os) {
+
+        // Doing the check to see if the current expected os value and the already existing os mismatch, if it does setting the version to empty triggers a fresh download
 
         if (os.equals(MAC_PLATFORM_PARAMETER_VALUE) && !operatingSystemType.equals(OperatingSystemType.MAC)) {
             return false;
