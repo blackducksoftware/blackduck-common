@@ -91,6 +91,8 @@ public class ProjectSyncModelTest {
         projectSyncModel.setReleasedOn(new Date());
         projectSyncModel.setVersionLicenseUrl("versionLicenseUrl");
         projectSyncModel.setUpdate(true);
+        projectSyncModel.setDeepLicenseDataEnabledEnabled(true);
+        projectSyncModel.setDeepLicenseDataSnippetEnabled(true);
 
         assertFalse(((Set) setFields.get(projectSyncModel)).isEmpty());
         assertEquals(allFields, setFields.get(projectSyncModel));
