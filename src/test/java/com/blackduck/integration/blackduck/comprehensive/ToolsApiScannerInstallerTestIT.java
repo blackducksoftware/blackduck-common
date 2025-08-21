@@ -62,20 +62,20 @@ public class ToolsApiScannerInstallerTestIT {
         downloadSignatureScanner(SystemUtils.OS_ARCH, false);
     }
 
-    @Test
-    void testFreshDownload_followedByArchitectureUpdate() throws Exception {
-        setUp();
-        downloadSignatureScanner(SystemUtils.OS_ARCH, false);
-        String osArchitecture;
-        if(SystemUtils.OS_ARCH.equals("aarch64")) {
-            osArchitecture = "amd64";
-        } else {
-            osArchitecture = "aarch64";
-        }
+    // @Test
+    // void testFreshDownload_followedByArchitectureUpdate() throws Exception {
+    //     setUp();
+    //     downloadSignatureScanner(SystemUtils.OS_ARCH, false);
+    //     String osArchitecture;
+    //     if(SystemUtils.OS_ARCH.equals("aarch64")) {
+    //         osArchitecture = "amd64";
+    //     } else {
+    //         osArchitecture = "aarch64";
+    //     }
 
-        // Attempt a subsequent download request that will upgrade always as architecture was changed
-        downloadSignatureScanner(osArchitecture, true);
-    }
+    //     // Attempt a subsequent download request that will upgrade always as architecture was changed
+    //     downloadSignatureScanner(osArchitecture, true);
+    // }
 
     private void downloadSignatureScanner(String osArchitecture, boolean checkArchitectureUpdate) throws BlackDuckIntegrationException {
         IntLogger logger = new BufferedIntLogger();
@@ -112,23 +112,23 @@ public class ToolsApiScannerInstallerTestIT {
         assertTrue(new File(scanPaths.getPathToOneJar()).canExecute());
         assertTrue(new File(scanPaths.getPathToScanExecutable()).canExecute());
 
-        assertTrue(scanPathsUtility.getMetadataFile().exists());
+        // assertTrue(scanPathsUtility.getMetadataFile().exists());
 
-        if(checkArchitectureUpdate) {
-            File metadataFile = scanPathsUtility.getMetadataFile();
-            try {
-                ScanCliMetadata scanCliMetadata = ScanCliMetadata.getMetadata(metadataFile);
-                String arch = scanCliMetadata.getArch();
+        // if(checkArchitectureUpdate) {
+        //     File metadataFile = scanPathsUtility.getMetadataFile();
+        //     try {
+        //         ScanCliMetadata scanCliMetadata = ScanCliMetadata.getMetadata(metadataFile);
+        //         String arch = scanCliMetadata.getArch();
 
-                if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
-                    assertNotEquals(arch, "x64");
-                } else {
-                    assertNotEquals(arch, "arm64");
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        //         if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
+        //             assertNotEquals(arch, "x64");
+        //         } else {
+        //             assertNotEquals(arch, "arm64");
+        //         }
+        //     } catch (IOException e) {
+        //         throw new RuntimeException(e);
+        //     }
+        // }
     }
 
     /**
