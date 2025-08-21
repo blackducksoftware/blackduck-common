@@ -22,12 +22,14 @@ import com.blackduck.integration.rest.response.Response;
 import com.blackduck.integration.util.CleanupZipExpander;
 import com.blackduck.integration.util.OperatingSystemType;
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.io.FileUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.cert.Certificate;
@@ -59,6 +61,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
     private final String osArchitecture;
+    private File versionFile;
 
     public ToolsApiScannerInstaller(
             IntLogger logger,
@@ -109,56 +112,48 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
+        versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
         File scanCliMetadataFile = scanPathsUtility.getMetadataFile();
 
         try {
-            ScanCliMetadata scanCliMetadata;
-            if (scanCliMetadataFile == null || !scanCliMetadataFile.exists()) {
-                logger.info("No metadata file exists, assuming this is new installation and the signature scanner should be downloaded.");
-                scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, "");
-               
-                // Delete version file if needed for upgrade scenario, since we do not delete files under that directory
-                // TODO delete this section once we reach end of support for 10.6.0 and below versions
-
-                File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
-                if (versionFile.exists()) {
-                    boolean deleted = versionFile.delete();
-                    if (!deleted) {
-                        logger.warn("Failed to delete version file: " + versionFile.getAbsolutePath());
-                    } else {
-                        logger.debug("Successfully deleted version file: " + versionFile.getAbsolutePath());
+            if (scanCliMetadataFile != null && scanCliMetadataFile.exists()) {
+                ScanCliMetadata scanCliMetadata = ScanCliMetadata.getMetadata(scanCliMetadataFile);
+                // determine last version from the file
+                String localScannerVersion = scanCliMetadata.getToolVersion();
+                
+                String localArchitecture = scanCliMetadata.getArch();
+                if (localArchitecture.equals(ARM64_CONSTANT)) {
+                    if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
+                        localScannerVersion = "";
+                    }
+                } else if (localArchitecture.equals(X64_CONSTANT)) {
+                    if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
+                        localScannerVersion = "";
                     }
                 }
 
-                return installDirectory;
-            }
+                String os = scanCliMetadata.getOs();
 
-            scanCliMetadata = ScanCliMetadata.getMetadata(scanCliMetadataFile);
-            // determine last version from the file
-            String localScannerVersion = scanCliMetadata.getToolVersion();
-            
-            String localArchitecture = scanCliMetadata.getArch();
-            if (localArchitecture.equals(ARM64_CONSTANT)) {
-                if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
+                if(!checkOSValue(os)) {
                     localScannerVersion = "";
                 }
-            } else if (localArchitecture.equals(X64_CONSTANT)) {
-                if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
-                    localScannerVersion = "";
-                }
+
+                logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
+                // We will call the tool download API and update our local signature scanner only if it happens to be outdated
+                scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
+            } else if (versionFile.exists()) {
+                //TODO delete this file when Detect 10.6.0 and lower reach end of support
+                // A version file exists, so we have to compare to determine if a download should occur.
+                String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+                logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
+
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
+            } else {
+                logger.info("No metadata file exists, assuming this is new installation and the signature scanner should be downloaded.");
+                scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, "");
             }
-
-            String os = scanCliMetadata.getOs();
-
-            if(!checkOSValue(os)) {
-                localScannerVersion = "";
-            }
-
-            logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
-            // We will call the tool download API and update our local signature scanner only if it happens to be outdated
-            scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
         }
@@ -296,6 +291,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
 
                 connectAndGetServerCertificate(downloadUrl, scanPaths);
+
+                //TODO delete this file when Detect 10.6.0 and lower reach end of support
+                FileUtils.writeStringToFile(versionFile, latestScannerVersion, Charset.defaultCharset());
 
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
                 return scanPathsUtility.getMetadataFile();
