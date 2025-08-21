@@ -274,7 +274,7 @@ public class ProjectSyncModel {
         return deepLicenseDataEnabled;
     }
 
-    public void setDeepLicenseDataEnabledEnabled(Boolean deepLicenseDataEnabled) {
+    public void setDeepLicenseDataEnabled(Boolean deepLicenseDataEnabled) {
         this.deepLicenseDataEnabled = deepLicenseDataEnabled;
         fieldsWithSetValues.add(ProjectSyncModel.DEEP_LICENSE_DATA_ENABLED_FIELD);
     }
