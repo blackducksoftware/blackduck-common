@@ -48,6 +48,9 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private static final String ALPINE_OS_RELEASE_PATH = "/etc/alpine-release";
     private static final String OS_RELEASE_PATH = "/etc/os-release";
     private static final String OS_RELEASE_ALTERNATE_PATH = "/usr/lib/os-release";
+    private static final String ARM64_CONSTANT = "arm64";
+    private static final String AARCH64_CONSTANT = "aarch64";
+    private static final String X64_CONSTANT = "x64";
 
     private final IntLogger logger;
     private final BlackDuckHttpClient blackDuckHttpClient;
@@ -58,6 +61,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     private final OperatingSystemType operatingSystemType;
     private final File installDirectory;
     private final String osArchitecture;
+    private File versionFile;
 
     public ToolsApiScannerInstaller(
             IntLogger logger,
@@ -108,27 +112,49 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
         File scannerExpansionDirectory = new File(installDirectory, BLACK_DUCK_SIGNATURE_SCANNER_INSTALL_DIRECTORY);
         scannerExpansionDirectory.mkdirs();
 
-        File versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
+        versionFile = new File(scannerExpansionDirectory, VERSION_FILENAME);
         HttpUrl downloadUrl = getDownloadUrl();
 
+        File scanCliMetadataFile = scanPathsUtility.getMetadataFile();
+
         try {
-            String scannerVersion;
-            if (!versionFile.exists()) {
-                logger.info("No version file exists, assuming this is new installation and the signature scanner should be downloaded.");
-                scannerVersion = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, "");
-                // Version file creation should happen after successful download
-                logger.debug("The version file has not been created yet so creating it now.");
-                FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
-                return installDirectory;
-            }
-            // A version file exists, so we have to compare to determine if a download should occur.
-            String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
-            logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
-            // We will call the tool download API and update our local signature scanner only if it happens to be outdated.
-            scannerVersion = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
-            // Update version file if needed
-            if (localScannerVersion != scannerVersion) {
-                FileUtils.writeStringToFile(versionFile, scannerVersion, Charset.defaultCharset());
+            if (scanCliMetadataFile != null && scanCliMetadataFile.exists()) {
+                ScanCliMetadata scanCliMetadata = ScanCliMetadata.getMetadata(scanCliMetadataFile);
+                // determine last version from the file
+                String localScannerVersion = scanCliMetadata.getToolVersion();
+                
+                String localArchitecture = scanCliMetadata.getArch();
+
+                // Doing the check to see if the current expected architecture value and the already existing architecture mismatch, if it does setting the version to empty triggers a fresh download
+                if (localArchitecture.equals(ARM64_CONSTANT)) {
+                    if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
+                        localScannerVersion = "";
+                    }
+                } else if (localArchitecture.equals(X64_CONSTANT)) {
+                    if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
+                        localScannerVersion = "";
+                    }
+                }
+
+                String os = scanCliMetadata.getOs();
+
+                if(!checkOSValue(os)) {
+                    localScannerVersion = "";
+                }
+
+                logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
+                // We will call the tool download API and update our local signature scanner only if it happens to be outdated
+                scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
+            } else if (versionFile.exists()) {
+                //TODO delete this file when Detect 10.6.0 and lower reach end of support
+                // A version file exists, so we have to compare to determine if a download should occur.
+                String localScannerVersion = FileUtils.readFileToString(versionFile, Charset.defaultCharset());
+                logger.debug(String.format("Locally installed signature scanner version: %s", localScannerVersion));
+
+                downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, localScannerVersion);
+            } else {
+                logger.info("No metadata file exists, assuming this is new installation and the signature scanner should be downloaded.");
+                scanCliMetadataFile = downloadSignatureScanner(scannerExpansionDirectory, downloadUrl, "");
             }
         } catch (Exception e) {
             throw new BlackDuckIntegrationException("The Black Duck Signature Scanner could not be downloaded successfully: " + e.getMessage(), e);
@@ -136,6 +162,23 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
         logger.info("The Black Duck Signature Scanner downloaded/found successfully: " + installDirectory.getAbsolutePath());
         return installDirectory;
+    }
+
+    private boolean checkOSValue(String os) {
+
+        // Doing the check to see if the current expected os value and the already existing os mismatch, if it does setting the version to empty triggers a fresh download
+
+        if (os.equals(MAC_PLATFORM_PARAMETER_VALUE) && !operatingSystemType.equals(OperatingSystemType.MAC)) {
+            return false;
+        } else if (os.equals(WINDOWS_PLATFORM_PARAMETER_VALUE) && !operatingSystemType.equals(OperatingSystemType.WINDOWS)) {
+            return false;
+        } else if (os.equals(ALPINE_PLATFORM_PARAMETER_VALUE) && isAlpineLinux() && !(operatingSystemType.equals(OperatingSystemType.ALPINE_LINUX) || operatingSystemType.equals(OperatingSystemType.LINUX))) {
+            return false;
+        } else if (os.equals(LINUX_PLATFORM_PARAMETER_VALUE) && !(operatingSystemType.equals(OperatingSystemType.LINUX))) {
+            return false;
+        }
+
+        return true;
     }
 
     protected HttpUrl getDownloadUrl() throws BlackDuckIntegrationException {
@@ -162,8 +205,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
             platform = LINUX_PLATFORM_PARAMETER_VALUE;
         }
 
-        if (osArchitecture.equals("aarch64") || osArchitecture.equals("arm64")) {
-            platform = platform + "_arm64";
+        if (osArchitecture.equals(AARCH64_CONSTANT) || osArchitecture.equals(ARM64_CONSTANT)) {
+            platform = platform + "_" + ARM64_CONSTANT;
         }
 
         url.append(PLATFORM_PARAMETER_KEY + "/" + platform);
@@ -176,7 +219,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
     }
 
     private boolean isAlpineLinux() {
-        if (!osArchitecture.equals("aarch64") && !osArchitecture.equals("arm64")) {
+        if (!osArchitecture.equals(AARCH64_CONSTANT) && !osArchitecture.equals(ARM64_CONSTANT)) {
             return false;
         }
 
@@ -213,7 +256,8 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
      * @return The version of scan-cli that will be used for Signature Scanning.
      * @throws IOException, IntegrationException, ArchiveException
      */
-    protected String downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException {
+    @Override
+    protected File downloadSignatureScanner(File scannerExpansionDirectory, HttpUrl downloadUrl, String localScannerVersion) throws IOException, IntegrationException, ArchiveException {
         BlackDuckRequestBuilder requestBuilder = new BlackDuckRequestBuilder()
                 .url(downloadUrl)
                 .addHeader("Version", localScannerVersion);
@@ -252,8 +296,11 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
 
                 connectAndGetServerCertificate(downloadUrl, scanPaths);
 
+                //TODO delete this file when Detect 10.6.0 and lower reach end of support
+                FileUtils.writeStringToFile(versionFile, latestScannerVersion, Charset.defaultCharset());
+
                 logger.info("Black Duck Signature Scanner downloaded successfully.");
-                return latestScannerVersion;
+                return scanPathsUtility.getMetadataFile();
             } else if (response.getStatusCode() == 304) {
                 // If no need to update, response is HTTP 304 Not modified
                 logger.debug("Locally installed Signature Scanner version is up to date - skipping download.");
@@ -261,7 +308,7 @@ public class ToolsApiScannerInstaller extends ApiScannerInstaller {
                 ScanPaths scanPaths = scanPathsUtility.searchForScanPaths(scannerExpansionDirectory.getParentFile());
                 connectAndGetServerCertificate(downloadUrl, scanPaths);
 
-                return localScannerVersion;
+                return scanPathsUtility.getMetadataFile();
             } else {
                 logger.debug("Unable to download Signature Scanner. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());
                 throw new IntegrationException("Unable to download Black Duck Signature Scanner. Response code: " + response.getStatusCode() + " " + response.getStatusMessage());

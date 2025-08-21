@@ -12,6 +12,7 @@ import com.blackduck.integration.function.ThrowingSupplier;
 import com.blackduck.integration.log.IntLogger;
 import com.blackduck.integration.util.IntEnvironmentVariables;
 import com.blackduck.integration.util.OperatingSystemType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,7 @@ public class ScanPathsUtility {
     private static final String OTHER_JAVA_PATH = String.format(JAVA_PATH_FORMAT, "java");
     private static final String CACERTS_PATH = "lib" + File.separator + "security" + File.separator + "cacerts";
     private static final String STANDALONE_JAR_PATH = "cache" + File.separator + "scan.cli.impl-standalone.jar";
+    private static final String METADATA_FILE_NAME = "metadata.json";
 
     private static final FileFilter EXCLUDE_NON_SCAN_CLI_DIRECTORIES_FILTER = file -> !file.isHidden() && !file.getName().contains("windows") && file.isDirectory();
     private static final FileFilter JRE_DIRECTORY_FILTER = file -> "jre".equalsIgnoreCase(file.getName()) && file.isDirectory();
@@ -48,6 +50,8 @@ public class ScanPathsUtility {
     private final IntLogger logger;
     private final IntEnvironmentVariables intEnvironmentVariables;
     private final OperatingSystemType operatingSystemType;
+
+    private File scanCliMetadataFile;
 
     public ScanPathsUtility(final IntLogger logger, final IntEnvironmentVariables intEnvironmentVariables, final OperatingSystemType operatingSystemType) {
         this.logger = logger;
@@ -95,6 +99,8 @@ public class ScanPathsUtility {
         final String pathToOneJar = findPathToStandaloneJar(libDirectory);
         final String pathToScanExecutable = findPathToScanCliJar(libDirectory);
 
+        scanCliMetadataFile = new File(installDirectory, METADATA_FILE_NAME);
+    
         return new ScanPaths(pathToJavaExecutable, pathToCacerts, pathToOneJar, pathToScanExecutable, managedByLibrary);
     }
 
@@ -219,4 +225,7 @@ public class ScanPathsUtility {
         return javaHomeSupplier.get();
     }
 
+    public File getMetadataFile() {
+        return scanCliMetadataFile;
+    }
 }
