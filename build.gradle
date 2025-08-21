@@ -1,6 +1,6 @@
 buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle', to: buildscript
-    project.ext { managedCgpVersion = '2.1.1' }
+    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
 
     ext {
         javaTargetCompatibility = 8
@@ -14,7 +14,7 @@ project.ext.moduleName = 'com.blackduck.integration.blackduck-common'
 project.ext.javaUseAutoModuleName = 'true'
 project.ext.junitShowStandardStreams = 'true'
 
-version = '67.0.18'
+version = '67.0.19-SNAPSHOT'
 
 description = 'A library for using various capabilities of Black Duck, notably the REST API and signature scanning.'
 
