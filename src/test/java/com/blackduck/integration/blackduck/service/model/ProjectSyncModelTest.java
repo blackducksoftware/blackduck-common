@@ -91,6 +91,8 @@ public class ProjectSyncModelTest {
         projectSyncModel.setReleasedOn(new Date());
         projectSyncModel.setVersionLicenseUrl("versionLicenseUrl");
         projectSyncModel.setUpdate(true);
+        projectSyncModel.setDeepLicenseDataEnabled(true);
+        projectSyncModel.setDeepLicenseDataSnippetEnabled(true);
 
         assertFalse(((Set) setFields.get(projectSyncModel)).isEmpty());
         assertEquals(allFields, setFields.get(projectSyncModel));
@@ -130,6 +132,8 @@ public class ProjectSyncModelTest {
         projectSyncModel.setVersionName("version name");
         projectSyncModel.setPhase(ProjectVersionPhaseType.DEVELOPMENT);
         projectSyncModel.setUpdate(true);
+        projectSyncModel.setDeepLicenseDataEnabled(true);
+        projectSyncModel.setDeepLicenseDataSnippetEnabled(true);
 
         ProjectRequest projectRequest = projectSyncModel.createProjectRequest();
         assertEquals("project name", projectRequest.getName());
@@ -147,6 +151,8 @@ public class ProjectSyncModelTest {
         assertEquals(ProjectVersionPhaseType.DEVELOPMENT, projectRequest.getVersionRequest().getPhase());
         assertEquals(ProjectVersionDistributionType.INTERNAL, projectRequest.getVersionRequest().getDistribution());
         assertEquals(true, projectRequest.getVersionRequest().getUpdate());
+        assertEquals(true, projectRequest.getDeepLicenseDataEnabled());
+        assertEquals(true, projectRequest.getDeepLicenseDataSnippetEnabled());
     }
 
 }

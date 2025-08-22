@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.12'
+    api 'com.blackduck.integration:blackduck-common-api:2023.4.2.13'
     api 'com.blackduck.integration:phone-home-client:7.0.1'
     api 'com.blackduck.integration:integration-bdio:27.0.4'
     api 'com.blackducksoftware.bdio:bdio2:3.2.12'
