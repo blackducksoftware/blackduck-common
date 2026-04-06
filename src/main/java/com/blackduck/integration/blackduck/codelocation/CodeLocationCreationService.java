@@ -47,6 +47,12 @@ public class CodeLocationCreationService extends DataService {
         return new CodeLocationCreationData<>(notificationTaskRange, output);
     }
 
+    public <T extends CodeLocationBatchOutput<?>> CodeLocationCreationData<T> createCodeLocationsWithoutNotificationTaskRange(CodeLocationCreationRequest<T> codeLocationCreationRequest) throws IntegrationException {
+        T output = codeLocationCreationRequest.executeRequest();
+
+        return new CodeLocationCreationData<>(null, output);
+    }
+
     public <T extends CodeLocationBatchOutput<?>> T createCodeLocationsAndWait(CodeLocationCreationRequest<T> codeLocationCreationRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return createCodeLocationsAndWait(codeLocationCreationRequest, timeoutInSeconds, DEFAULT_WAIT_INTERVAL_IN_SECONDS);
     }

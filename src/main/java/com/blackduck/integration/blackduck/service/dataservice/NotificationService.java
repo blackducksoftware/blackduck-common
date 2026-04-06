@@ -85,6 +85,7 @@ public class NotificationService extends DataService {
      * @throws IntegrationException
      */
     public Date getLatestUserNotificationDate(UserView userView) throws IntegrationException {
+        logger.warn("Fetching latest notification date for user via a low‑performance API.");
         BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
         BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
         List<NotificationUserView> userNotifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
