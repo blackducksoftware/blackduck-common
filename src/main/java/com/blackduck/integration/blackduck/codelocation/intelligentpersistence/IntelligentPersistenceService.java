@@ -46,6 +46,11 @@ public class IntelligentPersistenceService extends DataService {
         return uploadBdio(uploadRequest);
     }
 
+    public CodeLocationCreationData<UploadBatchOutput> uploadBdioWithoutNotificationsQuery(UploadBatch uploadBatch, long timeoutInSeconds, long clientStartTime) throws IntegrationException {
+        IntelligentPersistenceCodeLocationCreationRequest uploadRequest = this.createUploadRequest(uploadBatch, timeoutInSeconds, clientStartTime);
+        return codeLocationCreationService.createCodeLocationsWithoutNotificationTaskRange(uploadRequest);
+    }
+
     public UploadBatchOutput uploadBdioAndWait(CodeLocationCreationRequest<UploadBatchOutput> uploadRequest, long timeoutInSeconds) throws IntegrationException, InterruptedException {
         return codeLocationCreationService.createCodeLocationsAndWait(uploadRequest, timeoutInSeconds);
     }
