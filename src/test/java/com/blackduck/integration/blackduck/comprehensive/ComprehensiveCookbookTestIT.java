@@ -163,7 +163,7 @@ public class ComprehensiveCookbookTestIT {
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
         UserView currentUser = blackDuckServices.userService.findCurrentUser();
-        Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+        Date userStartDate = new Date(System.currentTimeMillis());
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
         // import the bdio
@@ -197,7 +197,7 @@ public class ComprehensiveCookbookTestIT {
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
         UserView currentUser = blackDuckServices.userService.findCurrentUser();
-        Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+        Date userStartDate =  new Date(System.currentTimeMillis());
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
         File scanFile = intHttpClientTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");

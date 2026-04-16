@@ -91,7 +91,7 @@ public class CodeLocationCreationService extends DataService {
 
         UrlSingleResponse<UserView> userResponse = apiDiscovery.metaSingleResponse(ApiDiscovery.CURRENT_USER_PATH);
         UserView currentUser = blackDuckApiClient.getResponse(userResponse);
-        Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
+        Date startDate = new Date(System.currentTimeMillis());
         Date endDate = Date.from(threeDaysLater.atZone(ZoneOffset.UTC).toInstant());
 
         return new NotificationTaskRange(startTime, startDate, endDate);
