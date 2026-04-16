@@ -104,7 +104,7 @@ public class BinaryScanUploadServiceTestIT {
 
     private BinaryScanData createBinaryScanData(BlackDuckServices blackDuckServices, BinaryScan binaryScan) throws IntegrationException {
         UserView currentUser = blackDuckServices.userService.findCurrentUser();
-        Date userStartDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+        Date userStartDate = new Date(System.currentTimeMillis());
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
 
         return new BinaryScanData(currentUser, userStartDate, systemStartDate, binaryScan);

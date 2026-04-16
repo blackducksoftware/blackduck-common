@@ -80,17 +80,6 @@ public class NotificationService extends DataService {
         return getFirstCreatedAtDate(notifications);
     }
 
-    /**
-     * @return The java.util.Date of the most recent notification in the user's stream. If there are no notifications, the current date will be returned. This can set an initial start time window for all future notifications.
-     * @throws IntegrationException
-     */
-    public Date getLatestUserNotificationDate(UserView userView) throws IntegrationException {
-        BlackDuckRequestBuilder blackDuckRequestBuilder = createLatestDateRequestBuilder();
-        BlackDuckMultipleRequest<NotificationUserView> requestMultiple = blackDuckRequestBuilder.buildBlackDuckRequest(userNotificationsResponses.apply(userView));
-        List<NotificationUserView> userNotifications = blackDuckApiClient.getSomeResponses(requestMultiple, 1);
-        return getFirstCreatedAtDate(userNotifications);
-    }
-
     private Date getFirstCreatedAtDate(List<? extends NotificationView> notifications) {
         if (notifications.size() == 1) {
             return notifications.get(0).getCreatedAt();

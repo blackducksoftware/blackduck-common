@@ -113,7 +113,7 @@ public class CreateProjectWithBdioAndVerifyBOMTest {
     }
 
     private void uploadAndVerifyBdio(UploadBatch uploadBatch, Set<String> expectedCodeLocationNames) throws IntegrationException, InterruptedException {
-        Date startDate = blackDuckServices.notificationService.getLatestUserNotificationDate(currentUser);
+        Date startDate =  new Date(System.currentTimeMillis());
         System.out.println("start date: ");
         System.out.println(RestConstants.formatDate(startDate));
 

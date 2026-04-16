@@ -42,6 +42,11 @@ public class BinaryScanUploadService extends DataService {
         return uploadBinaryScan(uploadRequest);
     }
 
+    public CodeLocationCreationData<BinaryScanBatchOutput> uploadBinaryScanWithoutNotificationsQuery(BinaryScanBatch uploadBatch) throws IntegrationException {
+        BinaryScanCodeLocationCreationRequest uploadRequest = createUploadRequest(uploadBatch);
+        return codeLocationCreationService.createCodeLocationsWithoutNotificationTaskRange(uploadRequest);
+    }
+
     public CodeLocationCreationData<BinaryScanBatchOutput> uploadBinaryScan(BinaryScan binaryScan) throws IntegrationException {
         BinaryScanBatch uploadBatch = new BinaryScanBatch();
         uploadBatch.addBinaryScan(binaryScan);

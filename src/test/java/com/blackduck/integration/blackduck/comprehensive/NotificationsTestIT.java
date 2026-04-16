@@ -50,7 +50,7 @@ public class NotificationsTestIT {
         ProjectSyncModel projectSyncModel = ProjectSyncModel.createWithDefaults(projectName, projectVersionName);
 
         UserView currentUser = userService.findCurrentUser();
-        Date startDate = notificationService.getLatestUserNotificationDate(currentUser);
+        Date startDate =  new Date(System.currentTimeMillis());
         Date endDate = Date.from(startDate.toInstant().plus(1, ChronoUnit.DAYS));
         List<String> notificationTypes = new ArrayList<>();
         notificationTypes.add(NotificationType.PROJECT.name());
