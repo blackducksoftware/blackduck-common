@@ -163,8 +163,12 @@ public class ComprehensiveCookbookTestIT {
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
         UserView currentUser = blackDuckServices.userService.findCurrentUser();
-        Date userStartDate = new Date(System.currentTimeMillis());
+        // Both dates must use the same server-side clock. Using System.currentTimeMillis() for userStartDate
+        // causes clock skew: if the build machine lags the BD server, the preceding test's BOM computed
+        // notification (timing worsened by the bdio library update in 8152fdab) bleeds into this test's
+        // user notification query window.
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
+        Date userStartDate = systemStartDate;
 
         // import the bdio
         File file = intHttpClientTestHelper.getFile("bdio/mtglist_bdio.jsonld");
@@ -197,8 +201,12 @@ public class ComprehensiveCookbookTestIT {
         setupPolicyCheck(blackDuckServices, checkPolicyData);
 
         UserView currentUser = blackDuckServices.userService.findCurrentUser();
-        Date userStartDate =  new Date(System.currentTimeMillis());
+        // Both dates must use the same server-side clock. Using System.currentTimeMillis() for userStartDate
+        // causes clock skew: if the build machine lags the BD server, the preceding test's BOM computed
+        // notification (timing worsened by the bdio library update in 8152fdab) bleeds into this test's
+        // user notification query window.
         Date systemStartDate = blackDuckServices.notificationService.getLatestNotificationDate();
+        Date userStartDate = systemStartDate;
 
         File scanFile = intHttpClientTestHelper.getFile("hub-artifactory-1.0.1-RC.zip");
         File parentDirectory = scanFile.getParentFile();
