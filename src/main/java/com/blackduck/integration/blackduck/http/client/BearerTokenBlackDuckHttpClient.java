@@ -49,6 +49,10 @@ public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
 
     @Override
     protected void completeAuthenticationRequest(HttpUriRequest request, Response response) {
-        // no-op: Authorization: Bearer header is already set as a common header in the constructor
+        // Re-add the bearer header stripped by handleErrorResponse on 401.
+        // Since bearer tokens are externally issued, we cannot fetch a new one — we re-add the same one.
+        // If the token is truly expired the retry will 401 again and exhaust the retry loop.
+        request.setHeader(AuthenticationSupport.AUTHORIZATION_HEADER, authorizationHeaderValue);
+        addCommonRequestHeader(AuthenticationSupport.AUTHORIZATION_HEADER, authorizationHeaderValue);
     }
 }
