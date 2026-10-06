@@ -56,6 +56,10 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return new BlackDuckServerConfigBuilder(KEYS.bearerToken);
     }
 
+    public static BlackDuckServerConfigBuilder newTokenBuilder() {
+        return new BlackDuckServerConfigBuilder(KEYS.anyToken);
+    }
+
     private final HttpUrl blackDuckUrl;
     private final NameVersion solutionDetails;
     private final int timeoutSeconds;
