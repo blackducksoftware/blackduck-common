@@ -52,6 +52,7 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     public static final BuilderPropertyKey TRUST_CERT_KEY = new BuilderPropertyKey("BLACKDUCK_TRUST_CERT");
 
     public static final BuilderPropertyKey API_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_API_TOKEN");
+    public static final BuilderPropertyKey BEARER_TOKEN_KEY = new BuilderPropertyKey("BLACKDUCK_BEARER_TOKEN");
 
     public static final BuilderPropertyKey USERNAME_KEY = new BuilderPropertyKey("BLACKDUCK_USERNAME");
     public static final BuilderPropertyKey PASSWORD_KEY = new BuilderPropertyKey("BLACKDUCK_PASSWORD");
@@ -87,8 +88,10 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
         NameVersion solutionDetails = getSolutionDetails();
         ProxyInfo proxyInfo = getProxyInfo();
-        if (StringUtils.isNotBlank(getApiToken())) {
-            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), getApiToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+        if (StringUtils.isNotBlank(getBearerToken())) {
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), null, getBearerToken(), proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
+        } else if (StringUtils.isNotBlank(getApiToken())) {
+            return new BlackDuckServerConfig(blackDuckUrl, solutionDetails, getTimeoutInSeconds(), getApiToken(), null, proxyInfo, isTrustCert(), intEnvironmentVariables, gson, objectMapper, authenticationSupport, executorService);
         } else {
             String username = getUsername();
             String password = getPassword();
@@ -138,14 +141,18 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     }
 
     private void validateConnectionDetails(BuilderStatus builderStatus) {
-        if (builderProperties.getKeys().contains(API_TOKEN_KEY)) {
+        if (builderProperties.getKeys().contains(BEARER_TOKEN_KEY)) {
+            if (StringUtils.isBlank(getBearerToken())) {
+                builderStatus.addErrorMessage("Configured to use Bearer Token but token was not set.");
+            }
+        } else if (builderProperties.getKeys().contains(API_TOKEN_KEY)) {
             if (StringUtils.isBlank(getApiToken())) {
                 builderStatus.addErrorMessage("Configured to use API Token but token was not set.");
             }
         } else if (builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY)) {
             validateBlackDuckCredentials(builderStatus);
         } else {
-            builderStatus.addErrorMessage("Must be configured to use an API Token or username/password.");
+            builderStatus.addErrorMessage("Must be configured to use a Bearer Token, API Token, or username/password.");
         }
     }
 
@@ -372,6 +379,15 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
 
     public BlackDuckServerConfigBuilder setApiToken(String apiToken) {
         builderProperties.set(API_TOKEN_KEY, apiToken);
+        return this;
+    }
+
+    public String getBearerToken() {
+        return builderProperties.get(BEARER_TOKEN_KEY);
+    }
+
+    public BlackDuckServerConfigBuilder setBearerToken(String bearerToken) {
+        builderProperties.set(BEARER_TOKEN_KEY, bearerToken);
         return this;
     }
 

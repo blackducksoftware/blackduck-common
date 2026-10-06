@@ -8,6 +8,7 @@
 package com.blackduck.integration.blackduck.configuration;
 
 import com.blackduck.integration.blackduck.http.client.ApiTokenBlackDuckHttpClient;
+import com.blackduck.integration.blackduck.http.client.BearerTokenBlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.client.BlackDuckHttpClient;
 import com.blackduck.integration.blackduck.http.client.CookieHeaderParser;
 import com.blackduck.integration.blackduck.http.client.CredentialsBlackDuckHttpClient;
@@ -51,11 +52,16 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return new BlackDuckServerConfigBuilder(KEYS.credentials);
     }
 
+    public static BlackDuckServerConfigBuilder newBearerTokenBuilder() {
+        return new BlackDuckServerConfigBuilder(KEYS.bearerToken);
+    }
+
     private final HttpUrl blackDuckUrl;
     private final NameVersion solutionDetails;
     private final int timeoutSeconds;
     private final Credentials credentials;
     private final String apiToken;
+    private final String bearerToken;
     private final ProxyInfo proxyInfo;
     private final boolean alwaysTrustServerCertificate;
     private final IntEnvironmentVariables intEnvironmentVariables;
@@ -68,23 +74,23 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     BlackDuckServerConfig(
         HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, Credentials credentials, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
         AuthenticationSupport authenticationSupport, CookieHeaderParser cookieHeaderParser, ExecutorService executorService) {
-        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser, executorService, credentials,
-            null);
+        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, cookieHeaderParser, executorService, credentials, null, null);
     }
 
     BlackDuckServerConfig(
-        HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, String apiToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson, ObjectMapper objectMapper,
-        AuthenticationSupport authenticationSupport, ExecutorService executorService) {
-        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, null, executorService, null, apiToken);
+        HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, String apiToken, String bearerToken, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson,
+        ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, ExecutorService executorService) {
+        this(url, solutionDetails, timeoutSeconds, proxyInfo, alwaysTrustServerCertificate, intEnvironmentVariables, gson, objectMapper, authenticationSupport, null, executorService, null, apiToken, bearerToken);
     }
 
     private BlackDuckServerConfig(HttpUrl url, NameVersion solutionDetails, int timeoutSeconds, ProxyInfo proxyInfo, boolean alwaysTrustServerCertificate, IntEnvironmentVariables intEnvironmentVariables, Gson gson,
         ObjectMapper objectMapper, AuthenticationSupport authenticationSupport, CookieHeaderParser cookieHeaderParser, ExecutorService executorService, Credentials credentials,
-        String apiToken) {
+        String apiToken, String bearerToken) {
         blackDuckUrl = url;
         this.solutionDetails = solutionDetails;
         this.credentials = credentials;
         this.apiToken = apiToken;
+        this.bearerToken = bearerToken;
         this.timeoutSeconds = timeoutSeconds;
         this.proxyInfo = proxyInfo;
         this.alwaysTrustServerCertificate = alwaysTrustServerCertificate;
@@ -111,7 +117,9 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         if (getCredentials().isPresent() && getCredentials().get().getUsername().isPresent()) {
             logger.alwaysLog("--> Black Duck User: " + getCredentials().get().getUsername().get());
         }
-        if (StringUtils.isNotBlank(apiToken)) {
+        if (StringUtils.isNotBlank(bearerToken)) {
+            logger.alwaysLog("--> Black Duck Bearer Token Used");
+        } else if (StringUtils.isNotBlank(apiToken)) {
             logger.alwaysLog("--> Black Duck API Token Used");
         }
         if (alwaysTrustServerCertificate) {
@@ -189,7 +197,9 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
     }
 
     public BlackDuckHttpClient createBlackDuckHttpClient(IntLogger logger) {
-        if (usingApiToken()) {
+        if (usingBearerToken()) {
+            return createBearerTokenBlackDuckHttpClient(logger);
+        } else if (usingApiToken()) {
             return createApiTokenBlackDuckHttpClient(logger);
         } else {
             return createCredentialsBlackDuckHttpClient(logger);
@@ -210,8 +220,16 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         return new ApiTokenBlackDuckHttpClient(logger, gson, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), getSolutionDetails(), authenticationSupport, getApiToken().orElse(null));
     }
 
+    public BearerTokenBlackDuckHttpClient createBearerTokenBlackDuckHttpClient(IntLogger logger) {
+        return new BearerTokenBlackDuckHttpClient(logger, gson, getTimeout(), isAlwaysTrustServerCertificate(), getProxyInfo(), getBlackDuckUrl(), getSolutionDetails(), authenticationSupport, getBearerToken().orElse(null));
+    }
+
     public boolean usingApiToken() {
         return StringUtils.isNotBlank(apiToken);
+    }
+
+    public boolean usingBearerToken() {
+        return StringUtils.isNotBlank(bearerToken);
     }
 
     public HttpUrl getBlackDuckUrl() {
@@ -228,6 +246,10 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
 
     public Optional<String> getApiToken() {
         return Optional.ofNullable(apiToken);
+    }
+
+    public Optional<String> getBearerToken() {
+        return Optional.ofNullable(bearerToken);
     }
 
     public ProxyInfo getProxyInfo() {
