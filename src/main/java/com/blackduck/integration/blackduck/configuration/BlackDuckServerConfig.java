@@ -121,9 +121,9 @@ public class BlackDuckServerConfig extends Stringable implements Buildable {
         if (getCredentials().isPresent() && getCredentials().get().getUsername().isPresent()) {
             logger.alwaysLog("--> Black Duck User: " + getCredentials().get().getUsername().get());
         }
-        if (StringUtils.isNotBlank(bearerToken)) {
+        if (usingBearerToken()) {
             logger.alwaysLog("--> Black Duck Bearer Token Used");
-        } else if (StringUtils.isNotBlank(apiToken)) {
+        } else if (usingApiToken()) {
             logger.alwaysLog("--> Black Duck API Token Used");
         }
         if (alwaysTrustServerCertificate) {

@@ -21,6 +21,7 @@ import org.apache.http.client.methods.RequestBuilder;
 
 public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
     private final String bearerToken;
+    private final String authorizationHeaderValue;
 
     public BearerTokenBlackDuckHttpClient(
         IntLogger logger, Gson gson, int timeout, boolean alwaysTrustServerCertificate, ProxyInfo proxyInfo,
@@ -30,7 +31,8 @@ public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
             throw new IllegalArgumentException("No bearer token was found.");
         }
         this.bearerToken = bearerToken;
-        addCommonRequestHeader(AuthenticationSupport.AUTHORIZATION_HEADER, "Bearer " + bearerToken);
+        this.authorizationHeaderValue = "Bearer " + bearerToken;
+        addCommonRequestHeader(AuthenticationSupport.AUTHORIZATION_HEADER, authorizationHeaderValue);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         // through the Apache client bypass path used by authenticationSupport.attemptAuthentication.
         HttpUrl currentUserUrl = getBlackDuckUrl().appendRelativeUrl("api/current-user");
         RequestBuilder requestBuilder = RequestBuilder.get()
-            .addHeader(AuthenticationSupport.AUTHORIZATION_HEADER, "Bearer " + bearerToken);
+            .addHeader(AuthenticationSupport.AUTHORIZATION_HEADER, authorizationHeaderValue);
         return authenticationSupport.attemptAuthentication(this, currentUserUrl, requestBuilder);
     }
 

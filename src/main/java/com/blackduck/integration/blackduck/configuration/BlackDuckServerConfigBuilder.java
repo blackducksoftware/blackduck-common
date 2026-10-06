@@ -141,9 +141,10 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     }
 
     private void validateConnectionDetails(BuilderStatus builderStatus) {
-        boolean bearerTokenRegistered = builderProperties.getKeys().contains(BEARER_TOKEN_KEY);
-        boolean apiTokenRegistered = builderProperties.getKeys().contains(API_TOKEN_KEY);
-        boolean credentialsRegistered = builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY);
+        Set<BuilderPropertyKey> registeredKeys = builderProperties.getKeys();
+        boolean bearerTokenRegistered = registeredKeys.contains(BEARER_TOKEN_KEY);
+        boolean apiTokenRegistered = registeredKeys.contains(API_TOKEN_KEY);
+        boolean credentialsRegistered = registeredKeys.contains(USERNAME_KEY) && registeredKeys.contains(PASSWORD_KEY);
 
         if (bearerTokenRegistered && StringUtils.isNotBlank(getBearerToken())) {
             logger.debug("Configured to use Bearer Token.");
