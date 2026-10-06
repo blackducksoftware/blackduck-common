@@ -141,18 +141,26 @@ public class BlackDuckServerConfigBuilder extends IntegrationBuilder<BlackDuckSe
     }
 
     private void validateConnectionDetails(BuilderStatus builderStatus) {
-        if (builderProperties.getKeys().contains(BEARER_TOKEN_KEY)) {
-            if (StringUtils.isBlank(getBearerToken())) {
-                builderStatus.addErrorMessage("Configured to use Bearer Token but token was not set.");
-            }
-        } else if (builderProperties.getKeys().contains(API_TOKEN_KEY)) {
-            if (StringUtils.isBlank(getApiToken())) {
-                builderStatus.addErrorMessage("Configured to use API Token but token was not set.");
-            }
-        } else if (builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY)) {
+        boolean bearerTokenRegistered = builderProperties.getKeys().contains(BEARER_TOKEN_KEY);
+        boolean apiTokenRegistered = builderProperties.getKeys().contains(API_TOKEN_KEY);
+        boolean credentialsRegistered = builderProperties.getKeys().contains(USERNAME_KEY) && builderProperties.getKeys().contains(PASSWORD_KEY);
+
+        if (bearerTokenRegistered && StringUtils.isNotBlank(getBearerToken())) {
+            logger.debug("Configured to use Bearer Token.");
+        } else if (apiTokenRegistered && StringUtils.isNotBlank(getApiToken())) {
+            logger.debug("Configured to use API Token.");
+        } else if (credentialsRegistered) {
             validateBlackDuckCredentials(builderStatus);
         } else {
-            builderStatus.addErrorMessage("Must be configured to use a Bearer Token, API Token, or username/password.");
+            if (bearerTokenRegistered) {
+                builderStatus.addErrorMessage("Configured to use Bearer Token but token was not set.");
+            }
+            if (apiTokenRegistered) {
+                builderStatus.addErrorMessage("Configured to use API Token but token was not set.");
+            }
+            if (!bearerTokenRegistered && !apiTokenRegistered) {
+                builderStatus.addErrorMessage("No authentication credentials provided. Set a bearer token, API token, or username/password.");
+            }
         }
     }
 
