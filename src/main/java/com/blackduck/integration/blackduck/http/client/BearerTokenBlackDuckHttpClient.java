@@ -20,7 +20,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 
 public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
-    private final String bearerToken;
     private final String authorizationHeaderValue;
 
     public BearerTokenBlackDuckHttpClient(
@@ -30,7 +29,6 @@ public class BearerTokenBlackDuckHttpClient extends DefaultBlackDuckHttpClient {
         if (StringUtils.isBlank(bearerToken)) {
             throw new IllegalArgumentException("No bearer token was found.");
         }
-        this.bearerToken = bearerToken;
         this.authorizationHeaderValue = "Bearer " + bearerToken;
         addCommonRequestHeader(AuthenticationSupport.AUTHORIZATION_HEADER, authorizationHeaderValue);
     }
