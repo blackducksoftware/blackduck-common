@@ -110,7 +110,7 @@ public class ProjectUsersService extends DataService {
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
-        UserGroupView userGroupView = resolveGroupFast(groupName);
+        UserGroupView userGroupView = resolveGroupByName(groupName);
         HttpUrl userGroupUrl = userGroupView.getHref();
         HttpUrl createUrl = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
@@ -118,29 +118,7 @@ public class ProjectUsersService extends DataService {
         blackDuckApiClient.post(createUrl, userGroupRequest);
     }
 
-    // BDSCA-2360: called by AddUserGroupsToProjectOperation for before/after timing benchmark
-    public UserGroupView resolveGroup(String groupName, boolean isFast) throws IntegrationException {
-        return isFast ? resolveGroupFast(groupName) : resolveGroupSlow(groupName);
-    }
-
-    // BDSCA-2360: benchmark only — resolves via slow path then POSTs assignment
-    public void addGroupToProjectSlow(ProjectView projectView, String groupName) throws IntegrationException {
-        UserGroupView userGroupView = resolveGroup(groupName, false);
-        HttpUrl userGroupUrl = userGroupView.getHref();
-        HttpUrl createUrl = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
-        AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
-        userGroupRequest.setGroup(userGroupUrl.string());
-        blackDuckApiClient.post(createUrl, userGroupRequest);
-    }
-
-    // BDSCA-2360: slow path — fetches ALL user groups, client-side linear search
-    private UserGroupView resolveGroupSlow(String groupName) throws IntegrationException {
-        Optional<UserGroupView> match = userGroupService.getGroupByName(groupName);
-        return match.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
-    }
-
-    // BDSCA-2360: fast path (fix) — GET /api/usergroups?q=name:<groupName>&filter=exactName:true
-    private UserGroupView resolveGroupFast(String groupName) throws IntegrationException {
+    private UserGroupView resolveGroupByName(String groupName) throws IntegrationException {
         BlackDuckMultipleRequest<UserGroupView> request = new BlackDuckRequestBuilder()
             .commonGet()
             .addBlackDuckQuery(new BlackDuckQuery("name", groupName))
