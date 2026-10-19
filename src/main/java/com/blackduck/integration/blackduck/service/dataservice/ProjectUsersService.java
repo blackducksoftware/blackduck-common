@@ -111,10 +111,9 @@ public class ProjectUsersService extends DataService {
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
         UserGroupView userGroupView = resolveGroupByName(groupName);
-        HttpUrl userGroupUrl = userGroupView.getHref();
         HttpUrl createUrl = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
-        userGroupRequest.setGroup(userGroupUrl.string());
+        userGroupRequest.setGroup(userGroupView.getHref().string());
         blackDuckApiClient.post(createUrl, userGroupRequest);
     }
 
