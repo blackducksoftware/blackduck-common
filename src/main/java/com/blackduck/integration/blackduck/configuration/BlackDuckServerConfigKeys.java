@@ -17,6 +17,8 @@ public class BlackDuckServerConfigKeys {
 
     public final Set<BuilderPropertyKey> common = new HashSet<>();
     public final Set<BuilderPropertyKey> apiToken = new HashSet<>();
+    public final Set<BuilderPropertyKey> bearerToken = new HashSet<>();
+    public final Set<BuilderPropertyKey> anyToken = new HashSet<>();
     public final Set<BuilderPropertyKey> credentials = new HashSet<>();
     public final Set<BuilderPropertyKey> all = new HashSet<>();
 
@@ -36,12 +38,19 @@ public class BlackDuckServerConfigKeys {
         apiToken.addAll(common);
         apiToken.add(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
 
+        bearerToken.addAll(common);
+        bearerToken.add(BlackDuckServerConfigBuilder.BEARER_TOKEN_KEY);
+
+        anyToken.addAll(apiToken);
+        anyToken.addAll(bearerToken);
+
         credentials.addAll(common);
         credentials.add(BlackDuckServerConfigBuilder.USERNAME_KEY);
         credentials.add(BlackDuckServerConfigBuilder.PASSWORD_KEY);
 
         all.addAll(common);
         all.add(BlackDuckServerConfigBuilder.API_TOKEN_KEY);
+        all.add(BlackDuckServerConfigBuilder.BEARER_TOKEN_KEY);
         all.add(BlackDuckServerConfigBuilder.USERNAME_KEY);
         all.add(BlackDuckServerConfigBuilder.PASSWORD_KEY);
     }
