@@ -11,6 +11,10 @@ import com.blackduck.integration.blackduck.api.core.response.UrlMultipleResponse
 import com.blackduck.integration.blackduck.api.generated.discovery.ApiDiscovery;
 import com.blackduck.integration.blackduck.api.generated.view.UserGroupView;
 import com.blackduck.integration.blackduck.api.generated.view.UserView;
+import com.blackduck.integration.blackduck.http.BlackDuckQuery;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestBuilder;
+import com.blackduck.integration.blackduck.http.BlackDuckRequestFilter;
+import com.blackduck.integration.blackduck.service.request.BlackDuckMultipleRequest;
 import com.blackduck.integration.blackduck.api.manual.temporary.component.AssignedUserGroupRequest;
 import com.blackduck.integration.blackduck.api.manual.temporary.component.AssignedUserRequest;
 import com.blackduck.integration.blackduck.api.manual.temporary.response.AssignedUserGroupView;
@@ -106,15 +110,24 @@ public class ProjectUsersService extends DataService {
     }
 
     public void addGroupToProject(ProjectView projectView, String groupName) throws IntegrationException {
-        Optional<UserGroupView> optionalUserGroupView = userGroupService.getGroupByName(groupName);
-        UserGroupView userGroupView = optionalUserGroupView.orElseThrow(() -> new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName)));
-
-        HttpUrl userGroupUrl = userGroupView.getHref();
+        UserGroupView userGroupView = resolveGroupByName(groupName);
         HttpUrl createUrl = projectView.getFirstLink(ProjectView.USERGROUPS_LINK);
-
         AssignedUserGroupRequest userGroupRequest = new AssignedUserGroupRequest();
-        userGroupRequest.setGroup(userGroupUrl.string());
+        userGroupRequest.setGroup(userGroupView.getHref().string());
         blackDuckApiClient.post(createUrl, userGroupRequest);
+    }
+
+    private UserGroupView resolveGroupByName(String groupName) throws IntegrationException {
+        BlackDuckMultipleRequest<UserGroupView> request = new BlackDuckRequestBuilder()
+            .commonGet()
+            .addBlackDuckQuery(new BlackDuckQuery("name", groupName))
+            .addBlackDuckFilter(BlackDuckRequestFilter.createFilterWithSingleValue("exactName", "true"))
+            .buildBlackDuckRequest(apiDiscovery.metaMultipleResponses(ApiDiscovery.USERGROUPS_PATH));
+        List<UserGroupView> matches = blackDuckApiClient.getAllResponses(request);
+        if (matches.size() != 1) {
+            throw new IntegrationException(String.format("The supplied group name (%s) does not exist.", groupName));
+        }
+        return matches.get(0);
     }
 
     public void addUserToProject(ProjectView projectView, String username) throws IntegrationException {
